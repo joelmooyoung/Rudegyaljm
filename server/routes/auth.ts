@@ -19,6 +19,25 @@ const users: User[] = [
     subscriptionStatus: "none",
     createdAt: new Date(),
   },
+  {
+    id: "premium1",
+    email: "premium@test.com",
+    username: "premiumuser",
+    role: "premium",
+    isAgeVerified: true,
+    subscriptionStatus: "active",
+    subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+    createdAt: new Date(),
+  },
+  {
+    id: "free1",
+    email: "free@test.com",
+    username: "freeuser",
+    role: "free",
+    isAgeVerified: true,
+    subscriptionStatus: "none",
+    createdAt: new Date(),
+  },
 ];
 
 const loginLogs: LoginLog[] = [];
