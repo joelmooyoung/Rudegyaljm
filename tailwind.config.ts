@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Storytelling platform specific colors
+        story: {
+          card: "hsl(var(--story-card))",
+          "card-hover": "hsl(var(--story-card-hover))",
+        },
+        premium: {
+          DEFAULT: "hsl(var(--premium-gradient-from))",
+          secondary: "hsl(var(--premium-gradient-to))",
+          badge: "hsl(var(--premium-badge))",
+        },
+        free: {
+          badge: "hsl(var(--free-badge))",
+        },
+        rating: {
+          star: "hsl(var(--rating-star))",
+        },
+        category: {
+          tag: "hsl(var(--category-tag))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
