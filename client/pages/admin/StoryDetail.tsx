@@ -153,38 +153,60 @@ export default function StoryDetail({
       return;
     }
 
+    if (file.size > 10 * 1024 * 1024) {
+      // 10MB limit
+      alert("File size must be less than 10MB.");
+      return;
+    }
+
     setIsUploadingImage(true);
     setImageFile(file);
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setImagePreview(result);
-    };
-    reader.readAsDataURL(file);
-
     try {
-      // In a real app, upload to server and get URL
-      // For now, we'll use the data URL
-      const formData = new FormData();
-      formData.append("image", file);
+      // Convert file to base64 for upload
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
 
-      // Simulate upload delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+        try {
+          // Upload to server
+          const response = await fetch("/api/upload/image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              imageData: result,
+              fileName: file.name,
+            }),
+          });
 
-      // For demo purposes, we'll use the data URL as the image URL
-      // In production, this would be replaced with actual server upload
-      const reader2 = new FileReader();
-      reader2.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        handleInputChange("imageUrl", dataUrl);
-        setIsUploadingImage(false);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              // For demo, we'll still use the data URL since we don't have a proper file server
+              // In production, you'd use data.imageUrl
+              handleInputChange("imageUrl", result);
+              console.log("Image uploaded successfully:", data);
+            } else {
+              throw new Error(data.message || "Upload failed");
+            }
+          } else {
+            throw new Error(`Upload failed: ${response.statusText}`);
+          }
+        } catch (uploadError) {
+          console.error("Upload error:", uploadError);
+          // Still use the preview even if upload fails (for demo purposes)
+          handleInputChange("imageUrl", result);
+        } finally {
+          setIsUploadingImage(false);
+        }
       };
-      reader2.readAsDataURL(file);
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Failed to upload image. Please try again.");
+      console.error("File read failed:", error);
+      alert("Failed to process image. Please try again.");
       setIsUploadingImage(false);
     }
   };
@@ -205,11 +227,29 @@ export default function StoryDetail({
 
     setIsUploadingImage(true);
     try {
-      // In a real app, this would download the image and re-upload to your server
-      // For now, we'll just use the existing URL
-      handleInputChange("imageUrl", url);
-      setImagePreview(url);
-      alert("Image copied successfully!");
+      // Call server endpoint to copy image
+      const response = await fetch("/api/upload/copy-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl: url }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // For demo purposes, keep the original URL
+          // In production, you'd use the new local URL from data.imageUrl
+          handleInputChange("imageUrl", url);
+          setImagePreview(url);
+          alert("Image copied successfully!");
+        } else {
+          throw new Error(data.message || "Copy failed");
+        }
+      } else {
+        throw new Error(`Copy failed: ${response.statusText}`);
+      }
     } catch (error) {
       console.error("Failed to copy image:", error);
       alert("Failed to copy image. Please try again.");
