@@ -97,9 +97,10 @@ const mockUser: UserType = {
 
 interface HomeProps {
   user?: UserType;
+  onLogout?: () => void;
 }
 
-export default function Home({ user = mockUser }: HomeProps) {
+export default function Home({ user = mockUser, onLogout }: HomeProps) {
   const [stories, setStories] = useState<Story[]>(mockStories);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -237,7 +238,7 @@ export default function Home({ user = mockUser }: HomeProps) {
                   {user.role}
                 </Badge>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={onLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
