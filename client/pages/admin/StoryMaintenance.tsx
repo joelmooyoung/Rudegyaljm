@@ -78,11 +78,22 @@ export default function StoryMaintenance({
   }, []);
 
   const filteredStories = stories.filter((story) => {
+    // Defensive programming - ensure story has required properties
+    if (
+      !story ||
+      !story.title ||
+      !story.author ||
+      !story.tags ||
+      !Array.isArray(story.tags)
+    ) {
+      return false;
+    }
+
     const matchesSearch =
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       story.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      story.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase()),
+      story.tags.some(
+        (tag) => tag && tag.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
     const matchesCategory =
