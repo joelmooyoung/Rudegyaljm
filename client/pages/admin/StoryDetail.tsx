@@ -148,60 +148,6 @@ export default function StoryDetail({
     }
   };
 
-  // Handle URL input
-  const handleUrlChange = (url: string) => {
-    handleInputChange("image", url);
-    if (url) {
-      setImagePreview(url);
-    } else {
-      setImagePreview("");
-    }
-  };
-
-  // Copy existing image from URL
-  const copyImageFromUrl = async (url: string) => {
-    if (!url) return;
-
-    setIsUploadingImage(true);
-    try {
-      // Call server endpoint to copy image
-      const response = await fetch("/api/upload/copy-url", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ imageUrl: url }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          // For demo purposes, keep the original URL
-          // In production, you'd use the new local URL from data.imageUrl
-          handleInputChange("image", url);
-          setImagePreview(url);
-          alert("Image copied successfully!");
-        } else {
-          throw new Error(data.message || "Copy failed");
-        }
-      } else {
-        throw new Error(`Copy failed: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error("Failed to copy image:", error);
-      alert("Failed to copy image. Please try again.");
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-  // Remove image
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview("");
-    handleInputChange("image", "");
-  };
-
   const handleSave = () => {
     const storyData: Partial<Story> = {
       ...formData,
