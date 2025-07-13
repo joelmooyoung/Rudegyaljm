@@ -55,7 +55,13 @@ export default function StoryMaintenance({
       const response = await fetch("/api/stories");
       if (response.ok) {
         const data = await response.json();
-        setStories(data);
+        // Convert date strings back to Date objects
+        const storiesWithDates = data.map((story: any) => ({
+          ...story,
+          createdAt: new Date(story.createdAt),
+          updatedAt: new Date(story.updatedAt),
+        }));
+        setStories(storiesWithDates);
       } else {
         console.error("Failed to fetch stories:", response.statusText);
       }
