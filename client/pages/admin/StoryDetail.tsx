@@ -36,6 +36,11 @@ import {
   Star,
   Type,
   Code,
+  Upload,
+  Copy,
+  Link,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Story } from "@shared/api";
 
@@ -71,6 +76,10 @@ export default function StoryDetail({
   const [plainTextInput, setPlainTextInput] = useState("");
   const [isPlainTextDialogOpen, setIsPlainTextDialogOpen] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
 
   useEffect(() => {
     if (story) {
