@@ -12,10 +12,11 @@ import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import StoryMaintenance from "./pages/admin/StoryMaintenance";
+import StoryDetail from "./pages/admin/StoryDetail";
 import UserMaintenance from "./pages/admin/UserMaintenance";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
-import { User } from "@shared/api";
+import { User, Story } from "@shared/api";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,8 @@ const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentView, setCurrentView] = useState<string>("home");
+  const [currentStory, setCurrentStory] = useState<Story | null>(null);
+  const [storyMode, setStoryMode] = useState<"add" | "edit">("add");
 
   useEffect(() => {
     // Check if user has already been age verified in this session
@@ -75,6 +78,23 @@ const App = () => {
     setCurrentView("home");
   };
 
+  const handleEditStory = (story: Story | null, mode: "add" | "edit") => {
+    setCurrentStory(story);
+    setStoryMode(mode);
+    setCurrentView("admin-story-detail");
+  };
+
+  const handleBackToStories = () => {
+    setCurrentView("admin-stories");
+  };
+
+  const handleSaveStory = (storyData: Partial<Story>) => {
+    // In a real app, this would save to the database
+    console.log("Saving story:", storyData);
+    // Navigate back to story maintenance
+    setCurrentView("admin-stories");
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -122,7 +142,21 @@ const App = () => {
 
     switch (currentView) {
       case "admin-stories":
-        return <StoryMaintenance onBack={handleBackToHome} />;
+        return (
+          <StoryMaintenance
+            onBack={handleBackToHome}
+            onEditStory={handleEditStory}
+          />
+        );
+      case "admin-story-detail":
+        return (
+          <StoryDetail
+            story={currentStory}
+            mode={storyMode}
+            onBack={handleBackToStories}
+            onSave={handleSaveStory}
+          />
+        );
       case "admin-users":
         return <UserMaintenance onBack={handleBackToHome} />;
       case "admin-login-logs":
