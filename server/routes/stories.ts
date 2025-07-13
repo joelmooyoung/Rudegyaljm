@@ -213,7 +213,7 @@ export const createStory: RequestHandler = (req, res) => {
       rating: storyData.rating || 0,
       ratingCount: storyData.ratingCount || 0,
       viewCount: storyData.viewCount || 0,
-      image: storyData.imageUrl || undefined,
+      image: storyData.image || undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
