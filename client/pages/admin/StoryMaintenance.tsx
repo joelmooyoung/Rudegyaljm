@@ -48,6 +48,29 @@ export default function StoryMaintenance({
 
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
+  // Fetch stories from server
+  const fetchStories = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/stories");
+      if (response.ok) {
+        const data = await response.json();
+        setStories(data);
+      } else {
+        console.error("Failed to fetch stories:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load stories on component mount
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
   const filteredStories = stories.filter((story) => {
     const matchesSearch =
       story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
