@@ -88,11 +88,42 @@ const App = () => {
     setCurrentView("admin-stories");
   };
 
-  const handleSaveStory = (storyData: Partial<Story>) => {
-    // In a real app, this would save to the database
-    console.log("Saving story:", storyData);
-    // Navigate back to story maintenance
-    setCurrentView("admin-stories");
+  const handleSaveStory = async (storyData: Partial<Story>) => {
+    try {
+      let response;
+      if (storyMode === "add") {
+        // Create new story
+        response = await fetch("/api/stories", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(storyData),
+        });
+      } else {
+        // Update existing story
+        response = await fetch(`/api/stories/${storyData.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(storyData),
+        });
+      }
+
+      if (response.ok) {
+        const savedStory = await response.json();
+        console.log("Story saved successfully:", savedStory);
+        // Navigate back to story maintenance
+        setCurrentView("admin-stories");
+      } else {
+        console.error("Failed to save story:", response.statusText);
+        alert("Failed to save story. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving story:", error);
+      alert("Error saving story. Please try again.");
+    }
   };
 
   if (isLoading) {
