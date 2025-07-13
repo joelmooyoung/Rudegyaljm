@@ -44,66 +44,6 @@ import {
 } from "lucide-react";
 import { Story } from "@shared/api";
 
-// Image compression utility
-const compressImage = (
-  file: File,
-  maxWidth: number = 1200,
-  quality: number = 0.8,
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-
-    img.onload = () => {
-      try {
-        // Calculate new dimensions while maintaining aspect ratio
-        let { width, height } = img;
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        // Draw and compress
-        if (!ctx) {
-          throw new Error("Unable to get canvas context");
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Convert to data URL with compression
-        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
-
-        // Clean up the object URL
-        URL.revokeObjectURL(img.src);
-
-        resolve(compressedDataUrl);
-      } catch (error) {
-        URL.revokeObjectURL(img.src);
-        reject(
-          new Error(
-            "Failed to compress image: " +
-              (error instanceof Error ? error.message : "Unknown error"),
-          ),
-        );
-      }
-    };
-
-    img.onerror = (event) => {
-      URL.revokeObjectURL(img.src); // Clean up the object URL
-      reject(new Error("Failed to load image for compression"));
-    };
-
-    try {
-      img.src = URL.createObjectURL(file);
-    } catch (error) {
-      reject(new Error("Failed to create object URL for image"));
-    }
-  });
-};
-
 interface StoryDetailProps {
   story?: Story | null;
   mode: "add" | "edit";
