@@ -55,11 +55,14 @@ export default function StoryMaintenance({
       const response = await fetch("/api/stories");
       if (response.ok) {
         const data = await response.json();
-        // Convert date strings back to Date objects
-        const storiesWithDates = data.map((story: any) => ({
+        // Convert date strings back to Date objects and ensure data integrity
+        const storiesWithDates = (data || []).map((story: any) => ({
           ...story,
-          createdAt: new Date(story.createdAt),
-          updatedAt: new Date(story.updatedAt),
+          title: story.title || "Untitled",
+          author: story.author || "Unknown Author",
+          tags: Array.isArray(story.tags) ? story.tags : [],
+          createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
+          updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
         }));
         setStories(storiesWithDates);
       } else {
