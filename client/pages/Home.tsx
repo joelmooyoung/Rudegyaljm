@@ -169,8 +169,7 @@ export default function Home({
       className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
       onClick={() => handleStoryClick(story)}
     >
-            {/* Story Header */}
-      <(
+                  {/* Story Header */}
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
