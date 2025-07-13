@@ -60,10 +60,11 @@ export default function StoryDetail({
     excerpt: "",
     tags: [],
     accessLevel: "free",
-    isPublished: false,
+    isPublished: mode === "add" ? true : false, // Default to published for new stories
     rating: 0,
     ratingCount: 0,
     viewCount: 0,
+    imageUrl: "",
     ...story,
   });
 
@@ -242,6 +243,43 @@ export default function StoryDetail({
                     value={tagsInput}
                     onChange={(e) => handleTagsChange(e.target.value)}
                   />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">Story Image URL</Label>
+                  <Input
+                    id="imageUrl"
+                    type="url"
+                    placeholder="https://example.com/story-image.jpg"
+                    value={formData.imageUrl || ""}
+                    onChange={(e) =>
+                      handleInputChange("imageUrl", e.target.value)
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Provide a URL to an image that represents your story.
+                    Recommended size: 400x600px
+                  </p>
+                </div>
+                <div>
+                  {formData.imageUrl && (
+                    <div className="space-y-2">
+                      <Label>Image Preview</Label>
+                      <div className="border rounded-md overflow-hidden bg-muted/20">
+                        <img
+                          src={formData.imageUrl}
+                          alt="Story preview"
+                          className="w-full h-32 object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
