@@ -200,10 +200,16 @@ export default function StoryDetail({
   };
 
   const handlePlainTextConfirm = () => {
-    const htmlContent = convertPlainTextToHTML(plainTextInput);
-    handleInputChange("content", htmlContent);
-    setPlainTextInput("");
-    setIsPlainTextDialogOpen(false);
+    try {
+      const htmlContent = convertPlainTextToHTML(plainTextInput);
+      handleInputChange("content", htmlContent);
+      setPlainTextInput("");
+      if (typeof setIsPlainTextDialogOpen === "function") {
+        setIsPlainTextDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Error in handlePlainTextConfirm:", error);
+    }
   };
 
   // Handle file upload
