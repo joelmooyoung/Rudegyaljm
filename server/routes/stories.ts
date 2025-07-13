@@ -18,7 +18,7 @@ let stories: Story[] = [
     rating: 4.8,
     ratingCount: 234,
     viewCount: 1542,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1518136247453-74e7b5265980?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-01-15"),
@@ -38,7 +38,7 @@ let stories: Story[] = [
     rating: 4.9,
     ratingCount: 156,
     viewCount: 892,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-10"),
     updatedAt: new Date("2024-01-10"),
@@ -58,7 +58,7 @@ let stories: Story[] = [
     rating: 4.6,
     ratingCount: 89,
     viewCount: 456,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-08"),
     updatedAt: new Date("2024-01-08"),
@@ -78,7 +78,7 @@ let stories: Story[] = [
     rating: 4.2,
     ratingCount: 67,
     viewCount: 234,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-05"),
     updatedAt: new Date("2024-01-06"),
@@ -98,7 +98,7 @@ let stories: Story[] = [
     rating: 4.4,
     ratingCount: 123,
     viewCount: 789,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-03"),
     updatedAt: new Date("2024-01-03"),
@@ -117,7 +117,7 @@ let stories: Story[] = [
     rating: 4.7,
     ratingCount: 198,
     viewCount: 1123,
-    imageUrl:
+    image:
       "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-02"),
@@ -213,7 +213,7 @@ export const createStory: RequestHandler = (req, res) => {
       rating: storyData.rating || 0,
       ratingCount: storyData.ratingCount || 0,
       viewCount: storyData.viewCount || 0,
-      imageUrl: storyData.imageUrl || undefined,
+      image: storyData.imageUrl || undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
