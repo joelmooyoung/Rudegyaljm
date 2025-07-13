@@ -17,6 +17,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
   BookOpen,
   Star,
   Eye,
@@ -33,100 +40,79 @@ import {
   Activity,
   AlertTriangle,
   ChevronDown,
+  Heart,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Story, User as UserType } from "@shared/api";
-
-// Mock data for now
-const mockStories: Story[] = [
-  {
-    id: "1",
-    title: "Midnight Desires",
-    excerpt:
-      "A passionate tale of forbidden romance that unfolds under the cover of darkness...",
-    content: "",
-    author: "Elena Rossini",
-    category: "Romance",
-    tags: ["passion", "forbidden", "dark"],
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.8,
-    ratingCount: 234,
-    viewCount: 1542,
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  },
-  {
-    id: "2",
-    title: "The Executive's Secret",
-    excerpt:
-      "Power, money, and desire collide in this steamy corporate thriller...",
-    content: "",
-    author: "Marcus Steel",
-    category: "Thriller",
-    tags: ["corporate", "power", "secrets"],
-    accessLevel: "premium",
-    isPublished: true,
-    rating: 4.9,
-    ratingCount: 156,
-    viewCount: 892,
-    createdAt: new Date("2024-01-10"),
-    updatedAt: new Date("2024-01-10"),
-  },
-  {
-    id: "3",
-    title: "Summer Heat",
-    excerpt:
-      "A vacation romance that turns into something much more intense...",
-    content: "",
-    author: "Sofia Martinez",
-    category: "Contemporary",
-    tags: ["vacation", "summer", "romance"],
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.6,
-    ratingCount: 89,
-    viewCount: 456,
-    createdAt: new Date("2024-01-08"),
-    updatedAt: new Date("2024-01-08"),
-  },
-];
-
-const mockUser: UserType = {
-  id: "1",
-  email: "user@example.com",
-  username: "reader123",
-  role: "free",
-  isAgeVerified: true,
-  subscriptionStatus: "none",
-  createdAt: new Date(),
-};
 
 interface HomeProps {
   user?: UserType;
   onLogout?: () => void;
   onNavigateToAdmin?: (section: string) => void;
+  onReadStory?: (story: Story) => void;
 }
 
 export default function Home({
-  user = mockUser,
+  user,
   onLogout,
   onNavigateToAdmin,
+  onReadStory,
 }: HomeProps) {
-  const [stories, setStories] = useState<Story[]>(mockStories);
+  const [stories, setStories] = useState<Story[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const categories = ["all", "Romance", "Thriller", "Contemporary", "Fantasy"];
+  const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
-  const filteredStories = stories
+  // Fetch stories from server
+  const fetchStories = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/stories");
+      if (response.ok) {
+        const data = await response.json();
+        // Convert date strings back to Date objects
+        const storiesWithDates = (data || []).map((story: any) => ({
+          ...story,
+          title: story.title || "Untitled",
+          author: story.author || "Unknown Author",
+          tags: Array.isArray(story.tags) ? story.tags : [],
+          createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
+          updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
+        }));
+        setStories(storiesWithDates);
+      } else {
+        console.error("Failed to fetch stories:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load stories on component mount
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  // Filter stories based on user role
+  const getVisibleStories = () => {
+    let visibleStories = stories.filter((story) => story.isPublished);
+
+    // Apply role-based filtering
+    if (user?.role === "free") {
+      visibleStories = visibleStories.filter(
+        (story) => story.accessLevel === "free",
+      );
+    }
+    // Admin and premium users see all stories
+
+    return visibleStories;
+  };
+
+  const filteredStories = getVisibleStories()
     .filter((story) => {
       const matchesSearch =
         story.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,6 +125,12 @@ export default function Home({
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
+      // For admin and premium users, sort premium stories first
+      if (user?.role !== "free") {
+        if (a.accessLevel === "premium" && b.accessLevel === "free") return -1;
+        if (a.accessLevel === "free" && b.accessLevel === "premium") return 1;
+      }
+
       switch (sortBy) {
         case "rating":
           return b.rating - a.rating;
@@ -150,22 +142,32 @@ export default function Home({
       }
     });
 
+  const handleStoryClick = (story: Story) => {
+    if (onReadStory) {
+      onReadStory(story);
+    }
+  };
+
   const renderStoryCard = (story: Story) => (
     <Card
       key={story.id}
-      className="bg-story-card hover:bg-story-card-hover transition-colors cursor-pointer border-border/50 group"
+      className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
+      onClick={() => handleStoryClick(story)}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">
-              {story.title}
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              by {story.author}
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
+      {/* Story Image Background */}
+      {story.imageUrl && (
+        <div className="relative h-48 bg-muted/20 overflow-hidden">
+          <img
+            src={story.imageUrl}
+            alt={story.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.parentElement!.style.display = "none";
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute top-3 right-3 flex flex-col gap-2">
             <Badge
               variant={
                 story.accessLevel === "premium" ? "default" : "secondary"
@@ -174,23 +176,59 @@ export default function Home({
                 story.accessLevel === "premium"
                   ? "bg-premium text-primary-foreground"
                   : "bg-free-badge text-background"
-              }`}
+              } shadow-lg`}
             >
-              {story.accessLevel === "premium" ? (
+              {story.accessLevel === "premium" && (
                 <Crown className="h-3 w-3 mr-1" />
-              ) : null}
+              )}
               {story.accessLevel}
             </Badge>
           </div>
+          <div className="absolute bottom-3 left-3 right-3">
+            <h3 className="text-white font-semibold text-lg line-clamp-2 mb-1">
+              {story.title}
+            </h3>
+            <p className="text-white/90 text-sm">by {story.author}</p>
+          </div>
         </div>
-      </CardHeader>
+      )}
+
+      {/* Fallback for stories without images */}
+      {!story.imageUrl && (
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                {story.title}
+              </CardTitle>
+              <CardDescription>by {story.author}</CardDescription>
+            </div>
+            <Badge
+              variant={
+                story.accessLevel === "premium" ? "default" : "secondary"
+              }
+              className={
+                story.accessLevel === "premium"
+                  ? "bg-premium text-primary-foreground"
+                  : "bg-free-badge text-background"
+              }
+            >
+              {story.accessLevel === "premium" && (
+                <Crown className="h-3 w-3 mr-1" />
+              )}
+              {story.accessLevel}
+            </Badge>
+          </div>
+        </CardHeader>
+      )}
+
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground line-clamp-2">
           {story.excerpt}
         </p>
 
         <div className="flex flex-wrap gap-1">
-          {story.tags.map((tag) => (
+          {story.tags.slice(0, 3).map((tag) => (
             <Badge
               key={tag}
               variant="outline"
@@ -199,6 +237,11 @@ export default function Home({
               {tag}
             </Badge>
           ))}
+          {story.tags.length > 3 && (
+            <Badge variant="outline" className="text-xs">
+              +{story.tags.length - 3}
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-2 text-sm text-muted-foreground">
@@ -224,6 +267,20 @@ export default function Home({
       </CardContent>
     </Card>
   );
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Please sign in</h3>
+          <p className="text-muted-foreground">
+            You need to be signed in to view stories
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -316,11 +373,16 @@ export default function Home({
         {/* Hero section */}
         <section className="mb-12 text-center">
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Discover Your Next Favorite Story
+            {user.role === "admin"
+              ? "All Stories - Admin View"
+              : user.role === "premium"
+                ? "Premium & Free Stories"
+                : "Free Stories"}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Immerse yourself in premium adult fiction crafted by talented
-            writers from around the world
+            {user.role === "free"
+              ? "Enjoy our collection of free stories. Upgrade to premium for exclusive content!"
+              : "Access our complete library of premium and free stories"}
           </p>
 
           {user.role === "free" && (
@@ -392,11 +454,18 @@ export default function Home({
 
         {/* Stories grid */}
         <section>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredStories.map(renderStoryCard)}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading stories...</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredStories.map(renderStoryCard)}
+            </div>
+          )}
 
-          {filteredStories.length === 0 && (
+          {!isLoading && filteredStories.length === 0 && (
             <div className="text-center py-12">
               <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
