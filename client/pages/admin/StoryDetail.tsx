@@ -240,9 +240,14 @@ export default function StoryDetail({
             throw new Error(data.message || "Upload failed");
           }
         } else {
-          const errorText = await response.text();
+          let errorText = "";
+          try {
+            errorText = await response.text();
+          } catch (textError) {
+            errorText = "Unable to read error details";
+          }
           throw new Error(
-            `Upload failed: ${response.status} ${response.statusText} - ${errorText}`,
+            `Upload failed: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ""}`,
           );
         }
       } catch (uploadError) {
