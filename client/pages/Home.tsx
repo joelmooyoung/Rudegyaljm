@@ -99,15 +99,20 @@ export default function Home({
 
   // Filter stories based on user role
   const getVisibleStories = () => {
-    let visibleStories = stories.filter((story) => story.isPublished);
+    let visibleStories;
 
-    // Apply role-based filtering
-    if (user?.role === "free") {
-      visibleStories = visibleStories.filter(
-        (story) => story.accessLevel === "free",
+    if (user?.role === "admin") {
+      // Administrators see ALL stories (including unpublished drafts)
+      visibleStories = stories;
+    } else if (user?.role === "premium") {
+      // Premium users see all published stories (both free and premium)
+      visibleStories = stories.filter((story) => story.isPublished);
+    } else {
+      // Free users only see published free stories
+      visibleStories = stories.filter(
+        (story) => story.isPublished && story.accessLevel === "free",
       );
     }
-    // Admin and premium users see all stories
 
     return visibleStories;
   };
@@ -183,6 +188,11 @@ export default function Home({
               )}
               {story.accessLevel}
             </Badge>
+            {!story.isPublished && (
+              <Badge variant="outline" className="bg-background/90 text-xs">
+                Draft
+              </Badge>
+            )}
           </div>
           <div className="absolute bottom-3 left-3 right-3">
             <h3 className="text-white font-semibold text-lg line-clamp-2 mb-1">
@@ -380,9 +390,18 @@ export default function Home({
                 : "Free Stories"}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            {user.role === "free"
-              ? "Enjoy our collection of free stories. Upgrade to premium for exclusive content!"
-              : "Access our complete library of premium and free stories"}
+            {user.role === "admin"
+              ? "Manage and view all stories including drafts and published content"
+              : user.role === "free"
+                ? "Enjoy our collection of free stories. Upgrade to premium for exclusive content!"
+                : "Access our complete library of premium and free stories"}
+          </p>
+
+          {/* Show story count for debugging */}
+          <p className="text-sm text-muted-foreground mb-4">
+            Showing {filteredStories.length} of {stories.length} stories
+            {user.role === "admin" &&
+              ` (including ${stories.filter((s) => !s.isPublished).length} drafts)`}
           </p>
 
           {user.role === "free" && (
@@ -460,9 +479,27 @@ export default function Home({
               <p className="text-muted-foreground">Loading stories...</p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredStories.map(renderStoryCard)}
-            </div>
+            <>
+              {/* Debug info for admins */}
+              {user.role === "admin" && stories.length > 0 && (
+                <div className="mb-4 p-4 bg-muted/30 rounded-lg text-sm">
+                  <strong>Admin Debug Info:</strong>
+                  <br />• Total stories in database: {stories.length}
+                  <br />• Published:{" "}
+                  {stories.filter((s) => s.isPublished).length}
+                  <br />• Drafts: {stories.filter((s) => !s.isPublished).length}
+                  <br />• Premium:{" "}
+                  {stories.filter((s) => s.accessLevel === "premium").length}
+                  <br />• Free:{" "}
+                  {stories.filter((s) => s.accessLevel === "free").length}
+                  <br />• After filtering: {filteredStories.length}
+                </div>
+              )}
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredStories.map(renderStoryCard)}
+              </div>
+            </>
           )}
 
           {!isLoading && filteredStories.length === 0 && (
