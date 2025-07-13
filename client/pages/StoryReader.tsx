@@ -38,52 +38,87 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
 
-  // Mock comments data
+  // Load initial data
   useEffect(() => {
-    const mockComments: Comment[] = [
-      {
-        id: "1",
-        storyId: story.id,
-        userId: "user1",
-        username: "BookLover92",
-        content:
-          "This story was absolutely captivating! The character development was incredible.",
-        isEdited: false,
-        createdAt: new Date("2024-01-10"),
-        updatedAt: new Date("2024-01-10"),
-      },
-      {
-        id: "2",
-        storyId: story.id,
-        userId: "user2",
-        username: "StoryFan",
-        content:
-          "I couldn't put it down. The plot twists kept me on the edge of my seat!",
-        isEdited: false,
-        createdAt: new Date("2024-01-11"),
-        updatedAt: new Date("2024-01-11"),
-      },
-    ];
-    setComments(mockComments);
-  }, [story.id]);
+    const loadInitialData = async () => {
+      try {
+        // Load comments
+        const commentsResponse = await fetch(
+          `/api/stories/${story.id}/comments`,
+        );
+        if (commentsResponse.ok) {
+          const commentsData = await commentsResponse.json();
+          setComments(
+            commentsData.map((comment: any) => ({
+              ...comment,
+              createdAt: new Date(comment.createdAt),
+              updatedAt: new Date(comment.updatedAt),
+            })),
+          );
+        }
+
+        // Load user interaction (rating and like status)
+        const interactionResponse = await fetch(
+          `/api/stories/${story.id}/user-interaction?userId=${user.id}`,
+        );
+        if (interactionResponse.ok) {
+          const interactionData = await interactionResponse.json();
+          setUserRating(interactionData.rating || 0);
+          setIsLiked(interactionData.liked || false);
+        }
+      } catch (error) {
+        console.error("Failed to load initial data:", error);
+      }
+    };
+
+    loadInitialData();
+  }, [story.id, user.id]);
 
   const handleLike = async () => {
-    setIsLiked(!isLiked);
-    // In a real app, this would call the API
-    console.log("Like toggled:", !isLiked);
+    try {
+      const response = await fetch(`/api/stories/${story.id}/like`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setIsLiked(result.liked);
+      } else {
+        console.error("Failed to toggle like");
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
   const handleRating = async (rating: number) => {
     if (isSubmittingRating) return;
 
     setIsSubmittingRating(true);
-    setUserRating(rating);
 
     try {
-      // In a real app, this would call the API
-      console.log("Rating submitted:", rating);
+      const response = await fetch(`/api/stories/${story.id}/rating`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          score: rating,
+          userId: user.id,
+        }),
+      });
+
+      if (response.ok) {
+        setUserRating(rating);
+      } else {
+        console.error("Failed to submit rating");
+      }
     } catch (error) {
-      console.error("Failed to submit rating:", error);
+      console.error("Error submitting rating:", error);
     } finally {
       setIsSubmittingRating(false);
     }
@@ -95,24 +130,32 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     setIsSubmittingComment(true);
 
     try {
-      const comment: Comment = {
-        id: Date.now().toString(),
-        storyId: story.id,
-        userId: user.id,
-        username: user.username,
-        content: newComment.trim(),
-        isEdited: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const response = await fetch(`/api/stories/${story.id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: newComment.trim(),
+          userId: user.id,
+          username: user.username,
+        }),
+      });
 
-      setComments([comment, ...comments]);
-      setNewComment("");
-
-      // In a real app, this would call the API
-      console.log("Comment submitted:", comment);
+      if (response.ok) {
+        const newCommentData = await response.json();
+        const comment: Comment = {
+          ...newCommentData,
+          createdAt: new Date(newCommentData.createdAt),
+          updatedAt: new Date(newCommentData.updatedAt),
+        };
+        setComments([comment, ...comments]);
+        setNewComment("");
+      } else {
+        console.error("Failed to submit comment");
+      }
     } catch (error) {
-      console.error("Failed to submit comment:", error);
+      console.error("Error submitting comment:", error);
     } finally {
       setIsSubmittingComment(false);
     }
