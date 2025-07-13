@@ -216,9 +216,10 @@ export default function StoryDetail({
     setIsUploadingImage(true);
     setImageFile(file);
 
+    let imageData: string | undefined;
+
     try {
       // Compress image to reduce size
-      let imageData: string;
 
       if (file.size > 2 * 1024 * 1024) {
         // If file is larger than 2MB, compress it
