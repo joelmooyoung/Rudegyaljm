@@ -85,6 +85,10 @@ export default function StoryDetail({
     if (story) {
       setFormData(story);
       setTagsInput(story.tags?.join(", ") || "");
+      // Set image preview if story has an image URL
+      if (story.imageUrl) {
+        setImagePreview(story.imageUrl);
+      }
     }
   }, [story]);
 
@@ -140,6 +144,85 @@ export default function StoryDetail({
     handleInputChange("content", htmlContent);
     setPlainTextInput("");
     setIsPlainTextDialogOpen(false);
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setImageFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setImagePreview(result);
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      // In a real app, upload to server and get URL
+      // For now, we'll use the data URL
+      const formData = new FormData();
+      formData.append("image", file);
+
+      // Simulate upload delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // For demo purposes, we'll use the data URL as the image URL
+      // In production, this would be replaced with actual server upload
+      const reader2 = new FileReader();
+      reader2.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        handleInputChange("imageUrl", dataUrl);
+        setIsUploadingImage(false);
+      };
+      reader2.readAsDataURL(file);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Failed to upload image. Please try again.");
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Handle URL input
+  const handleUrlChange = (url: string) => {
+    handleInputChange("imageUrl", url);
+    if (url) {
+      setImagePreview(url);
+    } else {
+      setImagePreview("");
+    }
+  };
+
+  // Copy existing image from URL
+  const copyImageFromUrl = async (url: string) => {
+    if (!url) return;
+
+    setIsUploadingImage(true);
+    try {
+      // In a real app, this would download the image and re-upload to your server
+      // For now, we'll just use the existing URL
+      handleInputChange("imageUrl", url);
+      setImagePreview(url);
+      alert("Image copied successfully!");
+    } catch (error) {
+      console.error("Failed to copy image:", error);
+      alert("Failed to copy image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Remove image
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    handleInputChange("imageUrl", "");
   };
 
   const handleSave = () => {
@@ -255,40 +338,127 @@ export default function StoryDetail({
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="imageUrl">Story Image URL</Label>
-                  <Input
-                    id="imageUrl"
-                    type="url"
-                    placeholder="https://example.com/story-image.jpg"
-                    value={formData.imageUrl || ""}
-                    onChange={(e) =>
-                      handleInputChange("imageUrl", e.target.value)
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Provide a URL to an image that represents your story.
-                    Recommended size: 400x600px
-                  </p>
+              {/* Image Upload Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Story Image</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                    >
+                      <Link className="h-4 w-4 mr-2" />
+                      {showUrlInput ? "Hide URL" : "Use URL"}
+                    </Button>
+                    {story?.imageUrl && mode === "edit" && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyImageFromUrl(story.imageUrl!)}
+                        disabled={isUploadingImage}
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy Current
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {formData.imageUrl && (
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    {/* File Upload */}
                     <div className="space-y-2">
-                      <Label>Image Preview</Label>
+                      <Label>Upload Image</Label>
+                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file);
+                          }}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className="cursor-pointer flex flex-col items-center gap-2"
+                        >
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <span className="text-sm font-medium">
+                            {isUploadingImage
+                              ? "Uploading..."
+                              : "Click to upload image"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            PNG, JPG, GIF up to 10MB
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* URL Input (conditional) */}
+                    {showUrlInput && (
+                      <div className="space-y-2">
+                        <Label htmlFor="imageUrl">Or use image URL</Label>
+                        <Input
+                          id="imageUrl"
+                          type="url"
+                          placeholder="https://example.com/image.jpg"
+                          value={formData.imageUrl || ""}
+                          onChange={(e) => handleUrlChange(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Image Preview */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Preview</Label>
+                      {imagePreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={removeImage}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    {imagePreview ? (
                       <div className="border rounded-md overflow-hidden bg-muted/20">
                         <img
-                          src={formData.imageUrl}
+                          src={imagePreview}
                           alt="Story preview"
-                          className="w-full h-32 object-cover"
+                          className="w-full h-48 object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = "none";
                           }}
                         />
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="border rounded-md bg-muted/20 h-48 flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                          <ImageIcon className="h-12 w-12 mx-auto mb-2" />
+                          <p className="text-sm">No image selected</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {imagePreview && (
+                      <p className="text-xs text-muted-foreground">
+                        Recommended size: 400x600px
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
