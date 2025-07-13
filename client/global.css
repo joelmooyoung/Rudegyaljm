@@ -4,94 +4,102 @@
 
 @layer base {
   /**
-   * Tailwind CSS theme
-   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
-   * A different format will require also updating the theme in tailwind.config.ts.
-  */
+   * Sophisticated Dark Theme for Adult Storytelling Platform
+   * Elegant, modern design with rich purples and warm accents
+   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark base theme */
+    --background: 225 12% 8%;
+    --foreground: 225 15% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 225 12% 10%;
+    --card-foreground: 225 15% 92%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 225 12% 12%;
+    --popover-foreground: 225 15% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Rich purple primary */
+    --primary: 270 70% 60%;
+    --primary-foreground: 225 15% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Warm secondary */
+    --secondary: 225 12% 15%;
+    --secondary-foreground: 225 15% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 225 12% 13%;
+    --muted-foreground: 225 8% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Gold accent for premium features */
+    --accent: 45 90% 65%;
+    --accent-foreground: 225 12% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 225 15% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 225 12% 18%;
+    --input: 225 12% 15%;
+    --ring: 270 70% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Storytelling platform specific colors */
+    --story-card: 225 12% 11%;
+    --story-card-hover: 225 12% 13%;
+    --premium-gradient-from: 270 70% 60%;
+    --premium-gradient-to: 310 70% 65%;
+    --free-badge: 150 60% 50%;
+    --premium-badge: 45 90% 65%;
+    --rating-star: 45 90% 65%;
+    --category-tag: 225 12% 16%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 225 12% 9%;
+    --sidebar-foreground: 225 15% 90%;
+    --sidebar-primary: 270 70% 60%;
+    --sidebar-primary-foreground: 225 15% 95%;
+    --sidebar-accent: 225 12% 14%;
+    --sidebar-accent-foreground: 225 15% 85%;
+    --sidebar-border: 225 12% 16%;
+    --sidebar-ring: 270 70% 60%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+  .light {
+    /* Light theme fallback (minimal use) */
+    --background: 225 15% 98%;
+    --foreground: 225 12% 8%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 225 15% 100%;
+    --card-foreground: 225 12% 10%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 225 15% 100%;
+    --popover-foreground: 225 12% 8%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 270 70% 50%;
+    --primary-foreground: 225 15% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 225 12% 90%;
+    --secondary-foreground: 225 12% 15%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 225 12% 94%;
+    --muted-foreground: 225 8% 45%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 90% 55%;
+    --accent-foreground: 225 12% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 225 15% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 225 12% 85%;
+    --input: 225 12% 90%;
+    --ring: 270 70% 50%;
+
+    --sidebar-background: 225 15% 96%;
+    --sidebar-foreground: 225 12% 15%;
+    --sidebar-primary: 270 70% 50%;
+    --sidebar-primary-foreground: 225 15% 98%;
+    --sidebar-accent: 225 12% 92%;
+    --sidebar-accent-foreground: 225 12% 20%;
+    --sidebar-border: 225 12% 88%;
+    --sidebar-ring: 270 70% 50%;
   }
 }
 
