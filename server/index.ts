@@ -8,6 +8,14 @@ import {
   getErrorLogs,
   clearLogs,
 } from "./routes/auth";
+import {
+  getStories,
+  getStory,
+  createStory,
+  updateStory,
+  deleteStory,
+  togglePublishStory,
+} from "./routes/stories";
 
 export function createServer() {
   const app = express();
@@ -27,6 +35,14 @@ export function createServer() {
   // Authentication routes
   app.post("/api/auth/login", handleLogin);
   app.post("/api/auth/register", handleRegister);
+
+  // Story routes
+  app.get("/api/stories", getStories);
+  app.get("/api/stories/:id", getStory);
+  app.post("/api/stories", createStory);
+  app.put("/api/stories/:id", updateStory);
+  app.delete("/api/stories/:id", deleteStory);
+  app.patch("/api/stories/:id/publish", togglePublishStory);
 
   // Admin routes for logs
   app.get("/api/admin/login-logs", getLoginLogs);
