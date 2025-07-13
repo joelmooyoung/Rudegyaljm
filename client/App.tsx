@@ -13,6 +13,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import StoryMaintenance from "./pages/admin/StoryMaintenance";
 import StoryDetail from "./pages/admin/StoryDetail";
+import StoryReader from "./pages/StoryReader";
 import UserMaintenance from "./pages/admin/UserMaintenance";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
@@ -27,6 +28,7 @@ const App = () => {
   const [currentView, setCurrentView] = useState<string>("home");
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [storyMode, setStoryMode] = useState<"add" | "edit">("add");
+  const [readingStory, setReadingStory] = useState<Story | null>(null);
 
   useEffect(() => {
     // Check if user has already been age verified in this session
@@ -86,6 +88,16 @@ const App = () => {
 
   const handleBackToStories = () => {
     setCurrentView("admin-stories");
+  };
+
+  const handleReadStory = (story: Story) => {
+    setReadingStory(story);
+    setCurrentView("story-reader");
+  };
+
+  const handleBackFromReader = () => {
+    setReadingStory(null);
+    setCurrentView("home");
   };
 
   const handleSaveStory = async (storyData: Partial<Story>) => {
@@ -188,6 +200,21 @@ const App = () => {
             onSave={handleSaveStory}
           />
         );
+      case "story-reader":
+        return readingStory && user ? (
+          <StoryReader
+            story={readingStory}
+            user={user}
+            onBack={handleBackFromReader}
+          />
+        ) : (
+          <Home
+            user={user}
+            onLogout={handleLogout}
+            onNavigateToAdmin={handleNavigateToAdmin}
+            onReadStory={handleReadStory}
+          />
+        );
       case "admin-users":
         return <UserMaintenance onBack={handleBackToHome} />;
       case "admin-login-logs":
@@ -201,6 +228,7 @@ const App = () => {
             user={user}
             onLogout={handleLogout}
             onNavigateToAdmin={handleNavigateToAdmin}
+            onReadStory={handleReadStory}
           />
         );
     }
