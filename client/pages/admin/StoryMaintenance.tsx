@@ -40,9 +40,13 @@ import { Story } from "@shared/api";
 
 interface StoryMaintenanceProps {
   onBack: () => void;
+  onEditStory: (story: Story | null, mode: "add" | "edit") => void;
 }
 
-export default function StoryMaintenance({ onBack }: StoryMaintenanceProps) {
+export default function StoryMaintenance({
+  onBack,
+  onEditStory,
+}: StoryMaintenanceProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
@@ -61,7 +65,7 @@ export default function StoryMaintenance({ onBack }: StoryMaintenanceProps) {
                 Story Maintenance
               </h1>
             </div>
-            <Button>
+            <Button onClick={() => onEditStory(null, "add")}>
               <Plus className="h-4 w-4 mr-2" />
               Add Story
             </Button>
@@ -100,9 +104,33 @@ export default function StoryMaintenance({ onBack }: StoryMaintenanceProps) {
                 publication status
               </p>
               <div className="flex justify-center gap-2">
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    onEditStory(
+                      {
+                        id: "sample1",
+                        title: "Sample Story",
+                        excerpt: "A sample story for demonstration",
+                        content:
+                          "<p>This is sample content with <strong>HTML formatting</strong>.</p>",
+                        author: "Sample Author",
+                        category: "Romance",
+                        tags: ["sample", "demo"],
+                        accessLevel: "free" as const,
+                        isPublished: false,
+                        rating: 4.5,
+                        ratingCount: 10,
+                        viewCount: 100,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                      },
+                      "edit",
+                    )
+                  }
+                >
                   <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Stories
+                  Edit Sample Story
                 </Button>
                 <Button variant="outline">
                   <Eye className="h-4 w-4 mr-2" />
