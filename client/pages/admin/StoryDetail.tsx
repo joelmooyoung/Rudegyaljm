@@ -56,22 +56,39 @@ const compressImage = (
     const img = new Image();
 
     img.onload = () => {
-      // Calculate new dimensions while maintaining aspect ratio
-      let { width, height } = img;
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
+      try {
+        // Calculate new dimensions while maintaining aspect ratio
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        if (!ctx) {
+          throw new Error("Unable to get canvas context");
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to data URL with compression
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+        // Clean up the object URL
+        URL.revokeObjectURL(img.src);
+
+        resolve(compressedDataUrl);
+      } catch (error) {
+        URL.revokeObjectURL(img.src);
+        reject(
+          new Error(
+            "Failed to compress image: " +
+              (error instanceof Error ? error.message : "Unknown error"),
+          ),
+        );
       }
-
-      canvas.width = width;
-      canvas.height = height;
-
-      // Draw and compress
-      ctx?.drawImage(img, 0, 0, width, height);
-
-      // Convert to data URL with compression
-      const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
-      resolve(compressedDataUrl);
     };
 
     img.onerror = (event) => {
