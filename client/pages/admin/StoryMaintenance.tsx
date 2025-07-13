@@ -204,7 +204,7 @@ export default function StoryMaintenance({
           </div>
         </div>
 
-                {/* Stories Grid */}
+        {/* Stories Grid */}
         <div className="max-h-[70vh] overflow-y-auto">
           {isLoading ? (
             <div className="text-center py-12">
@@ -213,65 +213,24 @@ export default function StoryMaintenance({
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredStories.map((story) => (
-              <Card
-                key={story.id}
-                className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group overflow-hidden"
-              >
-                {/* Story Image */}
-                {story.imageUrl && (
-                  <div className="relative h-32 bg-muted/20">
-                    <img
-                      src={story.imageUrl}
-                      alt={story.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.parentElement!.style.display = "none";
-                      }}
-                    />
-                    <div className="absolute top-2 right-2 flex flex-col gap-1">
-                      <Badge
-                        variant={
-                          story.accessLevel === "premium"
-                            ? "default"
-                            : "secondary"
-                        }
-                        className={`text-xs ${
-                          story.accessLevel === "premium"
-                            ? "bg-premium text-primary-foreground"
-                            : "bg-free-badge text-background"
-                        }`}
-                      >
-                        {story.accessLevel === "premium" && (
-                          <Crown className="h-3 w-3 mr-1" />
-                        )}
-                        {story.accessLevel}
-                      </Badge>
-                      {!story.isPublished && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-background/90"
-                        >
-                          Draft
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base leading-tight truncate group-hover:text-primary transition-colors">
-                        {story.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        by {story.author}
-                      </CardDescription>
-                    </div>
-                    {!story.imageUrl && (
-                      <div className="flex flex-col gap-1">
+              {filteredStories.map((story) => (
+                <Card
+                  key={story.id}
+                  className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group overflow-hidden"
+                >
+                  {/* Story Image */}
+                  {story.imageUrl && (
+                    <div className="relative h-32 bg-muted/20">
+                      <img
+                        src={story.imageUrl}
+                        alt={story.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.parentElement!.style.display = "none";
+                        }}
+                      />
+                      <div className="absolute top-2 right-2 flex flex-col gap-1">
                         <Badge
                           variant={
                             story.accessLevel === "premium"
@@ -290,94 +249,136 @@ export default function StoryMaintenance({
                           {story.accessLevel}
                         </Badge>
                         {!story.isPublished && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge
+                            variant="outline"
+                            className="text-xs bg-background/90"
+                          >
                             Draft
                           </Badge>
                         )}
                       </div>
-                    )}
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {story.excerpt}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1">
-                    {story.tags.slice(0, 3).map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="outline"
-                        className="text-xs bg-category-tag border-border/50"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                    {story.tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{story.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 text-rating-star fill-current" />
-                        <span>{story.rating}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        <span>{story.viewCount}</span>
-                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      <span>{story.createdAt.toLocaleDateString()}</span>
-                    </div>
-                  </div>
+                  )}
 
-                  <Badge variant="outline" className="text-xs w-fit">
-                    {story.category}
-                  </Badge>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onEditStory(story, "edit")}
-                      className="flex-1"
-                    >
-                      <Edit3 className="h-3 w-3 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => togglePublished(story.id)}
-                    >
-                      {story.isPublished ? (
-                        <EyeOff className="h-3 w-3" />
-                      ) : (
-                        <Eye className="h-3 w-3" />
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base leading-tight truncate group-hover:text-primary transition-colors">
+                          {story.title}
+                        </CardTitle>
+                        <CardDescription className="text-sm">
+                          by {story.author}
+                        </CardDescription>
+                      </div>
+                      {!story.imageUrl && (
+                        <div className="flex flex-col gap-1">
+                          <Badge
+                            variant={
+                              story.accessLevel === "premium"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-xs ${
+                              story.accessLevel === "premium"
+                                ? "bg-premium text-primary-foreground"
+                                : "bg-free-badge text-background"
+                            }`}
+                          >
+                            {story.accessLevel === "premium" && (
+                              <Crown className="h-3 w-3 mr-1" />
+                            )}
+                            {story.accessLevel}
+                          </Badge>
+                          {!story.isPublished && (
+                            <Badge variant="outline" className="text-xs">
+                              Draft
+                            </Badge>
+                          )}
+                        </div>
                       )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDeleteStory(story.id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </div>
+                  </CardHeader>
 
-          {filteredStories.length === 0 && (
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {story.excerpt}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1">
+                      {story.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-xs bg-category-tag border-border/50"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {story.tags.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{story.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-rating-star fill-current" />
+                          <span>{story.rating}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          <span>{story.viewCount}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        <span>{story.createdAt.toLocaleDateString()}</span>
+                      </div>
+                    </div>
+
+                    <Badge variant="outline" className="text-xs w-fit">
+                      {story.category}
+                    </Badge>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onEditStory(story, "edit")}
+                        className="flex-1"
+                      >
+                        <Edit3 className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => togglePublished(story.id)}
+                      >
+                        {story.isPublished ? (
+                          <EyeOff className="h-3 w-3" />
+                        ) : (
+                          <Eye className="h-3 w-3" />
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteStory(story.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {!isLoading && filteredStories.length === 0 && (
             <div className="text-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No stories found</h3>
