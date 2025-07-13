@@ -92,24 +92,43 @@ export default function StoryMaintenance({
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  const handleDeleteStory = (storyId: string) => {
+  const handleDeleteStory = async (storyId: string) => {
     if (
       confirm(
         "Are you sure you want to delete this story? This action cannot be undone.",
       )
     ) {
-      setStories(stories.filter((story) => story.id !== storyId));
+      try {
+        const response = await fetch(`/api/stories/${storyId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          setStories(stories.filter((story) => story.id !== storyId));
+        } else {
+          console.error("Failed to delete story:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error deleting story:", error);
+      }
     }
   };
 
-  const togglePublished = (storyId: string) => {
-    setStories(
-      stories.map((story) =>
-        story.id === storyId
-          ? { ...story, isPublished: !story.isPublished, updatedAt: new Date() }
-          : story,
-      ),
-    );
+  const togglePublished = async (storyId: string) => {
+    try {
+      const response = await fetch(`/api/stories/${storyId}/publish`, {
+        method: "PATCH",
+      });
+      if (response.ok) {
+        const updatedStory = await response.json();
+        setStories(
+          stories.map((story) => (story.id === storyId ? updatedStory : story)),
+        );
+      } else {
+        console.error("Failed to toggle publish status:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error toggling publish status:", error);
+    }
   };
 
   const stripHTML = (html: string): string => {
