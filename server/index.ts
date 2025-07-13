@@ -1,6 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  handleLogin,
+  handleRegister,
+  getLoginLogs,
+  getErrorLogs,
+  clearLogs,
+} from "./routes/auth";
 
 export function createServer() {
   const app = express();
@@ -16,6 +23,15 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Authentication routes
+  app.post("/api/auth/login", handleLogin);
+  app.post("/api/auth/register", handleRegister);
+
+  // Admin routes for logs
+  app.get("/api/admin/login-logs", getLoginLogs);
+  app.get("/api/admin/error-logs", getErrorLogs);
+  app.post("/api/admin/clear-logs", clearLogs);
 
   return app;
 }
