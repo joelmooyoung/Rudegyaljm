@@ -1,1 +1,375 @@
-import { useState } from "react";\nimport { Button } from "@/components/ui/button";\nimport {\n  Card,\n  CardContent,\n  CardDescription,\n  CardHeader,\n  CardTitle,\n} from "@/components/ui/card";\nimport { Input } from "@/components/ui/input";\nimport { Label } from "@/components/ui/label";\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";\nimport { BookOpen, Crown, Eye, EyeOff, Mail, User, Calendar } from "lucide-react";\nimport { LoginRequest, RegisterRequest, AuthResponse, User as UserType } from "@shared/api";\n\ninterface AuthProps {\n  onAuthenticated: (user: UserType) => void;\n}\n\nexport default function Auth({ onAuthenticated }: AuthProps) {\n  const [isLoading, setIsLoading] = useState(false);\n  const [showPassword, setShowPassword] = useState(false);\n  const [error, setError] = useState("");\n  \n  // Login form state\n  const [loginData, setLoginData] = useState<LoginRequest>({\n    email: "",\n    password: ""\n  });\n  \n  // Register form state\n  const [registerData, setRegisterData] = useState<RegisterRequest>({\n    email: "",\n    username: "",\n    password: "",\n    dateOfBirth: ""\n  });\n  const [confirmPassword, setConfirmPassword] = useState("");\n\n  const handleLogin = async (e: React.FormEvent) => {\n    e.preventDefault();\n    setIsLoading(true);\n    setError("");\n\n    try {\n      const response = await fetch("/api/auth/login", {\n        method: "POST",\n        headers: {\n          "Content-Type": "application/json",\n        },\n        body: JSON.stringify(loginData),\n      });\n\n      if (!response.ok) {\n        const errorData = await response.json();\n        throw new Error(errorData.message || "Login failed");\n      }\n\n      const data: AuthResponse = await response.json();\n      localStorage.setItem("token", data.token);\n      onAuthenticated(data.user);\n    } catch (err) {\n      setError(err instanceof Error ? err.message : "Login failed");\n    } finally {\n      setIsLoading(false);\n    }\n  };\n\n  const handleRegister = async (e: React.FormEvent) => {\n    e.preventDefault();\n    setIsLoading(true);\n    setError("");\n\n    if (registerData.password !== confirmPassword) {\n      setError("Passwords do not match");\n      setIsLoading(false);\n      return;\n    }\n\n    // Verify age\n    const birth = new Date(registerData.dateOfBirth);\n    const today = new Date();\n    let age = today.getFullYear() - birth.getFullYear();\n    const monthDiff = today.getMonth() - birth.getMonth();\n    \n    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {\n      age--;\n    }\n\n    if (age < 18) {\n      setError("You must be 18 or older to register");\n      setIsLoading(false);\n      return;\n    }\n\n    try {\n      const response = await fetch("/api/auth/register", {\n        method: "POST",\n        headers: {\n          "Content-Type": "application/json",\n        },\n        body: JSON.stringify(registerData),\n      });\n\n      if (!response.ok) {\n        const errorData = await response.json();\n        throw new Error(errorData.message || "Registration failed");\n      }\n\n      const data: AuthResponse = await response.json();\n      localStorage.setItem("token", data.token);\n      onAuthenticated(data.user);\n    } catch (err) {\n      setError(err instanceof Error ? err.message : "Registration failed");\n    } finally {\n      setIsLoading(false);\n    }\n  };\n\n  return (\n    <div className=\"min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden\">\n      {/* Background gradient */}\n      <div className=\"absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5\" />\n      \n      {/* Main content */}\n      <div className=\"relative z-10 w-full max-w-md mx-auto\">\n        <div className=\"text-center mb-8\">\n          <div className=\"inline-flex items-center gap-3 mb-4\">\n            <BookOpen className=\"h-8 w-8 text-primary\" />\n            <h1 className=\"text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent\">\n              Nocturne Stories\n            </h1>\n          </div>\n          <p className=\"text-muted-foreground\">\n            Access your premium storytelling experience\n          </p>\n        </div>\n\n        <Card className=\"border-border/50 bg-card/80 backdrop-blur-sm\">\n          <CardHeader className=\"text-center pb-4\">\n            <CardTitle>Welcome</CardTitle>\n            <CardDescription>\n              Sign in to your account or create a new one\n            </CardDescription>\n          </CardHeader>\n          <CardContent>\n            <Tabs defaultValue=\"login\" className=\"w-full\">\n              <TabsList className=\"grid w-full grid-cols-2 mb-6\">\n                <TabsTrigger value=\"login\">Sign In</TabsTrigger>\n                <TabsTrigger value=\"register\">Register</TabsTrigger>\n              </TabsList>\n              \n              <TabsContent value=\"login\">\n                <form onSubmit={handleLogin} className=\"space-y-4\">\n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"login-email\">Email</Label>\n                    <div className=\"relative\">\n                      <Mail className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />\n                      <Input\n                        id=\"login-email\"\n                        type=\"email\"\n                        placeholder=\"your@email.com\"\n                        value={loginData.email}\n                        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}\n                        className=\"pl-10\"\n                        required\n                      />\n                    </div>\n                  </div>\n                  \n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"login-password\">Password</Label>\n                    <div className=\"relative\">\n                      <Input\n                        id=\"login-password\"\n                        type={showPassword ? \"text\" : \"password\"}\n                        placeholder=\"••••••••\"\n                        value={loginData.password}\n                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}\n                        className=\"pr-10\"\n                        required\n                      />\n                      <Button\n                        type=\"button\"\n                        variant=\"ghost\"\n                        size=\"sm\"\n                        className=\"absolute right-0 top-0 h-full px-3 py-2\"\n                        onClick={() => setShowPassword(!showPassword)}\n                      >\n                        {showPassword ? (\n                          <EyeOff className=\"h-4 w-4\" />\n                        ) : (\n                          <Eye className=\"h-4 w-4\" />\n                        )}\n                      </Button>\n                    </div>\n                  </div>\n                  \n                  {error && (\n                    <div className=\"text-sm text-destructive bg-destructive/10 p-3 rounded-md\">\n                      {error}\n                    </div>\n                  )}\n                  \n                  <Button\n                    type=\"submit\"\n                    className=\"w-full bg-primary hover:bg-primary/90\"\n                    disabled={isLoading}\n                  >\n                    {isLoading ? \"Signing in...\" : \"Sign In\"}\n                  </Button>\n                </form>\n              </TabsContent>\n              \n              <TabsContent value=\"register\">\n                <form onSubmit={handleRegister} className=\"space-y-4\">\n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"register-email\">Email</Label>\n                    <div className=\"relative\">\n                      <Mail className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />\n                      <Input\n                        id=\"register-email\"\n                        type=\"email\"\n                        placeholder=\"your@email.com\"\n                        value={registerData.email}\n                        onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}\n                        className=\"pl-10\"\n                        required\n                      />\n                    </div>\n                  </div>\n                  \n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"register-username\">Username</Label>\n                    <div className=\"relative\">\n                      <User className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />\n                      <Input\n                        id=\"register-username\"\n                        type=\"text\"\n                        placeholder=\"Choose a username\"\n                        value={registerData.username}\n                        onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}\n                        className=\"pl-10\"\n                        required\n                      />\n                    </div>\n                  </div>\n                  \n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"register-birth\">Date of Birth</Label>\n                    <div className=\"relative\">\n                      <Calendar className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />\n                      <Input\n                        id=\"register-birth\"\n                        type=\"date\"\n                        value={registerData.dateOfBirth}\n                        onChange={(e) => setRegisterData({ ...registerData, dateOfBirth: e.target.value })}\n                        className=\"pl-10\"\n                        required\n                      />\n                    </div>\n                  </div>\n                  \n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"register-password\">Password</Label>\n                    <div className=\"relative\">\n                      <Input\n                        id=\"register-password\"\n                        type={showPassword ? \"text\" : \"password\"}\n                        placeholder=\"••••••••\"\n                        value={registerData.password}\n                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}\n                        className=\"pr-10\"\n                        required\n                      />\n                      <Button\n                        type=\"button\"\n                        variant=\"ghost\"\n                        size=\"sm\"\n                        className=\"absolute right-0 top-0 h-full px-3 py-2\"\n                        onClick={() => setShowPassword(!showPassword)}\n                      >\n                        {showPassword ? (\n                          <EyeOff className=\"h-4 w-4\" />\n                        ) : (\n                          <Eye className=\"h-4 w-4\" />\n                        )}\n                      </Button>\n                    </div>\n                  </div>\n                  \n                  <div className=\"space-y-2\">\n                    <Label htmlFor=\"confirm-password\">Confirm Password</Label>\n                    <Input\n                      id=\"confirm-password\"\n                      type={showPassword ? \"text\" : \"password\"}\n                      placeholder=\"••••••••\"\n                      value={confirmPassword}\n                      onChange={(e) => setConfirmPassword(e.target.value)}\n                      required\n                    />\n                  </div>\n                  \n                  {error && (\n                    <div className=\"text-sm text-destructive bg-destructive/10 p-3 rounded-md\">\n                      {error}\n                    </div>\n                  )}\n                  \n                  <Button\n                    type=\"submit\"\n                    className=\"w-full bg-primary hover:bg-primary/90\"\n                    disabled={isLoading}\n                  >\n                    {isLoading ? \"Creating Account...\" : \"Create Account\"}\n                  </Button>\n                </form>\n              </TabsContent>\n            </Tabs>\n            \n            <div className=\"mt-6 text-center\">\n              <div className=\"flex items-center gap-3 text-sm text-muted-foreground\">\n                <Crown className=\"h-4 w-4 text-premium\" />\n                <span>Premium features available after registration</span>\n              </div>\n            </div>\n          </CardContent>\n        </Card>\n      </div>\n    </div>\n  );\n}\n
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  BookOpen,
+  Crown,
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Calendar,
+} from "lucide-react";
+import {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  User as UserType,
+} from "@shared/api";
+
+interface AuthProps {
+  onAuthenticated: (user: UserType) => void;
+}
+
+export default function Auth({ onAuthenticated }: AuthProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  // Login form state
+  const [loginData, setLoginData] = useState<LoginRequest>({
+    email: "",
+    password: "",
+  });
+
+  // Register form state
+  const [registerData, setRegisterData] = useState<RegisterRequest>({
+    email: "",
+    username: "",
+    password: "",
+    dateOfBirth: "",
+  });
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      const data: AuthResponse = await response.json();
+      localStorage.setItem("token", data.token);
+      onAuthenticated(data.user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (registerData.password !== confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    // Verify age
+    const birth = new Date(registerData.dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+
+    if (age < 18) {
+      setError("You must be 18 or older to register");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed");
+      }
+
+      const data: AuthResponse = await response.json();
+      localStorage.setItem("token", data.token);
+      onAuthenticated(data.user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+
+      {/* Main content */}
+      <div className="relative z-10 w-full max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <BookOpen className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Nocturne Stories
+            </h1>
+          </div>
+          <p className="text-muted-foreground">
+            Access your premium storytelling experience
+          </p>
+        </div>
+
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <CardHeader className="text-center pb-4">
+            <CardTitle>Welcome</CardTitle>
+            <CardDescription>
+              Sign in to your account or create a new one
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="login">Sign In</TabsTrigger>
+                <TabsTrigger value="register">Register</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="login">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={loginData.email}
+                        onChange={(e) =>
+                          setLoginData({ ...loginData, email: e.target.value })
+                        }
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={loginData.password}
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            password: e.target.value,
+                          })
+                        }
+                        className="pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="register">
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="register-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={registerData.email}
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            email: e.target.value,
+                          })
+                        }
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="register-username">Username</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-username"
+                        type="text"
+                        placeholder="Choose a username"
+                        value={registerData.username}
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            username: e.target.value,
+                          })
+                        }
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="register-birth">Date of Birth</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-birth"
+                        type="date"
+                        value={registerData.dateOfBirth}
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            dateOfBirth: e.target.value,
+                          })
+                        }
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="register-password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="register-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={registerData.password}
+                        onChange={(e) =>
+                          setRegisterData({
+                            ...registerData,
+                            password: e.target.value,
+                          })
+                        }
+                        className="pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+
+            <div className="mt-6 text-center">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Crown className="h-4 w-4 text-premium" />
+                <span>Premium features available after registration</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
