@@ -138,12 +138,24 @@ const logError = (
 // GET /api/stories - Get all stories
 export const getStories: RequestHandler = (req, res) => {
   try {
+    console.log(`[DEBUG] Total stories in database: ${stories.length}`);
+    console.log(
+      `[DEBUG] Stories:`,
+      stories.map((s) => ({
+        id: s.id,
+        title: s.title,
+        isPublished: s.isPublished,
+        accessLevel: s.accessLevel,
+      })),
+    );
+
     // Sort by creation date (newest first)
     const sortedStories = [...stories].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
+    console.log(`[DEBUG] Returning ${sortedStories.length} stories`);
     res.json(sortedStories);
   } catch (error) {
     const errorMessage =
@@ -207,6 +219,12 @@ export const createStory: RequestHandler = (req, res) => {
     };
 
     stories.push(newStory);
+    console.log(`[DEBUG] Story created. Total stories now: ${stories.length}`);
+    console.log(`[DEBUG] New story:`, {
+      id: newStory.id,
+      title: newStory.title,
+      isPublished: newStory.isPublished,
+    });
 
     res.status(201).json(newStory);
   } catch (error) {
