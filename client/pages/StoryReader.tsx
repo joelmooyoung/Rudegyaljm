@@ -217,10 +217,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         <div className="grid gap-8">
           {/* Story Header */}
           <Card className="overflow-hidden">
-            {story.imageUrl && (
+            {story.image && (
               <div className="relative h-64 bg-muted/20">
                 <img
-                  src={story.imageUrl}
+                  src={story.image}
                   alt={story.title}
                   className="w-full h-full object-cover"
                 />
@@ -252,7 +252,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             )}
 
             <CardHeader>
-              {!story.imageUrl && (
+              {!story.image && (
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-3xl mb-2">
