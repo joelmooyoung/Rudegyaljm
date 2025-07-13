@@ -254,10 +254,10 @@ export default function StoryMaintenance({
                       className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group overflow-hidden"
                     >
                       {/* Story Image */}
-                      {story.imageUrl && (
+                      {story.image && (
                         <div className="relative h-32 bg-muted/20">
                           <img
-                            src={story.imageUrl}
+                            src={story.image}
                             alt={story.title}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -305,7 +305,7 @@ export default function StoryMaintenance({
                               by {story.author}
                             </CardDescription>
                           </div>
-                          {!story.imageUrl && (
+                          {!story.image && (
                             <div className="flex flex-col gap-1">
                               <Badge
                                 variant={
