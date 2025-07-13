@@ -225,10 +225,24 @@ export default function StoryDetail({
         console.log(
           `Compressing image: ${(file.size / (1024 * 1024)).toFixed(1)}MB`,
         );
-        imageData = await compressImage(file, 1200, 0.8);
-        console.log(
-          `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
-        );
+        try {
+          imageData = await compressImage(file, 1200, 0.8);
+          console.log(
+            `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
+          );
+        } catch (compressionError) {
+          console.warn(
+            "Image compression failed, using original:",
+            compressionError,
+          );
+          // Fall back to original file if compression fails
+          imageData = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsDataURL(file);
+          });
+        }
       } else {
         // For smaller files, just convert to base64
         imageData = await new Promise<string>((resolve, reject) => {
