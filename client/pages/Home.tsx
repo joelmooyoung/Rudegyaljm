@@ -169,52 +169,8 @@ export default function Home({
       className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
       onClick={() => handleStoryClick(story)}
     >
-      {/* Story Image Background */}
-      {story.image && (
-        <div className="relative h-48 bg-muted/20 overflow-hidden">
-          <img
-            src={story.image}
-            alt={story.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.parentElement!.style.display = "none";
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute top-3 right-3 flex flex-col gap-2">
-            <Badge
-              variant={
-                story.accessLevel === "premium" ? "default" : "secondary"
-              }
-              className={`${
-                story.accessLevel === "premium"
-                  ? "bg-premium text-primary-foreground"
-                  : "bg-free-badge text-background"
-              } shadow-lg`}
-            >
-              {story.accessLevel === "premium" && (
-                <Crown className="h-3 w-3 mr-1" />
-              )}
-              {story.accessLevel}
-            </Badge>
-            {!story.isPublished && (
-              <Badge variant="outline" className="bg-background/90 text-xs">
-                Draft
-              </Badge>
-            )}
-          </div>
-          <div className="absolute bottom-3 left-3 right-3">
-            <h3 className="text-white font-semibold text-lg line-clamp-2 mb-1">
-              {story.title}
-            </h3>
-            <p className="text-white/90 text-sm">by {story.author}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Fallback for stories without images */}
-      {!story.image && (
+            {/* Story Header */}
+      <(
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
