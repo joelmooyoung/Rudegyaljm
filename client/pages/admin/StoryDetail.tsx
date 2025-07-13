@@ -44,6 +44,41 @@ import {
 } from "lucide-react";
 import { Story } from "@shared/api";
 
+// Image compression utility
+const compressImage = (
+  file: File,
+  maxWidth: number = 1200,
+  quality: number = 0.8,
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      // Calculate new dimensions while maintaining aspect ratio
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      // Convert to data URL with compression
+      const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+      resolve(compressedDataUrl);
+    };
+
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
 interface StoryDetailProps {
   story?: Story | null;
   mode: "add" | "edit";
@@ -153,60 +188,72 @@ export default function StoryDetail({
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      // 10MB limit
-      alert("File size must be less than 10MB.");
-      return;
-    }
-
     setIsUploadingImage(true);
     setImageFile(file);
 
     try {
-      // Convert file to base64 for upload
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
+      // Compress image to reduce size
+      let imageData: string;
 
-        try {
-          // Upload to server
-          const response = await fetch("/api/upload/image", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              imageData: result,
-              fileName: file.name,
-            }),
-          });
+      if (file.size > 2 * 1024 * 1024) {
+        // If file is larger than 2MB, compress it
+        console.log(
+          `Compressing image: ${(file.size / (1024 * 1024)).toFixed(1)}MB`,
+        );
+        imageData = await compressImage(file, 1200, 0.8);
+        console.log(
+          `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
+        );
+      } else {
+        // For smaller files, just convert to base64
+        imageData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsDataURL(file);
+        });
+      }
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
-              // For demo, we'll still use the data URL since we don't have a proper file server
-              // In production, you'd use data.imageUrl
-              handleInputChange("imageUrl", result);
-              console.log("Image uploaded successfully:", data);
-            } else {
-              throw new Error(data.message || "Upload failed");
-            }
+      setImagePreview(imageData);
+
+      try {
+        // Upload to server
+        const response = await fetch("/api/upload/image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            imageData,
+            fileName: file.name,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            // For demo, we'll still use the data URL since we don't have a proper file server
+            // In production, you'd use data.imageUrl
+            handleInputChange("imageUrl", imageData);
+            console.log("Image uploaded successfully:", data);
           } else {
-            throw new Error(`Upload failed: ${response.statusText}`);
+            throw new Error(data.message || "Upload failed");
           }
-        } catch (uploadError) {
-          console.error("Upload error:", uploadError);
-          // Still use the preview even if upload fails (for demo purposes)
-          handleInputChange("imageUrl", result);
-        } finally {
-          setIsUploadingImage(false);
+        } else {
+          const errorText = await response.text();
+          throw new Error(
+            `Upload failed: ${response.status} ${response.statusText} - ${errorText}`,
+          );
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (uploadError) {
+        console.error("Upload error:", uploadError);
+        // Still use the preview even if upload fails (for demo purposes)
+        handleInputChange("imageUrl", imageData);
+      }
     } catch (error) {
-      console.error("File read failed:", error);
+      console.error("File processing failed:", error);
       alert("Failed to process image. Please try again.");
+    } finally {
       setIsUploadingImage(false);
     }
   };
