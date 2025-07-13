@@ -204,9 +204,15 @@ export default function StoryMaintenance({
           </div>
         </div>
 
-        {/* Stories Grid */}
+                {/* Stories Grid */}
         <div className="max-h-[70vh] overflow-y-auto">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading stories...</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredStories.map((story) => (
               <Card
                 key={story.id}
