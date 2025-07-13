@@ -27,7 +27,20 @@ import {
   TrendingUp,
   User,
   LogOut,
+  Settings,
+  Users,
+  FileText,
+  Activity,
+  AlertTriangle,
+  ChevronDown,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Story, User as UserType } from "@shared/api";
 
 // Mock data for now
@@ -98,9 +111,14 @@ const mockUser: UserType = {
 interface HomeProps {
   user?: UserType;
   onLogout?: () => void;
+  onNavigateToAdmin?: (section: string) => void;
 }
 
-export default function Home({ user = mockUser, onLogout }: HomeProps) {
+export default function Home({
+  user = mockUser,
+  onLogout,
+  onNavigateToAdmin,
+}: HomeProps) {
   const [stories, setStories] = useState<Story[]>(mockStories);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -229,15 +247,61 @@ export default function Home({ user = mockUser, onLogout }: HomeProps) {
                   className={
                     user.role === "premium"
                       ? "bg-premium text-primary-foreground"
-                      : ""
+                      : user.role === "admin"
+                        ? "bg-destructive text-destructive-foreground"
+                        : ""
                   }
                 >
                   {user.role === "premium" && (
                     <Crown className="h-3 w-3 mr-1" />
                   )}
+                  {user.role === "admin" && (
+                    <Settings className="h-3 w-3 mr-1" />
+                  )}
                   {user.role}
                 </Badge>
               </div>
+
+              {/* Admin Menu */}
+              {user.role === "admin" && onNavigateToAdmin && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("stories")}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Story Maintenance
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("users")}
+                    >
+                      <Users className="h-4 w-4 mr-2" />
+                      User Maintenance
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("login-logs")}
+                    >
+                      <Activity className="h-4 w-4 mr-2" />
+                      Login Logs
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("error-logs")}
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Error Logs
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
               <Button variant="outline" size="sm" onClick={onLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
