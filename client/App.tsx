@@ -8,13 +8,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AgeVerification from "./pages/AgeVerification";
+import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import { User } from "@shared/api";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [isAgeVerified, setIsAgeVerified] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -23,12 +26,39 @@ const App = () => {
     if (verified === "true") {
       setIsAgeVerified(true);
     }
+
+    // Check if user is already authenticated
+    const token = localStorage.getItem("token");
+    if (token) {
+      // In a real app, you'd verify the token with the server
+      // For now, we'll create a mock user
+      const mockUser: User = {
+        id: "1",
+        email: "user@example.com",
+        username: "reader123",
+        role: "free",
+        isAgeVerified: true,
+        subscriptionStatus: "none",
+        createdAt: new Date(),
+      };
+      setUser(mockUser);
+    }
+
     setIsLoading(false);
   }, []);
 
   const handleAgeVerified = () => {
     setIsAgeVerified(true);
     sessionStorage.setItem("age_verified", "true");
+  };
+
+  const handleAuthenticated = (authenticatedUser: User) => {
+    setUser(authenticatedUser);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("token");
   };
 
   if (isLoading) {
@@ -51,6 +81,18 @@ const App = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Auth onAuthenticated={handleAuthenticated} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -58,7 +100,10 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={<Home user={user} onLogout={handleLogout} />}
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
