@@ -11,6 +11,10 @@ import AgeVerification from "./pages/AgeVerification";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import StoryMaintenance from "./pages/admin/StoryMaintenance";
+import UserMaintenance from "./pages/admin/UserMaintenance";
+import LoginLogs from "./pages/admin/LoginLogs";
+import ErrorLogs from "./pages/admin/ErrorLogs";
 import { User } from "@shared/api";
 
 const queryClient = new QueryClient();
@@ -19,6 +23,7 @@ const App = () => {
   const [isAgeVerified, setIsAgeVerified] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState<string>("home");
 
   useEffect(() => {
     // Check if user has already been age verified in this session
@@ -59,6 +64,15 @@ const App = () => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("token");
+    setCurrentView("home");
+  };
+
+  const handleNavigateToAdmin = (section: string) => {
+    setCurrentView(`admin-${section}`);
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView("home");
   };
 
   if (isLoading) {
@@ -93,21 +107,46 @@ const App = () => {
     );
   }
 
+  const renderCurrentView = () => {
+    if (user?.role !== "admin" && currentView.startsWith("admin-")) {
+      // Non-admin users cannot access admin sections
+      setCurrentView("home");
+      return (
+        <Home
+          user={user}
+          onLogout={handleLogout}
+          onNavigateToAdmin={handleNavigateToAdmin}
+        />
+      );
+    }
+
+    switch (currentView) {
+      case "admin-stories":
+        return <StoryMaintenance onBack={handleBackToHome} />;
+      case "admin-users":
+        return <UserMaintenance onBack={handleBackToHome} />;
+      case "admin-login-logs":
+        return <LoginLogs onBack={handleBackToHome} />;
+      case "admin-error-logs":
+        return <ErrorLogs onBack={handleBackToHome} />;
+      case "home":
+      default:
+        return (
+          <Home
+            user={user}
+            onLogout={handleLogout}
+            onNavigateToAdmin={handleNavigateToAdmin}
+          />
+        );
+    }
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={<Home user={user} onLogout={handleLogout} />}
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        {renderCurrentView()}
       </TooltipProvider>
     </QueryClientProvider>
   );
