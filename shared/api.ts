@@ -30,6 +30,7 @@ export interface Story {
   rating: number;
   ratingCount: number;
   viewCount: number;
+  imageUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
