@@ -129,7 +129,7 @@ export default function StoryDetail({
     rating: 0,
     ratingCount: 0,
     viewCount: 0,
-    imageUrl: "",
+    image: "",
     ...story,
   });
 
@@ -145,9 +145,9 @@ export default function StoryDetail({
     if (story) {
       setFormData(story);
       setTagsInput(story.tags?.join(", ") || "");
-      // Set image preview if story has an image URL
-      if (story.imageUrl) {
-        setImagePreview(story.imageUrl);
+      // Set image preview if story has an image
+      if (story.image) {
+        setImagePreview(story.image);
       }
     }
   }, [story]);
@@ -275,7 +275,7 @@ export default function StoryDetail({
           if (data.success) {
             // For demo, we'll still use the data URL since we don't have a proper file server
             // In production, you'd use data.imageUrl
-            handleInputChange("imageUrl", imageData);
+            handleInputChange("image", imageData);
             console.log("Image uploaded successfully:", data);
           } else {
             throw new Error(data.message || "Upload failed");
@@ -295,7 +295,7 @@ export default function StoryDetail({
         console.error("Upload error:", uploadError);
         // Still use the preview even if upload fails (for demo purposes)
         if (imageData) {
-          handleInputChange("imageUrl", imageData);
+          handleInputChange("image", imageData);
         }
       }
     } catch (error) {
@@ -308,7 +308,7 @@ export default function StoryDetail({
 
   // Handle URL input
   const handleUrlChange = (url: string) => {
-    handleInputChange("imageUrl", url);
+    handleInputChange("image", url);
     if (url) {
       setImagePreview(url);
     } else {
@@ -336,7 +336,7 @@ export default function StoryDetail({
         if (data.success) {
           // For demo purposes, keep the original URL
           // In production, you'd use the new local URL from data.imageUrl
-          handleInputChange("imageUrl", url);
+          handleInputChange("image", url);
           setImagePreview(url);
           alert("Image copied successfully!");
         } else {
@@ -357,7 +357,7 @@ export default function StoryDetail({
   const removeImage = () => {
     setImageFile(null);
     setImagePreview("");
-    handleInputChange("imageUrl", "");
+    handleInputChange("image", "");
   };
 
   const handleSave = () => {
@@ -487,12 +487,12 @@ export default function StoryDetail({
                       <Link className="h-4 w-4 mr-2" />
                       {showUrlInput ? "Hide URL" : "Use URL"}
                     </Button>
-                    {story?.imageUrl && mode === "edit" && (
+                    {story?.image && mode === "edit" && (
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => copyImageFromUrl(story.imageUrl!)}
+                        onClick={() => copyImageFromUrl(story.image!)}
                         disabled={isUploadingImage}
                       >
                         <Copy className="h-4 w-4 mr-2" />
@@ -538,12 +538,12 @@ export default function StoryDetail({
                     {/* URL Input (conditional) */}
                     {showUrlInput && (
                       <div className="space-y-2">
-                        <Label htmlFor="imageUrl">Or use image URL</Label>
+                        <Label htmlFor="image">Or use image URL</Label>
                         <Input
-                          id="imageUrl"
+                          id="image"
                           type="url"
                           placeholder="https://example.com/image.jpg"
-                          value={formData.imageUrl || ""}
+                          value={formData.image || ""}
                           onChange={(e) => handleUrlChange(e.target.value)}
                         />
                       </div>
