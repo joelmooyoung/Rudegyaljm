@@ -169,33 +169,30 @@ export default function Home({
       className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
       onClick={() => handleStoryClick(story)}
     >
-                  {/* Story Header */}
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-                {story.title}
-              </CardTitle>
-              <CardDescription>by {story.author}</CardDescription>
-            </div>
-            <Badge
-              variant={
-                story.accessLevel === "premium" ? "default" : "secondary"
-              }
-              className={
-                story.accessLevel === "premium"
-                  ? "bg-premium text-primary-foreground"
-                  : "bg-free-badge text-background"
-              }
-            >
-              {story.accessLevel === "premium" && (
-                <Crown className="h-3 w-3 mr-1" />
-              )}
-              {story.accessLevel}
-            </Badge>
+      {/* Story Header */}
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+              {story.title}
+            </CardTitle>
+            <CardDescription>by {story.author}</CardDescription>
           </div>
-        </CardHeader>
-      )}
+          <Badge
+            variant={story.accessLevel === "premium" ? "default" : "secondary"}
+            className={
+              story.accessLevel === "premium"
+                ? "bg-premium text-primary-foreground"
+                : "bg-free-badge text-background"
+            }
+          >
+            {story.accessLevel === "premium" && (
+              <Crown className="h-3 w-3 mr-1" />
+            )}
+            {story.accessLevel}
+          </Badge>
+        </div>
+      </CardHeader>
 
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground line-clamp-2">
