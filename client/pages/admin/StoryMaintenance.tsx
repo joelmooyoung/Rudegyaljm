@@ -290,19 +290,21 @@ export default function StoryMaintenance({
             {filteredStories.map((story) => (
               <Card
                 key={story.id}
-                className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group"
+                className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group overflow-hidden"
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base leading-tight truncate group-hover:text-primary transition-colors">
-                        {story.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        by {story.author}
-                      </CardDescription>
-                    </div>
-                    <div className="flex flex-col gap-1">
+                {/* Story Image */}
+                {story.imageUrl && (
+                  <div className="relative h-32 bg-muted/20">
+                    <img
+                      src={story.imageUrl}
+                      alt={story.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.parentElement!.style.display = "none";
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 flex flex-col gap-1">
                       <Badge
                         variant={
                           story.accessLevel === "premium"
@@ -321,11 +323,53 @@ export default function StoryMaintenance({
                         {story.accessLevel}
                       </Badge>
                       {!story.isPublished && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-background/90"
+                        >
                           Draft
                         </Badge>
                       )}
                     </div>
+                  </div>
+                )}
+
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base leading-tight truncate group-hover:text-primary transition-colors">
+                        {story.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        by {story.author}
+                      </CardDescription>
+                    </div>
+                    {!story.imageUrl && (
+                      <div className="flex flex-col gap-1">
+                        <Badge
+                          variant={
+                            story.accessLevel === "premium"
+                              ? "default"
+                              : "secondary"
+                          }
+                          className={`text-xs ${
+                            story.accessLevel === "premium"
+                              ? "bg-premium text-primary-foreground"
+                              : "bg-free-badge text-background"
+                          }`}
+                        >
+                          {story.accessLevel === "premium" && (
+                            <Crown className="h-3 w-3 mr-1" />
+                          )}
+                          {story.accessLevel}
+                        </Badge>
+                        {!story.isPublished && (
+                          <Badge variant="outline" className="text-xs">
+                            Draft
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardHeader>
 
