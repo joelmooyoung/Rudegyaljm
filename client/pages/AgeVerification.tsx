@@ -27,7 +27,7 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
 
     const birth = new Date(birthDate);
     const today = new Date();
-    const age = today.getFullYear() - birth.getFullYear();
+    let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
 
     if (
