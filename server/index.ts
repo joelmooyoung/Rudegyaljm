@@ -24,6 +24,7 @@ import {
   getUserInteraction,
   getStoryStats,
 } from "./routes/interactions";
+import { uploadImage, copyImageFromUrl, testUpload } from "./routes/upload";
 
 export function createServer() {
   const app = express();
@@ -59,6 +60,11 @@ export function createServer() {
   app.post("/api/stories/:id/like", toggleStoryLike);
   app.get("/api/stories/:id/user-interaction", getUserInteraction);
   app.get("/api/stories/:id/stats", getStoryStats);
+
+  // Upload routes
+  app.post("/api/upload/image", uploadImage);
+  app.post("/api/upload/copy-url", copyImageFromUrl);
+  app.get("/api/upload/test", testUpload);
 
   // Admin routes for logs
   app.get("/api/admin/login-logs", getLoginLogs);
