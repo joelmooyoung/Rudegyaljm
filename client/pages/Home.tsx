@@ -41,6 +41,7 @@ import {
   AlertTriangle,
   ChevronDown,
   Heart,
+  RefreshCw,
 } from "lucide-react";
 import { Story, User as UserType } from "@shared/api";
 
@@ -62,16 +63,20 @@ export default function Home({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
   // Fetch stories from server
   const fetchStories = async () => {
     setIsLoading(true);
+    setError(null);
     try {
+      console.log("Fetching stories from /api/stories...");
       const response = await fetch("/api/stories");
       if (response.ok) {
         const data = await response.json();
+        console.log("Fetched stories:", data);
         // Convert date strings back to Date objects
         const storiesWithDates = (data || []).map((story: any) => ({
           ...story,
@@ -82,11 +87,16 @@ export default function Home({
           updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
         }));
         setStories(storiesWithDates);
+        console.log("Processed stories:", storiesWithDates);
       } else {
-        console.error("Failed to fetch stories:", response.statusText);
+        const errorMsg = `Failed to fetch stories: ${response.status} ${response.statusText}`;
+        console.error(errorMsg);
+        setError(errorMsg);
       }
     } catch (error) {
-      console.error("Error fetching stories:", error);
+      const errorMsg = `Error fetching stories: ${error}`;
+      console.error(errorMsg);
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -369,6 +379,11 @@ export default function Home({
                 </DropdownMenu>
               )}
 
+              <Button variant="outline" size="sm" onClick={fetchStories}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+
               <Button variant="outline" size="sm" onClick={onLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -473,7 +488,19 @@ export default function Home({
 
         {/* Stories grid */}
         <section>
-          {isLoading ? (
+          {error ? (
+            <div className="text-center py-12">
+              <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Failed to load stories
+              </h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <Button onClick={fetchStories}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          ) : isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-muted-foreground">Loading stories...</p>
