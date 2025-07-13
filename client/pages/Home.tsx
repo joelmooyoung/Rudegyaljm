@@ -170,10 +170,10 @@ export default function Home({
       onClick={() => handleStoryClick(story)}
     >
       {/* Story Image Background */}
-      {story.imageUrl && (
+      {story.image && (
         <div className="relative h-48 bg-muted/20 overflow-hidden">
           <img
-            src={story.imageUrl}
+            src={story.image}
             alt={story.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
             onError={(e) => {
@@ -214,7 +214,7 @@ export default function Home({
       )}
 
       {/* Fallback for stories without images */}
-      {!story.imageUrl && (
+      {!story.image && (
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
