@@ -227,9 +227,11 @@ export default function StoryDetail({
         );
         try {
           imageData = await compressImage(file, 1200, 0.8);
-          console.log(
-            `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
-          );
+          if (imageData) {
+            console.log(
+              `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
+            );
+          }
         } catch (compressionError) {
           console.warn(
             "Image compression failed, using original:",
