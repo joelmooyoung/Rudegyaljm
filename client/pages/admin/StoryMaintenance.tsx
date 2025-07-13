@@ -140,8 +140,16 @@ export default function StoryMaintenance({
       });
       if (response.ok) {
         const updatedStory = await response.json();
+        // Ensure dates are properly converted
+        const storyWithDates = {
+          ...updatedStory,
+          createdAt: new Date(updatedStory.createdAt),
+          updatedAt: new Date(updatedStory.updatedAt),
+        };
         setStories(
-          stories.map((story) => (story.id === storyId ? updatedStory : story)),
+          stories.map((story) =>
+            story.id === storyId ? storyWithDates : story,
+          ),
         );
       } else {
         console.error("Failed to toggle publish status:", response.statusText);
