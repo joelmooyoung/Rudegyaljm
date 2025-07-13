@@ -40,7 +40,6 @@ import {
   Copy,
   Link,
   X,
-  Image as ImageIcon,
 } from "lucide-react";
 import { Story } from "@shared/api";
 
