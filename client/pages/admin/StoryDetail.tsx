@@ -295,8 +295,12 @@ export default function StoryDetail({
       } catch (uploadError) {
         console.error("Upload error:", uploadError);
         // Still use the preview even if upload fails (for demo purposes)
-        if (imageData) {
-          handleInputChange("image", imageData);
+        try {
+          if (imageData && typeof imageData === "string") {
+            handleInputChange("image", imageData);
+          }
+        } catch (handlerError) {
+          console.error("Error in handleInputChange:", handlerError);
         }
       }
     } catch (error) {
