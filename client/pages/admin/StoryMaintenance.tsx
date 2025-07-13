@@ -351,7 +351,11 @@ export default function StoryMaintenance({
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{story.createdAt.toLocaleDateString()}</span>
+                        <span>
+                          {story.createdAt instanceof Date
+                            ? story.createdAt.toLocaleDateString()
+                            : new Date(story.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
 
