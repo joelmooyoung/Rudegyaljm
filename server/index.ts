@@ -16,6 +16,14 @@ import {
   deleteStory,
   togglePublishStory,
 } from "./routes/stories";
+import {
+  getStoryComments,
+  addStoryComment,
+  rateStory,
+  toggleStoryLike,
+  getUserInteraction,
+  getStoryStats,
+} from "./routes/interactions";
 
 export function createServer() {
   const app = express();
@@ -43,6 +51,14 @@ export function createServer() {
   app.put("/api/stories/:id", updateStory);
   app.delete("/api/stories/:id", deleteStory);
   app.patch("/api/stories/:id/publish", togglePublishStory);
+
+  // Story interaction routes
+  app.get("/api/stories/:id/comments", getStoryComments);
+  app.post("/api/stories/:id/comments", addStoryComment);
+  app.post("/api/stories/:id/rating", rateStory);
+  app.post("/api/stories/:id/like", toggleStoryLike);
+  app.get("/api/stories/:id/user-interaction", getUserInteraction);
+  app.get("/api/stories/:id/stats", getStoryStats);
 
   // Admin routes for logs
   app.get("/api/admin/login-logs", getLoginLogs);
