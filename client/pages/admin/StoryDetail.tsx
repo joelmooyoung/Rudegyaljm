@@ -74,8 +74,16 @@ const compressImage = (
       resolve(compressedDataUrl);
     };
 
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = URL.createObjectURL(file);
+    img.onerror = (event) => {
+      URL.revokeObjectURL(img.src); // Clean up the object URL
+      reject(new Error("Failed to load image for compression"));
+    };
+
+    try {
+      img.src = URL.createObjectURL(file);
+    } catch (error) {
+      reject(new Error("Failed to create object URL for image"));
+    }
   });
 };
 
