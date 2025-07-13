@@ -1,7 +1,11 @@
 import { RequestHandler } from "express";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 import { join } from "path";
-import { v4 as uuidv4 } from "uuid";
+
+// Simple UUID alternative
+const generateId = () => {
+  return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+};
 
 // Helper function to log errors
 const logError = (
@@ -33,7 +37,7 @@ export const uploadImage: RequestHandler = async (req, res) => {
 
     // Generate unique filename
     const fileExtension = fileName?.split(".").pop() || "jpg";
-    const uniqueFileName = `${uuidv4()}.${fileExtension}`;
+    const uniqueFileName = `${generateId()}.${fileExtension}`;
     const filePath = join(uploadsDir, uniqueFileName);
 
     try {
