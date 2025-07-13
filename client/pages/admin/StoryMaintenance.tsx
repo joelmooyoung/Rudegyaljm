@@ -241,7 +241,13 @@ export default function StoryMaintenance({
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredStories.map((story) => (
+                            {filteredStories.map((story) => {
+                // Safety check to ensure story has all required properties
+                if (!story || !story.id) {
+                  return null;
+                }
+
+                return (
                 <Card
                   key={story.id}
                   className="bg-story-card hover:bg-story-card-hover transition-colors border-border/50 group overflow-hidden"
