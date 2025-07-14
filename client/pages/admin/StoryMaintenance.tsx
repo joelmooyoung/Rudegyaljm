@@ -41,6 +41,7 @@ interface StoryMaintenanceProps {
 export default function StoryMaintenance({
   onBack,
   onEditStory,
+  onCommentsMaintenance,
 }: StoryMaintenanceProps) {
   const [stories, setStories] = useState<Story[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
