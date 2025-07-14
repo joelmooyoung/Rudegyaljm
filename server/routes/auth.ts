@@ -125,7 +125,6 @@ export const handleLogin: RequestHandler = async (req, res) => {
     const user = users.find((u) => u.email === email);
 
     if (!user) {
-      logLogin("unknown", false, req);
       logError(
         `Login attempt with non-existent email: ${email}`,
         req,
@@ -140,7 +139,6 @@ export const handleLogin: RequestHandler = async (req, res) => {
     const isValidPassword = password.length > 0;
 
     if (!isValidPassword) {
-      logLogin(user.id, false, req);
       logError(
         `Failed login attempt for user: ${user.id}`,
         req,
@@ -150,9 +148,9 @@ export const handleLogin: RequestHandler = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Update last login
+    // Update last login and log successful login
     user.lastLogin = new Date();
-    logLogin(user.id, true, req);
+    logSuccessfulLogin(user.id, user.email, req);
 
     const token = generateToken(user.id);
     const response: AuthResponse = {
