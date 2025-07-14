@@ -240,6 +240,12 @@ const App = () => {
         return <LoginLogs onBack={handleBackToHome} />;
       case "admin-error-logs":
         return <ErrorLogs onBack={handleBackToHome} />;
+      case "about":
+        return <About onBack={handleBackToHome} />;
+      case "contact":
+        return <Contact onBack={handleBackToHome} />;
+      case "help":
+        return <Help onBack={handleBackToHome} />;
       case "home":
       default:
         return (
