@@ -155,9 +155,11 @@ export default function Home({
           tag.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
-      // Category filter
+      // Category filter (handles both story categories and access levels)
       const matchesCategory =
-        selectedCategory === "all" || story.category === selectedCategory;
+        selectedCategory === "all" ||
+        story.category === selectedCategory ||
+        story.accessLevel === selectedCategory;
 
       return matchesSearch && matchesCategory;
     })
