@@ -16,6 +16,7 @@ const users: User[] = [
     username: "admin",
     role: "admin",
     isAgeVerified: true,
+    isActive: true,
     subscriptionStatus: "none",
     createdAt: new Date(),
   },
@@ -25,6 +26,7 @@ const users: User[] = [
     username: "premiumuser",
     role: "premium",
     isAgeVerified: true,
+    isActive: true,
     subscriptionStatus: "active",
     subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
     createdAt: new Date(),
@@ -35,6 +37,7 @@ const users: User[] = [
     username: "freeuser",
     role: "free",
     isAgeVerified: true,
+    isActive: true,
     subscriptionStatus: "none",
     createdAt: new Date(),
   },
