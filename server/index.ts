@@ -61,6 +61,7 @@ export function createServer() {
   // Story interaction routes
   app.get("/api/stories/:id/comments", getStoryComments);
   app.post("/api/stories/:id/comments", addStoryComment);
+  app.delete("/api/stories/:id/comments/:commentId", deleteComment);
   app.post("/api/stories/:id/rating", rateStory);
   app.post("/api/stories/:id/like", toggleStoryLike);
   app.get("/api/stories/:id/user-interaction", getUserInteraction);
