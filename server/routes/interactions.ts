@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { Comment, Rating } from "@shared/api";
-import { stories, saveStories, loadStories } from "./stories";
+import { loadStories, saveStories } from "../utils/dataStore";
 import {
   loadComments,
   saveComments,
@@ -11,6 +11,8 @@ import {
 // Load data from JSON files
 let comments: Comment[] = loadComments();
 let interactions = loadInteractions();
+
+// Convert stored interactions to runtime format
 let likes: { userId: string; storyId: string; createdAt: Date }[] =
   Object.entries(interactions.likes).flatMap(([storyId, users]) =>
     Object.entries(users)
@@ -42,39 +44,71 @@ const logError = (
   );
 };
 
+// Helper function to save interactions to JSON
+const saveInteractionsData = () => {
+  const interactionsData = {
+    likes: {} as { [storyId: string]: { [userId: string]: boolean } },
+    ratings: {} as { [storyId: string]: { [userId: string]: number } },
+  };
+
+  // Convert likes array to object format
+  likes.forEach((like) => {
+    if (!interactionsData.likes[like.storyId]) {
+      interactionsData.likes[like.storyId] = {};
+    }
+    interactionsData.likes[like.storyId][like.userId] = true;
+  });
+
+  // Convert ratings array to object format
+  ratings.forEach((rating) => {
+    if (!interactionsData.ratings[rating.storyId]) {
+      interactionsData.ratings[rating.storyId] = {};
+    }
+    interactionsData.ratings[rating.storyId][rating.userId] = rating.score;
+  });
+
+  saveInteractions(interactionsData);
+};
+
 // Helper function to update story statistics
 const updateStoryStats = (storyId: string) => {
-  const story = stories.find((s) => s.id === storyId);
-  if (!story) return;
+  const currentStories = loadStories();
+  const storyIndex = currentStories.findIndex((s) => s.id === storyId);
+  if (storyIndex === -1) return;
 
   // Update rating and rating count
   const storyRatings = ratings.filter((r) => r.storyId === storyId);
   if (storyRatings.length > 0) {
     const avgRating =
       storyRatings.reduce((sum, r) => sum + r.score, 0) / storyRatings.length;
-    story.rating = parseFloat(avgRating.toFixed(1));
-    story.ratingCount = storyRatings.length;
+    currentStories[storyIndex].rating = parseFloat(avgRating.toFixed(1));
+    currentStories[storyIndex].ratingCount = storyRatings.length;
   }
 
-  story.updatedAt = new Date();
+  currentStories[storyIndex].updatedAt = new Date();
+  saveStories(currentStories);
 };
 
 // Helper function to increment view count
 const incrementViewCount = (storyId: string) => {
-  const story = stories.find((s) => s.id === storyId);
-  if (story) {
-    story.viewCount += 1;
-    story.updatedAt = new Date();
+  const currentStories = loadStories();
+  const storyIndex = currentStories.findIndex((s) => s.id === storyId);
+  if (storyIndex !== -1) {
+    currentStories[storyIndex].viewCount += 1;
+    currentStories[storyIndex].updatedAt = new Date();
+    saveStories(currentStories);
   }
 };
 
 // Helper function to update comment count
 const updateCommentCount = (storyId: string) => {
-  const story = stories.find((s) => s.id === storyId);
-  if (story) {
+  const currentStories = loadStories();
+  const storyIndex = currentStories.findIndex((s) => s.id === storyId);
+  if (storyIndex !== -1) {
     const storyComments = comments.filter((c) => c.storyId === storyId);
-    story.commentCount = storyComments.length;
-    story.updatedAt = new Date();
+    currentStories[storyIndex].commentCount = storyComments.length;
+    currentStories[storyIndex].updatedAt = new Date();
+    saveStories(currentStories);
   }
 };
 
@@ -82,6 +116,8 @@ const updateCommentCount = (storyId: string) => {
 export const getStoryComments: RequestHandler = (req, res) => {
   try {
     const { id: storyId } = req.params;
+    // Reload comments to get latest data
+    comments = loadComments();
     const storyComments = comments
       .filter((comment) => comment.storyId === storyId)
       .sort(
@@ -122,7 +158,10 @@ export const addStoryComment: RequestHandler = (req, res) => {
       updatedAt: new Date(),
     };
 
+    // Reload comments, add new one, and save
+    comments = loadComments();
     comments.push(newComment);
+    saveComments(comments);
 
     // Update comment count in story
     updateCommentCount(storyId);
@@ -150,6 +189,20 @@ export const rateStory: RequestHandler = (req, res) => {
         .json({ message: "Rating score must be between 1 and 5" });
     }
 
+    // Reload interactions data
+    interactions = loadInteractions();
+
+    // Convert to runtime format for consistency
+    ratings = Object.entries(interactions.ratings).flatMap(([sId, users]) =>
+      Object.entries(users).map(([uId, sc]) => ({
+        id: `${sId}-${uId}`,
+        storyId: sId,
+        userId: uId,
+        score: sc,
+        createdAt: new Date(),
+      })),
+    );
+
     // Check if user already rated this story
     const existingRatingIndex = ratings.findIndex(
       (rating) => rating.storyId === storyId && rating.userId === userId,
@@ -160,9 +213,6 @@ export const rateStory: RequestHandler = (req, res) => {
       ratings[existingRatingIndex].score = score;
       ratings[existingRatingIndex].createdAt = new Date();
       res.json(ratings[existingRatingIndex]);
-
-      // Update story statistics
-      updateStoryStats(storyId);
     } else {
       // Create new rating
       const newRating: Rating = {
@@ -177,7 +227,8 @@ export const rateStory: RequestHandler = (req, res) => {
       res.status(201).json(newRating);
     }
 
-    // Update story statistics
+    // Save ratings and update story statistics
+    saveInteractionsData();
     updateStoryStats(storyId);
   } catch (error) {
     const errorMessage =
@@ -193,6 +244,18 @@ export const toggleStoryLike: RequestHandler = (req, res) => {
     const { id: storyId } = req.params;
     // In a real app, get user from authentication token
     const userId = req.body.userId || "anonymous";
+
+    // Reload interactions data
+    interactions = loadInteractions();
+
+    // Convert to runtime format
+    likes = Object.entries(interactions.likes).flatMap(([sId, users]) =>
+      Object.entries(users)
+        .map(([uId, liked]) =>
+          liked ? { userId: uId, storyId: sId, createdAt: new Date() } : null,
+        )
+        .filter(Boolean),
+    ) as { userId: string; storyId: string; createdAt: Date }[];
 
     const existingLikeIndex = likes.findIndex(
       (like) => like.storyId === storyId && like.userId === userId,
@@ -212,6 +275,9 @@ export const toggleStoryLike: RequestHandler = (req, res) => {
       likes.push(newLike);
       res.json({ liked: true, message: "Story liked" });
     }
+
+    // Save likes data
+    saveInteractionsData();
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Failed to toggle like";
@@ -227,17 +293,18 @@ export const getUserInteraction: RequestHandler = (req, res) => {
     // In a real app, get user from authentication token
     const userId = req.body.userId || req.query.userId || "anonymous";
 
-    const userRating = ratings.find(
-      (rating) => rating.storyId === storyId && rating.userId === userId,
-    );
+    // Reload interactions data
+    interactions = loadInteractions();
 
-    const userLike = likes.find(
-      (like) => like.storyId === storyId && like.userId === userId,
-    );
+    // Check user's rating
+    const userRating = interactions.ratings[storyId]?.[userId] || 0;
+
+    // Check user's like
+    const userLike = interactions.likes[storyId]?.[userId] || false;
 
     res.json({
-      rating: userRating?.score || 0,
-      liked: !!userLike,
+      rating: userRating,
+      liked: userLike,
     });
   } catch (error) {
     const errorMessage =
@@ -268,15 +335,21 @@ export const getStoryStats: RequestHandler = (req, res) => {
   try {
     const { id: storyId } = req.params;
 
-    const storyRatings = ratings.filter((rating) => rating.storyId === storyId);
-    const storyLikes = likes.filter((like) => like.storyId === storyId);
+    // Reload data to get latest stats
+    comments = loadComments();
+    interactions = loadInteractions();
+
+    const storyRatings = Object.values(interactions.ratings[storyId] || {});
+    const storyLikes = Object.values(interactions.likes[storyId] || {}).filter(
+      Boolean,
+    );
     const storyComments = comments.filter(
       (comment) => comment.storyId === storyId,
     );
 
     const averageRating =
       storyRatings.length > 0
-        ? storyRatings.reduce((sum, rating) => sum + rating.score, 0) /
+        ? storyRatings.reduce((sum, rating) => sum + rating, 0) /
           storyRatings.length
         : 0;
 
