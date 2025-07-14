@@ -366,3 +366,38 @@ export const getStoryStats: RequestHandler = (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// DELETE /api/stories/:id/comments/:commentId - Delete a comment
+export const deleteComment: RequestHandler = (req, res) => {
+  try {
+    const { id: storyId, commentId } = req.params;
+
+    // Reload comments to get latest data
+    comments = loadComments();
+
+    const commentIndex = comments.findIndex(
+      (comment) => comment.id === commentId && comment.storyId === storyId,
+    );
+
+    if (commentIndex === -1) {
+      logError(`Comment not found for deletion: ${commentId}`, req, "medium");
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const deletedComment = comments.splice(commentIndex, 1)[0];
+    saveComments(comments);
+
+    // Update comment count in story
+    updateCommentCount(storyId);
+
+    res.json({
+      message: "Comment deleted successfully",
+      comment: deletedComment,
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to delete comment";
+    logError(`Error deleting comment: ${errorMessage}`, req, "high");
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
