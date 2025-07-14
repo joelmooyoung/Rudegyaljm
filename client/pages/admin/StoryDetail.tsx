@@ -385,6 +385,78 @@ export default function StoryDetail({
                 />
               </div>
 
+              {/* Image Upload Section */}
+              <div className="space-y-4">
+                <Label>Story Image</Label>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Upload Image</Label>
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          {isUploadingImage
+                            ? "Processing..."
+                            : "Click to upload image"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          PNG, JPG, GIF up to 5MB (will be compressed)
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Image Preview */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Preview</Label>
+                      {imagePreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={removeImage}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    {imagePreview ? (
+                      <div className="border rounded-md overflow-hidden bg-muted/20">
+                        <img
+                          src={imagePreview}
+                          alt="Story preview"
+                          className="w-full h-48 object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="border rounded-md bg-muted/20 h-48 flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                          <Upload className="h-12 w-12 mx-auto mb-2" />
+                          <p className="text-sm">No image selected</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Premium checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
