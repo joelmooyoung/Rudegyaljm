@@ -5,27 +5,6 @@ import { loadStories, saveStories } from "../utils/dataStore";
 // Load stories from JSON file
 export let stories: Story[] = loadStories();
   {
-    id: "1",
-    title: "Midnight Desires",
-    excerpt:
-      "A passionate tale of forbidden romance that unfolds under the cover of darkness...",
-    content:
-      "<p>In the depths of the city night, <strong>Emma</strong> discovered that some secrets are worth keeping...</p>",
-    author: "Elena Rossini",
-    category: "Romance",
-    tags: ["passion", "forbidden", "dark"],
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.8,
-    ratingCount: 234,
-    viewCount: 1542,
-    commentCount: 23,
-    image:
-      "https://images.unsplash.com/photo-1518136247453-74e7b5265980?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  },
-  {
     id: "2",
     title: "The Executive's Secret",
     excerpt:
