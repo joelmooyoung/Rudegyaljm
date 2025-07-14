@@ -1,78 +1,117 @@
 // Enhanced IP to country mapping with comprehensive ranges and flags
 
 export const getCountryFromIP = (ip: string): string => {
-  // Enhanced country detection with comprehensive IP ranges and flags
+  // Clean up IP address and handle edge cases
+  if (!ip || ip === "unknown" || ip === "undefined") return "🌐 Unknown Region";
+
+  // Handle IPv6-mapped IPv4 addresses
+  let cleanIP = ip.trim();
+  if (cleanIP.startsWith("::ffff:")) {
+    cleanIP = cleanIP.substring(7);
+  }
+
+  // Remove port numbers if present
+  if (cleanIP.includes(":") && !cleanIP.includes("::")) {
+    cleanIP = cleanIP.split(":")[0];
+  }
+
+  console.log(`[GEO] Detecting country for IP: ${ip} -> cleaned: ${cleanIP}`);
 
   // Local and private network detection
-  if (ip === "127.0.0.1" || ip === "::1") return "🏠 Localhost";
+  if (cleanIP === "127.0.0.1" || cleanIP === "::1" || cleanIP === "localhost")
+    return "🏠 Localhost";
   if (
-    ip.startsWith("192.168.") ||
-    ip.startsWith("10.") ||
-    ip.startsWith("172.16.") ||
-    ip.startsWith("172.17.") ||
-    ip.startsWith("172.18.") ||
-    ip.startsWith("172.19.") ||
-    ip.startsWith("172.20.") ||
-    ip.startsWith("172.21.") ||
-    ip.startsWith("172.22.") ||
-    ip.startsWith("172.23.") ||
-    ip.startsWith("172.24.") ||
-    ip.startsWith("172.25.") ||
-    ip.startsWith("172.26.") ||
-    ip.startsWith("172.27.") ||
-    ip.startsWith("172.28.") ||
-    ip.startsWith("172.29.") ||
-    ip.startsWith("172.30.") ||
-    ip.startsWith("172.31.")
+    cleanIP.startsWith("192.168.") ||
+    cleanIP.startsWith("10.") ||
+    cleanIP.startsWith("172.16.") ||
+    cleanIP.startsWith("172.17.") ||
+    cleanIP.startsWith("172.18.") ||
+    cleanIP.startsWith("172.19.") ||
+    cleanIP.startsWith("172.20.") ||
+    cleanIP.startsWith("172.21.") ||
+    cleanIP.startsWith("172.22.") ||
+    cleanIP.startsWith("172.23.") ||
+    cleanIP.startsWith("172.24.") ||
+    cleanIP.startsWith("172.25.") ||
+    cleanIP.startsWith("172.26.") ||
+    cleanIP.startsWith("172.27.") ||
+    cleanIP.startsWith("172.28.") ||
+    cleanIP.startsWith("172.29.") ||
+    cleanIP.startsWith("172.30.") ||
+    cleanIP.startsWith("172.31.")
   ) {
     return "🏢 Private Network";
   }
 
-  // United States (major ISP ranges)
+  // United States (expanded ISP ranges)
   if (
-    ip.startsWith("8.8.8.") || // Google DNS
-    ip.startsWith("1.1.1.") || // Cloudflare
-    ip.startsWith("76.") ||
-    ip.startsWith("104.") ||
-    ip.startsWith("107.") ||
-    ip.startsWith("173.") ||
-    ip.startsWith("184.") ||
-    ip.startsWith("208.") ||
-    ip.startsWith("75.") ||
-    ip.startsWith("96.") ||
-    ip.startsWith("98.") ||
-    ip.startsWith("74.") ||
-    ip.startsWith("71.") ||
-    ip.startsWith("67.") ||
-    ip.startsWith("68.") ||
-    ip.startsWith("72.") ||
-    ip.startsWith("70.") ||
-    ip.startsWith("69.") ||
-    ip.startsWith("73.")
+    cleanIP.startsWith("8.8.8.") || // Google DNS
+    cleanIP.startsWith("8.8.4.") || // Google DNS
+    cleanIP.startsWith("1.1.1.") || // Cloudflare
+    cleanIP.startsWith("1.0.0.") || // Cloudflare
+    cleanIP.startsWith("4.2.2.") || // Level3 DNS
+    cleanIP.startsWith("76.") ||
+    cleanIP.startsWith("104.") ||
+    cleanIP.startsWith("107.") ||
+    cleanIP.startsWith("173.") ||
+    cleanIP.startsWith("184.") ||
+    cleanIP.startsWith("208.") ||
+    cleanIP.startsWith("75.") ||
+    cleanIP.startsWith("96.") ||
+    cleanIP.startsWith("98.") ||
+    cleanIP.startsWith("74.") ||
+    cleanIP.startsWith("71.") ||
+    cleanIP.startsWith("67.") ||
+    cleanIP.startsWith("68.") ||
+    cleanIP.startsWith("72.") ||
+    cleanIP.startsWith("70.") ||
+    cleanIP.startsWith("69.") ||
+    cleanIP.startsWith("73.") ||
+    cleanIP.startsWith("50.") ||
+    cleanIP.startsWith("66.") ||
+    cleanIP.startsWith("199.") ||
+    cleanIP.startsWith("209.") ||
+    cleanIP.startsWith("154.") ||
+    cleanIP.startsWith("38.") ||
+    cleanIP.startsWith("45.") ||
+    cleanIP.startsWith("47.") ||
+    cleanIP.startsWith("52.") ||
+    cleanIP.startsWith("54.") ||
+    cleanIP.startsWith("23.") ||
+    cleanIP.startsWith("35.") ||
+    cleanIP.startsWith("44.") ||
+    cleanIP.startsWith("3.") // AWS range
   )
     return "🇺🇸 United States";
 
-  // Canada
+  // Canada (expanded ranges)
   if (
-    ip.startsWith("24.") ||
-    ip.startsWith("99.") ||
-    ip.startsWith("142.") ||
-    ip.startsWith("216.") ||
-    ip.startsWith("206.") ||
-    ip.startsWith("207.") ||
-    ip.startsWith("64.") ||
-    ip.startsWith("65.")
+    cleanIP.startsWith("24.") ||
+    cleanIP.startsWith("99.") ||
+    cleanIP.startsWith("142.") ||
+    cleanIP.startsWith("216.") ||
+    cleanIP.startsWith("206.") ||
+    cleanIP.startsWith("207.") ||
+    cleanIP.startsWith("64.") ||
+    cleanIP.startsWith("65.") ||
+    cleanIP.startsWith("198.") ||
+    cleanIP.startsWith("205.") ||
+    cleanIP.startsWith("204.") ||
+    cleanIP.startsWith("192.197.") ||
+    cleanIP.startsWith("129.")
   )
     return "🇨🇦 Canada";
 
-  // United Kingdom
+  // United Kingdom (expanded ranges)
   if (
-    ip.startsWith("81.") ||
-    ip.startsWith("86.") ||
-    ip.startsWith("90.") ||
-    ip.startsWith("151.") ||
-    ip.startsWith("92.") ||
-    ip.startsWith("195.")
+    cleanIP.startsWith("81.") ||
+    cleanIP.startsWith("86.") ||
+    cleanIP.startsWith("90.") ||
+    cleanIP.startsWith("151.") ||
+    cleanIP.startsWith("92.") ||
+    cleanIP.startsWith("195.") ||
+    cleanIP.startsWith("82.") ||
+    cleanIP.startsWith("2.")
   )
     return "🇬🇧 United Kingdom";
 
@@ -219,6 +258,9 @@ export const getCountryFromIP = (ip: string): string => {
 
   // South American ranges (general)
   if (ip.startsWith("191.") || ip.startsWith("170.")) return "🌎 South America";
+
+  // Log unmatched IPs for debugging
+  console.log(`[GEO] No match found for IP: ${cleanIP}`);
 
   return "🌐 Unknown Region";
 };
