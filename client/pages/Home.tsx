@@ -466,9 +466,9 @@ export default function Home({
               </CardContent>
             </Card>
           )}
-        </section>
+                </section>
 
-                {/* Search and filters */}
+        {/* Search and filters */}
         <section className="mb-12">
           <div className="max-w-4xl mx-auto">
             <h3 className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6">
