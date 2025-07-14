@@ -180,7 +180,8 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                   value="login"
                   className="font-serif data-[state=active]:text-passion-gradient"
                 >
-                  Enter Sanctuary
+                  {" "}
+                  Login
                 </TabsTrigger>
                 <TabsTrigger
                   value="register"
