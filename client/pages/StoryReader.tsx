@@ -102,6 +102,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           rating: stats.averageRating,
           ratingCount: stats.totalRatings,
           viewCount: prev.viewCount, // Keep current view count, server handles increment
+          commentCount: stats.totalComments,
         }));
       }
     } catch (error) {
