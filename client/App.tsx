@@ -103,6 +103,22 @@ const App = () => {
     setCurrentView("home");
   };
 
+  const handleNavigateToAbout = () => {
+    setCurrentView("about");
+  };
+
+  const handleNavigateToContact = () => {
+    setCurrentView("contact");
+  };
+
+  const handleNavigateToHelp = () => {
+    setCurrentView("help");
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView("home");
+  };
+
   const handleSaveStory = async (storyData: Partial<Story>) => {
     try {
       let response;
