@@ -91,11 +91,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       const statsResponse = await fetch(`/api/stories/${story.id}/stats`);
       if (statsResponse.ok) {
         const stats = await statsResponse.json();
-        setStoryStats({
+        setStoryStats((prev) => ({
           rating: stats.averageRating,
           ratingCount: stats.totalRatings,
-          viewCount: storyStats.viewCount + 1, // Keep incrementing view count
-        });
+          viewCount: prev.viewCount, // Keep current view count, server handles increment
+        }));
       }
     } catch (error) {
       console.error("Failed to refresh story stats:", error);
