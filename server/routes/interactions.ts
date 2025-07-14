@@ -18,6 +18,32 @@ const logError = (
   );
 };
 
+// Helper function to update story statistics
+const updateStoryStats = (storyId: string) => {
+  const story = stories.find((s) => s.id === storyId);
+  if (!story) return;
+
+  // Update rating and rating count
+  const storyRatings = ratings.filter((r) => r.storyId === storyId);
+  if (storyRatings.length > 0) {
+    const avgRating =
+      storyRatings.reduce((sum, r) => sum + r.score, 0) / storyRatings.length;
+    story.rating = parseFloat(avgRating.toFixed(1));
+    story.ratingCount = storyRatings.length;
+  }
+
+  story.updatedAt = new Date();
+};
+
+// Helper function to increment view count
+const incrementViewCount = (storyId: string) => {
+  const story = stories.find((s) => s.id === storyId);
+  if (story) {
+    story.viewCount += 1;
+    story.updatedAt = new Date();
+  }
+};
+
 // GET /api/stories/:id/comments - Get comments for a story
 export const getStoryComments: RequestHandler = (req, res) => {
   try {
