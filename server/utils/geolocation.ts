@@ -22,6 +22,77 @@ export const getCountryFromIP = (ip: string): string => {
     `[GEO] Detecting country for IP: "${ip}" -> cleaned: "${cleanIP}"`,
   );
 
+  // IPv6 address detection
+  if (cleanIP.includes(":")) {
+    console.log(`[GEO] IPv6 address detected: ${cleanIP}`);
+
+    // IPv6 localhost
+    if (cleanIP === "::1") {
+      console.log(`[GEO] IPv6 localhost detected: ${cleanIP}`);
+      return "🏠 Localhost";
+    }
+
+    // United States IPv6 ranges
+    if (
+      cleanIP.startsWith("2001:4860:") || // Google
+      cleanIP.startsWith("2607:f8b0:") || // Google
+      cleanIP.startsWith("2600:") || // Various US ISPs
+      cleanIP.startsWith("2601:") || // Comcast/Xfinity
+      cleanIP.startsWith("2602:") || // Various US ISPs
+      cleanIP.startsWith("2603:") || // Various US ISPs
+      cleanIP.startsWith("2604:") || // Various US ISPs
+      cleanIP.startsWith("2605:") || // Various US ISPs
+      cleanIP.startsWith("2606:") || // Various US ISPs
+      cleanIP.startsWith("2607:") || // Various US ISPs
+      cleanIP.startsWith("2620:") || // Various US organizations
+      cleanIP.startsWith("2001:550:") || // US ISPs
+      cleanIP.startsWith("2610:") // US ISPs
+    ) {
+      console.log(`[GEO] United States IPv6 detected: ${cleanIP}`);
+      return "🇺🇸 United States";
+    }
+
+    // Canada IPv6 ranges
+    if (cleanIP.startsWith("2001:56a:") || cleanIP.startsWith("2607:5300:")) {
+      console.log(`[GEO] Canada IPv6 detected: ${cleanIP}`);
+      return "🇨🇦 Canada";
+    }
+
+    // United Kingdom IPv6 ranges
+    if (cleanIP.startsWith("2001:ba8:") || cleanIP.startsWith("2a00:")) {
+      console.log(`[GEO] United Kingdom IPv6 detected: ${cleanIP}`);
+      return "🇬🇧 United Kingdom";
+    }
+
+    // European IPv6 ranges (general)
+    if (
+      cleanIP.startsWith("2a01:") ||
+      cleanIP.startsWith("2a02:") ||
+      cleanIP.startsWith("2a03:") ||
+      cleanIP.startsWith("2a04:") ||
+      cleanIP.startsWith("2a05:") ||
+      cleanIP.startsWith("2a06:") ||
+      cleanIP.startsWith("2a07:")
+    ) {
+      console.log(`[GEO] Europe IPv6 detected: ${cleanIP}`);
+      return "🇪🇺 Europe";
+    }
+
+    // Asian IPv6 ranges (general)
+    if (
+      cleanIP.startsWith("2001:200:") ||
+      cleanIP.startsWith("2001:da8:") ||
+      cleanIP.startsWith("240")
+    ) {
+      console.log(`[GEO] Asia IPv6 detected: ${cleanIP}`);
+      return "🌏 Asia";
+    }
+
+    // Log unknown IPv6 for debugging
+    console.log(`[GEO] Unknown IPv6 range: ${cleanIP}`);
+    return "🌐 Unknown Region (IPv6)";
+  }
+
   // Local and private network detection
   if (cleanIP === "127.0.0.1" || cleanIP === "::1" || cleanIP === "localhost") {
     console.log(`[GEO] Localhost detected: ${cleanIP}`);
