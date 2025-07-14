@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { Comment, Rating } from "@shared/api";
+import { stories } from "./stories";
 
 // Mock database storage (replace with real database in production)
 let comments: Comment[] = [];
