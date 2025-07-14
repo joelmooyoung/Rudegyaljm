@@ -10,7 +10,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Crown, Eye, EyeOff, Mail, User, Calendar } from "lucide-react";
+import {
+  Crown,
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Calendar,
+  Heart,
+  Flame,
+  Lock,
+} from "lucide-react";
 import {
   LoginRequest,
   RegisterRequest,
