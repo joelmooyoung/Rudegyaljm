@@ -239,6 +239,8 @@ const App = () => {
             onNavigateToHelp={handleNavigateToHelp}
           />
         );
+      case "admin-comments":
+        return <CommentsMaintenance onBack={handleBackToStories} />;
       case "admin-users":
         return <UserMaintenance onBack={handleBackToHome} />;
       case "admin-login-logs":
