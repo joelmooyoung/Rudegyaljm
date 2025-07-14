@@ -545,12 +545,111 @@ export default function Home({
 
       {/* Footer */}
       <footer className="border-t border-border/50 bg-card/30 mt-auto">
-        <div className="container mx-auto px-4 py-6">
-          <div className="text-center text-sm text-muted-foreground">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Brand */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2F9a930541b2654097be9377fff1612aa0%2F6532a2d2c5444a69b0f8c5b4757e7b05?format=webp&width=800"
+                  alt="Rude Gyal Confessions Logo"
+                  className="h-6 w-6 object-contain"
+                />
+                <span className="font-bold text-sm">Rude Gyal Confessions</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Authentic confessions and intimate stories from real
+                experiences.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Quick Links</h4>
+              <div className="space-y-2 text-xs">
+                {onNavigateToAbout && (
+                  <button
+                    onClick={onNavigateToAbout}
+                    className="block text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    About Us
+                  </button>
+                )}
+                {onNavigateToContact && (
+                  <button
+                    onClick={onNavigateToContact}
+                    className="block text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Contact
+                  </button>
+                )}
+                {onNavigateToHelp && (
+                  <button
+                    onClick={onNavigateToHelp}
+                    className="block text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Help & FAQ
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Follow Us</h4>
+              <div className="flex gap-3">
+                <a
+                  href="https://instagram.com/rudegyaljm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-pink-500 transition-colors"
+                  title="Instagram"
+                >
+                  📷
+                </a>
+                <a
+                  href="https://twitter.com/rudegyaljm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-blue-400 transition-colors"
+                  title="Twitter"
+                >
+                  🐦
+                </a>
+                <a
+                  href="https://facebook.com/rudegyaljm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-blue-600 transition-colors"
+                  title="Facebook"
+                >
+                  📘
+                </a>
+                <a
+                  href="mailto:hello@rudegyaljm.com"
+                  className="text-muted-foreground hover:text-green-500 transition-colors"
+                  title="Email"
+                >
+                  ✉️
+                </a>
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Contact</h4>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <p>hello@rudegyaljm.com</p>
+                <p>support@rudegyaljm.com</p>
+                <p>Response: 24 hours</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-border/50 mt-6 pt-4 text-center text-xs text-muted-foreground">
             <p>
               © {new Date().getFullYear()} Rudegyaljm.com - All rights reserved
             </p>
-            <p className="mt-1">Authentic confessions and intimate stories</p>
           </div>
         </div>
       </footer>
