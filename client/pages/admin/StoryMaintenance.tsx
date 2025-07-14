@@ -35,6 +35,7 @@ import { Story } from "@shared/api";
 interface StoryMaintenanceProps {
   onBack: () => void;
   onEditStory: (story: Story | null, mode: "add" | "edit") => void;
+  onCommentsMaintenance: () => void;
 }
 
 export default function StoryMaintenance({
