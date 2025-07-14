@@ -171,7 +171,7 @@ export default function Home({
   const renderStoryCard = (story: Story) => (
     <Card
       key={story.id}
-      className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
+      className="story-card-intimate cursor-pointer group overflow-hidden passionate-shimmer"
       onClick={() => handleStoryClick(story)}
     >
       {/* Story Image */}
