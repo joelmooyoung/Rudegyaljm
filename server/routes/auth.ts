@@ -235,6 +235,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
       username,
       role: "free",
       isAgeVerified: true,
+      isActive: true,
       subscriptionStatus: "none",
       createdAt: new Date(),
       lastLogin: new Date(),
