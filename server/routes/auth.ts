@@ -84,7 +84,7 @@ const logSuccessfulLogin = (userId: string, email: string, req: any): void => {
     userId,
     email,
     ipAddress,
-    country: getCountryFromIP(ipAddress),
+    country: getEnhancedCountryFromIP(ipAddress),
     userAgent: req.get("User-Agent") || "unknown",
     success: true,
     createdAt: new Date(),
