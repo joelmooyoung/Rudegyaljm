@@ -214,13 +214,15 @@ export default function Home({
 
       {/* Story Header for stories without images */}
       {!story.image && (
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-2">
+        <CardHeader className="pb-4 bg-gradient-to-br from-card to-card/50">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+              <CardTitle className="text-xl font-display font-bold leading-tight group-hover:text-passion-gradient transition-colors duration-300">
                 {story.title}
               </CardTitle>
-              <CardDescription>by {story.author}</CardDescription>
+              <CardDescription className="font-serif italic text-base mt-1">
+                by {story.author}
+              </CardDescription>
             </div>
             <Badge
               variant={
