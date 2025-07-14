@@ -25,6 +25,9 @@ import {
   RefreshCw,
   CheckCircle,
   XCircle,
+  Mail,
+  Globe,
+  Monitor,
 } from "lucide-react";
 import { LoginLog } from "@shared/api";
 
