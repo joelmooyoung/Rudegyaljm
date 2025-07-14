@@ -13,9 +13,22 @@ export const getCountryFromIP = (ip: string): string => {
     cleanIP = cleanIP.substring(7);
   }
 
-  // Remove port numbers if present
-  if (cleanIP.includes(":") && !cleanIP.includes("::")) {
-    cleanIP = cleanIP.split(":")[0];
+  // Remove port numbers if present (only for IPv4, not IPv6)
+  // IPv6 addresses contain colons as part of their format, so we need to be careful
+  // Port numbers in IPv6 are enclosed in brackets: [2001:db8::1]:8080
+  if (cleanIP.includes("]:")) {
+    // IPv6 with port: [2001:db8::1]:8080 -> 2001:db8::1
+    cleanIP = cleanIP.substring(1, cleanIP.indexOf("]:"));
+  } else if (
+    cleanIP.includes(":") &&
+    !cleanIP.includes("::") &&
+    cleanIP.split(":").length === 2
+  ) {
+    // IPv4 with port: 192.168.1.1:8080 -> 192.168.1.1
+    const parts = cleanIP.split(":");
+    if (parts.length === 2 && !isNaN(parseInt(parts[1]))) {
+      cleanIP = parts[0];
+    }
   }
 
   console.log(
