@@ -19,6 +19,7 @@ import {
 import {
   getStoryComments,
   addStoryComment,
+  deleteComment,
   rateStory,
   toggleStoryLike,
   getUserInteraction,
