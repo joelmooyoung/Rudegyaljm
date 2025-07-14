@@ -11,10 +11,29 @@ export interface User {
   username: string;
   role: UserRole;
   isAgeVerified: boolean;
+  isActive: boolean;
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionExpiry?: Date;
   createdAt: Date;
   lastLogin?: Date;
+}
+
+export interface UserCreateRequest {
+  email: string;
+  username: string;
+  password: string;
+  role: UserRole;
+  isAgeVerified: boolean;
+}
+
+export interface UserUpdateRequest {
+  email?: string;
+  username?: string;
+  password?: string;
+  role?: UserRole;
+  isActive?: boolean;
+  subscriptionStatus?: "active" | "expired" | "none";
+  subscriptionExpiry?: Date;
 }
 
 export interface Story {
