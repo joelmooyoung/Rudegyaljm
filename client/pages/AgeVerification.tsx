@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar, Shield, Users, Star } from "lucide-react";
+import { Calendar, Shield, Users, Star, Flame, Heart, Eye } from "lucide-react";
 
 interface AgeVerificationProps {
   onVerified: () => void;
