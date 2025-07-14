@@ -27,6 +27,15 @@ import {
   incrementStoryViews,
 } from "./routes/interactions";
 import { uploadImage, copyImageFromUrl, testUpload } from "./routes/upload";
+import {
+  getUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  toggleUserActive,
+  getUserStats,
+} from "./routes/users";
 
 export function createServer() {
   const app = express();
