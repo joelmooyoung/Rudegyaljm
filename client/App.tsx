@@ -16,6 +16,7 @@ import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 import StoryMaintenance from "./pages/admin/StoryMaintenance";
 import StoryDetail from "./pages/admin/StoryDetail";
+import CommentsMaintenance from "./pages/admin/CommentsMaintenance";
 import StoryReader from "./pages/StoryReader";
 import UserMaintenance from "./pages/admin/UserMaintenance";
 import LoginLogs from "./pages/admin/LoginLogs";
