@@ -52,52 +52,61 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/5" />
+      {/* Passionate background gradient */}
+      <div className="absolute inset-0 bg-desire-gradient opacity-10 blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/10" />
 
       {/* Main content */}
       <div className="relative z-10 w-full max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
+          <div className="inline-flex items-center gap-4 mb-6">
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2F9a930541b2654097be9377fff1612aa0%2F6532a2d2c5444a69b0f8c5b4757e7b05?format=webp&width=800"
               alt="Rude Gyal Confessions Logo"
-              className="h-12 w-12 object-contain"
+              className="h-16 w-16 object-contain sultry-pulse"
             />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-5xl font-display font-bold text-passion-gradient">
               Rude Gyal Confessions
             </h1>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Authentic confessions and intimate stories from real experiences -
-            where bold voices share their truth
+          <p className="text-2xl font-serif text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <em>Where forbidden desires meet bold confessions</em> - Enter a
+            realm of authentic passion, intimate secrets, and stories that
+            ignite the soul
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Age verification card */}
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="story-card-intimate passionate-shimmer seductive-border">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
-                <Shield className="h-8 w-8 text-destructive" />
+              <div className="mx-auto w-20 h-20 bg-seductive-gradient rounded-full flex items-center justify-center mb-6 passionate-glow">
+                <Flame className="h-10 w-10 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl">
-                Age Verification Required
+              <CardTitle className="text-3xl font-display font-bold text-passion-gradient mb-3">
+                Enter the Forbidden Realm
               </CardTitle>
-              <CardDescription className="text-base">
-                This site contains adult content. You must be 18 or older to
-                continue.
+              <CardDescription className="text-lg font-serif text-muted-foreground leading-relaxed">
+                This sanctuary contains adult tales of desire and passion.
+                <br />
+                You must be <strong className="text-accent">
+                  18 or older
+                </strong>{" "}
+                to witness these intimate confessions.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="birthdate">Date of Birth</Label>
+            <CardContent className="space-y-8">
+              <div className="space-y-3">
+                <Label htmlFor="birthdate" className="text-lg font-serif">
+                  <Calendar className="inline h-4 w-4 mr-2" />
+                  Reveal Your Age
+                </Label>
                 <Input
                   id="birthdate"
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className="bg-input/50"
+                  className="bg-input/80 seductive-border py-3 text-lg font-serif focus:passionate-glow transition-all duration-300"
                 />
               </div>
 
