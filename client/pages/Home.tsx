@@ -501,11 +501,11 @@ export default function Home({
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-32">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
+                              <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-40 py-3 font-serif seductive-border">
+                    <TrendingUp className="h-4 w-4 mr-2 text-accent" />
+                    <SelectValue />
+                  </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="newest">Newest</SelectItem>
                   <SelectItem value="rating">Top Rated</SelectItem>
