@@ -187,10 +187,16 @@ export default function StoryMaintenance({
                 {filteredStories.length} stories
               </Badge>
             </div>
-            <Button onClick={() => onEditStory(null, "add")}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Story
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onCommentsMaintenance}>
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Comments
+              </Button>
+              <Button onClick={() => onEditStory(null, "add")}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Story
+              </Button>
+            </div>
           </div>
         </div>
       </header>
