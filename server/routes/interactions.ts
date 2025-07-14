@@ -99,6 +99,10 @@ export const addStoryComment: RequestHandler = (req, res) => {
     };
 
     comments.push(newComment);
+
+    // Update comment count in story
+    updateCommentCount(storyId);
+
     res.status(201).json(newComment);
   } catch (error) {
     const errorMessage =
