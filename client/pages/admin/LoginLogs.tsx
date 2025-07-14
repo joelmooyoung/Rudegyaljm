@@ -135,11 +135,13 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
         </div>
 
         {/* Logs Table */}
-        <Card>
+        <Card className="story-card-intimate seductive-border">
           <CardHeader>
-            <CardTitle>Login Activity</CardTitle>
-            <CardDescription>
-              Monitor user login attempts and track security events
+            <CardTitle className="text-xl font-display font-bold text-passion-gradient">
+              Successful Login Activity
+            </CardTitle>
+            <CardDescription className="font-serif">
+              Monitor successful user logins with detailed tracking information
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -147,12 +149,21 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>IP Address</TableHead>
-                    <TableHead>Country</TableHead>
-                    <TableHead>User Agent</TableHead>
-                    <TableHead>Timestamp</TableHead>
+                    <TableHead className="font-serif">User ID</TableHead>
+                    <TableHead className="font-serif">
+                      <Mail className="inline h-4 w-4 mr-1" />
+                      Email
+                    </TableHead>
+                    <TableHead className="font-serif">
+                      <Monitor className="inline h-4 w-4 mr-1" />
+                      IP Address
+                    </TableHead>
+                    <TableHead className="font-serif">
+                      <Globe className="inline h-4 w-4 mr-1" />
+                      Country
+                    </TableHead>
+                    <TableHead className="font-serif">User Agent</TableHead>
+                    <TableHead className="font-serif">Timestamp</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
