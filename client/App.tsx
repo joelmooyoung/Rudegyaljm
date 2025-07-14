@@ -209,6 +209,7 @@ const App = () => {
           <StoryMaintenance
             onBack={handleBackToHome}
             onEditStory={handleEditStory}
+            onCommentsMaintenance={handleCommentsMaintenance}
           />
         );
       case "admin-story-detail":
