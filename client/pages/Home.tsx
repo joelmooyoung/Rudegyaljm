@@ -273,7 +273,7 @@ export default function Home({
             </div>
             <div className="flex items-center gap-1">
               <MessageCircle className="h-4 w-4" />
-              <span>{Math.floor(story.viewCount * 0.1)}</span>
+              <span>{story.commentCount || 0}</span>
             </div>
           </div>
           <Badge variant="outline" className="text-xs">
