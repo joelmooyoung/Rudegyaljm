@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import { Story, StoryRequest } from "@shared/api";
+import { loadStories, saveStories } from "../utils/dataStore";
 
-// Mock database storage (replace with real database in production)
-export let stories: Story[] = [
+// Load stories from JSON file
+export let stories: Story[] = loadStories();
   {
     id: "1",
     title: "Midnight Desires",
@@ -119,7 +120,7 @@ export let stories: Story[] = [
     tags: ["library", "secrets", "supernatural"],
     accessLevel: "premium",
     isPublished: true,
-    rating: 4.7,
+        rating: 4.7,
     ratingCount: 198,
     viewCount: 1123,
     commentCount: 31,
@@ -217,7 +218,7 @@ export const createStory: RequestHandler = (req, res) => {
       isPublished:
         storyData.isPublished !== undefined ? storyData.isPublished : true,
       rating: storyData.rating || 0,
-      ratingCount: storyData.ratingCount || 0,
+            ratingCount: storyData.ratingCount || 0,
       viewCount: storyData.viewCount || 0,
       commentCount: storyData.commentCount || 0,
       image: storyData.image || undefined,
