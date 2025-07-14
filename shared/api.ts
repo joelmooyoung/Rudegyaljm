@@ -88,6 +88,7 @@ export interface Payment {
 export interface LoginLog {
   id: string;
   userId: string;
+  email: string;
   ipAddress: string;
   country: string;
   userAgent: string;
