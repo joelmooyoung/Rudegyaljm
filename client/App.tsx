@@ -161,6 +161,74 @@ const App = () => {
     }
   };
 
+  const handleEditUser = (user: User | null, mode: "add" | "edit") => {
+    setCurrentUser(user);
+    setUserMode(mode);
+    setCurrentView("admin-user-detail");
+  };
+
+  const handleBackToUsers = () => {
+    setCurrentView("admin-users");
+  };
+
+  const handleSaveUser = async (userData: Partial<User>) => {
+    try {
+      let response;
+      if (userMode === "add") {
+        // Create new user
+        response = await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        });
+      } else {
+        // Update existing user
+        response = await fetch(`/api/users/${userData.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        });
+      }
+
+      if (response.ok) {
+        const savedUser = await response.json();
+        console.log("User saved successfully:", savedUser);
+        // Navigate back to user maintenance
+        setCurrentView("admin-users");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save user");
+      }
+    } catch (error) {
+      console.error("Error saving user:", error);
+      throw error; // Let the UserDetail component handle the error display
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log("User deleted successfully");
+        // Navigate back to user maintenance
+        setCurrentView("admin-users");
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error; // Let the UserDetail component handle the error display
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
