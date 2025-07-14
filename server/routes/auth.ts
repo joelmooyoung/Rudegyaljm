@@ -335,3 +335,48 @@ export const clearLogs: RequestHandler = (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Enhanced IP extraction function for better geolocation
+export const getEnhancedClientIP = (req: any): string => {
+  // Check X-Forwarded-For header (most common for proxies/load balancers)
+  const forwardedFor = req.get("X-Forwarded-For");
+  if (forwardedFor) {
+    const ips = forwardedFor.split(",");
+    const clientIP = ips[0].trim();
+    console.log(
+      `[IP] X-Forwarded-For found: ${forwardedFor}, using: ${clientIP}`,
+    );
+    return clientIP;
+  }
+
+  // Check other common proxy headers
+  const realIP = req.get("X-Real-IP");
+  if (realIP) {
+    console.log(`[IP] X-Real-IP found: ${realIP}`);
+    return realIP.trim();
+  }
+
+  const clientIP = req.get("X-Client-IP");
+  if (clientIP) {
+    console.log(`[IP] X-Client-IP found: ${clientIP}`);
+    return clientIP.trim();
+  }
+
+  // Check CF-Connecting-IP (Cloudflare)
+  const cfIP = req.get("CF-Connecting-IP");
+  if (cfIP) {
+    console.log(`[IP] CF-Connecting-IP found: ${cfIP}`);
+    return cfIP.trim();
+  }
+
+  // Fallback to connection IP
+  const connectionIP =
+    req.ip ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    req.connection?.socket?.remoteAddress ||
+    "unknown";
+
+  console.log(`[IP] Using connection IP: ${connectionIP}`);
+  return connectionIP;
+};
