@@ -168,13 +168,13 @@ export default function Home({
     }
   };
 
-  const renderStoryCard = (story: Story) => (
+    const renderStoryCard = (story: Story) => (
     <Card
       key={story.id}
       className="story-card-intimate cursor-pointer group overflow-hidden passionate-shimmer"
       onClick={() => handleStoryClick(story)}
     >
-      {/* Story Image */}
+            {/* Story Image */}
       {story.image && (
         <div className="relative h-52 bg-muted/20 overflow-hidden">
           <img
@@ -185,7 +185,7 @@ export default function Home({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-red-900/20 group-hover:to-red-900/40 transition-all duration-500" />
           <div className="absolute top-3 right-3">
-            <Badge
+                        <Badge
               variant={
                 story.accessLevel === "premium" ? "default" : "secondary"
               }
@@ -201,18 +201,16 @@ export default function Home({
               {story.accessLevel}
             </Badge>
           </div>
-          <div className="absolute bottom-4 left-4 right-4">
+                    <div className="absolute bottom-4 left-4 right-4">
             <h3 className="text-white font-display font-bold text-xl line-clamp-2 mb-2 drop-shadow-lg group-hover:text-accent transition-colors duration-300">
               {story.title}
             </h3>
-            <p className="text-white/95 text-sm font-serif italic drop-shadow">
-              by {story.author}
-            </p>
+            <p className="text-white/95 text-sm font-serif italic drop-shadow">by {story.author}</p>
           </div>
         </div>
       )}
 
-      {/* Story Header for stories without images */}
+            {/* Story Header for stories without images */}
       {!story.image && (
         <CardHeader className="pb-4 bg-gradient-to-br from-card to-card/50">
           <div className="flex items-start justify-between gap-3">
@@ -220,9 +218,7 @@ export default function Home({
               <CardTitle className="text-xl font-display font-bold leading-tight group-hover:text-passion-gradient transition-colors duration-300">
                 {story.title}
               </CardTitle>
-              <CardDescription className="font-serif italic text-base mt-1">
-                by {story.author}
-              </CardDescription>
+              <CardDescription className="font-serif italic text-base mt-1">by {story.author}</CardDescription>
             </div>
             <Badge
               variant={
@@ -243,7 +239,7 @@ export default function Home({
         </CardHeader>
       )}
 
-      <CardContent className="space-y-5 p-6">
+            <CardContent className="space-y-5 p-6">
         <p className="text-base font-serif text-muted-foreground line-clamp-3 leading-relaxed italic">
           "{story.excerpt}"
         </p>
@@ -276,7 +272,7 @@ export default function Home({
               <Eye className="h-4 w-4" />
               <span>{story.viewCount.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1">
               <MessageCircle className="h-4 w-4" />
               <span>{story.commentCount || 0}</span>
             </div>
@@ -398,7 +394,7 @@ export default function Home({
         </div>
       </header>
 
-      {/* Main content */}
+            {/* Main content */}
       <main className="container mx-auto px-4 py-8">
         {/* Hero section */}
         <section className="mb-16 text-center relative overflow-hidden">
@@ -424,26 +420,15 @@ export default function Home({
             {/* Sensual statistics */}
             <div className="flex justify-center gap-8 mb-8 text-sm font-serif">
               <div className="text-center">
-                <div className="text-2xl font-bold text-passion-gradient">
-                  {stories.length}
-                </div>
+                <div className="text-2xl font-bold text-passion-gradient">{stories.length}</div>
                 <div className="text-muted-foreground">Seductive Tales</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-passion-gradient">
-                  {stories
-                    .reduce((sum, story) => sum + story.viewCount, 0)
-                    .toLocaleString()}
-                </div>
+                <div className="text-2xl font-bold text-passion-gradient">{stories.reduce((sum, story) => sum + story.viewCount, 0).toLocaleString()}</div>
                 <div className="text-muted-foreground">Hearts Racing</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-passion-gradient">
-                  {stories.reduce(
-                    (sum, story) => sum + (story.commentCount || 0),
-                    0,
-                  )}
-                </div>
+                <div className="text-2xl font-bold text-passion-gradient">{stories.reduce((sum, story) => sum + (story.commentCount || 0), 0)}</div>
                 <div className="text-muted-foreground">Whispered Secrets</div>
               </div>
             </div>
@@ -456,7 +441,7 @@ export default function Home({
               ` (including ${stories.filter((s) => !s.isPublished).length} drafts)`}
           </p>
 
-          {user.role === "free" && (
+                    {user.role === "free" && (
             <Card className="max-w-3xl mx-auto story-card-intimate passionate-shimmer seductive-border">
               <CardContent className="p-8">
                 <div className="text-center">
@@ -465,12 +450,8 @@ export default function Home({
                     Unlock the Vault of Desires
                   </h3>
                   <p className="text-lg font-serif text-muted-foreground mb-6 leading-relaxed">
-                    Behind these golden gates lie the most{" "}
-                    <span className="text-desire-gradient font-semibold">
-                      intoxicating stories
-                    </span>{" "}
-                    ever penned. Tales so alluring, so forbidden, they're
-                    reserved only for those who dare to indulge completely.
+                    Behind these golden gates lie the most <span className="text-desire-gradient font-semibold">intoxicating stories</span> ever penned.
+                    Tales so alluring, so forbidden, they're reserved only for those who dare to indulge completely.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <Button className="btn-seductive px-8 py-3 text-lg font-semibold">
@@ -487,18 +468,22 @@ export default function Home({
           )}
         </section>
 
-        {/* Search and filters */}
-        <section className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search stories, authors, or tags..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-input/50"
-              />
-            </div>
+                {/* Search and filters */}
+        <section className="mb-12">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6">
+              Find Your Perfect Temptation
+            </h3>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search for forbidden desires, seductive authors, tantalizing tags..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
+                />
+              </div>
             <div className="flex gap-2">
               <Select
                 value={selectedCategory}
