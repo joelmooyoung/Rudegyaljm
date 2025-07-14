@@ -142,6 +142,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
       if (response.ok) {
         setUserRating(rating);
+        // Refresh story stats to show updated rating
+        await refreshStoryStats();
       } else {
         console.error("Failed to submit rating");
       }
