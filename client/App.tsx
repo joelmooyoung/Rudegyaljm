@@ -115,10 +115,6 @@ const App = () => {
     setCurrentView("help");
   };
 
-  const handleBackToHome = () => {
-    setCurrentView("home");
-  };
-
   const handleSaveStory = async (storyData: Partial<Story>) => {
     try {
       let response;
