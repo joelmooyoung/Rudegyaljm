@@ -84,6 +84,10 @@ export default function StoryDetail({
     if (story) {
       setFormData(story);
       setTagsInput(story.tags?.join(", ") || "");
+      // Set image preview if story has an image
+      if (story.image) {
+        setImagePreview(story.image);
+      }
     }
   }, [story]);
 
