@@ -135,6 +135,9 @@ export const rateStory: RequestHandler = (req, res) => {
       ratings.push(newRating);
       res.status(201).json(newRating);
     }
+
+    // Update story statistics
+    updateStoryStats(storyId);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Failed to rate story";
