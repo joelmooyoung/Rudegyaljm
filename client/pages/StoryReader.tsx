@@ -190,7 +190,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         setComments([comment, ...comments]);
         setNewComment("");
 
-        // Refresh story stats to show updated comment count
+        // Update local comment count immediately
+        setStoryStats((prev) => ({
+          ...prev,
+          commentCount: prev.commentCount + 1,
+        }));
+
+        // Also refresh story stats to sync with server
         await refreshStoryStats();
       } else {
         console.error("Failed to submit comment");
