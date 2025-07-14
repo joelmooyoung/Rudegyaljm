@@ -122,6 +122,7 @@ export let stories: Story[] = [
     rating: 4.7,
     ratingCount: 198,
     viewCount: 1123,
+    commentCount: 31,
     image:
       "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
     createdAt: new Date("2024-01-01"),
