@@ -527,7 +527,13 @@ export default function Home({
                   <SelectContent>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
-                        {category === "all" ? "All Desires" : category}
+                        {category === "all"
+                          ? "All Desires"
+                          : category === "premium"
+                            ? "💎 Premium Stories"
+                            : category === "free"
+                              ? "🆓 Free Stories"
+                              : category}
                       </SelectItem>
                     ))}
                   </SelectContent>
