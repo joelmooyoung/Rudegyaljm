@@ -217,6 +217,41 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         <div className="grid gap-8">
           {/* Story Header */}
           <Card className="overflow-hidden">
+            {/* Story Image */}
+            {story.image && (
+              <div className="relative h-64 bg-muted/20">
+                <img
+                  src={story.image}
+                  alt={story.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <h2 className="text-3xl font-bold text-white mb-2">
+                    {story.title}
+                  </h2>
+                  <p className="text-white/90 text-lg">by {story.author}</p>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <Badge
+                    variant={
+                      story.accessLevel === "premium" ? "default" : "secondary"
+                    }
+                    className={`${
+                      story.accessLevel === "premium"
+                        ? "bg-premium text-primary-foreground"
+                        : "bg-free-badge text-background"
+                    } shadow-lg`}
+                  >
+                    {story.accessLevel === "premium" && (
+                      <Crown className="h-4 w-4 mr-1" />
+                    )}
+                    {story.accessLevel}
+                  </Badge>
+                </div>
+              </div>
+            )}
+
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
