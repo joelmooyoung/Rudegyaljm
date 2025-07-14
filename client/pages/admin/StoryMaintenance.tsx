@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   Star,
   Calendar,
+  MessageSquare,
 } from "lucide-react";
 import { Story } from "@shared/api";
 
