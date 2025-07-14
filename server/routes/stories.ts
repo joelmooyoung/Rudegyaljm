@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { Story, StoryRequest } from "@shared/api";
 
 // Mock database storage (replace with real database in production)
-let stories: Story[] = [
+export let stories: Story[] = [
   {
     id: "1",
     title: "Midnight Desires",
