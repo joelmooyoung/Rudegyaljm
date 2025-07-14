@@ -111,43 +111,44 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
               </div>
 
               {error && (
-                <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                <div className="text-sm text-destructive bg-destructive/10 p-4 rounded-lg font-serif">
+                  <Flame className="inline h-4 w-4 mr-2" />
                   {error}
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Button
                   onClick={handleVerification}
-                  className="flex-1 bg-primary hover:bg-primary/90"
+                  className="flex-1 btn-seductive py-3 text-lg font-semibold"
                 >
-                  <Calendar className="h-4 w-4 mr-2" />I am 18 or older
+                  <Heart className="h-5 w-5 mr-2" />I am 18+ - Enter Paradise
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleExit}
-                  className="flex-1"
+                  className="flex-1 py-3 text-lg font-serif seductive-border"
                 >
-                  Exit Site
+                  <Eye className="h-5 w-5 mr-2" />
+                  Exit
                 </Button>
               </div>
 
-              <div className="text-xs text-muted-foreground text-center space-y-1">
+              <div className="text-sm font-serif text-muted-foreground text-center space-y-2 italic">
                 <p>
-                  By continuing, you confirm that you are of legal age and
-                  consent to viewing adult content.
+                  By entering, you confirm that you are of legal age and
+                  willingly consent to experiencing passionate adult content.
                 </p>
                 <p>
-                  We respect your privacy and never store birth date
-                  information.
+                  Your privacy is sacred - we never store personal information.
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Platform features */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold text-foreground">
+          <div className="space-y-8">
+            <h2 className="text-3xl font-display font-bold text-passion-gradient text-center">
               What awaits you:
             </h2>
 
