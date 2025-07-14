@@ -69,13 +69,16 @@ export default function StoryDetail({
     rating: 0,
     ratingCount: 0,
     viewCount: 0,
-
+    image: "",
     ...story,
   });
 
   const [plainTextInput, setPlainTextInput] = useState("");
   const [isPlainTextDialogOpen, setIsPlainTextDialogOpen] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     if (story) {
