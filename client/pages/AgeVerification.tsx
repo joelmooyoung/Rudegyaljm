@@ -149,59 +149,63 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
           {/* Platform features */}
           <div className="space-y-8">
             <h2 className="text-3xl font-display font-bold text-passion-gradient text-center">
-              What awaits you:
+              What Awaits Your Desire:
             </h2>
 
-            <div className="grid gap-4">
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-card/30 border border-border/30">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Star className="h-5 w-5 text-primary" />
+            <div className="grid gap-6">
+              <div className="flex items-start gap-4 p-6 rounded-lg story-card-intimate seductive-border">
+                <div className="w-12 h-12 bg-seductive-gradient rounded-lg flex items-center justify-center passionate-glow">
+                  <Flame className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">
-                    Premium Stories
+                  <h3 className="text-lg font-display font-semibold text-passion-gradient mb-2">
+                    Intoxicating Tales
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Access exclusive adult fiction from renowned authors with
-                    immersive storytelling
+                  <p className="text-base font-serif text-muted-foreground leading-relaxed">
+                    Immerse yourself in exclusive stories of passion, desire,
+                    and forbidden romance crafted by master storytellers who
+                    understand the art of seduction.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-card/30 border border-border/30">
-                <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <Users className="h-5 w-5 text-accent" />
+              <div className="flex items-start gap-4 p-6 rounded-lg story-card-intimate seductive-border">
+                <div className="w-12 h-12 bg-seductive-gradient rounded-lg flex items-center justify-center passionate-glow">
+                  <Heart className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">
-                    Community Features
+                  <h3 className="text-lg font-display font-semibold text-passion-gradient mb-2">
+                    Passionate Community
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Rate, comment, and engage with a community of adult fiction
-                    enthusiasts
+                  <p className="text-base font-serif text-muted-foreground leading-relaxed">
+                    Share your desires, whisper your secrets, and connect with
+                    kindred souls who appreciate the beauty of erotic
+                    storytelling.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-lg bg-card/30 border border-border/30">
-                <div className="w-10 h-10 bg-premium/10 rounded-lg flex items-center justify-center">
-                  <Star className="h-5 w-5 text-premium" />
+              <div className="flex items-start gap-4 p-6 rounded-lg story-card-intimate seductive-border">
+                <div className="w-12 h-12 bg-seductive-gradient rounded-lg flex items-center justify-center passionate-glow">
+                  <Eye className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">
-                    Tiered Access
+                  <h3 className="text-lg font-display font-semibold text-passion-gradient mb-2">
+                    Layers of Pleasure
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Free stories available, premium subscription for exclusive
-                    content and features
+                  <p className="text-base font-serif text-muted-foreground leading-relaxed">
+                    Begin with tantalizing free stories, then unlock the vault
+                    of premium desires for the most intimate and forbidden
+                    tales.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="text-center pt-4">
-              <p className="text-sm text-muted-foreground">
-                Join thousands of readers enjoying quality adult fiction
+            <div className="text-center pt-6">
+              <p className="text-lg font-serif text-muted-foreground italic">
+                Join thousands of passionate souls already lost in our realm of
+                desire...
               </p>
             </div>
           </div>
