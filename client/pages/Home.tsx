@@ -483,16 +483,16 @@ export default function Home({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-12 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
                 />
-              </div>
-            <div className="flex gap-2">
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
-                <SelectTrigger className="w-40">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
+                            </div>
+              <div className="flex gap-3">
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-44 py-3 font-serif seductive-border">
+                    <Filter className="h-4 w-4 mr-2 text-accent" />
+                    <SelectValue />
+                  </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
