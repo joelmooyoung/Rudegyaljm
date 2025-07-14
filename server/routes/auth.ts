@@ -48,18 +48,47 @@ const generateToken = (userId: string): string => {
   return `token_${userId}_${Date.now()}`;
 };
 
-// Helper function to log login attempts
-const logLogin = (userId: string, success: boolean, req: any): void => {
+// Helper function to get country from IP (basic implementation)
+const getCountryFromIP = (ip: string): string => {
+  // Simple mapping for common IPs (in production, use a proper geolocation service)
+  if (ip.startsWith("127.0.0.1") || ip === "::1") return "Local";
+  if (
+    ip.startsWith("192.168.") ||
+    ip.startsWith("10.") ||
+    ip.startsWith("172.")
+  )
+    return "Private Network";
+  if (ip.startsWith("203.")) return "Australia";
+  if (ip.startsWith("185.")) return "Europe";
+  if (ip.startsWith("104.") || ip.startsWith("76.")) return "United States";
+  if (ip.startsWith("216.")) return "Canada";
+  if (ip.startsWith("196.")) return "South Africa";
+  if (ip.startsWith("41.")) return "Africa";
+  if (ip.startsWith("220.")) return "Asia";
+  return "Unknown";
+};
+
+// Helper function to log successful login attempts only
+const logSuccessfulLogin = (userId: string, email: string, req: any): void => {
+  const ipAddress =
+    req.ip ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    "unknown";
   const log: LoginLog = {
     id: Date.now().toString(),
     userId,
-    ipAddress: req.ip || req.connection.remoteAddress || "unknown",
-    country: "Unknown", // In real app, use IP geolocation service
+    email,
+    ipAddress,
+    country: getCountryFromIP(ipAddress),
     userAgent: req.get("User-Agent") || "unknown",
-    success,
+    success: true,
     createdAt: new Date(),
   };
   loginLogs.push(log);
+  console.log(
+    `[LOGIN] User ${email} (${userId}) logged in from ${ipAddress} (${log.country})`,
+  );
 };
 
 // Helper function to log errors
