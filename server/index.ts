@@ -23,6 +23,7 @@ import {
   toggleStoryLike,
   getUserInteraction,
   getStoryStats,
+  incrementStoryViews,
 } from "./routes/interactions";
 import { uploadImage, copyImageFromUrl, testUpload } from "./routes/upload";
 
