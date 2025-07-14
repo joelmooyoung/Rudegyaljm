@@ -87,5 +87,14 @@ export function createServer() {
   app.get("/api/admin/error-logs", getErrorLogs);
   app.post("/api/admin/clear-logs", clearLogs);
 
+  // User management routes (admin only)
+  app.get("/api/users", getUsers);
+  app.get("/api/users/stats", getUserStats);
+  app.get("/api/users/:id", getUser);
+  app.post("/api/users", createUser);
+  app.put("/api/users/:id", updateUser);
+  app.delete("/api/users/:id", deleteUser);
+  app.patch("/api/users/:id/toggle-active", toggleUserActive);
+
   return app;
 }
