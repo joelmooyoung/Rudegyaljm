@@ -300,9 +300,13 @@ export default function Home({
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <BookOpen className="h-8 w-8 text-primary" />
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F9a930541b2654097be9377fff1612aa0%2F6532a2d2c5444a69b0f8c5b4757e7b05?format=webp&width=800"
+                alt="Rude Gyal Confessions Logo"
+                className="h-10 w-10 object-contain"
+              />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Nocturne Stories
+                Rude Gyal Confessions
               </h1>
             </div>
 
