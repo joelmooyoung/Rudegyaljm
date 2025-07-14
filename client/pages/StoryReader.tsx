@@ -41,6 +41,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     rating: story.rating,
     ratingCount: story.ratingCount,
     viewCount: story.viewCount,
+    commentCount: story.commentCount || 0,
   });
 
   // Load initial data
