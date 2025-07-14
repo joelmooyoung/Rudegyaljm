@@ -243,9 +243,9 @@ export default function Home({
         </CardHeader>
       )}
 
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {story.excerpt}
+      <CardContent className="space-y-5 p-6">
+        <p className="text-base font-serif text-muted-foreground line-clamp-3 leading-relaxed italic">
+          "{story.excerpt}"
         </p>
 
         <div className="flex flex-wrap gap-1">
