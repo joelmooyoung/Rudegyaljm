@@ -176,33 +176,54 @@ export default function Auth({ onAuthenticated }: AuthProps) {
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-8 seductive-border bg-card/50">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger
+                  value="login"
+                  className="font-serif data-[state=active]:text-passion-gradient"
+                >
+                  Enter Sanctuary
+                </TabsTrigger>
+                <TabsTrigger
+                  value="register"
+                  className="font-serif data-[state=active]:text-passion-gradient"
+                >
+                  Begin Journey
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                <form onSubmit={handleLogin} className="space-y-6">
+                  <div className="space-y-3">
+                    <Label
+                      htmlFor="login-email"
+                      className="text-base font-serif"
+                    >
+                      Your Secret Identity
+                    </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-accent" />
                       <Input
                         id="login-email"
                         type="email"
-                        placeholder="your@email.com"
+                        placeholder="whisper@yourdesires.com"
                         value={loginData.email}
                         onChange={(e) =>
                           setLoginData({ ...loginData, email: e.target.value })
                         }
-                        className="pl-10"
+                        className="pl-11 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                  <div className="space-y-3">
+                    <Label
+                      htmlFor="login-password"
+                      className="text-base font-serif"
+                    >
+                      Your Secret Key
+                    </Label>
                     <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-accent" />
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
@@ -214,7 +235,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                             password: e.target.value,
                           })
                         }
-                        className="pr-10"
+                        className="pl-11 pr-12 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
                         required
                       />
                       <Button
