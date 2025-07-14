@@ -253,29 +253,33 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             )}
 
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-3xl mb-2">{story.title}</CardTitle>
-                  <CardDescription className="text-lg">
-                    by {story.author}
-                  </CardDescription>
+              {!story.image && (
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-3xl mb-2">
+                      {story.title}
+                    </CardTitle>
+                    <CardDescription className="text-lg">
+                      by {story.author}
+                    </CardDescription>
+                  </div>
+                  <Badge
+                    variant={
+                      story.accessLevel === "premium" ? "default" : "secondary"
+                    }
+                    className={
+                      story.accessLevel === "premium"
+                        ? "bg-premium text-primary-foreground"
+                        : "bg-free-badge text-background"
+                    }
+                  >
+                    {story.accessLevel === "premium" && (
+                      <Crown className="h-4 w-4 mr-1" />
+                    )}
+                    {story.accessLevel}
+                  </Badge>
                 </div>
-                <Badge
-                  variant={
-                    story.accessLevel === "premium" ? "default" : "secondary"
-                  }
-                  className={
-                    story.accessLevel === "premium"
-                      ? "bg-premium text-primary-foreground"
-                      : "bg-free-badge text-background"
-                  }
-                >
-                  {story.accessLevel === "premium" && (
-                    <Crown className="h-4 w-4 mr-1" />
-                  )}
-                  {story.accessLevel}
-                </Badge>
-              </div>
+              )}
 
               <div className="flex flex-wrap gap-4 items-center text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
