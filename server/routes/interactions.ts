@@ -44,6 +44,16 @@ const incrementViewCount = (storyId: string) => {
   }
 };
 
+// Helper function to update comment count
+const updateCommentCount = (storyId: string) => {
+  const story = stories.find((s) => s.id === storyId);
+  if (story) {
+    const storyComments = comments.filter((c) => c.storyId === storyId);
+    story.commentCount = storyComments.length;
+    story.updatedAt = new Date();
+  }
+};
+
 // GET /api/stories/:id/comments - Get comments for a story
 export const getStoryComments: RequestHandler = (req, res) => {
   try {
