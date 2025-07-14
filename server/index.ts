@@ -64,6 +64,7 @@ export function createServer() {
   app.post("/api/stories/:id/like", toggleStoryLike);
   app.get("/api/stories/:id/user-interaction", getUserInteraction);
   app.get("/api/stories/:id/stats", getStoryStats);
+  app.post("/api/stories/:id/view", incrementStoryViews);
 
   // Upload routes
   app.post("/api/upload/image", uploadImage);
