@@ -4,111 +4,6 @@ import { loadStories, saveStories } from "../utils/dataStore";
 
 // Load stories from JSON file
 export let stories: Story[] = loadStories();
-  {
-    id: "2",
-    title: "The Executive's Secret",
-    excerpt:
-      "Power, money, and desire collide in this steamy corporate thriller...",
-    content:
-      "<p>Marcus Steel ruled the boardroom by day, but at night, his desires led him down a different path...</p>",
-    author: "Marcus Steel",
-    category: "Mystery",
-    tags: ["corporate", "power", "secrets"],
-    accessLevel: "premium",
-    isPublished: true,
-    rating: 4.9,
-    ratingCount: 156,
-    viewCount: 892,
-    commentCount: 18,
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-10"),
-    updatedAt: new Date("2024-01-10"),
-  },
-  {
-    id: "3",
-    title: "Summer Heat",
-    excerpt:
-      "A vacation romance that turns into something much more intense...",
-    content:
-      "<p>What started as a simple beach vacation became the adventure of a lifetime...</p>",
-    author: "Sofia Martinez",
-    category: "Romance",
-    tags: ["vacation", "summer", "romance"],
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.6,
-    ratingCount: 89,
-    viewCount: 456,
-    commentCount: 12,
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-08"),
-    updatedAt: new Date("2024-01-08"),
-  },
-  {
-    id: "4",
-    title: "Dragons of Eldoria",
-    excerpt:
-      "In a world where dragons rule the skies, one woman must choose between love and duty...",
-    content:
-      "<p>The ancient prophecy spoke of a chosen one who would bridge two worlds...</p>",
-    author: "J.R. Windham",
-    category: "Fantasy",
-    tags: ["dragons", "magic", "prophecy"],
-    accessLevel: "premium",
-    isPublished: false,
-    rating: 4.2,
-    ratingCount: 67,
-    viewCount: 234,
-    commentCount: 8,
-    image:
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-05"),
-    updatedAt: new Date("2024-01-06"),
-  },
-  {
-    id: "5",
-    title: "The Comedy Club Catastrophe",
-    excerpt:
-      "When the lights go out at the comedy club, the real show begins...",
-    content:
-      "<p>Nobody expected the evening to end with a mystery that would change everything...</p>",
-    author: "Danny Laughs",
-    category: "Comedy",
-    tags: ["humor", "mystery", "club"],
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.4,
-    ratingCount: 123,
-    viewCount: 789,
-    commentCount: 15,
-    image:
-      "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-03"),
-    updatedAt: new Date("2024-01-03"),
-  },
-  {
-    id: "6",
-    title: "Whispers in the Library",
-    excerpt: "Some books contain more than just words...",
-    content:
-      "<p>The old library held secrets that had been buried for decades...</p>",
-    author: "Margaret Ashworth",
-    category: "Mystery",
-    tags: ["library", "secrets", "supernatural"],
-    accessLevel: "premium",
-    isPublished: true,
-        rating: 4.7,
-    ratingCount: 198,
-    viewCount: 1123,
-    commentCount: 31,
-    image:
-      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-02"),
-  },
-];
 
 // Helper function to log errors
 const logError = (
@@ -124,6 +19,8 @@ const logError = (
 // GET /api/stories - Get all stories
 export const getStories: RequestHandler = (req, res) => {
   try {
+    // Reload stories from JSON to get latest data
+    stories = loadStories();
     console.log(`[DEBUG] Total stories in database: ${stories.length}`);
     console.log(
       `[DEBUG] Stories:`,
@@ -155,6 +52,8 @@ export const getStories: RequestHandler = (req, res) => {
 export const getStory: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
+    // Reload stories from JSON to get latest data
+    stories = loadStories();
     const story = stories.find((s) => s.id === id);
 
     if (!story) {
@@ -184,6 +83,9 @@ export const createStory: RequestHandler = (req, res) => {
         .json({ message: "Title, author, and content are required" });
     }
 
+    // Reload stories to get latest data
+    stories = loadStories();
+
     // Create new story with generated ID
     const newStory: Story = {
       id: Date.now().toString(),
@@ -197,7 +99,7 @@ export const createStory: RequestHandler = (req, res) => {
       isPublished:
         storyData.isPublished !== undefined ? storyData.isPublished : true,
       rating: storyData.rating || 0,
-            ratingCount: storyData.ratingCount || 0,
+      ratingCount: storyData.ratingCount || 0,
       viewCount: storyData.viewCount || 0,
       commentCount: storyData.commentCount || 0,
       image: storyData.image || undefined,
@@ -206,6 +108,7 @@ export const createStory: RequestHandler = (req, res) => {
     };
 
     stories.push(newStory);
+    saveStories(stories);
     console.log(`[DEBUG] Story created. Total stories now: ${stories.length}`);
     console.log(`[DEBUG] New story:`, {
       id: newStory.id,
@@ -228,6 +131,8 @@ export const updateStory: RequestHandler = (req, res) => {
     const { id } = req.params;
     const storyData: Partial<Story> = req.body;
 
+    // Reload stories to get latest data
+    stories = loadStories();
     const storyIndex = stories.findIndex((s) => s.id === id);
     if (storyIndex === -1) {
       logError(`Story not found for update: ${id}`, req, "medium");
@@ -244,6 +149,7 @@ export const updateStory: RequestHandler = (req, res) => {
     };
 
     stories[storyIndex] = updatedStory;
+    saveStories(stories);
 
     res.json(updatedStory);
   } catch (error) {
@@ -258,6 +164,8 @@ export const updateStory: RequestHandler = (req, res) => {
 export const deleteStory: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
+    // Reload stories to get latest data
+    stories = loadStories();
     const storyIndex = stories.findIndex((s) => s.id === id);
 
     if (storyIndex === -1) {
@@ -266,6 +174,7 @@ export const deleteStory: RequestHandler = (req, res) => {
     }
 
     const deletedStory = stories.splice(storyIndex, 1)[0];
+    saveStories(stories);
 
     res.json({ message: "Story deleted successfully", story: deletedStory });
   } catch (error) {
@@ -280,6 +189,8 @@ export const deleteStory: RequestHandler = (req, res) => {
 export const togglePublishStory: RequestHandler = (req, res) => {
   try {
     const { id } = req.params;
+    // Reload stories to get latest data
+    stories = loadStories();
     const storyIndex = stories.findIndex((s) => s.id === id);
 
     if (storyIndex === -1) {
@@ -289,6 +200,7 @@ export const togglePublishStory: RequestHandler = (req, res) => {
 
     stories[storyIndex].isPublished = !stories[storyIndex].isPublished;
     stories[storyIndex].updatedAt = new Date();
+    saveStories(stories);
 
     res.json(stories[storyIndex]);
   } catch (error) {
