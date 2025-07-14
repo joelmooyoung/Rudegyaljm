@@ -187,7 +187,8 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                   value="register"
                   className="font-serif data-[state=active]:text-passion-gradient"
                 >
-                  Begin Journey
+                  {" "}
+                  Register
                 </TabsTrigger>
               </TabsList>
 
