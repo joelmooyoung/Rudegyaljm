@@ -96,7 +96,9 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
                 Back
               </Button>
               <Activity className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">Login Logs</h1>
+              <h1 className="text-2xl font-display font-bold text-passion-gradient">
+                Login Logs
+              </h1>
             </div>
             <div className="flex gap-2">
               <Button
