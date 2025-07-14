@@ -196,12 +196,14 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
               </Table>
             ) : (
               <div className="text-center py-12">
-                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No login logs</h3>
-                <p className="text-muted-foreground">
+                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4 sultry-pulse" />
+                <h3 className="text-lg font-display font-semibold mb-2 text-passion-gradient">
+                  No login logs
+                </h3>
+                <p className="text-muted-foreground font-serif">
                   {isLoading
-                    ? "Loading login logs..."
-                    : "No login activity found"}
+                    ? "Loading passionate login activity..."
+                    : "No successful login activity found"}
                 </p>
               </div>
             )}
