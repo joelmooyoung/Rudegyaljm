@@ -137,37 +137,45 @@ export default function Auth({ onAuthenticated }: AuthProps) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+      {/* Passionate background gradient */}
+      <div className="absolute inset-0 bg-desire-gradient opacity-10 blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10" />
 
       {/* Main content */}
       <div className="relative z-10 w-full max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-4 mb-6">
             <img
               src="https://cdn.builder.io/api/v1/image/assets%2F9a930541b2654097be9377fff1612aa0%2F6532a2d2c5444a69b0f8c5b4757e7b05?format=webp&width=800"
               alt="Rude Gyal Confessions Logo"
-              className="h-10 w-10 object-contain"
+              className="h-12 w-12 object-contain sultry-pulse"
             />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-4xl font-display font-bold text-passion-gradient">
               Rude Gyal Confessions
             </h1>
           </div>
-          <p className="text-muted-foreground">
-            Access your confession experience at Rudegyaljm.com
+          <p className="text-lg font-serif text-muted-foreground">
+            <em>Your gateway to forbidden desires</em> awaits at{" "}
+            <span className="text-accent font-semibold">Rudegyaljm.com</span>
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-          <CardHeader className="text-center pb-4">
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>
-              Sign in to your account or create a new one
+        <Card className="story-card-intimate passionate-shimmer seductive-border">
+          <CardHeader className="text-center pb-6">
+            <div className="mx-auto w-16 h-16 bg-seductive-gradient rounded-full flex items-center justify-center mb-4 passionate-glow">
+              <Heart className="h-8 w-8 text-primary-foreground" />
+            </div>
+            <CardTitle className="text-2xl font-display font-bold text-passion-gradient">
+              Welcome, Seeker of Desires
+            </CardTitle>
+            <CardDescription className="text-base font-serif text-muted-foreground mt-2">
+              Enter your sanctuary of passion or begin your journey into
+              temptation
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-2 mb-8 seductive-border bg-card/50">
                 <TabsTrigger value="login">Sign In</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
