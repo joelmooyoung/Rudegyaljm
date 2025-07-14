@@ -1,105 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   /**
-   * Sophisticated Dark Theme for Adult Storytelling Platform
-   * Elegant, modern design with rich purples and warm accents
+   * Passionate & Erotic Dark Theme for Adult Storytelling Platform
+   * Deep reds, sultry purples, warm golds creating an intoxicating atmosphere
    */
   :root {
-    /* Dark base theme */
-    --background: 225 12% 8%;
-    --foreground: 225 15% 95%;
+    /* Passionate dark base theme with warm undertones */
+    --background: 355 20% 6%;
+    --foreground: 20 15% 95%;
 
-    --card: 225 12% 10%;
-    --card-foreground: 225 15% 92%;
+    --card: 355 18% 9%;
+    --card-foreground: 20 12% 92%;
 
-    --popover: 225 12% 12%;
-    --popover-foreground: 225 15% 95%;
+    --popover: 355 20% 8%;
+    --popover-foreground: 20 15% 95%;
 
-    /* Rich purple primary */
-    --primary: 270 70% 60%;
-    --primary-foreground: 225 15% 95%;
+    /* Deep passionate red-purple primary */
+    --primary: 340 85% 55%;
+    --primary-foreground: 20 15% 95%;
 
-    /* Warm secondary */
-    --secondary: 225 12% 15%;
-    --secondary-foreground: 225 15% 85%;
+    /* Warm seductive secondary */
+    --secondary: 355 15% 12%;
+    --secondary-foreground: 20 12% 85%;
 
-    --muted: 225 12% 13%;
-    --muted-foreground: 225 8% 65%;
+    --muted: 355 12% 10%;
+    --muted-foreground: 20 8% 65%;
 
-    /* Gold accent for premium features */
-    --accent: 45 90% 65%;
-    --accent-foreground: 225 12% 8%;
+    /* Rich gold accent for luxury and desire */
+    --accent: 35 90% 70%;
+    --accent-foreground: 355 20% 8%;
 
-    --destructive: 0 70% 60%;
-    --destructive-foreground: 225 15% 95%;
+    --destructive: 0 80% 65%;
+    --destructive-foreground: 20 15% 95%;
 
-    --border: 225 12% 18%;
-    --input: 225 12% 15%;
-    --ring: 270 70% 60%;
+    --border: 355 15% 18%;
+    --input: 355 15% 11%;
+    --ring: 340 85% 55%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    /* Storytelling platform specific colors */
-    --story-card: 225 12% 11%;
-    --story-card-hover: 225 12% 13%;
-    --premium-gradient-from: 270 70% 60%;
-    --premium-gradient-to: 310 70% 65%;
-    --free-badge: 150 60% 50%;
-    --premium-badge: 45 90% 65%;
-    --rating-star: 45 90% 65%;
-    --category-tag: 225 12% 16%;
+    /* Passionate storytelling platform specific colors */
+    --story-card: 355 16% 8%;
+    --story-card-hover: 340 20% 12%;
+    --premium-gradient-from: 340 85% 55%;
+    --premium-gradient-to: 320 80% 60%;
+    --sensual-gradient-from: 340 85% 55%;
+    --sensual-gradient-to: 35 90% 70%;
+    --erotic-glow: 340 85% 55%;
+    --desire-accent: 320 80% 65%;
+    --passion-red: 0 85% 60%;
+    --sultry-purple: 285 75% 65%;
+    --free-badge: 140 60% 55%;
+    --premium-badge: 35 90% 70%;
+    --rating-star: 35 90% 70%;
+    --category-tag: 355 12% 14%;
 
-    --sidebar-background: 225 12% 9%;
-    --sidebar-foreground: 225 15% 90%;
-    --sidebar-primary: 270 70% 60%;
-    --sidebar-primary-foreground: 225 15% 95%;
-    --sidebar-accent: 225 12% 14%;
-    --sidebar-accent-foreground: 225 15% 85%;
-    --sidebar-border: 225 12% 16%;
-    --sidebar-ring: 270 70% 60%;
+    /* Heat and passion effects */
+    --heat-glow: 0 100% 50%;
+    --seduction-shadow: 340 85% 20%;
+    --intimate-border: 340 50% 25%;
+
+    --sidebar-background: 355 18% 7%;
+    --sidebar-foreground: 20 15% 90%;
+    --sidebar-primary: 340 85% 55%;
+    --sidebar-primary-foreground: 20 15% 95%;
+    --sidebar-accent: 355 12% 12%;
+    --sidebar-accent-foreground: 20 12% 85%;
+    --sidebar-border: 355 15% 16%;
+    --sidebar-ring: 340 85% 55%;
   }
 
   .light {
-    /* Light theme fallback (minimal use) */
-    --background: 225 15% 98%;
-    --foreground: 225 12% 8%;
+    /* Light theme with warm passionate undertones */
+    --background: 20 25% 98%;
+    --foreground: 355 15% 8%;
 
-    --card: 225 15% 100%;
-    --card-foreground: 225 12% 10%;
+    --card: 20 20% 100%;
+    --card-foreground: 355 12% 10%;
 
-    --popover: 225 15% 100%;
-    --popover-foreground: 225 12% 8%;
+    --popover: 20 20% 100%;
+    --popover-foreground: 355 15% 8%;
 
-    --primary: 270 70% 50%;
-    --primary-foreground: 225 15% 98%;
+    --primary: 340 75% 45%;
+    --primary-foreground: 20 25% 98%;
 
-    --secondary: 225 12% 90%;
-    --secondary-foreground: 225 12% 15%;
+    --secondary: 20 15% 90%;
+    --secondary-foreground: 355 12% 15%;
 
-    --muted: 225 12% 94%;
-    --muted-foreground: 225 8% 45%;
+    --muted: 20 12% 94%;
+    --muted-foreground: 355 8% 45%;
 
-    --accent: 45 90% 55%;
-    --accent-foreground: 225 12% 8%;
+    --accent: 35 80% 55%;
+    --accent-foreground: 355 15% 8%;
 
     --destructive: 0 70% 50%;
-    --destructive-foreground: 225 15% 98%;
+    --destructive-foreground: 20 25% 98%;
 
-    --border: 225 12% 85%;
-    --input: 225 12% 90%;
-    --ring: 270 70% 50%;
+    --border: 20 12% 85%;
+    --input: 20 12% 90%;
+    --ring: 340 75% 45%;
 
-    --sidebar-background: 225 15% 96%;
-    --sidebar-foreground: 225 12% 15%;
-    --sidebar-primary: 270 70% 50%;
-    --sidebar-primary-foreground: 225 15% 98%;
-    --sidebar-accent: 225 12% 92%;
-    --sidebar-accent-foreground: 225 12% 20%;
-    --sidebar-border: 225 12% 88%;
-    --sidebar-ring: 270 70% 50%;
+    --sidebar-background: 20 20% 96%;
+    --sidebar-foreground: 355 12% 15%;
+    --sidebar-primary: 340 75% 45%;
+    --sidebar-primary-foreground: 20 25% 98%;
+    --sidebar-accent: 20 12% 92%;
+    --sidebar-accent-foreground: 355 12% 20%;
+    --sidebar-border: 20 12% 88%;
+    --sidebar-ring: 340 75% 45%;
   }
 }
 
@@ -110,5 +122,252 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Crimson Text", serif;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
   }
+
+  /* Sensual typography hierarchy */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+
+  .font-script {
+    font-family: "Dancing Script", cursive;
+  }
+
+  .font-serif {
+    font-family: "Crimson Text", serif;
+  }
+
+  .font-display {
+    font-family: "Playfair Display", serif;
+  }
+
+  /* Passionate glow effects */
+  .passionate-glow {
+    box-shadow: 0 0 20px hsl(var(--erotic-glow) / 0.3);
+  }
+
+  .seductive-border {
+    border: 1px solid hsl(var(--intimate-border));
+    box-shadow: 0 0 10px hsl(var(--seduction-shadow) / 0.2);
+  }
+
+  /* Sensual gradients */
+  .bg-passion-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--sensual-gradient-from)) 0%,
+      hsl(var(--sensual-gradient-to)) 100%
+    );
+  }
+
+  .bg-desire-gradient {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--passion-red)) 0%,
+      hsl(var(--sultry-purple)) 50%,
+      hsl(var(--desire-accent)) 100%
+    );
+  }
+
+  .bg-seductive-gradient {
+    background: linear-gradient(
+      160deg,
+      hsl(var(--premium-gradient-from)) 0%,
+      hsl(var(--premium-gradient-to)) 100%
+    );
+  }
+
+  /* Text gradients for alluring effects */
+  .text-passion-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--accent)) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-desire-gradient {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--passion-red)) 0%,
+      hsl(var(--sultry-purple)) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Sultry animations */
+  .sultry-pulse {
+    animation: sultryPulse 3s ease-in-out infinite;
+  }
+
+  .sensual-float {
+    animation: sensualFloat 6s ease-in-out infinite;
+  }
+
+  .passionate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .passionate-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--accent) / 0.3),
+      transparent
+    );
+    animation: passionateShimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes sultryPulse {
+    0%,
+    100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes sensualFloat {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes passionateShimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+  /* Intimate card effects */
+  .story-card-intimate {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--story-card)) 0%,
+      hsl(var(--story-card-hover)) 100%
+    );
+    border: 1px solid hsl(var(--intimate-border));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .story-card-intimate:hover {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--story-card-hover)) 0%,
+      hsl(var(--seduction-shadow)) 100%
+    );
+    box-shadow:
+      0 10px 25px hsl(var(--seduction-shadow) / 0.4),
+      0 0 20px hsl(var(--erotic-glow) / 0.2);
+    transform: translateY(-5px) scale(1.02);
+  }
+
+  /* Seductive button styling */
+  .btn-seductive {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--desire-accent)) 100%
+    );
+    color: hsl(var(--primary-foreground));
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-seductive:hover {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--desire-accent)) 0%,
+      hsl(var(--primary)) 100%
+    );
+    box-shadow: 0 5px 15px hsl(var(--primary) / 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-seductive::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--accent) / 0.3),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .btn-seductive:hover::before {
+    left: 100%;
+  }
+}
+
+/* Custom scrollbar with passionate theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--desire-accent)) 100%
+  );
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--desire-accent)) 0%,
+    hsl(var(--primary)) 100%
+  );
+}
+
+/* Selection with passionate colors */
+::selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--primary-foreground));
 }
