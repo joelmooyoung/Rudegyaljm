@@ -94,6 +94,10 @@ const App = () => {
     setCurrentView("admin-stories");
   };
 
+  const handleCommentsMaintenance = () => {
+    setCurrentView("admin-comments");
+  };
+
   const handleReadStory = (story: Story) => {
     setReadingStory(story);
     setCurrentView("story-reader");
