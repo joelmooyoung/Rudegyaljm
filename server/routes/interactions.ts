@@ -211,6 +211,20 @@ export const getUserInteraction: RequestHandler = (req, res) => {
   }
 };
 
+// POST /api/stories/:id/view - Increment view count
+export const incrementStoryViews: RequestHandler = (req, res) => {
+  try {
+    const { id: storyId } = req.params;
+    incrementViewCount(storyId);
+    res.json({ success: true, message: "View count incremented" });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to increment view count";
+    logError(`Error incrementing view count: ${errorMessage}`, req, "medium");
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // GET /api/stories/:id/stats - Get story statistics
 export const getStoryStats: RequestHandler = (req, res) => {
   try {
