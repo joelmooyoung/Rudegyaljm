@@ -168,31 +168,26 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
                 </TableHeader>
                 <TableBody>
                   {filteredLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell className="font-mono text-sm">
+                    <TableRow key={log.id} className="hover:bg-card/50">
+                      <TableCell className="font-mono text-sm font-serif">
                         {log.userId}
                       </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={log.success ? "default" : "destructive"}
-                          className="flex items-center gap-1 w-fit"
-                        >
-                          {log.success ? (
-                            <CheckCircle className="h-3 w-3" />
-                          ) : (
-                            <XCircle className="h-3 w-3" />
-                          )}
-                          {log.success ? "Success" : "Failed"}
-                        </Badge>
-                      </TableCell>
+                      <TableCell className="font-serif">{log.email}</TableCell>
                       <TableCell className="font-mono text-sm">
                         {log.ipAddress}
                       </TableCell>
-                      <TableCell>{log.country}</TableCell>
-                      <TableCell className="max-w-48 truncate text-sm text-muted-foreground">
+                      <TableCell className="font-serif">
+                        <Badge
+                          variant="outline"
+                          className="bg-seductive-gradient text-primary-foreground"
+                        >
+                          {log.country}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-48 truncate text-sm text-muted-foreground font-serif">
                         {log.userAgent}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="text-sm text-muted-foreground font-serif">
                         {new Date(log.createdAt).toLocaleString()}
                       </TableCell>
                     </TableRow>
