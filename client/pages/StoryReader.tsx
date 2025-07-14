@@ -53,6 +53,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           headers: { "Content-Type": "application/json" },
         });
 
+        // Update local view count
+        setStoryStats((prev) => ({
+          ...prev,
+          viewCount: prev.viewCount + 1,
+        }));
+
         // Load comments
         const commentsResponse = await fetch(
           `/api/stories/${story.id}/comments`,
