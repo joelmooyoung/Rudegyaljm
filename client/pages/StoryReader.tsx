@@ -341,6 +341,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                     {storyStats.rating} ({storyStats.ratingCount} ratings)
                   </span>
                 </div>
+                <div className="flex items-center gap-1">
+                  <MessageCircle className="h-4 w-4" />
+                  <span>{storyStats.commentCount} comments</span>
+                </div>
                 <Badge variant="outline">{story.category}</Badge>
               </div>
 
