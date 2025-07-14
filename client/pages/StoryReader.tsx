@@ -85,6 +85,23 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     loadInitialData();
   }, [story.id, user.id]);
 
+  // Function to refresh story stats
+  const refreshStoryStats = async () => {
+    try {
+      const statsResponse = await fetch(`/api/stories/${story.id}/stats`);
+      if (statsResponse.ok) {
+        const stats = await statsResponse.json();
+        setStoryStats({
+          rating: stats.averageRating,
+          ratingCount: stats.totalRatings,
+          viewCount: storyStats.viewCount + 1, // Keep incrementing view count
+        });
+      }
+    } catch (error) {
+      console.error("Failed to refresh story stats:", error);
+    }
+  };
+
   const handleLike = async () => {
     try {
       const response = await fetch(`/api/stories/${story.id}/like`, {
