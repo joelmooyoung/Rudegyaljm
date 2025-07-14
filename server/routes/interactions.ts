@@ -122,6 +122,9 @@ export const rateStory: RequestHandler = (req, res) => {
       ratings[existingRatingIndex].score = score;
       ratings[existingRatingIndex].createdAt = new Date();
       res.json(ratings[existingRatingIndex]);
+
+      // Update story statistics
+      updateStoryStats(storyId);
     } else {
       // Create new rating
       const newRating: Rating = {
