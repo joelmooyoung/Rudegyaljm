@@ -49,6 +49,9 @@ interface HomeProps {
   onLogout?: () => void;
   onNavigateToAdmin?: (section: string) => void;
   onReadStory?: (story: Story) => void;
+  onNavigateToAbout?: () => void;
+  onNavigateToContact?: () => void;
+  onNavigateToHelp?: () => void;
 }
 
 export default function Home({
