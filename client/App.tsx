@@ -232,6 +232,9 @@ const App = () => {
             onLogout={handleLogout}
             onNavigateToAdmin={handleNavigateToAdmin}
             onReadStory={handleReadStory}
+            onNavigateToAbout={handleNavigateToAbout}
+            onNavigateToContact={handleNavigateToContact}
+            onNavigateToHelp={handleNavigateToHelp}
           />
         );
       case "admin-users":
