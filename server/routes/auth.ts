@@ -238,7 +238,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
     };
 
     users.push(newUser);
-    logLogin(newUser.id, true, req);
+    logSuccessfulLogin(newUser.id, newUser.email, req);
 
     const token = generateToken(newUser.id);
     const response: AuthResponse = {
