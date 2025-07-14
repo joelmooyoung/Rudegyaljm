@@ -482,8 +482,8 @@ export default function Home({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-12 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
-                />
-                            </div>
+                                />
+              </div>
               <div className="flex gap-3">
                 <Select
                   value={selectedCategory}
