@@ -536,6 +536,18 @@ export default function Home({
           )}
         </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border/50 bg-card/30 mt-auto">
+        <div className="container mx-auto px-4 py-6">
+          <div className="text-center text-sm text-muted-foreground">
+            <p>
+              © {new Date().getFullYear()} Rudegyaljm.com - All rights reserved
+            </p>
+            <p className="mt-1">Authentic confessions and intimate stories</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
