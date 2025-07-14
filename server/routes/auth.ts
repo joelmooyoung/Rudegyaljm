@@ -7,7 +7,7 @@ import {
   LoginLog,
   ErrorLog,
 } from "@shared/api";
-import { getCountryFromIP } from "../utils/geolocation";
+import { getCountryFromIP as getEnhancedCountryFromIP } from "../utils/geolocation";
 
 // Mock data storage (replace with real database)
 const users: User[] = [
