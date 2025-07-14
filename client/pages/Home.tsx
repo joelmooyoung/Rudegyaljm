@@ -201,11 +201,13 @@ export default function Home({
               {story.accessLevel}
             </Badge>
           </div>
-          <div className="absolute bottom-3 left-3 right-3">
-            <h3 className="text-white font-semibold text-lg line-clamp-2 mb-1">
+          <div className="absolute bottom-4 left-4 right-4">
+            <h3 className="text-white font-display font-bold text-xl line-clamp-2 mb-2 drop-shadow-lg group-hover:text-accent transition-colors duration-300">
               {story.title}
             </h3>
-            <p className="text-white/90 text-sm">by {story.author}</p>
+            <p className="text-white/95 text-sm font-serif italic drop-shadow">
+              by {story.author}
+            </p>
           </div>
         </div>
       )}
