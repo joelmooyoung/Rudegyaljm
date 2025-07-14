@@ -169,30 +169,69 @@ export default function Home({
       className="bg-story-card hover:bg-story-card-hover transition-all duration-200 cursor-pointer border-border/50 group overflow-hidden"
       onClick={() => handleStoryClick(story)}
     >
-      {/* Story Header */}
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-              {story.title}
-            </CardTitle>
-            <CardDescription>by {story.author}</CardDescription>
+      {/* Story Image */}
+      {story.image && (
+        <div className="relative h-48 bg-muted/20 overflow-hidden">
+          <img
+            src={story.image}
+            alt={story.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute top-3 right-3">
+            <Badge
+              variant={
+                story.accessLevel === "premium" ? "default" : "secondary"
+              }
+              className={`${
+                story.accessLevel === "premium"
+                  ? "bg-premium text-primary-foreground"
+                  : "bg-free-badge text-background"
+              } shadow-lg`}
+            >
+              {story.accessLevel === "premium" && (
+                <Crown className="h-3 w-3 mr-1" />
+              )}
+              {story.accessLevel}
+            </Badge>
           </div>
-          <Badge
-            variant={story.accessLevel === "premium" ? "default" : "secondary"}
-            className={
-              story.accessLevel === "premium"
-                ? "bg-premium text-primary-foreground"
-                : "bg-free-badge text-background"
-            }
-          >
-            {story.accessLevel === "premium" && (
-              <Crown className="h-3 w-3 mr-1" />
-            )}
-            {story.accessLevel}
-          </Badge>
+          <div className="absolute bottom-3 left-3 right-3">
+            <h3 className="text-white font-semibold text-lg line-clamp-2 mb-1">
+              {story.title}
+            </h3>
+            <p className="text-white/90 text-sm">by {story.author}</p>
+          </div>
         </div>
-      </CardHeader>
+      )}
+
+      {/* Story Header for stories without images */}
+      {!story.image && (
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                {story.title}
+              </CardTitle>
+              <CardDescription>by {story.author}</CardDescription>
+            </div>
+            <Badge
+              variant={
+                story.accessLevel === "premium" ? "default" : "secondary"
+              }
+              className={
+                story.accessLevel === "premium"
+                  ? "bg-premium text-primary-foreground"
+                  : "bg-free-badge text-background"
+              }
+            >
+              {story.accessLevel === "premium" && (
+                <Crown className="h-3 w-3 mr-1" />
+              )}
+              {story.accessLevel}
+            </Badge>
+          </div>
+        </CardHeader>
+      )}
 
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground line-clamp-2">
