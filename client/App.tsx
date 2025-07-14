@@ -313,7 +313,22 @@ const App = () => {
       case "admin-comments":
         return <CommentsMaintenance onBack={handleBackToStories} />;
       case "admin-users":
-        return <UserMaintenance onBack={handleBackToHome} />;
+        return (
+          <UserMaintenance
+            onBack={handleBackToHome}
+            onEditUser={handleEditUser}
+          />
+        );
+      case "admin-user-detail":
+        return (
+          <UserDetail
+            user={currentUser}
+            mode={userMode}
+            onBack={handleBackToUsers}
+            onSave={handleSaveUser}
+            onDelete={handleDeleteUser}
+          />
+        );
       case "admin-login-logs":
         return <LoginLogs onBack={handleBackToHome} />;
       case "admin-error-logs":
