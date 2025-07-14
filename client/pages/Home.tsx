@@ -73,6 +73,8 @@ export default function Home({
 
   const categories = [
     "all",
+    "premium",
+    "free",
     "Romance",
     "Mystery",
     "Comedy",
