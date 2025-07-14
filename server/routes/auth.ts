@@ -72,6 +72,31 @@ const getCountryFromIP = (ip: string): string => {
   return "Unknown";
 };
 
+// Helper function to extract real IP address (handles proxies, load balancers)
+const extractRealIP = (req: any): string => {
+  // Check X-Forwarded-For header (most common for proxies)
+  const forwardedFor = req.get("X-Forwarded-For");
+  if (forwardedFor) {
+    const ips = forwardedFor.split(",");
+    return ips[0].trim(); // Get the first (original) IP
+  }
+
+  // Check other common proxy headers
+  const realIP = req.get("X-Real-IP");
+  if (realIP) return realIP.trim();
+
+  const clientIP = req.get("X-Client-IP");
+  if (clientIP) return clientIP.trim();
+
+  // Fallback to connection IP
+  return (
+    req.ip ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    "unknown"
+  );
+};
+
 // Helper function to log successful login attempts only
 const logSuccessfulLogin = (userId: string, email: string, req: any): void => {
   const ipAddress =
