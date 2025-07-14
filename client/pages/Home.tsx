@@ -191,9 +191,9 @@ export default function Home({
               }
               className={`${
                 story.accessLevel === "premium"
-                  ? "bg-premium text-primary-foreground"
-                  : "bg-free-badge text-background"
-              } shadow-lg`}
+                  ? "bg-seductive-gradient text-primary-foreground shadow-lg passionate-glow"
+                  : "bg-free-badge text-background shadow-md"
+              } font-semibold`}
             >
               {story.accessLevel === "premium" && (
                 <Crown className="h-3 w-3 mr-1" />
