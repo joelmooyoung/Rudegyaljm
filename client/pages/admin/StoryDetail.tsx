@@ -211,6 +211,56 @@ export default function StoryDetail({
     }
   };
 
+  // Handle image file upload
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setImageFile(file);
+
+    try {
+      let imageData: string;
+
+      // Compress image to reduce size
+      if (file.size > 1 * 1024 * 1024) {
+        // If file is larger than 1MB, compress it
+        console.log(
+          `Compressing image: ${(file.size / (1024 * 1024)).toFixed(1)}MB`,
+        );
+        imageData = await compressImage(file, 800, 0.8);
+        console.log(
+          `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
+        );
+      } else {
+        // For smaller files, just convert to base64
+        imageData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      setImagePreview(imageData);
+      handleInputChange("image", imageData);
+    } catch (error) {
+      console.error("Failed to process image:", error);
+      alert("Failed to process image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Remove image
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    handleInputChange("image", "");
+  };
+
   const handleSave = () => {
     const storyData: Partial<Story> = {
       ...formData,
