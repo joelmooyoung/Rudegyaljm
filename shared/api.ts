@@ -30,6 +30,7 @@ export interface Story {
   rating: number;
   ratingCount: number;
   viewCount: number;
+  commentCount: number;
   image?: string; // Base64 encoded image data
   createdAt: Date;
   updatedAt: Date;
