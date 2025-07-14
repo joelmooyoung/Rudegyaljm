@@ -396,21 +396,53 @@ export default function Home({
       {/* Main content */}
       <main className="container mx-auto px-4 py-8">
         {/* Hero section */}
-        <section className="mb-12 text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">
-            {user.role === "admin"
-              ? "All Stories - Admin View"
-              : user.role === "premium"
-                ? "Premium & Free Stories"
-                : "Free Stories"}
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            {user.role === "admin"
-              ? "Manage and view all stories including drafts and published content"
-              : user.role === "free"
-                ? "Enjoy our collection of free stories. Upgrade to premium for exclusive content!"
-                : "Access our complete library of premium and free stories"}
-          </p>
+        <section className="mb-16 text-center relative overflow-hidden">
+          {/* Passionate background gradient */}
+          <div className="absolute inset-0 bg-desire-gradient opacity-5 blur-3xl"></div>
+
+          <div className="relative z-10">
+            <h2 className="text-5xl md:text-6xl font-display font-bold text-passion-gradient mb-6 sultry-pulse">
+              {user.role === "admin"
+                ? "Forbidden Chronicles - Admin Sanctuary"
+                : user.role === "premium"
+                  ? "Unlock Your Deepest Desires"
+                  : "Taste Forbidden Pleasures"}
+            </h2>
+            <p className="text-xl md:text-2xl font-serif text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed">
+              {user.role === "admin"
+                ? "Command the realm of desire. Curate the most intoxicating tales that ignite souls and awaken hidden passions."
+                : user.role === "free"
+                  ? "Indulge in tantalizing tales that will leave you breathless. But the most <em className='text-desire-gradient font-semibold'>forbidden secrets</em> await those who dare to go premium..."
+                  : "Dive deep into an ocean of passion, where every story is a gateway to ecstasy and every word drips with desire."}
+            </p>
+
+            {/* Sensual statistics */}
+            <div className="flex justify-center gap-8 mb-8 text-sm font-serif">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-passion-gradient">
+                  {stories.length}
+                </div>
+                <div className="text-muted-foreground">Seductive Tales</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-passion-gradient">
+                  {stories
+                    .reduce((sum, story) => sum + story.viewCount, 0)
+                    .toLocaleString()}
+                </div>
+                <div className="text-muted-foreground">Hearts Racing</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-passion-gradient">
+                  {stories.reduce(
+                    (sum, story) => sum + (story.commentCount || 0),
+                    0,
+                  )}
+                </div>
+                <div className="text-muted-foreground">Whispered Secrets</div>
+              </div>
+            </div>
+          </div>
 
           {/* Show story count for debugging */}
           <p className="text-sm text-muted-foreground mb-4">
@@ -420,22 +452,30 @@ export default function Home({
           </p>
 
           {user.role === "free" && (
-            <Card className="max-w-2xl mx-auto bg-gradient-to-r from-premium/10 to-accent/10 border-premium/20">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <Crown className="h-8 w-8 text-premium" />
-                  <div className="text-left">
-                    <h3 className="font-semibold text-foreground">
-                      Upgrade to Premium
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Access exclusive stories, unlimited reading, and premium
-                      features
-                    </p>
+            <Card className="max-w-3xl mx-auto story-card-intimate passionate-shimmer seductive-border">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <Crown className="h-12 w-12 text-accent mx-auto mb-4 sultry-pulse" />
+                  <h3 className="text-2xl font-display font-bold text-passion-gradient mb-3">
+                    Unlock the Vault of Desires
+                  </h3>
+                  <p className="text-lg font-serif text-muted-foreground mb-6 leading-relaxed">
+                    Behind these golden gates lie the most{" "}
+                    <span className="text-desire-gradient font-semibold">
+                      intoxicating stories
+                    </span>{" "}
+                    ever penned. Tales so alluring, so forbidden, they're
+                    reserved only for those who dare to indulge completely.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Button className="btn-seductive px-8 py-3 text-lg font-semibold">
+                      <Heart className="h-5 w-5 mr-2" />
+                      Surrender to Premium
+                    </Button>
+                    <span className="text-sm text-muted-foreground font-serif italic">
+                      Your deepest fantasies await...
+                    </span>
                   </div>
-                  <Button className="bg-premium hover:bg-premium/90 ml-auto">
-                    Upgrade Now
-                  </Button>
                 </div>
               </CardContent>
             </Card>
