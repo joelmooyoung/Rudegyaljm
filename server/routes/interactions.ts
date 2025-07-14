@@ -1,11 +1,35 @@
 import { RequestHandler } from "express";
 import { Comment, Rating } from "@shared/api";
-import { stories } from "./stories";
+import { stories, saveStories, loadStories } from "./stories";
+import {
+  loadComments,
+  saveComments,
+  loadInteractions,
+  saveInteractions,
+} from "../utils/dataStore";
 
-// Mock database storage (replace with real database in production)
-let comments: Comment[] = [];
-let ratings: Rating[] = [];
-let likes: { userId: string; storyId: string; createdAt: Date }[] = [];
+// Load data from JSON files
+let comments: Comment[] = loadComments();
+let interactions = loadInteractions();
+let likes: { userId: string; storyId: string; createdAt: Date }[] =
+  Object.entries(interactions.likes).flatMap(([storyId, users]) =>
+    Object.entries(users)
+      .map(([userId, liked]) =>
+        liked ? { userId, storyId, createdAt: new Date() } : null,
+      )
+      .filter(Boolean),
+  ) as { userId: string; storyId: string; createdAt: Date }[];
+
+let ratings: Rating[] = Object.entries(interactions.ratings).flatMap(
+  ([storyId, users]) =>
+    Object.entries(users).map(([userId, score]) => ({
+      id: `${storyId}-${userId}`,
+      storyId,
+      userId,
+      score,
+      createdAt: new Date(),
+    })),
+);
 
 // Helper function to log errors
 const logError = (
