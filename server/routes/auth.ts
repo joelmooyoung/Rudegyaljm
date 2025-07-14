@@ -270,7 +270,8 @@ export const handleRegister: RequestHandler = async (req, res) => {
     };
 
     users.push(newUser);
-    logSuccessfulLogin(newUser.id, newUser.email, req);
+    const loginLog = createLoginLog(newUser.id, newUser.email, req);
+    loginLogs.push(loginLog);
 
     const token = generateToken(newUser.id);
     const response: AuthResponse = {
