@@ -40,6 +40,7 @@ import {
   Copy,
   Link,
   X,
+  Upload,
 } from "lucide-react";
 import { Story } from "@shared/api";
 
