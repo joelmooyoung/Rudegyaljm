@@ -180,7 +180,8 @@ export const handleLogin: RequestHandler = async (req, res) => {
 
     // Update last login and log successful login
     user.lastLogin = new Date();
-    logSuccessfulLogin(user.id, user.email, req);
+    const loginLog = createLoginLog(user.id, user.email, req);
+    loginLogs.push(loginLog);
 
     const token = generateToken(user.id);
     const response: AuthResponse = {
