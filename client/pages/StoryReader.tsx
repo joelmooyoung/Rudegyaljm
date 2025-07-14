@@ -189,6 +189,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         };
         setComments([comment, ...comments]);
         setNewComment("");
+
+        // Refresh story stats to show updated comment count
+        await refreshStoryStats();
       } else {
         console.error("Failed to submit comment");
       }
