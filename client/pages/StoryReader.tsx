@@ -42,6 +42,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        // Increment view count
+        await fetch(`/api/stories/${story.id}/view`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
         // Load comments
         const commentsResponse = await fetch(
           `/api/stories/${story.id}/comments`,
