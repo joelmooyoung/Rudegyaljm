@@ -6,7 +6,7 @@ let comments = [
     userId: "admin1",
     username: "admin",
     comment: "This is an amazing story! The passion really comes through.",
-    createdAt: new Date("2024-01-16"),
+    createdAt: "2024-01-16T00:00:00.000Z",
   },
   {
     id: "2",
@@ -14,7 +14,7 @@ let comments = [
     userId: "premium1",
     username: "premiumuser",
     comment: "Absolutely captivating. Looking forward to more like this.",
-    createdAt: new Date("2024-01-17"),
+    createdAt: "2024-01-17T00:00:00.000Z",
   },
   {
     id: "3",
@@ -22,7 +22,7 @@ let comments = [
     userId: "free1",
     username: "freeuser",
     comment: "The tension in this story is incredible!",
-    createdAt: new Date("2024-01-21"),
+    createdAt: "2024-01-21T00:00:00.000Z",
   },
 ];
 
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
           userId: req.body.userId || "anonymous",
           username: req.body.username || "Anonymous",
           comment: commentText,
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         };
 
         comments.push(newComment);
