@@ -1,38 +1,6 @@
-// Story likes API - handle liking and unliking stories
-// Global storage simulation (in production, use database)
-if (!global.likes) {
-  global.likes = [
-    {
-      id: "1",
-      storyId: "1",
-      userId: "admin1",
-      createdAt: "2024-01-16T00:00:00.000Z",
-    },
-    {
-      id: "2",
-      storyId: "1",
-      userId: "premium1",
-      createdAt: "2024-01-17T00:00:00.000Z",
-    },
-    {
-      id: "3",
-      storyId: "2",
-      userId: "free1",
-      createdAt: "2024-01-21T00:00:00.000Z",
-    },
-  ];
-}
-
-if (!global.likeCounts) {
-  global.likeCounts = {
-    1: 2,
-    2: 1,
-    3: 0,
-  };
-}
-
-let likes = global.likes;
-let likeCounts = global.likeCounts;
+// Story likes API with MongoDB integration
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Like, Story } from "../../../models/index.js";
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -50,22 +18,24 @@ export default async function handler(req, res) {
   }
 
   try {
+    await connectToDatabase();
+
     const userId = req.body?.userId || "anonymous";
 
     switch (req.method) {
       case "GET":
         // Get like count and user's like status
         console.log(`[LIKES API] Getting likes for story ${storyId}`);
-        const count = likeCounts[storyId] || 0;
-        const userLiked = likes.some(
-          (like) => like.storyId === storyId && like.userId === userId,
-        );
+
+        const likeCount = await Like.countDocuments({ storyId });
+        const userLike = await Like.findOne({ storyId, userId });
+        const userLiked = !!userLike;
 
         return res.status(200).json({
           success: true,
           data: {
             storyId,
-            likeCount: count,
+            likeCount,
             userLiked,
             userId,
           },
@@ -79,54 +49,63 @@ export default async function handler(req, res) {
         );
         console.log(`[LIKES API] Request body:`, req.body);
 
-        const existingLikeIndex = likes.findIndex(
-          (like) => like.storyId === storyId && like.userId === userId,
-        );
+        const existingLike = await Like.findOne({ storyId, userId });
 
-        if (existingLikeIndex >= 0) {
+        if (existingLike) {
           // Unlike - remove existing like
-          likes.splice(existingLikeIndex, 1);
-          likeCounts[storyId] = Math.max(0, (likeCounts[storyId] || 1) - 1);
+          await Like.deleteOne({ _id: existingLike._id });
+
+          // Update story like count
+          await Story.findOneAndUpdate(
+            { storyId },
+            { $inc: { likeCount: -1 } },
+          );
+
+          const newLikeCount = await Like.countDocuments({ storyId });
           console.log(
-            `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
+            `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${newLikeCount}`,
           );
 
           return res.status(200).json({
             success: true,
             message: "Story unliked",
             liked: false, // Direct field for frontend compatibility
-            likeCount: likeCounts[storyId],
+            likeCount: newLikeCount,
             data: {
               storyId,
               liked: false,
-              likeCount: likeCounts[storyId],
+              likeCount: newLikeCount,
             },
             timestamp: new Date().toISOString(),
           });
         } else {
           // Like - add new like
-          const newLike = {
-            id: Date.now().toString(),
+          const likeId = Date.now().toString();
+          const newLike = new Like({
+            likeId,
             storyId,
             userId,
-            createdAt: new Date().toISOString(),
-          };
+          });
 
-          likes.push(newLike);
-          likeCounts[storyId] = (likeCounts[storyId] || 0) + 1;
+          await newLike.save();
+
+          // Update story like count
+          await Story.findOneAndUpdate({ storyId }, { $inc: { likeCount: 1 } });
+
+          const newLikeCount = await Like.countDocuments({ storyId });
           console.log(
-            `[LIKES API] ✅ LIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
+            `[LIKES API] ✅ LIKED story ${storyId} - new count: ${newLikeCount}`,
           );
 
           return res.status(201).json({
             success: true,
             message: "Story liked",
             liked: true, // Direct field for frontend compatibility
-            likeCount: likeCounts[storyId],
+            likeCount: newLikeCount,
             data: {
               storyId,
               liked: true,
-              likeCount: likeCounts[storyId],
+              likeCount: newLikeCount,
             },
             timestamp: new Date().toISOString(),
           });
