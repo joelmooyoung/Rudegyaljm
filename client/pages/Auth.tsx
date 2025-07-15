@@ -58,13 +58,16 @@ export default function Auth({ onAuthenticated }: AuthProps) {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.PROD ? "https://rudegyaljm.com" : ""}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginData),
         },
-        body: JSON.stringify(loginData),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
