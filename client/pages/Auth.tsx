@@ -112,16 +112,13 @@ export default function Auth({ onAuthenticated }: AuthProps) {
     }
 
     try {
-      const response = await fetch(
-        `${import.meta.env.PROD ? "https://rudegyaljm.com" : ""}/api/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(registerData),
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(registerData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
