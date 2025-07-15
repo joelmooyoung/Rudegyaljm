@@ -287,10 +287,10 @@ export default async function handler(req, res) {
             displayResult('like-result', result);
         }
 
-        async function testAddRating() {
+                async function testAddRating() {
             const storyId = document.getElementById('rating-story-id').value;
             const ratingData = {
-                rating: parseInt(document.getElementById('rating-value').value),
+                score: parseInt(document.getElementById('rating-value').value), // Using 'score' like frontend
                 userId: document.getElementById('rating-user-id').value
             };
 
