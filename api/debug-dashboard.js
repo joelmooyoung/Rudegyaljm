@@ -253,10 +253,10 @@ export default async function handler(req, res) {
             displayResult('login-result', result);
         }
 
-                async function testAddComment() {
+                        async function testAddComment() {
             const storyId = document.getElementById('comment-story-id').value;
             const commentData = {
-                comment: document.getElementById('comment-text').value,
+                content: document.getElementById('comment-text').value, // Using 'content' like frontend
                 username: document.getElementById('comment-username').value,
                 userId: 'test-user-' + Date.now()
             };
