@@ -253,6 +253,54 @@ export default async function handler(req, res) {
             displayResult('login-result', result);
         }
 
+                async function testAddComment() {
+            const storyId = document.getElementById('comment-story-id').value;
+            const commentData = {
+                comment: document.getElementById('comment-text').value,
+                username: document.getElementById('comment-username').value,
+                userId: 'test-user-' + Date.now()
+            };
+
+            const result = await makeRequest(\`/api/stories/\${storyId}/comments\`, {
+                method: 'POST',
+                body: JSON.stringify(commentData)
+            });
+            displayResult('comment-result', result);
+        }
+
+        async function testGetComments() {
+            const storyId = document.getElementById('get-comments-story-id').value;
+            const result = await makeRequest(\`/api/stories/\${storyId}/comments\`);
+            displayResult('get-comments-result', result);
+        }
+
+        async function testToggleLike() {
+            const storyId = document.getElementById('like-story-id').value;
+            const likeData = {
+                userId: document.getElementById('like-user-id').value
+            };
+
+            const result = await makeRequest(\`/api/stories/\${storyId}/like\`, {
+                method: 'POST',
+                body: JSON.stringify(likeData)
+            });
+            displayResult('like-result', result);
+        }
+
+        async function testAddRating() {
+            const storyId = document.getElementById('rating-story-id').value;
+            const ratingData = {
+                rating: parseInt(document.getElementById('rating-value').value),
+                userId: document.getElementById('rating-user-id').value
+            };
+
+            const result = await makeRequest(\`/api/stories/\${storyId}/rating\`, {
+                method: 'POST',
+                body: JSON.stringify(ratingData)
+            });
+            displayResult('rating-result', result);
+        }
+
         // Auto-test API status on load
         window.addEventListener('load', testApiStatus);
     </script>
