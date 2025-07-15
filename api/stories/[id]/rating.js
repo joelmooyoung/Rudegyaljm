@@ -1,44 +1,18 @@
-// Story rating API - handle story ratings
-// Global storage simulation (in production, use database)
-if (!global.ratings) {
-  global.ratings = [
-    {
-      id: "1",
-      storyId: "1",
-      userId: "admin1",
-      rating: 5,
-      createdAt: "2024-01-16T00:00:00.000Z",
-    },
-    {
-      id: "2",
-      storyId: "1",
-      userId: "premium1",
-      rating: 4,
-      createdAt: "2024-01-17T00:00:00.000Z",
-    },
-    {
-      id: "3",
-      storyId: "2",
-      userId: "free1",
-      rating: 5,
-      createdAt: "2024-01-21T00:00:00.000Z",
-    },
-  ];
-}
+// Story rating API with MongoDB integration
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Rating, Story } from "../../../models/index.js";
 
-let ratings = global.ratings;
+// Calculate average rating for a story
+async function calculateAverageRating(storyId) {
+  const ratings = await Rating.find({ storyId });
+  if (ratings.length === 0) return { average: 0, count: 0 };
 
-// Calculate average ratings
-function calculateAverageRating(storyId) {
-  const storyRatings = ratings.filter((r) => r.storyId === storyId);
-  if (storyRatings.length === 0) return { average: 0, count: 0 };
-
-  const sum = storyRatings.reduce((acc, r) => acc + r.rating, 0);
-  const average = sum / storyRatings.length;
+  const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+  const average = sum / ratings.length;
 
   return {
     average: Math.round(average * 10) / 10, // Round to 1 decimal
-    count: storyRatings.length,
+    count: ratings.length,
   };
 }
 
@@ -58,11 +32,14 @@ export default async function handler(req, res) {
   }
 
   try {
+    await connectToDatabase();
+
     switch (req.method) {
       case "GET":
         // Get rating stats for story
         console.log(`[RATING API] Getting ratings for story ${storyId}`);
-        const stats = calculateAverageRating(storyId);
+
+        const stats = await calculateAverageRating(storyId);
 
         return res.status(200).json({
           success: true,
@@ -101,33 +78,41 @@ export default async function handler(req, res) {
         );
 
         // Check if user already rated this story
-        const existingRatingIndex = ratings.findIndex(
-          (r) => r.storyId === storyId && r.userId === userId,
-        );
+        const existingRating = await Rating.findOne({ storyId, userId });
 
-        if (existingRatingIndex >= 0) {
+        if (existingRating) {
           // Update existing rating
-          ratings[existingRatingIndex].rating = ratingValue;
-          ratings[existingRatingIndex].createdAt = new Date().toISOString();
+          existingRating.rating = ratingValue;
+          await existingRating.save();
           console.log(
             `[RATING API] ✅ Updated rating for story ${storyId} to ${ratingValue}`,
           );
         } else {
           // Add new rating
-          const newRating = {
-            id: Date.now().toString(),
+          const ratingId = Date.now().toString();
+          const newRating = new Rating({
+            ratingId,
             storyId,
             userId,
             rating: ratingValue,
-            createdAt: new Date().toISOString(),
-          };
-          ratings.push(newRating);
+          });
+          await newRating.save();
           console.log(
             `[RATING API] ✅ Added new rating for story ${storyId}: ${ratingValue}`,
           );
         }
 
-        const newStats = calculateAverageRating(storyId);
+        // Recalculate story average rating
+        const newStats = await calculateAverageRating(storyId);
+
+        // Update story document with new rating stats
+        await Story.findOneAndUpdate(
+          { storyId },
+          {
+            averageRating: newStats.average,
+            ratingCount: newStats.count,
+          },
+        );
 
         return res.status(200).json({
           success: true,
