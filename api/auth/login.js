@@ -59,21 +59,32 @@ export default function handler(req, res) {
     console.log("Request body:", req.body);
     const { email, password } = req.body;
 
+    console.log("Extracted credentials:", {
+      email,
+      password: password ? "[PROVIDED]" : "[MISSING]",
+    });
+
     if (!email || !password) {
+      console.log("Missing credentials");
       return res.status(400).json({ message: "Email and password required" });
     }
 
     // Find user by email
     const user = users.find((u) => u.email === email);
+    console.log("User found:", user ? user.email : "NOT FOUND");
 
     if (!user) {
+      console.log("User not found for email:", email);
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     // For demo, accept any password for existing users
     if (password.length === 0) {
+      console.log("Empty password provided");
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    console.log("Login successful for:", user.email);
 
     // Update last login
     user.lastLogin = new Date();
