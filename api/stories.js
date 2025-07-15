@@ -1,4 +1,4 @@
-// Story management API - both reading and writing
+// Story management API - handles all story CRUD operations
 let stories = [
   {
     id: "1",
@@ -62,7 +62,11 @@ let stories = [
   },
 ];
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  console.log(`[STORIES API] ${req.method} request to /api/stories`);
+  console.log(`[STORIES API] Query params:`, req.query);
+  console.log(`[STORIES API] Body:`, req.body);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -72,96 +76,118 @@ export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+    console.log(`[STORIES API] OPTIONS request handled`);
+    return res.status(200).end();
   }
 
-  const { method } = req;
-  const { id } = req.query;
-
   try {
+    const { method, query, body } = req;
+    const storyId = query.id;
+
     switch (method) {
       case "GET":
-        if (id) {
+        console.log(`[STORIES API] GET request, storyId: ${storyId}`);
+        if (storyId) {
           // Get single story
-          const story = stories.find((s) => s.id === id);
+          const story = stories.find((s) => s.id === storyId);
           if (!story) {
+            console.log(`[STORIES API] Story not found: ${storyId}`);
             return res.status(404).json({ message: "Story not found" });
           }
-          res.json(story);
+          console.log(`[STORIES API] Returning single story: ${story.title}`);
+          return res.json(story);
         } else {
           // Get all stories
-          console.log(`[DEBUG] Returning ${stories.length} stories`);
-          res.json(stories);
+          console.log(`[STORIES API] Returning ${stories.length} stories`);
+          return res.json(stories);
         }
-        break;
 
       case "POST":
-        // Create new story
-        console.log("[STORY CREATE] Request body:", req.body);
+        console.log(`[STORIES API] Creating new story with data:`, body);
+
+        if (!body || !body.title) {
+          console.log(`[STORIES API] Invalid story data - missing title`);
+          return res.status(400).json({ message: "Story title is required" });
+        }
+
         const newStory = {
           id: Date.now().toString(),
-          ...req.body,
-          rating: req.body.rating || 0,
-          ratingCount: req.body.ratingCount || 0,
-          viewCount: req.body.viewCount || 0,
-          commentCount: req.body.commentCount || 0,
+          title: body.title || "Untitled",
+          author: body.author || "Unknown Author",
+          excerpt: body.excerpt || "",
+          content: body.content || "",
+          tags: Array.isArray(body.tags) ? body.tags : [],
+          category: body.category || "Romance",
+          accessLevel: body.accessLevel || "free",
+          isPublished: body.isPublished || false,
+          rating: body.rating || 0,
+          ratingCount: body.ratingCount || 0,
+          viewCount: body.viewCount || 0,
+          commentCount: body.commentCount || 0,
+          image: body.image || "",
           createdAt: new Date(),
           updatedAt: new Date(),
         };
+
         stories.push(newStory);
-        console.log("[STORY CREATE] Success! New story ID:", newStory.id);
-        res.status(201).json(newStory);
-        break;
+        console.log(
+          `[STORIES API] ✅ Created new story with ID: ${newStory.id}`,
+        );
+        return res.status(201).json(newStory);
 
       case "PUT":
-        // Update story
-        if (!id) {
-          console.log("[STORY UPDATE] Error: No story ID provided");
-          return res.status(400).json({ message: "Story ID required" });
+        console.log(`[STORIES API] Updating story ${storyId} with data:`, body);
+
+        if (!storyId) {
+          console.log(`[STORIES API] PUT request missing story ID`);
+          return res.status(400).json({ message: "Story ID is required" });
         }
-        console.log(
-          "[STORY UPDATE] Updating story:",
-          id,
-          "with data:",
-          req.body,
-        );
-        const storyIndex = stories.findIndex((s) => s.id === id);
+
+        const storyIndex = stories.findIndex((s) => s.id === storyId);
         if (storyIndex === -1) {
-          console.log("[STORY UPDATE] Error: Story not found:", id);
+          console.log(`[STORIES API] Story not found for update: ${storyId}`);
           return res.status(404).json({ message: "Story not found" });
         }
+
+        // Update the story
         stories[storyIndex] = {
           ...stories[storyIndex],
-          ...req.body,
+          ...body,
+          id: storyId, // Ensure ID doesn't change
           updatedAt: new Date(),
         };
-        console.log("[STORY UPDATE] Success! Updated story:", id);
-        res.json(stories[storyIndex]);
-        break;
+
+        console.log(`[STORIES API] ✅ Updated story ${storyId}`);
+        return res.json(stories[storyIndex]);
 
       case "DELETE":
-        // Delete story
-        if (!id) {
-          return res.status(400).json({ message: "Story ID required" });
+        console.log(`[STORIES API] Deleting story: ${storyId}`);
+
+        if (!storyId) {
+          return res.status(400).json({ message: "Story ID is required" });
         }
-        console.log("[STORY DELETE] Deleting story:", id);
-        const deleteIndex = stories.findIndex((s) => s.id === id);
+
+        const deleteIndex = stories.findIndex((s) => s.id === storyId);
         if (deleteIndex === -1) {
+          console.log(`[STORIES API] Story not found for deletion: ${storyId}`);
           return res.status(404).json({ message: "Story not found" });
         }
+
         stories.splice(deleteIndex, 1);
-        console.log("[STORY DELETE] Success! Deleted story:", id);
-        res.json({ message: "Story deleted successfully" });
-        break;
+        console.log(`[STORIES API] ✅ Deleted story ${storyId}`);
+        return res.json({ message: "Story deleted successfully" });
 
       default:
-        res.status(405).json({ message: "Method not allowed" });
+        console.log(`[STORIES API] Method not allowed: ${method}`);
+        return res
+          .status(405)
+          .json({ message: `Method ${method} not allowed` });
     }
   } catch (error) {
-    console.error("[STORY API] Error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error(`[STORIES API] ❌ Error:`, error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }
