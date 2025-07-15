@@ -1,5 +1,5 @@
-// Vercel serverless function for stories
-const stories = [
+// Story management API - both reading and writing
+let stories = [
   {
     id: "1",
     title: "Midnight Desires",
@@ -60,62 +60,6 @@ const stories = [
     image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
   },
-  {
-    id: "4",
-    title: "Dragons of Eldoria",
-    author: "Fantasy Weaver",
-    excerpt:
-      "In a realm where magic and desire intertwine, a princess discovers that the greatest treasures aren't gold, but the fire that burns within.",
-    content: "Fantasy adventure content...",
-    tags: ["Fantasy", "Dragons", "Magic"],
-    category: "Fantasy",
-    accessLevel: "premium",
-    isPublished: false,
-    rating: 4.7,
-    ratingCount: 234,
-    viewCount: 3456,
-    commentCount: 67,
-    createdAt: new Date("2024-02-10"),
-    updatedAt: new Date("2024-02-10"),
-  },
-  {
-    id: "5",
-    title: "The Comedy Club Catastrophe",
-    author: "Laughing Lover",
-    excerpt:
-      "When stand-up comedy meets romantic chaos, the only thing funnier than the jokes are the disasters that follow. A lighthearted romp through love and laughter.",
-    content: "Comedy content...",
-    tags: ["Comedy", "Romance", "Laughter"],
-    category: "Comedy",
-    accessLevel: "free",
-    isPublished: true,
-    rating: 4.2,
-    ratingCount: 189,
-    viewCount: 5678,
-    commentCount: 92,
-    createdAt: new Date("2024-02-15"),
-    updatedAt: new Date("2024-02-15"),
-  },
-  {
-    id: "6",
-    title: "Whispers in the Library",
-    author: "Literary Seductress",
-    excerpt:
-      "Between dusty books and quiet corners, she found more than knowledge. A tale of intellectual seduction and the power of whispered words.",
-    content: "Premium library romance...",
-    tags: ["Library", "Intellectual", "Whispers"],
-    category: "Seductive",
-    accessLevel: "premium",
-    isPublished: true,
-    rating: 4.9,
-    ratingCount: 445,
-    viewCount: 7890,
-    commentCount: 78,
-    createdAt: new Date("2024-02-20"),
-    updatedAt: new Date("2024-02-20"),
-    image:
-      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80",
-  },
 ];
 
 export default function handler(req, res) {
@@ -132,26 +76,92 @@ export default function handler(req, res) {
     return;
   }
 
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+  const { method } = req;
+  const { id } = req.query;
 
   try {
-    console.log(`[DEBUG] Total stories in database: ${stories.length}`);
-    console.log(
-      "[DEBUG] Stories:",
-      stories.map((s) => ({
-        id: s.id,
-        title: s.title,
-        isPublished: s.isPublished,
-        accessLevel: s.accessLevel,
-      })),
-    );
-    console.log(`[DEBUG] Returning ${stories.length} stories`);
+    switch (method) {
+      case "GET":
+        if (id) {
+          // Get single story
+          const story = stories.find((s) => s.id === id);
+          if (!story) {
+            return res.status(404).json({ message: "Story not found" });
+          }
+          res.json(story);
+        } else {
+          // Get all stories
+          console.log(`[DEBUG] Returning ${stories.length} stories`);
+          res.json(stories);
+        }
+        break;
 
-    res.json(stories);
+      case "POST":
+        // Create new story
+        console.log("[STORY CREATE] Request body:", req.body);
+        const newStory = {
+          id: Date.now().toString(),
+          ...req.body,
+          rating: req.body.rating || 0,
+          ratingCount: req.body.ratingCount || 0,
+          viewCount: req.body.viewCount || 0,
+          commentCount: req.body.commentCount || 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        stories.push(newStory);
+        console.log("[STORY CREATE] Success! New story ID:", newStory.id);
+        res.status(201).json(newStory);
+        break;
+
+      case "PUT":
+        // Update story
+        if (!id) {
+          console.log("[STORY UPDATE] Error: No story ID provided");
+          return res.status(400).json({ message: "Story ID required" });
+        }
+        console.log(
+          "[STORY UPDATE] Updating story:",
+          id,
+          "with data:",
+          req.body,
+        );
+        const storyIndex = stories.findIndex((s) => s.id === id);
+        if (storyIndex === -1) {
+          console.log("[STORY UPDATE] Error: Story not found:", id);
+          return res.status(404).json({ message: "Story not found" });
+        }
+        stories[storyIndex] = {
+          ...stories[storyIndex],
+          ...req.body,
+          updatedAt: new Date(),
+        };
+        console.log("[STORY UPDATE] Success! Updated story:", id);
+        res.json(stories[storyIndex]);
+        break;
+
+      case "DELETE":
+        // Delete story
+        if (!id) {
+          return res.status(400).json({ message: "Story ID required" });
+        }
+        console.log("[STORY DELETE] Deleting story:", id);
+        const deleteIndex = stories.findIndex((s) => s.id === id);
+        if (deleteIndex === -1) {
+          return res.status(404).json({ message: "Story not found" });
+        }
+        stories.splice(deleteIndex, 1);
+        console.log("[STORY DELETE] Success! Deleted story:", id);
+        res.json({ message: "Story deleted successfully" });
+        break;
+
+      default:
+        res.status(405).json({ message: "Method not allowed" });
+    }
   } catch (error) {
-    console.error("Error fetching stories:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("[STORY API] Error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 }
