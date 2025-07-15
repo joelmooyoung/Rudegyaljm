@@ -34,6 +34,8 @@ const users = [
 ];
 
 export default function handler(req, res) {
+  console.log("Login endpoint called:", req.method, req.url);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -43,15 +45,18 @@ export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
+    console.log("OPTIONS request handled");
     res.status(200).end();
     return;
   }
 
   if (req.method !== "POST") {
+    console.log("Wrong method:", req.method);
     return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
+    console.log("Request body:", req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
