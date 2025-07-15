@@ -19,6 +19,11 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
   const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState("");
 
+  // Development bypass - uncomment for testing
+  // React.useEffect(() => {
+  //   onVerified();
+  // }, [onVerified]);
+
   const handleVerification = () => {
     if (!birthDate) {
       setError("Please enter your date of birth");
