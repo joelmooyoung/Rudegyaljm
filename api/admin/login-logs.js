@@ -1,47 +1,78 @@
-// Login logs API
-const loginLogs = [
-  {
-    id: "1",
-    userId: "admin1",
-    email: "admin@nocturne.com",
-    ipAddress: "192.168.1.100",
-    country: "🇺🇸 United States",
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    success: true,
-    createdAt: new Date(),
-  },
-  {
-    id: "2",
-    userId: "premium1",
-    email: "premium@test.com",
-    ipAddress: "203.0.113.45",
-    country: "🇦🇺 Australia",
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-    success: true,
-    createdAt: new Date(Date.now() - 3600000),
-  },
-];
+// Admin login logs API with MongoDB integration
+import { connectToDatabase } from "../../lib/mongodb.js";
+import { LoginLog } from "../../models/index.js";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  console.log(`[LOGIN-LOGS API] ${req.method} /api/admin/login-logs`);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
-  }
-
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(200).end();
   }
 
   try {
-    res.json(loginLogs.slice(-100)); // Return last 100 logs
+    await connectToDatabase();
+
+    switch (req.method) {
+      case "GET":
+        console.log(`[LOGIN-LOGS API] Fetching login logs`);
+
+        const logs = await LoginLog.find({})
+          .sort({ timestamp: -1 })
+          .limit(100)
+          .select("-__v");
+
+        // Transform to expected format
+        const transformedLogs = logs.map((log) => ({
+          id: log.logId,
+          userId: log.userId,
+          username: log.username,
+          ip: log.ip,
+          country: log.country,
+          userAgent: log.userAgent,
+          success: log.success,
+          timestamp: log.timestamp,
+        }));
+
+        console.log(`[LOGIN-LOGS API] Found ${transformedLogs.length} logs`);
+
+        return res.status(200).json({
+          success: true,
+          data: transformedLogs,
+          count: transformedLogs.length,
+        });
+
+      case "DELETE":
+        console.log(`[LOGIN-LOGS API] Clearing all login logs`);
+
+        const deleteResult = await LoginLog.deleteMany({});
+
+        console.log(
+          `[LOGIN-LOGS API] ✅ Cleared ${deleteResult.deletedCount} login logs`,
+        );
+
+        return res.status(200).json({
+          success: true,
+          message: `Cleared ${deleteResult.deletedCount} login logs`,
+          deletedCount: deleteResult.deletedCount,
+        });
+
+      default:
+        return res.status(405).json({
+          success: false,
+          message: `Method ${req.method} not allowed`,
+        });
+    }
   } catch (error) {
-    console.error("Login logs error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error(`[LOGIN-LOGS API] Error:`, error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }
