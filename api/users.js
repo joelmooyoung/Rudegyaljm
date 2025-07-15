@@ -1,65 +1,11 @@
-// Vercel serverless function for user management
-let users = [
-  {
-    id: "admin1",
-    email: "admin@nocturne.com",
-    username: "admin",
-    role: "admin",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "none",
-    createdAt: new Date("2024-01-01"),
-    lastLogin: new Date(),
-  },
-  {
-    id: "premium1",
-    email: "premium@test.com",
-    username: "premiumuser",
-    role: "premium",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "active",
-    subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-    createdAt: new Date("2024-01-10"),
-    lastLogin: new Date(),
-  },
-  {
-    id: "free1",
-    email: "free@test.com",
-    username: "freeuser",
-    role: "free",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "none",
-    createdAt: new Date("2024-01-15"),
-    lastLogin: new Date(),
-  },
-  {
-    id: "free2",
-    email: "reader@example.com",
-    username: "storyreader",
-    role: "free",
-    isAgeVerified: true,
-    isActive: false,
-    subscriptionStatus: "none",
-    createdAt: new Date("2024-02-01"),
-    lastLogin: new Date("2024-02-01"),
-  },
-  {
-    id: "premium2",
-    email: "vip@example.com",
-    username: "vipuser",
-    role: "premium",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "active",
-    subscriptionExpiry: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-    createdAt: new Date("2024-02-10"),
-    lastLogin: new Date(),
-  },
-];
+// Users management API with MongoDB integration
+import { connectToDatabase } from "../lib/mongodb.js";
+import { User } from "../models/index.js";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
+  console.log(`[USERS API] ${req.method} /api/users`);
+  console.log(`[USERS API] Body:`, req.body);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -69,72 +15,175 @@ export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  const { method } = req;
-  const { id } = req.query;
-
   try {
-    switch (method) {
+    await connectToDatabase();
+
+    switch (req.method) {
       case "GET":
-        if (id) {
-          // Get single user
-          const user = users.find((u) => u.id === id);
-          if (!user) {
-            return res.status(404).json({ message: "User not found" });
-          }
-          res.json(user);
-        } else {
-          // Get all users
-          res.json(users);
-        }
-        break;
+        console.log(`[USERS API] Fetching all users`);
+
+        const users = await User.find({})
+          .sort({ createdAt: -1 })
+          .select("-password -__v");
+
+        // Transform to expected format
+        const transformedUsers = users.map((user) => ({
+          id: user.userId,
+          username: user.username,
+          email: user.email,
+          type: user.type,
+          country: user.country,
+          active: user.active,
+          lastLogin: user.lastLogin,
+          loginCount: user.loginCount,
+          joinedAt: user.createdAt,
+        }));
+
+        console.log(`[USERS API] Found ${transformedUsers.length} users`);
+        return res.status(200).json({
+          success: true,
+          data: transformedUsers,
+          count: transformedUsers.length,
+        });
 
       case "POST":
-        // Create new user
-        const newUser = {
-          id: Date.now().toString(),
-          ...req.body,
-          createdAt: new Date(),
-          lastLogin: null,
-        };
-        users.push(newUser);
-        res.status(201).json(newUser);
-        break;
+        console.log(`[USERS API] Creating new user`);
+        const { username, email, password, type = "free" } = req.body;
+
+        if (!username || !email || !password) {
+          return res.status(400).json({
+            success: false,
+            message: "Username, email and password are required",
+          });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({
+          $or: [{ email }, { username }],
+        });
+
+        if (existingUser) {
+          return res.status(409).json({
+            success: false,
+            message: "User with this email or username already exists",
+          });
+        }
+
+        const userId = Date.now().toString();
+        const newUser = new User({
+          userId,
+          username,
+          email,
+          password,
+          type,
+          country: "Unknown",
+          active: true,
+          loginCount: 0,
+        });
+
+        await newUser.save();
+        console.log(`[USERS API] ✅ Created user: ${username}`);
+
+        return res.status(201).json({
+          success: true,
+          message: "User created successfully",
+          data: {
+            id: newUser.userId,
+            username: newUser.username,
+            email: newUser.email,
+            type: newUser.type,
+            active: newUser.active,
+          },
+        });
 
       case "PUT":
-        // Update user
-        if (!id) {
-          return res.status(400).json({ message: "User ID required" });
+        console.log(`[USERS API] Updating user`);
+        const { id: updateId } = req.body;
+
+        if (!updateId) {
+          return res.status(400).json({
+            success: false,
+            message: "User ID is required",
+          });
         }
-        const userIndex = users.findIndex((u) => u.id === id);
-        if (userIndex === -1) {
-          return res.status(404).json({ message: "User not found" });
+
+        const userToUpdate = await User.findOne({ userId: updateId });
+        if (!userToUpdate) {
+          return res.status(404).json({
+            success: false,
+            message: "User not found",
+          });
         }
-        users[userIndex] = { ...users[userIndex], ...req.body };
-        res.json(users[userIndex]);
-        break;
+
+        // Update fields
+        const updateFields = {};
+        if (req.body.username) updateFields.username = req.body.username;
+        if (req.body.email) updateFields.email = req.body.email;
+        if (req.body.type) updateFields.type = req.body.type;
+        if (req.body.hasOwnProperty("active"))
+          updateFields.active = req.body.active;
+
+        const updatedUser = await User.findOneAndUpdate(
+          { userId: updateId },
+          updateFields,
+          { new: true },
+        ).select("-password");
+
+        console.log(`[USERS API] ✅ Updated user ${updateId}`);
+
+        return res.status(200).json({
+          success: true,
+          message: "User updated successfully",
+          data: {
+            id: updatedUser.userId,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            type: updatedUser.type,
+            active: updatedUser.active,
+          },
+        });
 
       case "DELETE":
-        // Delete user
-        if (!id) {
-          return res.status(400).json({ message: "User ID required" });
+        console.log(`[USERS API] Deleting user`);
+        const { id: deleteId } = req.body;
+
+        if (!deleteId) {
+          return res.status(400).json({
+            success: false,
+            message: "User ID is required",
+          });
         }
-        const deleteIndex = users.findIndex((u) => u.id === id);
-        if (deleteIndex === -1) {
-          return res.status(404).json({ message: "User not found" });
+
+        const deletedUser = await User.findOneAndDelete({ userId: deleteId });
+        if (!deletedUser) {
+          return res.status(404).json({
+            success: false,
+            message: "User not found",
+          });
         }
-        users.splice(deleteIndex, 1);
-        res.json({ message: "User deleted successfully" });
-        break;
+
+        console.log(`[USERS API] ✅ Deleted user ${deleteId}`);
+
+        return res.status(200).json({
+          success: true,
+          message: "User deleted successfully",
+        });
 
       default:
-        res.status(405).json({ message: "Method not allowed" });
+        return res.status(405).json({
+          success: false,
+          message: `Method ${req.method} not allowed`,
+        });
     }
   } catch (error) {
-    console.error("User management error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error(`[USERS API] Error:`, error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }
