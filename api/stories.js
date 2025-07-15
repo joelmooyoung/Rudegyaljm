@@ -139,10 +139,55 @@ export default async function handler(req, res) {
           console.log(
             `📚 [STORIES API] Fetching all stories (${stories.length} total)`,
           );
+
+          // Validate stories array
+          if (!Array.isArray(stories)) {
+            console.error(
+              `❌ [STORIES API] Stories is not an array:`,
+              typeof stories,
+            );
+            return res.status(500).json({
+              error: "Internal error: stories data is corrupted",
+              type: typeof stories,
+              value: stories,
+            });
+          }
+
+          // Ensure all stories have required fields
+          const validatedStories = stories.map((story) => ({
+            ...story,
+            id: story.id || Date.now().toString(),
+            title: story.title || "Untitled",
+            author: story.author || "Unknown Author",
+            excerpt: story.excerpt || "",
+            content: story.content || "",
+            tags: Array.isArray(story.tags) ? story.tags : [],
+            category: story.category || "Romance",
+            accessLevel: story.accessLevel || "free",
+            isPublished: Boolean(story.isPublished),
+            rating: Number(story.rating) || 0,
+            ratingCount: Number(story.ratingCount) || 0,
+            viewCount: Number(story.viewCount) || 0,
+            commentCount: Number(story.commentCount) || 0,
+            createdAt: story.createdAt || new Date(),
+            updatedAt: story.updatedAt || new Date(),
+          }));
+
           console.log(
-            `📋 [STORIES API] Returning stories array directly for frontend`,
+            `📋 [STORIES API] Returning ${validatedStories.length} validated stories as array`,
           );
-          return res.status(200).json(stories);
+          console.log(
+            `🔍 [STORIES API] Sample story:`,
+            validatedStories[0]
+              ? {
+                  id: validatedStories[0].id,
+                  title: validatedStories[0].title,
+                  author: validatedStories[0].author,
+                }
+              : "No stories available",
+          );
+
+          return res.status(200).json(validatedStories);
         }
 
       case "POST":
