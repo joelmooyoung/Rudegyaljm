@@ -1,23 +1,27 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/spa",
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
+  "builds": [
+    {
+      "src": "dist/spa/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     },
     {
-      "handle": "filesystem"
+      "src": "/(.*)",
+      "dest": "/dist/spa/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "/",
+      "dest": "/dist/spa/index.html"
     }
   ]
 }
