@@ -438,7 +438,10 @@ export default function Home({
                   ? "Unlock Your Deepest Desires"
                   : "Taste Forbidden Pleasures"}
             </h2>
-            <p className="text-xl md:text-2xl font-serif text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed">
+            <p
+              className="text-xl md:text-2xl font-serif text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed"
+              style={{ color: "#d1d5db", fontSize: "1.25rem" }}
+            >
               {user.role === "admin" ? (
                 "Command the realm of desire. Curate the most intoxicating tales that ignite souls and awaken hidden passions."
               ) : user.role === "free" ? (
