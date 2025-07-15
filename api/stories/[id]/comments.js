@@ -1,35 +1,6 @@
-// Story comments API - handle adding and fetching comments
-// Global storage simulation (in production, use database)
-if (!global.comments) {
-  global.comments = [
-    {
-      id: "1",
-      storyId: "1",
-      userId: "admin1",
-      username: "admin",
-      comment: "This is an amazing story! The passion really comes through.",
-      createdAt: "2024-01-16T00:00:00.000Z",
-    },
-    {
-      id: "2",
-      storyId: "1",
-      userId: "premium1",
-      username: "premiumuser",
-      comment: "Absolutely captivating. Looking forward to more like this.",
-      createdAt: "2024-01-17T00:00:00.000Z",
-    },
-    {
-      id: "3",
-      storyId: "2",
-      userId: "free1",
-      username: "freeuser",
-      comment: "The tension in this story is incredible!",
-      createdAt: "2024-01-21T00:00:00.000Z",
-    },
-  ];
-}
-
-let comments = global.comments;
+// Story comments API with MongoDB integration
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Comment } from "../../../models/index.js";
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -47,17 +18,35 @@ export default async function handler(req, res) {
   }
 
   try {
+    await connectToDatabase();
+
     switch (req.method) {
       case "GET":
         // Get all comments for a story
         console.log(`[COMMENTS API] Fetching comments for story ${storyId}`);
-        const storyComments = comments.filter((c) => c.storyId === storyId);
-        console.log(`[COMMENTS API] Found ${storyComments.length} comments`);
+
+        const comments = await Comment.find({ storyId })
+          .sort({ createdAt: -1 })
+          .select("-__v");
+
+        // Transform to expected format
+        const transformedComments = comments.map((comment) => ({
+          id: comment.commentId,
+          storyId: comment.storyId,
+          userId: comment.userId,
+          username: comment.username,
+          comment: comment.comment,
+          createdAt: comment.createdAt.toISOString(),
+        }));
+
+        console.log(
+          `[COMMENTS API] Found ${transformedComments.length} comments`,
+        );
 
         return res.status(200).json({
           success: true,
-          data: storyComments,
-          count: storyComments.length,
+          data: transformedComments,
+          count: transformedComments.length,
           timestamp: new Date().toISOString(),
         });
 
@@ -82,24 +71,31 @@ export default async function handler(req, res) {
           });
         }
 
-        const newComment = {
-          id: Date.now().toString(),
-          storyId: storyId,
+        const commentId = Date.now().toString();
+        const newComment = new Comment({
+          commentId,
+          storyId,
           userId: req.body.userId || "anonymous",
           username: req.body.username || "Anonymous",
           comment: commentText,
-          createdAt: new Date().toISOString(),
-        };
+        });
 
-        comments.push(newComment);
+        await newComment.save();
         console.log(
-          `[COMMENTS API] ✅ Added comment ${newComment.id} to story ${storyId}`,
+          `[COMMENTS API] ✅ Added comment ${commentId} to story ${storyId}`,
         );
 
         return res.status(201).json({
           success: true,
           message: "Comment added successfully",
-          data: newComment,
+          data: {
+            id: newComment.commentId,
+            storyId: newComment.storyId,
+            userId: newComment.userId,
+            username: newComment.username,
+            comment: newComment.comment,
+            createdAt: newComment.createdAt.toISOString(),
+          },
           timestamp: new Date().toISOString(),
         });
 
