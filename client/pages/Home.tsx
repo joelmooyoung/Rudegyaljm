@@ -320,7 +320,10 @@ export default function Home({
       style={{ backgroundColor: "#0f172a", color: "white", minHeight: "100vh" }}
     >
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header
+        className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50"
+        style={{ backgroundColor: "#1e293b", borderColor: "#374151" }}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
