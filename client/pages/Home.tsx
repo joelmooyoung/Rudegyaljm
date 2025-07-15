@@ -428,7 +428,10 @@ export default function Home({
           <div className="absolute inset-0 bg-desire-gradient opacity-5 blur-3xl"></div>
 
           <div className="relative z-10">
-            <h2 className="text-5xl md:text-6xl font-display font-bold text-passion-gradient mb-6 sultry-pulse">
+            <h2
+              className="text-5xl md:text-6xl font-display font-bold text-passion-gradient mb-6 sultry-pulse"
+              style={{ color: "#ef4444", fontSize: "3rem" }}
+            >
               {user.role === "admin"
                 ? "Forbidden Chronicles - Admin Sanctuary"
                 : user.role === "premium"
