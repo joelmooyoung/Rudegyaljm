@@ -92,7 +92,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
 
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Age verification card */}
-          <Card className="story-card-intimate passionate-shimmer seductive-border">
+          <Card
+            className="story-card-intimate passionate-shimmer seductive-border"
+            style={{ backgroundColor: "#1e293b", borderColor: "#ef4444" }}
+          >
             <CardHeader className="text-center">
               <div className="mx-auto w-20 h-20 bg-seductive-gradient rounded-full flex items-center justify-center mb-6 passionate-glow">
                 <Flame className="h-10 w-10 text-primary-foreground" />
