@@ -73,7 +73,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
               alt="Rude Gyal Confessions Logo"
               className="h-16 w-16 object-contain sultry-pulse"
             />
-            <h1 className="text-5xl font-display font-bold text-passion-gradient">
+            <h1
+              className="text-5xl font-display font-bold text-passion-gradient"
+              style={{ color: "#ef4444", fontSize: "3rem" }}
+            >
               Rude Gyal Confessions
             </h1>
           </div>
