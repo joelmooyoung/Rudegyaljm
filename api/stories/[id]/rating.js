@@ -117,7 +117,7 @@ export default async function handler(req, res) {
           message: "Rating saved successfully",
           data: {
             storyId,
-            userRating: rating,
+            userRating: ratingValue,
             averageRating: newStats.average,
             ratingCount: newStats.count,
           },
