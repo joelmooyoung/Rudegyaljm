@@ -80,7 +80,7 @@ export default async function handler(req, res) {
         }
 
         console.log(
-          `[RATING API] User ${userId} rating story ${storyId}: ${rating}`,
+          `[RATING API] User ${userId} rating story ${storyId}: ${ratingValue}`,
         );
 
         // Check if user already rated this story
@@ -90,20 +90,24 @@ export default async function handler(req, res) {
 
         if (existingRatingIndex >= 0) {
           // Update existing rating
-          ratings[existingRatingIndex].rating = rating;
+          ratings[existingRatingIndex].rating = ratingValue;
           ratings[existingRatingIndex].createdAt = new Date();
-          console.log(`[RATING API] ✅ Updated rating for story ${storyId}`);
+          console.log(
+            `[RATING API] ✅ Updated rating for story ${storyId} to ${ratingValue}`,
+          );
         } else {
           // Add new rating
           const newRating = {
             id: Date.now().toString(),
             storyId,
             userId,
-            rating,
+            rating: ratingValue,
             createdAt: new Date(),
           };
           ratings.push(newRating);
-          console.log(`[RATING API] ✅ Added rating for story ${storyId}`);
+          console.log(
+            `[RATING API] ✅ Added new rating for story ${storyId}: ${ratingValue}`,
+          );
         }
 
         const newStats = calculateAverageRating(storyId);
