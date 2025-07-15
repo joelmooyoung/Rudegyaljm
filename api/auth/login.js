@@ -1,106 +1,213 @@
-// Vercel serverless function for login
-const users = [
-  {
-    id: "admin1",
-    email: "admin@nocturne.com",
-    username: "admin",
-    role: "admin",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "none",
-    createdAt: new Date(),
-  },
-  {
-    id: "premium1",
-    email: "premium@test.com",
-    username: "premiumuser",
-    role: "premium",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "active",
-    subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-    createdAt: new Date(),
-  },
-  {
-    id: "free1",
-    email: "free@test.com",
-    username: "freeuser",
-    role: "free",
-    isAgeVerified: true,
-    isActive: true,
-    subscriptionStatus: "none",
-    createdAt: new Date(),
-  },
-];
+import bcrypt from "bcryptjs";
+import { db } from "../../lib/supabase.js";
 
-export default function handler(req, res) {
-  console.log("Login endpoint called:", req.method, req.url);
+// IP to country mapping helper
+function getCountryFromIP(ip) {
+  console.log(`[AUTH] Detecting country for IP: ${ip}`);
+
+  if (!ip || ip === "127.0.0.1" || ip === "::1") {
+    return "United States"; // Default for localhost
+  }
+
+  // IPv6 address handling - enhanced detection
+  if (ip.includes(":")) {
+    console.log(`[AUTH] IPv6 address detected: ${ip}`);
+
+    // Common US ISP IPv6 prefixes
+    const usIPv6Prefixes = [
+      "2601:", // Comcast/Xfinity
+      "2602:", // Charter/Spectrum
+      "2603:", // Microsoft
+      "2604:", // Various US ISPs
+      "2605:", // Various US ISPs
+      "2606:", // AT&T
+      "2607:", // Verizon
+      "2620:", // Various US organizations
+      "2001:558:", // Comcast
+      "2001:4888:", // Charter
+    ];
+
+    for (const prefix of usIPv6Prefixes) {
+      if (ip.startsWith(prefix)) {
+        console.log(`[AUTH] Matched US IPv6 prefix: ${prefix}`);
+        return "United States";
+      }
+    }
+
+    // If no specific match, still default to US for unrecognized IPv6
+    console.log(`[AUTH] Unrecognized IPv6, defaulting to US`);
+    return "United States";
+  }
+
+  // IPv4 address handling
+  const ipParts = ip.split(".");
+  if (ipParts.length === 4) {
+    const firstOctet = parseInt(ipParts[0]);
+
+    // US IP ranges (simplified)
+    if (
+      (firstOctet >= 3 && firstOctet <= 6) ||
+      (firstOctet >= 8 && firstOctet <= 15) ||
+      (firstOctet >= 17 && firstOctet <= 30) ||
+      (firstOctet >= 32 && firstOctet <= 45) ||
+      (firstOctet >= 47 && firstOctet <= 75) ||
+      (firstOctet >= 96 && firstOctet <= 126) ||
+      (firstOctet >= 128 && firstOctet <= 191)
+    ) {
+      return "United States";
+    }
+  }
+
+  return "Unknown Region";
+}
+
+function getClientIP(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  const realIP = req.headers["x-real-ip"];
+  const remoteAddr = req.connection?.remoteAddress || req.socket?.remoteAddress;
+
+  let ip = forwarded || realIP || remoteAddr || "127.0.0.1";
+
+  // Handle comma-separated IPs (take first one)
+  if (ip.includes(",")) {
+    ip = ip.split(",")[0].trim();
+  }
+
+  // Remove IPv6 wrapper if present
+  if (ip.startsWith("::ffff:")) {
+    ip = ip.substring(7);
+  }
+
+  console.log(`[AUTH] Extracted IP: ${ip} from headers:`, {
+    forwarded,
+    realIP,
+    remoteAddr,
+  });
+
+  return ip;
+}
+
+export default async function handler(req, res) {
+  console.log(`[AUTH LOGIN] ${req.method} /api/auth/login`);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
-  );
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
-    console.log("OPTIONS request handled");
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== "POST") {
-    console.log("Wrong method:", req.method);
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed",
+    });
   }
 
   try {
-    console.log("Request body:", req.body);
-    const { email, password } = req.body;
+    const { username, password } = req.body;
+    console.log(`[AUTH LOGIN] Login attempt for username: ${username}`);
 
-    console.log("Extracted credentials:", {
-      email,
-      password: password ? "[PROVIDED]" : "[MISSING]",
-    });
-
-    if (!email || !password) {
-      console.log("Missing credentials");
-      return res.status(400).json({ message: "Email and password required" });
+    if (!username || !password) {
+      console.log(`[AUTH LOGIN] Missing credentials`);
+      return res.status(400).json({
+        success: false,
+        message: "Username and password are required",
+      });
     }
 
-    // Find user by email
-    const user = users.find((u) => u.email === email);
-    console.log("User found:", user ? user.email : "NOT FOUND");
+    // Get user from database
+    const user = await db.getUserByUsername(username);
 
     if (!user) {
-      console.log("User not found for email:", email);
-      return res.status(401).json({ message: "Invalid credentials" });
+      console.log(`[AUTH LOGIN] User not found: ${username}`);
+      await logLoginAttempt(req, username, null, false, "User not found");
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    // For demo, accept any password for existing users
-    if (password.length === 0) {
-      console.log("Empty password provided");
-      return res.status(401).json({ message: "Invalid credentials" });
+    // Verify password
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      console.log(`[AUTH LOGIN] Invalid password for user: ${username}`);
+      await logLoginAttempt(req, username, user.id, false, "Invalid password");
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    console.log("Login successful for:", user.email);
+    if (!user.is_active) {
+      console.log(`[AUTH LOGIN] Inactive user attempted login: ${username}`);
+      await logLoginAttempt(req, username, user.id, false, "Account inactive");
+      return res.status(401).json({
+        success: false,
+        message: "Account is inactive",
+      });
+    }
 
-    // Update last login
-    user.lastLogin = new Date();
+    // Successful login
+    console.log(
+      `[AUTH LOGIN] ✅ Successful login for ${username} (${user.role})`,
+    );
+    await logLoginAttempt(req, username, user.id, true, "Login successful");
 
-    // Generate simple token
-    const token = `token_${user.id}_${Date.now()}`;
+    // Remove sensitive data
+    const { password_hash, ...userResponse } = user;
 
-    const response = {
-      user,
-      token,
+    return res.status(200).json({
+      success: true,
       message: "Login successful",
-    };
-
-    res.json(response);
+      user: userResponse,
+    });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error(`[AUTH LOGIN] Error:`, error);
+
+    // Log error to database
+    try {
+      await db.logError({
+        error_type: "LOGIN_ERROR",
+        error_message: error.message,
+        stack_trace: error.stack,
+        request_path: "/api/auth/login",
+      });
+    } catch (logError) {
+      console.error(`[AUTH LOGIN] Failed to log error:`, logError);
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+async function logLoginAttempt(req, username, userId, success, reason) {
+  try {
+    const ip = getClientIP(req);
+    const country = getCountryFromIP(ip);
+    const userAgent = req.headers["user-agent"] || "";
+
+    console.log(
+      `[AUTH LOGIN] Logging attempt: ${username}, IP: ${ip}, Country: ${country}, Success: ${success}`,
+    );
+
+    await db.logLogin({
+      user_id: userId,
+      username: username,
+      ip_address: ip,
+      country: country,
+      user_agent: userAgent,
+      success: success,
+    });
+
+    console.log(`[AUTH LOGIN] ✅ Login attempt logged successfully`);
+  } catch (error) {
+    console.error(`[AUTH LOGIN] Failed to log login attempt:`, error);
   }
 }
