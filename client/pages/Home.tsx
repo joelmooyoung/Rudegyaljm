@@ -418,7 +418,10 @@ export default function Home({
       </header>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+      <main
+        className="container mx-auto px-4 py-8"
+        style={{ backgroundColor: "#0f172a" }}
+      >
         {/* Hero section */}
         <section className="mb-16 text-center relative overflow-hidden">
           {/* Passionate background gradient */}
