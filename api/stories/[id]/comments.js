@@ -59,12 +59,21 @@ export default async function handler(req, res) {
       case "POST":
         // Add new comment
         console.log(`[COMMENTS API] Adding comment to story ${storyId}`);
+        console.log(`[COMMENTS API] Request body:`, req.body);
 
-        if (!req.body || !req.body.comment) {
+        // Accept either 'comment' or 'content' field for frontend compatibility
+        const commentText = req.body.comment || req.body.content;
+
+        if (!req.body || !commentText) {
           console.log(`[COMMENTS API] Error: Missing comment text`);
+          console.log(`[COMMENTS API] Received:`, {
+            comment: req.body.comment,
+            content: req.body.content,
+          });
           return res.status(400).json({
             success: false,
-            message: "Comment text is required",
+            message: "Comment text is required (comment or content field)",
+            received: req.body,
           });
         }
 
@@ -73,7 +82,7 @@ export default async function handler(req, res) {
           storyId: storyId,
           userId: req.body.userId || "anonymous",
           username: req.body.username || "Anonymous",
-          comment: req.body.comment,
+          comment: commentText,
           createdAt: new Date(),
         };
 
