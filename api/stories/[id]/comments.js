@@ -1,30 +1,35 @@
 // Story comments API - handle adding and fetching comments
-let comments = [
-  {
-    id: "1",
-    storyId: "1",
-    userId: "admin1",
-    username: "admin",
-    comment: "This is an amazing story! The passion really comes through.",
-    createdAt: "2024-01-16T00:00:00.000Z",
-  },
-  {
-    id: "2",
-    storyId: "1",
-    userId: "premium1",
-    username: "premiumuser",
-    comment: "Absolutely captivating. Looking forward to more like this.",
-    createdAt: "2024-01-17T00:00:00.000Z",
-  },
-  {
-    id: "3",
-    storyId: "2",
-    userId: "free1",
-    username: "freeuser",
-    comment: "The tension in this story is incredible!",
-    createdAt: "2024-01-21T00:00:00.000Z",
-  },
-];
+// Global storage simulation (in production, use database)
+if (!global.comments) {
+  global.comments = [
+    {
+      id: "1",
+      storyId: "1",
+      userId: "admin1",
+      username: "admin",
+      comment: "This is an amazing story! The passion really comes through.",
+      createdAt: "2024-01-16T00:00:00.000Z",
+    },
+    {
+      id: "2",
+      storyId: "1",
+      userId: "premium1",
+      username: "premiumuser",
+      comment: "Absolutely captivating. Looking forward to more like this.",
+      createdAt: "2024-01-17T00:00:00.000Z",
+    },
+    {
+      id: "3",
+      storyId: "2",
+      userId: "free1",
+      username: "freeuser",
+      comment: "The tension in this story is incredible!",
+      createdAt: "2024-01-21T00:00:00.000Z",
+    },
+  ];
+}
+
+let comments = global.comments;
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
