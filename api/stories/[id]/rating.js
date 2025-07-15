@@ -59,13 +59,23 @@ export default async function handler(req, res) {
 
       case "POST":
         // Add/update rating
-        const { userId, rating } = req.body;
+        const { userId, rating, score } = req.body;
 
-        if (!userId || !rating || rating < 1 || rating > 5) {
-          console.log(`[RATING API] Invalid rating data`);
+        // Accept either 'rating' or 'score' field for frontend compatibility
+        const ratingValue = rating || score;
+
+        console.log(`[RATING API] Request body:`, req.body);
+        console.log(`[RATING API] Extracted values:`, { userId, ratingValue });
+
+        if (!userId || !ratingValue || ratingValue < 1 || ratingValue > 5) {
+          console.log(`[RATING API] Invalid rating data:`, {
+            userId,
+            ratingValue,
+          });
           return res.status(400).json({
             success: false,
-            message: "Valid userId and rating (1-5) are required",
+            message: "Valid userId and rating/score (1-5) are required",
+            received: { userId, rating, score, ratingValue },
           });
         }
 
