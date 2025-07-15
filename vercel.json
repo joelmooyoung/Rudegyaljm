@@ -1,15 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "dist/spa/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/spa",
+  "framework": "vite",
   "routes": [
     {
       "src": "/api/(.*)",
@@ -17,11 +9,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/spa/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/dist/spa/index.html"
+      "dest": "/index.html"
     }
   ]
 }
