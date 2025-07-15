@@ -56,7 +56,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundColor: "#0f172a", color: "white" }}
+    >
       {/* Passionate background gradient */}
       <div className="absolute inset-0 bg-desire-gradient opacity-10 blur-3xl" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/10" />
