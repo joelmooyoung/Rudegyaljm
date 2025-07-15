@@ -1,15 +1,38 @@
 // Story likes API - handle liking and unliking stories
-let likes = [
-  { id: "1", storyId: "1", userId: "admin1", createdAt: new Date() },
-  { id: "2", storyId: "1", userId: "premium1", createdAt: new Date() },
-  { id: "3", storyId: "2", userId: "free1", createdAt: new Date() },
-];
+// Global storage simulation (in production, use database)
+if (!global.likes) {
+  global.likes = [
+    {
+      id: "1",
+      storyId: "1",
+      userId: "admin1",
+      createdAt: "2024-01-16T00:00:00.000Z",
+    },
+    {
+      id: "2",
+      storyId: "1",
+      userId: "premium1",
+      createdAt: "2024-01-17T00:00:00.000Z",
+    },
+    {
+      id: "3",
+      storyId: "2",
+      userId: "free1",
+      createdAt: "2024-01-21T00:00:00.000Z",
+    },
+  ];
+}
 
-let likeCounts = {
-  1: 2,
-  2: 1,
-  3: 0,
-};
+if (!global.likeCounts) {
+  global.likeCounts = {
+    1: 2,
+    2: 1,
+    3: 0,
+  };
+}
+
+let likes = global.likes;
+let likeCounts = global.likeCounts;
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -86,7 +109,7 @@ export default async function handler(req, res) {
             id: Date.now().toString(),
             storyId,
             userId,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
           };
 
           likes.push(newLike);
