@@ -54,6 +54,7 @@ export default async function handler(req, res) {
         console.log(
           `[LIKES API] User ${userId} toggling like for story ${storyId}`,
         );
+        console.log(`[LIKES API] Request body:`, req.body);
 
         const existingLikeIndex = likes.findIndex(
           (like) => like.storyId === storyId && like.userId === userId,
@@ -63,11 +64,15 @@ export default async function handler(req, res) {
           // Unlike - remove existing like
           likes.splice(existingLikeIndex, 1);
           likeCounts[storyId] = Math.max(0, (likeCounts[storyId] || 1) - 1);
-          console.log(`[LIKES API] ✅ Removed like from story ${storyId}`);
+          console.log(
+            `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
+          );
 
           return res.status(200).json({
             success: true,
             message: "Story unliked",
+            liked: false, // Direct field for frontend compatibility
+            likeCount: likeCounts[storyId],
             data: {
               storyId,
               liked: false,
@@ -86,11 +91,15 @@ export default async function handler(req, res) {
 
           likes.push(newLike);
           likeCounts[storyId] = (likeCounts[storyId] || 0) + 1;
-          console.log(`[LIKES API] ✅ Added like to story ${storyId}`);
+          console.log(
+            `[LIKES API] ✅ LIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
+          );
 
           return res.status(201).json({
             success: true,
             message: "Story liked",
+            liked: true, // Direct field for frontend compatibility
+            likeCount: likeCounts[storyId],
             data: {
               storyId,
               liked: true,
