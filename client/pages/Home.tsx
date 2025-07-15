@@ -520,7 +520,10 @@ export default function Home({
         {/* Search and filters */}
         <section className="mb-12">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6">
+            <h3
+              className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6"
+              style={{ color: "#ef4444", fontSize: "1.5rem" }}
+            >
               Find Your Perfect Temptation
             </h3>
             <div className="flex flex-col md:flex-row gap-4">
