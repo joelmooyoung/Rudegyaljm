@@ -1,73 +1,85 @@
-// Vercel serverless function for registration
-export default function handler(req, res) {
+// User registration API with MongoDB integration
+import { connectToDatabase } from "../../lib/mongodb.js";
+import { User } from "../../models/index.js";
+
+export default async function handler(req, res) {
+  console.log(`[REGISTER API] ${req.method} /api/auth/register`);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
-  );
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
   }
 
   try {
-    const { email, username, password, dateOfBirth } = req.body;
+    await connectToDatabase();
 
-    if (!email || !username || !password || !dateOfBirth) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { username, email, password, type = "free" } = req.body;
+    console.log(`[REGISTER API] Registration attempt for: ${email}`);
+
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Username, email and password are required",
+      });
     }
 
-    // Verify age
-    const birth = new Date(dateOfBirth);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }],
+    });
 
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    if (age < 18) {
-      return res
-        .status(400)
-        .json({ message: "You must be 18 or older to register" });
+    if (existingUser) {
+      console.log(`[REGISTER API] ❌ User already exists: ${email}`);
+      return res.status(409).json({
+        success: false,
+        message: "User with this email or username already exists",
+      });
     }
 
     // Create new user
-    const newUser = {
-      id: Date.now().toString(),
-      email,
+    const userId = Date.now().toString();
+    const newUser = new User({
+      userId,
       username,
-      role: "free",
-      isAgeVerified: true,
-      isActive: true,
-      subscriptionStatus: "none",
-      createdAt: new Date(),
-      lastLogin: new Date(),
-    };
+      email,
+      password,
+      type,
+      country: "Unknown",
+      active: true,
+      loginCount: 0,
+    });
 
-    // Generate simple token
-    const token = `token_${newUser.id}_${Date.now()}`;
+    await newUser.save();
+    console.log(`[REGISTER API] ✅ Created user: ${username}`);
 
-    const response = {
-      user: newUser,
-      token,
-      message: "Registration successful",
-    };
-
-    res.status(201).json(response);
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: {
+        userId: newUser.userId,
+        username: newUser.username,
+        email: newUser.email,
+        type: newUser.type,
+        country: newUser.country,
+        active: newUser.active,
+      },
+    });
   } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error(`[REGISTER API] Error:`, error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 }
