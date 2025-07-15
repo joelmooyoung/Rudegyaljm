@@ -1,15 +1,32 @@
 // Story rating API - handle story ratings
-let ratings = [
-  { id: "1", storyId: "1", userId: "admin1", rating: 5, createdAt: new Date() },
-  {
-    id: "2",
-    storyId: "1",
-    userId: "premium1",
-    rating: 4,
-    createdAt: new Date(),
-  },
-  { id: "3", storyId: "2", userId: "free1", rating: 5, createdAt: new Date() },
-];
+// Global storage simulation (in production, use database)
+if (!global.ratings) {
+  global.ratings = [
+    {
+      id: "1",
+      storyId: "1",
+      userId: "admin1",
+      rating: 5,
+      createdAt: "2024-01-16T00:00:00.000Z",
+    },
+    {
+      id: "2",
+      storyId: "1",
+      userId: "premium1",
+      rating: 4,
+      createdAt: "2024-01-17T00:00:00.000Z",
+    },
+    {
+      id: "3",
+      storyId: "2",
+      userId: "free1",
+      rating: 5,
+      createdAt: "2024-01-21T00:00:00.000Z",
+    },
+  ];
+}
+
+let ratings = global.ratings;
 
 // Calculate average ratings
 function calculateAverageRating(storyId) {
@@ -91,7 +108,7 @@ export default async function handler(req, res) {
         if (existingRatingIndex >= 0) {
           // Update existing rating
           ratings[existingRatingIndex].rating = ratingValue;
-          ratings[existingRatingIndex].createdAt = new Date();
+          ratings[existingRatingIndex].createdAt = new Date().toISOString();
           console.log(
             `[RATING API] ✅ Updated rating for story ${storyId} to ${ratingValue}`,
           );
@@ -102,7 +119,7 @@ export default async function handler(req, res) {
             storyId,
             userId,
             rating: ratingValue,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
           };
           ratings.push(newRating);
           console.log(
