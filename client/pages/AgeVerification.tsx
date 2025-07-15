@@ -80,7 +80,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
               Rude Gyal Confessions
             </h1>
           </div>
-          <p className="text-2xl font-serif text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p
+            className="text-2xl font-serif text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            style={{ color: "#d1d5db", fontSize: "1.5rem" }}
+          >
             <em>Where forbidden desires meet bold confessions</em> - Enter a
             realm of authentic passion, intimate secrets, and stories that
             ignite the soul
