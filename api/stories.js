@@ -210,19 +210,46 @@ export default async function handler(req, res) {
           });
         }
 
-        console.log(`📝 [STORIES API] Updating story ${storyId}`);
-        console.log(`📦 [STORIES API] Update data:`, body);
+        console.log(`📝 [STORIES API] ADMIN EDIT - Updating story ${storyId}`);
+        console.log(`📦 [STORIES API] Original request body:`, body);
+        console.log(
+          `🔍 [STORIES API] Available stories:`,
+          stories.map((s) => ({ id: s.id, title: s.title })),
+        );
 
         const storyIndex = stories.findIndex((s) => s.id === storyId);
         if (storyIndex === -1) {
           console.log(
             `❌ [STORIES API] Story not found for update: ${storyId}`,
           );
+          console.log(
+            `📋 [STORIES API] Available story IDs:`,
+            stories.map((s) => s.id),
+          );
           return res.status(404).json({
             success: false,
             message: `Story with ID ${storyId} not found`,
+            availableIds: stories.map((s) => s.id),
             timestamp: new Date().toISOString(),
           });
+        }
+
+        console.log(
+          `🎯 [STORIES API] Found story to update:`,
+          stories[storyIndex].title,
+        );
+
+        // Handle tags properly - support both array and string formats
+        let processedTags = stories[storyIndex].tags; // Default to existing tags
+        if (body.tags !== undefined) {
+          if (Array.isArray(body.tags)) {
+            processedTags = body.tags.filter((tag) => tag && tag.trim());
+          } else if (typeof body.tags === "string") {
+            processedTags = body.tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter((tag) => tag);
+          }
         }
 
         // Update story while preserving ID and timestamps
@@ -232,23 +259,34 @@ export default async function handler(req, res) {
           id: storyId, // Ensure ID doesn't change
           createdAt: stories[storyIndex].createdAt, // Preserve creation date
           updatedAt: new Date(), // Update modified date
-          // Handle tags properly
-          tags: Array.isArray(body.tags)
-            ? body.tags
-            : body.tags
-              ? body.tags.split(",").map((tag) => tag.trim())
-              : stories[storyIndex].tags,
+          tags: processedTags,
+          // Ensure boolean fields are properly handled
+          isPublished:
+            body.isPublished !== undefined
+              ? Boolean(body.isPublished)
+              : stories[storyIndex].isPublished,
         };
+
+        console.log(`🔧 [STORIES API] Processed update data:`, {
+          id: updatedStory.id,
+          title: updatedStory.title,
+          author: updatedStory.author,
+          category: updatedStory.category,
+          accessLevel: updatedStory.accessLevel,
+          isPublished: updatedStory.isPublished,
+          tags: updatedStory.tags,
+        });
 
         stories[storyIndex] = updatedStory;
         console.log(
-          `✅ [STORIES API] Updated story "${updatedStory.title}" (ID: ${storyId})`,
+          `✅ [STORIES API] ADMIN EDIT SUCCESS - Updated story "${updatedStory.title}" (ID: ${storyId})`,
         );
 
         return res.status(200).json({
           success: true,
-          message: "Story updated successfully",
+          message: "Story updated successfully by administrator",
           data: updatedStory,
+          changes: Object.keys(body),
           timestamp: new Date().toISOString(),
         });
 
