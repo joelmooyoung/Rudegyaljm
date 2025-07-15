@@ -135,16 +135,14 @@ export default async function handler(req, res) {
             timestamp: new Date().toISOString(),
           });
         } else {
-          // Get all stories
+          // Get all stories - return array directly for frontend compatibility
           console.log(
             `📚 [STORIES API] Fetching all stories (${stories.length} total)`,
           );
-          return res.status(200).json({
-            success: true,
-            data: stories,
-            count: stories.length,
-            timestamp: new Date().toISOString(),
-          });
+          console.log(
+            `📋 [STORIES API] Returning stories array directly for frontend`,
+          );
+          return res.status(200).json(stories);
         }
 
       case "POST":
