@@ -598,46 +598,46 @@ export default function Home({
       {/* Footer */}
       <footer className="border-t border-border/50 bg-card/30 mt-auto">
         <div className="container mx-auto px-4 py-8">
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Brand */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2F9a930541b2654097be9377fff1612aa0%2F6532a2d2c5444a69b0f8c5b4757e7b05?format=webp&width=800"
                   alt="Rude Gyal Confessions Logo"
-                  className="h-6 w-6 object-contain"
+                  className="h-6 w-6 object-contain flex-shrink-0"
                 />
-                <span className="font-bold text-sm font-display">
+                <span className="font-bold text-sm font-display leading-tight">
                   Rude Gyal Confessions
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground font-serif">
+              <p className="text-xs text-muted-foreground font-serif leading-relaxed">
                 Where desires unfold and fantasies come alive through the power
                 of passionate storytelling.
               </p>
             </div>
 
             {/* Quick Links */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <h4 className="text-sm font-semibold font-display">
                 Quick Links
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <button
                   onClick={onNavigateToAbout}
-                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif"
+                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif text-left w-full"
                 >
                   About Our Passion
                 </button>
                 <button
                   onClick={onNavigateToContact}
-                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif"
+                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif text-left w-full"
                 >
                   Contact & Connect
                 </button>
                 <button
                   onClick={onNavigateToHelp}
-                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif"
+                  className="block text-xs text-muted-foreground hover:text-primary transition-colors font-serif text-left w-full"
                 >
                   Help & Support
                 </button>
@@ -645,28 +645,28 @@ export default function Home({
             </div>
 
             {/* Social */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <h4 className="text-sm font-semibold font-display">Follow Us</h4>
-              <div className="space-y-2 text-xs text-muted-foreground font-serif">
-                <div>📸 Instagram: @rudegyaljm</div>
-                <div>🐦 Twitter: @rudegyaljm</div>
-                <div>📘 Facebook: @rudegyaljm</div>
-                <div>📺 YouTube: @rudegyaljm</div>
+              <div className="space-y-3 text-xs text-muted-foreground font-serif">
+                <div className="break-all">📸 Instagram: @rudegyaljm</div>
+                <div className="break-all">🐦 Twitter: @rudegyaljm</div>
+                <div className="break-all">📘 Facebook: @rudegyaljm</div>
+                <div className="break-all">📺 YouTube: @rudegyaljm</div>
               </div>
             </div>
 
             {/* Contact */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <h4 className="text-sm font-semibold font-display">Contact</h4>
-              <div className="space-y-2 text-xs text-muted-foreground font-serif">
-                <div>📧 hello@rudegyaljm.com</div>
-                <div>🛠️ support@rudegyaljm.com</div>
-                <div>🌐 Rudegyaljm.com</div>
+              <div className="space-y-3 text-xs text-muted-foreground font-serif">
+                <div className="break-all">📧 hello@rudegyaljm.com</div>
+                <div className="break-all">🛠️ support@rudegyaljm.com</div>
+                <div className="break-all">🌐 Rudegyaljm.com</div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-border/50 mt-6 pt-4 text-center">
+          <div className="border-t border-border/50 mt-8 pt-6 text-center">
             <p className="text-xs text-muted-foreground font-serif">
               © {new Date().getFullYear()} Rudegyaljm.com - All rights reserved
             </p>
