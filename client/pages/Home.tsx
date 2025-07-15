@@ -332,7 +332,10 @@ export default function Home({
                 alt="Rude Gyal Confessions Logo"
                 className="h-12 w-12 object-contain sultry-pulse"
               />
-              <h1 className="text-3xl font-display font-bold text-passion-gradient">
+              <h1
+                className="text-3xl font-display font-bold text-passion-gradient"
+                style={{ color: "#ef4444", fontSize: "1.875rem" }}
+              >
                 Rude Gyal Confessions
               </h1>
             </div>
