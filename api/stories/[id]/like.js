@@ -1,38 +1,4 @@
-// Story likes API - handle liking and unliking stories
-// Global storage simulation (in production, use database)
-if (!global.likes) {
-  global.likes = [
-    {
-      id: "1",
-      storyId: "1",
-      userId: "admin1",
-      createdAt: "2024-01-16T00:00:00.000Z",
-    },
-    {
-      id: "2",
-      storyId: "1",
-      userId: "premium1",
-      createdAt: "2024-01-17T00:00:00.000Z",
-    },
-    {
-      id: "3",
-      storyId: "2",
-      userId: "free1",
-      createdAt: "2024-01-21T00:00:00.000Z",
-    },
-  ];
-}
-
-if (!global.likeCounts) {
-  global.likeCounts = {
-    1: 2,
-    2: 1,
-    3: 0,
-  };
-}
-
-let likes = global.likes;
-let likeCounts = global.likeCounts;
+import { db } from "../../../lib/supabase.js";
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -54,84 +20,9 @@ export default async function handler(req, res) {
 
     switch (req.method) {
       case "GET":
-        // Get like count and user's like status
-        console.log(`[LIKES API] Getting likes for story ${storyId}`);
-        const count = likeCounts[storyId] || 0;
-        const userLiked = likes.some(
-          (like) => like.storyId === storyId && like.userId === userId,
-        );
-
-        return res.status(200).json({
-          success: true,
-          data: {
-            storyId,
-            likeCount: count,
-            userLiked,
-            userId,
-          },
-          timestamp: new Date().toISOString(),
-        });
-
+        return await handleGetLikes(req, res, storyId, userId);
       case "POST":
-        // Add like (toggle like/unlike)
-        console.log(
-          `[LIKES API] User ${userId} toggling like for story ${storyId}`,
-        );
-        console.log(`[LIKES API] Request body:`, req.body);
-
-        const existingLikeIndex = likes.findIndex(
-          (like) => like.storyId === storyId && like.userId === userId,
-        );
-
-        if (existingLikeIndex >= 0) {
-          // Unlike - remove existing like
-          likes.splice(existingLikeIndex, 1);
-          likeCounts[storyId] = Math.max(0, (likeCounts[storyId] || 1) - 1);
-          console.log(
-            `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
-          );
-
-          return res.status(200).json({
-            success: true,
-            message: "Story unliked",
-            liked: false, // Direct field for frontend compatibility
-            likeCount: likeCounts[storyId],
-            data: {
-              storyId,
-              liked: false,
-              likeCount: likeCounts[storyId],
-            },
-            timestamp: new Date().toISOString(),
-          });
-        } else {
-          // Like - add new like
-          const newLike = {
-            id: Date.now().toString(),
-            storyId,
-            userId,
-            createdAt: new Date().toISOString(),
-          };
-
-          likes.push(newLike);
-          likeCounts[storyId] = (likeCounts[storyId] || 0) + 1;
-          console.log(
-            `[LIKES API] ✅ LIKED story ${storyId} - new count: ${likeCounts[storyId]}`,
-          );
-
-          return res.status(201).json({
-            success: true,
-            message: "Story liked",
-            liked: true, // Direct field for frontend compatibility
-            likeCount: likeCounts[storyId],
-            data: {
-              storyId,
-              liked: true,
-              likeCount: likeCounts[storyId],
-            },
-            timestamp: new Date().toISOString(),
-          });
-        }
-
+        return await handleToggleLike(req, res, storyId, userId);
       default:
         return res.status(405).json({
           success: false,
@@ -140,10 +31,88 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error(`[LIKES API] Error:`, error);
+
+    // Log error to database
+    try {
+      await db.logError({
+        error_type: "LIKES_API_ERROR",
+        error_message: error.message,
+        stack_trace: error.stack,
+        request_path: `/api/stories/${storyId}/like`,
+      });
+    } catch (logError) {
+      console.error(`[LIKES API] Failed to log error:`, logError);
+    }
+
     return res.status(500).json({
       success: false,
       message: "Internal server error",
       error: error.message,
+    });
+  }
+}
+
+async function handleGetLikes(req, res, storyId, userId) {
+  console.log(`[LIKES API] Getting likes for story ${storyId}`);
+
+  const likes = await db.getLikes(storyId);
+  const userLiked = likes.some((like) => like.user_id === userId);
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      storyId,
+      likeCount: likes.length,
+      userLiked,
+      userId,
+    },
+    timestamp: new Date().toISOString(),
+  });
+}
+
+async function handleToggleLike(req, res, storyId, userId) {
+  console.log(`[LIKES API] User ${userId} toggling like for story ${storyId}`);
+  console.log(`[LIKES API] Request body:`, req.body);
+
+  const result = await db.toggleLike(storyId, userId);
+
+  // Get updated like count
+  const likes = await db.getLikes(storyId);
+  const likeCount = likes.length;
+
+  if (result.liked) {
+    console.log(
+      `[LIKES API] ✅ LIKED story ${storyId} - new count: ${likeCount}`,
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Story liked",
+      liked: true, // Direct field for frontend compatibility
+      likeCount: likeCount,
+      data: {
+        storyId,
+        liked: true,
+        likeCount: likeCount,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } else {
+    console.log(
+      `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${likeCount}`,
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Story unliked",
+      liked: false, // Direct field for frontend compatibility
+      likeCount: likeCount,
+      data: {
+        storyId,
+        liked: false,
+        likeCount: likeCount,
+      },
+      timestamp: new Date().toISOString(),
     });
   }
 }
