@@ -117,11 +117,17 @@ const initializeServer = async () => {
     }
   } catch (error) {
     console.error("❌ Failed to initialize database:", error);
+    console.log(
+      "💡 Please ensure MongoDB is running at: mongodb://localhost:27017",
+    );
+    console.log(
+      "💡 Or set MONGODB_URI environment variable to your MongoDB connection string",
+    );
     process.exit(1);
   }
 };
 
 // Start database initialization if this file is run directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   initializeServer();
 }
