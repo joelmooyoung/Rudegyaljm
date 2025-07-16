@@ -1,4 +1,6 @@
-import { db } from "../lib/supabase.js";
+// Production-ready Stories API with MongoDB integration
+import { connectToDatabase } from "../lib/mongodb.js";
+import { Story } from "../models/index.js";
 
 export default async function handler(req, res) {
   console.log(`[STORIES API] ${req.method} /api/stories`);
@@ -17,30 +19,35 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Connect to MongoDB
+    await connectToDatabase();
+
     switch (req.method) {
       case "GET":
         console.log(`[STORIES API] Fetching all stories`);
 
-        const stories = await db.getStories({ published: true });
+        const stories = await Story.find({ published: true })
+          .sort({ createdAt: -1 })
+          .select("-__v");
 
-        // Transform to frontend format
+        // Transform MongoDB documents to frontend format
         const transformedStories = stories.map((story) => ({
-          id: story.id,
+          id: story.storyId,
           title: story.title,
-          author: story.author?.username || "Unknown",
+          author: story.author,
           excerpt: story.content.substring(0, 200) + "...",
           content: story.content,
-          tags: story.tags || [],
+          tags: story.tags,
           category: story.category,
           accessLevel: "free", // Default for compatibility
-          isPublished: story.is_published,
-          rating: story.averageRating || 0,
-          ratingCount: story.ratingCount || 0,
-          viewCount: story.view_count || 0,
-          commentCount: story.comments?.length || 0,
+          isPublished: story.published,
+          rating: story.averageRating,
+          ratingCount: story.ratingCount,
+          viewCount: story.views,
+          commentCount: 0, // Will be calculated separately if needed
           image: `https://images.unsplash.com/photo-${Math.random().toString(36).substr(2, 9)}?w=800&q=80`,
-          createdAt: story.created_at,
-          updatedAt: story.updated_at,
+          createdAt: story.createdAt,
+          updatedAt: story.updatedAt,
         }));
 
         console.log(
@@ -55,42 +62,48 @@ export default async function handler(req, res) {
         const {
           title,
           content,
-          author_id,
+          author,
           category,
           tags,
-          is_published = false,
+          published = false,
         } = req.body;
 
-        if (!title || !content || !author_id || !category) {
+        if (!title || !content || !author || !category) {
           console.log(`[STORIES API] Missing required fields`);
           return res.status(400).json({
             success: false,
-            message: "Title, content, author_id, and category are required",
+            message: "Title, content, author, and category are required",
           });
         }
 
-        const newStory = await db.createStory({
+        const storyId = Date.now().toString();
+        const newStory = new Story({
+          storyId,
           title,
           content,
-          author_id,
+          author,
           category,
-          tags: tags || [],
-          is_published,
-          is_featured: false,
-          view_count: 0,
+          tags: Array.isArray(tags) ? tags : [],
+          published,
+          featured: false,
+          views: 0,
+          likeCount: 0,
+          averageRating: 0,
+          ratingCount: 0,
         });
 
-        console.log(`[STORIES API] ✅ Created story ${newStory.id}`);
+        await newStory.save();
+        console.log(`[STORIES API] ✅ Created story ${storyId}`);
 
         return res.status(201).json({
           success: true,
           message: "Story created successfully",
           data: {
-            id: newStory.id,
+            id: newStory.storyId,
             title: newStory.title,
-            author_id: newStory.author_id,
+            author: newStory.author,
             category: newStory.category,
-            is_published: newStory.is_published,
+            published: newStory.published,
           },
         });
 
@@ -105,16 +118,30 @@ export default async function handler(req, res) {
           });
         }
 
+        const existingStory = await Story.findOne({ storyId: updateId });
+        if (!existingStory) {
+          return res.status(404).json({
+            success: false,
+            message: "Story not found",
+          });
+        }
+
         // Update fields
         const updateFields = {};
         if (req.body.title) updateFields.title = req.body.title;
         if (req.body.content) updateFields.content = req.body.content;
+        if (req.body.author) updateFields.author = req.body.author;
         if (req.body.category) updateFields.category = req.body.category;
-        if (req.body.tags) updateFields.tags = req.body.tags;
-        if (req.body.hasOwnProperty("is_published"))
-          updateFields.is_published = req.body.is_published;
+        if (req.body.tags)
+          updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
+        if (req.body.hasOwnProperty("published"))
+          updateFields.published = req.body.published;
 
-        const updatedStory = await db.updateStory(updateId, updateFields);
+        const updatedStory = await Story.findOneAndUpdate(
+          { storyId: updateId },
+          updateFields,
+          { new: true },
+        );
 
         console.log(`[STORIES API] ✅ Updated story ${updateId}`);
 
@@ -122,10 +149,11 @@ export default async function handler(req, res) {
           success: true,
           message: "Story updated successfully",
           data: {
-            id: updatedStory.id,
+            id: updatedStory.storyId,
             title: updatedStory.title,
+            author: updatedStory.author,
             category: updatedStory.category,
-            is_published: updatedStory.is_published,
+            published: updatedStory.published,
           },
         });
 
@@ -140,7 +168,15 @@ export default async function handler(req, res) {
           });
         }
 
-        await db.getSupabaseAdmin().from("stories").delete().eq("id", deleteId);
+        const deletedStory = await Story.findOneAndDelete({
+          storyId: deleteId,
+        });
+        if (!deletedStory) {
+          return res.status(404).json({
+            success: false,
+            message: "Story not found",
+          });
+        }
 
         console.log(`[STORIES API] ✅ Deleted story ${deleteId}`);
 
