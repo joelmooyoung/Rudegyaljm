@@ -1,4 +1,6 @@
-import { db } from "../../../lib/supabase.js";
+// Story comments API with MongoDB integration
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Comment } from "../../../models/index.js";
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -16,21 +18,25 @@ export default async function handler(req, res) {
   }
 
   try {
+    await connectToDatabase();
+
     switch (req.method) {
       case "GET":
         // Get all comments for a story
         console.log(`[COMMENTS API] Fetching comments for story ${storyId}`);
 
-        const comments = await db.getComments(storyId);
+        const comments = await Comment.find({ storyId })
+          .sort({ createdAt: -1 })
+          .select("-__v");
 
         // Transform to expected format
         const transformedComments = comments.map((comment) => ({
-          id: comment.id,
-          storyId: comment.story_id,
-          userId: comment.user_id,
+          id: comment.commentId,
+          storyId: comment.storyId,
+          userId: comment.userId,
           username: comment.username,
           comment: comment.comment,
-          createdAt: comment.created_at,
+          createdAt: comment.createdAt,
         }));
 
         console.log(
@@ -65,27 +71,30 @@ export default async function handler(req, res) {
           });
         }
 
-        const newComment = await db.createComment({
-          story_id: storyId,
-          user_id: req.body.userId || "anonymous",
+        const commentId = Date.now().toString();
+        const newComment = new Comment({
+          commentId,
+          storyId,
+          userId: req.body.userId || "anonymous",
           username: req.body.username || "Anonymous",
           comment: commentText,
         });
 
+        await newComment.save();
         console.log(
-          `[COMMENTS API] ✅ Added comment ${newComment.id} to story ${storyId}`,
+          `[COMMENTS API] ✅ Added comment ${commentId} to story ${storyId}`,
         );
 
         return res.status(201).json({
           success: true,
           message: "Comment added successfully",
           data: {
-            id: newComment.id,
-            storyId: newComment.story_id,
-            userId: newComment.user_id,
+            id: newComment.commentId,
+            storyId: newComment.storyId,
+            userId: newComment.userId,
             username: newComment.username,
             comment: newComment.comment,
-            createdAt: newComment.created_at,
+            createdAt: newComment.createdAt,
           },
           timestamp: new Date().toISOString(),
         });
