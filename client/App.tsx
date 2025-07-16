@@ -42,14 +42,17 @@ const App = () => {
     const devParam = urlParams.get("dev") === "true";
     const adminHash = window.location.hash.includes("admin-seeding");
     const isBuilderEnv = window.location.hostname.includes("builder.my");
+    const isVercelEnv = window.location.hostname.includes("vercel.app");
 
-    // Force dev mode in Builder.io environment
-    const devMode = devParam || adminHash || isBuilderEnv;
+    // Force dev mode in Builder.io OR Vercel environment
+    const devMode = devParam || adminHash || isBuilderEnv || isVercelEnv;
 
     console.log("Dev mode checks:", {
       devParam,
       adminHash,
       isBuilderEnv,
+      isVercelEnv,
+      hostname: window.location.hostname,
       devMode,
     });
 
