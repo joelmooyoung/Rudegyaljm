@@ -42,6 +42,7 @@ import {
   Heart,
   RefreshCw,
   Flame,
+  Database,
 } from "lucide-react";
 import { Story, User as UserType } from "@shared/api";
 
