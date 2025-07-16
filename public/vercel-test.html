@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vercel Deployment Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        line-height: 1.6;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+      }
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+      .info {
+        background: rgba(59, 130, 246, 0.3);
+      }
+      button {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      button:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      pre {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 8px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Vercel Deployment Diagnostic</h1>
+
+      <div class="status success">
+        ✅ This page loaded successfully - Vercel deployment is working!
+      </div>
+
+      <div class="status info">
+        📊 Your Vercel app is deployed, but the main React app has routing
+        issues.
+      </div>
+
+      <h3>🧪 Test Your API Endpoints:</h3>
+
+      <button onclick="testPing()">Test /api/ping</button>
+      <button onclick="testDbStatus()">Test Database Connection</button>
+      <button onclick="testSeedDb()">Test Database Seeding</button>
+
+      <div id="results" style="margin-top: 20px"></div>
+
+      <h3>🎯 Next Steps:</h3>
+      <ol>
+        <li>
+          <strong>Add MongoDB URI</strong> to Vercel environment variables
+        </li>
+        <li><strong>Redeploy</strong> your Vercel app</li>
+        <li><strong>Test the API endpoints</strong> above</li>
+      </ol>
+
+      <div class="status info">
+        <strong>Environment Variable Needed:</strong><br />
+        <code
+          >MONGODB_URI =
+          mongodb+srv://username:password@cluster.mongodb.net/rude-gyal-confessions?retryWrites=true&w=majority</code
+        >
+      </div>
+    </div>
+
+    <script>
+      function showResult(title, data, isError = false) {
+        const results = document.getElementById("results");
+        const statusClass = isError ? "error" : "success";
+
+        results.innerHTML = `
+                <div class="status ${statusClass}">
+                    <h4>${title}</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+      }
+
+      async function testEndpoint(url, title) {
+        try {
+          showResult(`${title} - Testing...`, { status: "Loading..." });
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (response.ok) {
+            showResult(`✅ ${title} - Success`, data);
+          } else {
+            showResult(`❌ ${title} - Failed`, data, true);
+          }
+        } catch (error) {
+          showResult(
+            `❌ ${title} - Error`,
+            {
+              error: error.message,
+              likely_cause: "API endpoint not found or server error",
+            },
+            true,
+          );
+        }
+      }
+
+      function testPing() {
+        testEndpoint("/api/ping", "API Ping");
+      }
+
+      function testDbStatus() {
+        testEndpoint("/api/db-status", "Database Status");
+      }
+
+      async function testSeedDb() {
+        try {
+          showResult("Database Seeding - Testing...", { status: "Loading..." });
+
+          const response = await fetch("/api/seed-database", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showResult("✅ Database Seeding - Success", data);
+          } else {
+            showResult("❌ Database Seeding - Failed", data, true);
+          }
+        } catch (error) {
+          showResult(
+            "❌ Database Seeding - Error",
+            {
+              error: error.message,
+              likely_cause: "Database connection or seeding endpoint issue",
+            },
+            true,
+          );
+        }
+      }
+
+      // Auto-test on page load
+      window.onload = function () {
+        setTimeout(testPing, 1000);
+      };
+    </script>
+  </body>
+</html>
