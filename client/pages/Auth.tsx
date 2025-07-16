@@ -59,11 +59,20 @@ export default function Auth({ onAuthenticated }: AuthProps) {
     try {
       console.log("🌱 Attempting to seed database...");
 
-      const response = await fetch("/api/seed-database", {
+      // Use production API for database operations from preview environment
+      const isBuilderPreview = window.location.hostname.includes("builder.my");
+      const apiUrl = isBuilderPreview
+        ? "https://rudegyaljm.vercel.app/api/seed-database"
+        : "/api/seed-database";
+
+      console.log(`🌱 Seeding database via: ${apiUrl}`);
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        mode: "cors", // Enable CORS for cross-origin requests
       });
 
       const result = await response.json();
