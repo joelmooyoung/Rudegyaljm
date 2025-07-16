@@ -315,16 +315,23 @@ const App = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const skipAgeVerification = urlParams.get("dev") === "true";
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
+  const isVercelEnvironment = window.location.hostname.includes("vercel.app");
 
   console.log("Age verification check:", {
     isAgeVerified,
     skipAgeVerification,
     isBuilderEnvironment,
+    isVercelEnvironment,
     hostname: window.location.hostname,
   });
 
-  // Always skip age verification in Builder.io environment
-  if (!isAgeVerified && !skipAgeVerification && !isBuilderEnvironment) {
+  // Always skip age verification in Builder.io OR Vercel environment
+  if (
+    !isAgeVerified &&
+    !skipAgeVerification &&
+    !isBuilderEnvironment &&
+    !isVercelEnvironment
+  ) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
