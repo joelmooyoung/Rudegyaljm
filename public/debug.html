@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Debug Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #1e40af;
+        color: white;
+        line-height: 1.6;
+      }
+      .status {
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        border-left: 4px solid #fff;
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+      .info {
+        background: rgba(59, 130, 246, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 JavaScript Debug Test</h1>
+
+    <div id="js-test" class="status error">
+      ❌ JavaScript NOT working - This should change if JS loads
+    </div>
+
+    <div id="react-test" class="status error">
+      ❌ React assets NOT loading - Testing...
+    </div>
+
+    <div id="console-test" class="status info">
+      📊 Check browser console (F12) for any error messages
+    </div>
+
+    <div class="status info">
+      <h3>🧪 Manual Tests:</h3>
+      <p>1. <strong>Open browser console (F12)</strong></p>
+      <p>2. <strong>Look for any red error messages</strong></p>
+      <p>3. <strong>Check Network tab for failed asset loads</strong></p>
+      <p>
+        4. Try main app: <a href="/" style="color: #60a5fa">Go to main app</a>
+      </p>
+    </div>
+
+    <script>
+      console.log("🔧 Debug page JavaScript is working!");
+
+      // Test 1: Basic JavaScript functionality
+      document.getElementById("js-test").innerHTML =
+        "✅ JavaScript IS working!";
+      document.getElementById("js-test").className = "status success";
+
+      // Test 2: Check if React assets exist
+      async function testReactAssets() {
+        try {
+          // Try to fetch the main index page
+          const response = await fetch("/");
+          const html = await response.text();
+
+          // Look for React asset references
+          const hasAssets =
+            html.includes("/assets/index-") && html.includes(".js");
+
+          if (hasAssets) {
+            document.getElementById("react-test").innerHTML =
+              "✅ React assets found in HTML";
+            document.getElementById("react-test").className = "status success";
+
+            // Try to test the actual asset
+            const jsMatch = html.match(/\/assets\/index-[^"]+\.js/);
+            if (jsMatch) {
+              const assetUrl = jsMatch[0];
+              const assetResponse = await fetch(assetUrl);
+
+              if (assetResponse.ok) {
+                document.getElementById("react-test").innerHTML =
+                  "✅ React assets loading correctly";
+              } else {
+                document.getElementById("react-test").innerHTML =
+                  "❌ React asset exists but fails to load: " +
+                  assetResponse.status;
+                document.getElementById("react-test").className =
+                  "status error";
+              }
+            }
+          } else {
+            document.getElementById("react-test").innerHTML =
+              "❌ React assets NOT found in HTML";
+            document.getElementById("react-test").className = "status error";
+          }
+        } catch (error) {
+          document.getElementById("react-test").innerHTML =
+            "❌ Error testing React assets: " + error.message;
+          document.getElementById("react-test").className = "status error";
+        }
+      }
+
+      // Test 3: Check for common errors
+      window.addEventListener("error", function (e) {
+        console.error("🚨 JavaScript Error:", e.error);
+        document.body.innerHTML +=
+          '<div class="status error">🚨 JavaScript Error: ' +
+          e.message +
+          "</div>";
+      });
+
+      // Run tests
+      testReactAssets();
+
+      // Test if we can access the React app
+      setTimeout(() => {
+        const testDiv = document.createElement("div");
+        testDiv.className = "status info";
+        testDiv.innerHTML =
+          "<h3>🎯 Next Steps:</h3><ol><li>Check Network tab for 404s or failed loads</li><li>Look for any JavaScript errors in console</li><li>Try clearing browser cache and refreshing</li></ol>";
+        document.body.appendChild(testDiv);
+      }, 1000);
+    </script>
+  </body>
+</html>

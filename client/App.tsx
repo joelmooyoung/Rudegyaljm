@@ -29,6 +29,22 @@ const App = () => {
   const [isAgeVerified, setIsAgeVerified] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<string>("App starting...");
+
+  // Add error handling
+  useEffect(() => {
+    console.log("🚀 App component mounted");
+    setDebugInfo("App component mounted");
+
+    window.addEventListener("error", (e) => {
+      console.error("🚨 Window error:", e.error);
+      setDebugInfo("Error: " + e.message);
+    });
+
+    return () => {
+      window.removeEventListener("error", () => {});
+    };
+  }, []);
   const [currentView, setCurrentView] = useState<string>("home");
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [storyMode, setStoryMode] = useState<"add" | "edit">("add");
