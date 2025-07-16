@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+    <title>EMERGENCY VERCEL TEST</title>
+    <style>
+      body {
+        background: red;
+        color: white;
+        font-size: 24px;
+        padding: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚨 EMERGENCY VERCEL TEST</h1>
+    <p>If you can see this RED page, Vercel static files are working!</p>
+    <p>Timestamp: <span id="time"></span></p>
+    <p>URL: <span id="url"></span></p>
+
+    <script>
+      document.getElementById("time").textContent = new Date().toISOString();
+      document.getElementById("url").textContent = window.location.href;
+      console.log("🚨 EMERGENCY TEST: JavaScript working on Vercel!");
+    </script>
+  </body>
+</html>
