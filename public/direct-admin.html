@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Admin Access - Rude Gyal Confessions</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+      }
+      .btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px;
+        display: block;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .status {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.3);
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+      .loading {
+        background: rgba(59, 130, 246, 0.3);
+      }
+      .hidden {
+        display: none;
+      }
+      pre {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 8px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Direct Admin Access</h1>
+      <p>
+        This page bypasses the React app and provides direct database access for
+        testing your MongoDB connection.
+      </p>
+
+      <div id="status" class="status hidden"></div>
+
+      <button class="btn" onclick="testConnection()">
+        🔍 Test Database Connection
+      </button>
+      <button class="btn" onclick="seedDatabase()">🌱 Seed Database</button>
+      <button class="btn" onclick="verifyDatabase()">✅ Verify Database</button>
+      <button class="btn" onclick="clearDatabase()">🗑️ Clear Database</button>
+
+      <a href="/" class="btn" style="margin-top: 30px">🏠 Back to Main App</a>
+
+      <div id="results" class="hidden">
+        <h3>Results:</h3>
+        <pre id="output"></pre>
+      </div>
+    </div>
+
+    <script>
+      function showStatus(message, type = "loading") {
+        const status = document.getElementById("status");
+        status.className = `status ${type}`;
+        status.textContent = message;
+        status.classList.remove("hidden");
+      }
+
+      function showResults(data) {
+        const results = document.getElementById("results");
+        const output = document.getElementById("output");
+        output.textContent = JSON.stringify(data, null, 2);
+        results.classList.remove("hidden");
+      }
+
+      async function makeRequest(endpoint, method = "GET") {
+        try {
+          showStatus(`Making ${method} request to ${endpoint}...`);
+
+          const response = await fetch(endpoint, {
+            method: method,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showStatus("✅ Request successful", "success");
+            showResults(data);
+          } else {
+            showStatus(`❌ Request failed: ${response.status}`, "error");
+            showResults(data);
+          }
+        } catch (error) {
+          showStatus(`❌ Error: ${error.message}`, "error");
+          showResults({ error: error.message, stack: error.stack });
+        }
+      }
+
+      async function testConnection() {
+        await makeRequest("/api/ping");
+      }
+
+      async function seedDatabase() {
+        await makeRequest("/api/seed-database", "POST");
+      }
+
+      async function verifyDatabase() {
+        await makeRequest("/api/verify-database");
+      }
+
+      async function clearDatabase() {
+        if (confirm("Are you sure you want to clear the database?")) {
+          await makeRequest("/api/clear-database", "POST");
+        }
+      }
+
+      // Test on page load
+      window.onload = function () {
+        showStatus("Direct admin interface loaded. Ready to test!", "success");
+      };
+    </script>
+  </body>
+</html>
