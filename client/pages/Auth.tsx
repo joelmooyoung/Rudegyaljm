@@ -269,6 +269,15 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                   >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full mt-2 text-xs text-muted-foreground"
+                    onClick={handleSeedDatabase}
+                  >
+                    🌱 Seed Database (First Time Setup)
+                  </Button>
                 </form>
               </TabsContent>
 
