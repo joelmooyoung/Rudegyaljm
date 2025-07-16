@@ -1,5 +1,3 @@
-import "./global.css";
-
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -22,6 +20,7 @@ import UserDetail from "./pages/admin/UserDetail";
 import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
+import DatabaseSeeding from "./pages/DatabaseSeeding";
 import { User, Story } from "@shared/api";
 
 const queryClient = new QueryClient();
@@ -50,13 +49,15 @@ const App = () => {
       // In a real app, you'd verify the token with the server
       // For now, we'll create a mock user
       const mockUser: User = {
-        id: "1",
-        email: "user@example.com",
-        username: "reader123",
-        role: "free",
+        id: "mock-user-1",
+        email: "test@example.com",
+        username: "TestUser",
+        role: "admin", // Make sure they can access seeding
         isAgeVerified: true,
+        isActive: true,
         subscriptionStatus: "none",
         createdAt: new Date(),
+        lastLogin: new Date(),
       };
       setUser(mockUser);
     }
@@ -64,13 +65,16 @@ const App = () => {
     setIsLoading(false);
   }, []);
 
-  const handleAgeVerified = () => {
-    setIsAgeVerified(true);
-    sessionStorage.setItem("age_verified", "true");
+  const handleAgeVerification = (verified: boolean) => {
+    setIsAgeVerified(verified);
+    if (verified) {
+      sessionStorage.setItem("age_verified", "true");
+    }
   };
 
   const handleAuthenticated = (authenticatedUser: User) => {
     setUser(authenticatedUser);
+    localStorage.setItem("token", "mock-token");
   };
 
   const handleLogout = () => {
@@ -200,12 +204,12 @@ const App = () => {
         // Navigate back to user maintenance
         setCurrentView("admin-users");
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save user");
+        console.error("Failed to save user:", response.statusText);
+        alert("Failed to save user. Please try again.");
       }
     } catch (error) {
       console.error("Error saving user:", error);
-      throw error; // Let the UserDetail component handle the error display
+      alert("Error saving user. Please try again.");
     }
   };
 
@@ -220,30 +224,41 @@ const App = () => {
         // Navigate back to user maintenance
         setCurrentView("admin-users");
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete user");
+        console.error("Failed to delete user:", response.statusText);
+        alert("Failed to delete user. Please try again.");
       }
     } catch (error) {
       console.error("Error deleting user:", error);
-      throw error; // Let the UserDetail component handle the error display
+      alert("Error deleting user. Please try again.");
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
-      </div>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </TooltipProvider>
+      </QueryClientProvider>
     );
   }
 
-  if (!isAgeVerified) {
+  // For development, we'll skip age verification if a specific query param is present
+  const urlParams = new URLSearchParams(window.location.search);
+  const skipAgeVerification = urlParams.get("dev") === "true";
+
+  if (!isAgeVerified && !skipAgeVerification) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <AgeVerification onVerified={handleAgeVerified} />
+          <AgeVerification onVerified={handleAgeVerification} />
         </TooltipProvider>
       </QueryClientProvider>
     );
@@ -333,6 +348,8 @@ const App = () => {
         return <LoginLogs onBack={handleBackToHome} />;
       case "admin-error-logs":
         return <ErrorLogs onBack={handleBackToHome} />;
+      case "admin-seeding":
+        return <DatabaseSeeding />;
       case "about":
         return <About onBack={handleBackToHome} />;
       case "contact":
