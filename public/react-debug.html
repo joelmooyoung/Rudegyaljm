@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Debug - Rude Gyal Confessions</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #0f172a;
+        color: white;
+        line-height: 1.6;
+      }
+      .debug-section {
+        background: rgba(59, 130, 246, 0.2);
+        border: 1px solid rgba(59, 130, 246, 0.5);
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.2);
+        border-color: rgba(34, 197, 94, 0.5);
+      }
+      .warning {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.5);
+      }
+      button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #2563eb;
+      }
+      pre {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 8px;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+      #console-output {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 React App Debug Center</h1>
+
+    <div class="debug-section">
+      <h3>📊 Current Status</h3>
+      <p>Hostname: <span id="hostname"></span></p>
+      <p>User Agent: <span id="useragent"></span></p>
+      <p>Current URL: <span id="currenturl"></span></p>
+    </div>
+
+    <div class="debug-section" id="bundle-check">
+      <h3>📦 Bundle Loading Test</h3>
+      <button onclick="testBundle()">Test React Bundle</button>
+      <div id="bundle-result">Click to test...</div>
+    </div>
+
+    <div class="debug-section" id="api-check">
+      <h3>🔗 API Connectivity Test</h3>
+      <button onclick="testAPI()">Test API Endpoints</button>
+      <div id="api-result">Click to test...</div>
+    </div>
+
+    <div class="debug-section" id="env-check">
+      <h3>🌍 Environment Detection Test</h3>
+      <button onclick="testEnvironment()">Test Environment Logic</button>
+      <div id="env-result">Click to test...</div>
+    </div>
+
+    <div class="debug-section error" id="console-section">
+      <h3>🚨 Console Errors</h3>
+      <div id="console-output">No errors captured yet...</div>
+      <button onclick="clearConsole()">Clear</button>
+    </div>
+
+    <div class="debug-section">
+      <h3>🚀 Quick Actions</h3>
+      <button onclick="goToMain()">Try Main App</button>
+      <button onclick="clearCache()">Clear Cache & Reload</button>
+      <button onclick="testDirectSeeding()">Test Database Seeding</button>
+    </div>
+
+    <script>
+      // Initialize page info
+      document.getElementById("hostname").textContent =
+        window.location.hostname;
+      document.getElementById("useragent").textContent =
+        navigator.userAgent.substr(0, 100) + "...";
+      document.getElementById("currenturl").textContent = window.location.href;
+
+      // Console error capture
+      const consoleOutput = document.getElementById("console-output");
+      const originalError = console.error;
+      const originalLog = console.log;
+
+      console.error = function (...args) {
+        originalError.apply(console, args);
+        consoleOutput.innerHTML += `<div style="color: #ef4444">[ERROR] ${args.join(" ")}</div>`;
+      };
+
+      console.log = function (...args) {
+        originalLog.apply(console, args);
+        consoleOutput.innerHTML += `<div>[LOG] ${args.join(" ")}</div>`;
+      };
+
+      // Global error handler
+      window.addEventListener("error", function (e) {
+        consoleOutput.innerHTML += `<div style="color: #ef4444">[GLOBAL ERROR] ${e.message} at ${e.filename}:${e.lineno}</div>`;
+      });
+
+      async function testBundle() {
+        const result = document.getElementById("bundle-result");
+        result.innerHTML = "Testing React bundle...";
+
+        try {
+          // Get the main page to find bundle name
+          const response = await fetch("/");
+          const html = await response.text();
+
+          const bundleMatch = html.match(/\/assets\/index-[^"]+\.js/);
+
+          if (bundleMatch) {
+            const bundlePath = bundleMatch[0];
+            result.innerHTML = `Found bundle: ${bundlePath}<br>`;
+
+            // Test bundle loading
+            const bundleResponse = await fetch(bundlePath);
+
+            if (bundleResponse.ok) {
+              const size = bundleResponse.headers.get("content-length");
+              result.innerHTML += `✅ Bundle loads (${size} bytes)`;
+              document.getElementById("bundle-check").className =
+                "debug-section success";
+            } else {
+              result.innerHTML += `❌ Bundle failed: ${bundleResponse.status}`;
+              document.getElementById("bundle-check").className =
+                "debug-section error";
+            }
+          } else {
+            result.innerHTML = "❌ No bundle reference found";
+            document.getElementById("bundle-check").className =
+              "debug-section error";
+          }
+        } catch (error) {
+          result.innerHTML = `❌ Test failed: ${error.message}`;
+          document.getElementById("bundle-check").className =
+            "debug-section error";
+        }
+      }
+
+      async function testAPI() {
+        const result = document.getElementById("api-result");
+        result.innerHTML = "Testing API endpoints...";
+
+        try {
+          const pingResponse = await fetch("/api/ping");
+          if (pingResponse.ok) {
+            const data = await pingResponse.json();
+            result.innerHTML = `✅ API Working: ${JSON.stringify(data)}`;
+            document.getElementById("api-check").className =
+              "debug-section success";
+          } else {
+            result.innerHTML = `❌ API Failed: ${pingResponse.status}`;
+            document.getElementById("api-check").className =
+              "debug-section error";
+          }
+        } catch (error) {
+          result.innerHTML = `❌ API Error: ${error.message}`;
+          document.getElementById("api-check").className =
+            "debug-section error";
+        }
+      }
+
+      function testEnvironment() {
+        const result = document.getElementById("env-result");
+
+        const hostname = window.location.hostname;
+        const isBuilder = hostname.includes("builder.my");
+        const isVercel = hostname.includes("vercel.app");
+        const hasDevParam =
+          new URLSearchParams(window.location.search).get("dev") === "true";
+        const hasAdminHash = window.location.hash.includes("admin-seeding");
+
+        result.innerHTML = `
+          <strong>Environment Detection:</strong><br>
+          Hostname: ${hostname}<br>
+          Is Builder.io: ${isBuilder}<br>
+          Is Vercel: ${isVercel}<br>
+          Has dev param: ${hasDevParam}<br>
+          Has admin hash: ${hasAdminHash}<br>
+          <strong>Should bypass auth: ${isBuilder || isVercel || hasDevParam || hasAdminHash}</strong>
+        `;
+
+        document.getElementById("env-check").className =
+          "debug-section " +
+          (isBuilder || isVercel || hasDevParam || hasAdminHash
+            ? "success"
+            : "warning");
+      }
+
+      function clearConsole() {
+        consoleOutput.innerHTML = "Console cleared...";
+      }
+
+      function goToMain() {
+        window.location.href = "/?dev=true";
+      }
+
+      function clearCache() {
+        if ("caches" in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => caches.delete(name));
+          });
+        }
+        window.location.reload(true);
+      }
+
+      async function testDirectSeeding() {
+        const result = document.getElementById("api-result");
+        result.innerHTML = "Attempting database seeding...";
+
+        try {
+          const response = await fetch("/api/seed-database", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            result.innerHTML = `✅ Database seeded successfully!<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            document.getElementById("api-check").className =
+              "debug-section success";
+          } else {
+            result.innerHTML = `❌ Seeding failed:<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            document.getElementById("api-check").className =
+              "debug-section error";
+          }
+        } catch (error) {
+          result.innerHTML = `❌ Seeding error: ${error.message}`;
+          document.getElementById("api-check").className =
+            "debug-section error";
+        }
+      }
+
+      // Auto-run tests on load
+      window.onload = function () {
+        testEnvironment();
+        setTimeout(testBundle, 1000);
+        setTimeout(testAPI, 2000);
+      };
+    </script>
+  </body>
+</html>
