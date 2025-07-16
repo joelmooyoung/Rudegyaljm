@@ -15,14 +15,12 @@ const userSchema = new mongoose.Schema<User>(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
     },
     username: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     passwordHash: {
