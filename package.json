@@ -20,8 +20,12 @@
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
     "vercel-build": "vite build",
+    "vercel-dev": "vite",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
     "seed:local": "node scripts/seed-local.js",
-    "verify:local": "node scripts/verify-local.js"
+    "verify:local": "node scripts/verify-local.js",
+    "postbuild": "echo 'Build completed successfully. Dist directory:' && ls -la dist/"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.51.0",
