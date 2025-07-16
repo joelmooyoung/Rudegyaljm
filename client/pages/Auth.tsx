@@ -52,6 +52,41 @@ export default function Auth({ onAuthenticated }: AuthProps) {
   });
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const handleSeedDatabase = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      console.log("🌱 Attempting to seed database...");
+
+      const response = await fetch("/api/seed-database", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setError(
+          "✅ Database seeded! Login with: admin@nocturne.com / admin123",
+        );
+        console.log("✅ Database seeding successful:", result);
+      } else {
+        setError("❌ Seeding failed: " + (result.message || "Unknown error"));
+        console.error("❌ Database seeding failed:", result);
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      setError("❌ Seeding error: " + errorMessage);
+      console.error("❌ Database seeding error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
