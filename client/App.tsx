@@ -293,8 +293,10 @@ const App = () => {
   // For development, we'll skip age verification if a specific query param is present
   const urlParams = new URLSearchParams(window.location.search);
   const skipAgeVerification = urlParams.get("dev") === "true";
+  const isBuilderEnvironment = window.location.hostname.includes("builder.my");
 
-  if (!isAgeVerified && !skipAgeVerification) {
+  // Always skip age verification in Builder.io environment
+  if (!isAgeVerified && !skipAgeVerification && !isBuilderEnvironment) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
