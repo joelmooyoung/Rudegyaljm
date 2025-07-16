@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-// Story comments API with MongoDB integration
-import { connectToDatabase } from "../../../lib/mongodb.js";
-import { Comment } from "../../../models/index.js";
-=======
 import { db } from "../../../lib/supabase.js";
->>>>>>> 5a56b8ea6e425b9ec097296fbb24a05ee5163ac4
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -22,26 +16,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    await connectToDatabase();
-
     switch (req.method) {
       case "GET":
-<<<<<<< HEAD
         // Get all comments for a story
         console.log(`[COMMENTS API] Fetching comments for story ${storyId}`);
 
-        const comments = await Comment.find({ storyId })
-          .sort({ createdAt: -1 })
-          .select("-__v");
+        const comments = await db.getComments(storyId);
 
         // Transform to expected format
         const transformedComments = comments.map((comment) => ({
-          id: comment.commentId,
-          storyId: comment.storyId,
-          userId: comment.userId,
+          id: comment.id,
+          storyId: comment.story_id,
+          userId: comment.user_id,
           username: comment.username,
           comment: comment.comment,
-          createdAt: comment.createdAt.toISOString(),
+          createdAt: comment.created_at,
         }));
 
         console.log(
@@ -76,39 +65,31 @@ export default async function handler(req, res) {
           });
         }
 
-        const commentId = Date.now().toString();
-        const newComment = new Comment({
-          commentId,
-          storyId,
-          userId: req.body.userId || "anonymous",
+        const newComment = await db.createComment({
+          story_id: storyId,
+          user_id: req.body.userId || "anonymous",
           username: req.body.username || "Anonymous",
           comment: commentText,
         });
 
-        await newComment.save();
         console.log(
-          `[COMMENTS API] ✅ Added comment ${commentId} to story ${storyId}`,
+          `[COMMENTS API] ✅ Added comment ${newComment.id} to story ${storyId}`,
         );
 
         return res.status(201).json({
           success: true,
           message: "Comment added successfully",
           data: {
-            id: newComment.commentId,
-            storyId: newComment.storyId,
-            userId: newComment.userId,
+            id: newComment.id,
+            storyId: newComment.story_id,
+            userId: newComment.user_id,
             username: newComment.username,
             comment: newComment.comment,
-            createdAt: newComment.createdAt.toISOString(),
+            createdAt: newComment.created_at,
           },
           timestamp: new Date().toISOString(),
         });
 
-=======
-        return await handleGetComments(req, res, storyId);
-      case "POST":
-        return await handleCreateComment(req, res, storyId);
->>>>>>> 5a56b8ea6e425b9ec097296fbb24a05ee5163ac4
       default:
         return res.status(405).json({
           success: false,
@@ -117,79 +98,10 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error(`[COMMENTS API] Error:`, error);
-
-    // Log error to database
-    try {
-      await db.logError({
-        error_type: "COMMENTS_API_ERROR",
-        error_message: error.message,
-        stack_trace: error.stack,
-        request_path: `/api/stories/${storyId}/comments`,
-      });
-    } catch (logError) {
-      console.error(`[COMMENTS API] Failed to log error:`, logError);
-    }
-
     return res.status(500).json({
       success: false,
       message: "Internal server error",
       error: error.message,
     });
   }
-}
-
-async function handleGetComments(req, res, storyId) {
-  console.log(`[COMMENTS API] Fetching comments for story ${storyId}`);
-
-  const comments = await db.getComments(storyId);
-
-  console.log(`[COMMENTS API] Found ${comments.length} comments`);
-
-  return res.status(200).json({
-    success: true,
-    data: comments,
-    count: comments.length,
-    timestamp: new Date().toISOString(),
-  });
-}
-
-async function handleCreateComment(req, res, storyId) {
-  console.log(`[COMMENTS API] Adding comment to story ${storyId}`);
-  console.log(`[COMMENTS API] Request body:`, req.body);
-
-  // Accept either 'comment' or 'content' field for frontend compatibility
-  const commentText = req.body.comment || req.body.content;
-
-  if (!req.body || !commentText) {
-    console.log(`[COMMENTS API] Error: Missing comment text`);
-    console.log(`[COMMENTS API] Received:`, {
-      comment: req.body.comment,
-      content: req.body.content,
-    });
-    return res.status(400).json({
-      success: false,
-      message: "Comment text is required (comment or content field)",
-      received: req.body,
-    });
-  }
-
-  const commentData = {
-    story_id: storyId,
-    user_id: req.body.userId || "anonymous",
-    username: req.body.username || "Anonymous",
-    comment: commentText,
-  };
-
-  const newComment = await db.createComment(commentData);
-
-  console.log(
-    `[COMMENTS API] ✅ Added comment ${newComment.id} to story ${storyId}`,
-  );
-
-  return res.status(201).json({
-    success: true,
-    message: "Comment added successfully",
-    data: newComment,
-    timestamp: new Date().toISOString(),
-  });
 }
