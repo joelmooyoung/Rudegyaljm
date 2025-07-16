@@ -33,7 +33,7 @@ const seedDatabase = async () => {
       {
         email: "admin@nocturne.com",
         username: "admin",
-        passwordHash: await bcrypt.hash("admin123", saltRounds),
+        password: await bcrypt.hash("admin123", saltRounds),
         role: "admin",
         isAgeVerified: true,
         isActive: true,

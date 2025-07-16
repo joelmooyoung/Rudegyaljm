@@ -108,7 +108,7 @@ export const createUser: RequestHandler = async (req, res) => {
     const newUser = new UserModel({
       email: userData.email.toLowerCase(),
       username: userData.username.toLowerCase(),
-      passwordHash,
+      password: passwordHash,
       role: userData.role || "free",
       isAgeVerified: userData.isAgeVerified || false,
       isActive: true,
@@ -169,7 +169,7 @@ export const updateUser: RequestHandler = async (req, res) => {
     // Hash new password if provided
     if (userData.password) {
       const saltRounds = 12;
-      user.passwordHash = await bcrypt.hash(userData.password, saltRounds);
+      user.password = await bcrypt.hash(userData.password, saltRounds);
     }
 
     // Update other fields

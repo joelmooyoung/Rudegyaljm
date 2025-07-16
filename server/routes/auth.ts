@@ -89,7 +89,7 @@ export const handleLogin: RequestHandler = async (req, res) => {
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
       await logError(
@@ -201,7 +201,7 @@ export const handleRegister: RequestHandler = async (req, res) => {
     const newUser = new UserModel({
       email: email.toLowerCase(),
       username: username.toLowerCase(),
-      passwordHash,
+      password: passwordHash,
       role: "free",
       isAgeVerified: true,
       isActive: true,
