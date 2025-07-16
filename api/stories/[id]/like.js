@@ -1,4 +1,6 @@
-import { db } from "../../../lib/supabase.js";
+// Story likes API with MongoDB integration
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Like, Story } from "../../../models/index.js";
 
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
@@ -16,6 +18,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    await connectToDatabase();
+
     const userId = req.body?.userId || "anonymous";
 
     switch (req.method) {
@@ -23,15 +27,15 @@ export default async function handler(req, res) {
         // Get like count and user's like status
         console.log(`[LIKES API] Getting likes for story ${storyId}`);
 
-        const likes = await db.getLikes(storyId);
-        const userLike = await db.getUserLike(storyId, userId);
+        const likeCount = await Like.countDocuments({ storyId });
+        const userLike = await Like.findOne({ storyId, userId });
         const userLiked = !!userLike;
 
         return res.status(200).json({
           success: true,
           data: {
             storyId,
-            likeCount: likes.length,
+            likeCount,
             userLiked,
             userId,
           },
@@ -45,26 +49,67 @@ export default async function handler(req, res) {
         );
         console.log(`[LIKES API] Request body:`, req.body);
 
-        const result = await db.toggleLike(storyId, userId);
-        const likes = await db.getLikes(storyId);
-        const likeCount = likes.length;
+        const existingLike = await Like.findOne({ storyId, userId });
 
-        console.log(
-          `[LIKES API] ✅ ${result.liked ? "LIKED" : "UNLIKED"} story ${storyId} - new count: ${likeCount}`,
-        );
+        if (existingLike) {
+          // Unlike - remove existing like
+          await Like.deleteOne({ _id: existingLike._id });
 
-        return res.status(result.liked ? 201 : 200).json({
-          success: true,
-          message: result.liked ? "Story liked" : "Story unliked",
-          liked: result.liked, // Direct field for frontend compatibility
-          likeCount,
-          data: {
+          // Update story like count
+          await Story.findOneAndUpdate(
+            { storyId },
+            { $inc: { likeCount: -1 } },
+          );
+
+          const newLikeCount = await Like.countDocuments({ storyId });
+          console.log(
+            `[LIKES API] ✅ UNLIKED story ${storyId} - new count: ${newLikeCount}`,
+          );
+
+          return res.status(200).json({
+            success: true,
+            message: "Story unliked",
+            liked: false, // Direct field for frontend compatibility
+            likeCount: newLikeCount,
+            data: {
+              storyId,
+              liked: false,
+              likeCount: newLikeCount,
+            },
+            timestamp: new Date().toISOString(),
+          });
+        } else {
+          // Like - add new like
+          const likeId = Date.now().toString();
+          const newLike = new Like({
+            likeId,
             storyId,
-            liked: result.liked,
-            likeCount,
-          },
-          timestamp: new Date().toISOString(),
-        });
+            userId,
+          });
+
+          await newLike.save();
+
+          // Update story like count
+          await Story.findOneAndUpdate({ storyId }, { $inc: { likeCount: 1 } });
+
+          const newLikeCount = await Like.countDocuments({ storyId });
+          console.log(
+            `[LIKES API] ✅ LIKED story ${storyId} - new count: ${newLikeCount}`,
+          );
+
+          return res.status(201).json({
+            success: true,
+            message: "Story liked",
+            liked: true, // Direct field for frontend compatibility
+            likeCount: newLikeCount,
+            data: {
+              storyId,
+              liked: true,
+              likeCount: newLikeCount,
+            },
+            timestamp: new Date().toISOString(),
+          });
+        }
 
       default:
         return res.status(405).json({
