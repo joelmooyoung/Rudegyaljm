@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Deployment Check</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #1e40af;
+        color: white;
+      }
+      .box {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Vercel Deployment Check</h1>
+
+    <div class="box success">
+      ✅ This page loaded - Vercel static files working!
+    </div>
+
+    <div class="box">
+      <h3>📅 Deployment Info:</h3>
+      <p>If you can see this, the latest code was deployed.</p>
+      <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+    </div>
+
+    <div class="box">
+      <h3>🧪 Tests:</h3>
+      <button onclick="testAPI()" style="margin: 5px; padding: 10px">
+        Test API
+      </button>
+      <button onclick="testReact()" style="margin: 5px; padding: 10px">
+        Test React App
+      </button>
+      <div id="results"></div>
+    </div>
+
+    <div class="box">
+      <h3>🎯 Next Steps:</h3>
+      <ol>
+        <li>If this page loads: Static deployment ✅</li>
+        <li>If API test fails: Add MongoDB URI to Vercel</li>
+        <li>If React test fails: Check browser console for errors</li>
+      </ol>
+    </div>
+
+    <script>
+      document.getElementById("timestamp").textContent =
+        new Date().toISOString();
+
+      async function testAPI() {
+        const results = document.getElementById("results");
+        results.innerHTML = '<div class="box">Testing API...</div>';
+
+        try {
+          const response = await fetch("/api/ping");
+          const data = await response.json();
+
+          if (response.ok) {
+            results.innerHTML =
+              '<div class="box success">✅ API Working: ' +
+              JSON.stringify(data) +
+              "</div>";
+          } else {
+            results.innerHTML =
+              '<div class="box error">❌ API Failed: ' +
+              response.status +
+              "</div>";
+          }
+        } catch (error) {
+          results.innerHTML =
+            '<div class="box error">❌ API Error: ' + error.message + "</div>";
+        }
+      }
+
+      function testReact() {
+        const results = document.getElementById("results");
+        results.innerHTML =
+          '<div class="box">Testing React app redirect...</div>';
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
