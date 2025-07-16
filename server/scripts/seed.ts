@@ -584,7 +584,7 @@ But even as she lost herself in Adrian's arms, a small part of her mind wondered
 };
 
 // Run the seeding script
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   seedDatabase();
 }
 
