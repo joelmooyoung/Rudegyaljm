@@ -1,11 +1,14 @@
-import bcrypt from "bcryptjs";
-import { db } from "../../lib/supabase.js";
+// User authentication API with MongoDB integration
+import { connectToDatabase } from "../../lib/mongodb.js";
+import { User, LoginLog } from "../../models/index.js";
 
-// IP to country mapping helper
+// Function to detect country from IP
 function getCountryFromIP(ip) {
   console.log(`[AUTH] Detecting country for IP: ${ip}`);
 
+  // Handle IPv6 addresses
   if (ip && ip.includes(":")) {
+    // Check for common US IPv6 prefixes
     const commonUSPrefixes = [
       "2601:", // Comcast/Xfinity
       "2600:", // AT&T
@@ -27,15 +30,16 @@ function getCountryFromIP(ip) {
     return "United States";
   }
 
+  // Handle IPv4 addresses - basic detection
   if (
     (ip && ip.startsWith("192.168.")) ||
     ip.startsWith("10.") ||
     ip.startsWith("172.")
   ) {
-    return "United States";
+    return "United States"; // Local network, assume US
   }
 
-  return "United States";
+  return "United States"; // Default fallback
 }
 
 export default async function handler(req, res) {
@@ -57,8 +61,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, username, password } = req.body;
-    console.log(`[LOGIN API] Login attempt for:`, { email, username });
+    await connectToDatabase();
+
+    const { email, password } = req.body;
+    console.log(`[LOGIN API] Login attempt for email: ${email}`);
 
     // Get IP and User Agent
     const ip =
@@ -70,90 +76,101 @@ export default async function handler(req, res) {
 
     console.log(`[LOGIN API] Request details:`, { ip, userAgent, country });
 
-    if ((!email && !username) || !password) {
+    if (!email || !password) {
       // Log failed attempt
-      await db.logLogin({
-        user_id: null,
-        username: email || username || "unknown",
-        ip_address: ip,
+      await LoginLog.create({
+        logId: Date.now().toString(),
+        userId: "unknown",
+        username: email || "unknown",
+        ip,
         country,
-        user_agent: userAgent,
+        userAgent,
         success: false,
       });
 
       return res.status(400).json({
         success: false,
-        message: "Email/Username and password are required",
+        message: "Email and password are required",
       });
     }
 
-    // Find user by email or username
-    let user;
-    try {
-      if (email) {
-        const { data, error } = await db
-          .getSupabaseAdmin()
-          .from("users")
-          .select("*")
-          .eq("email", email)
-          .single();
+    // Find user by email
+    let user = await User.findOne({ email });
 
-        if (!error) user = data;
-      } else if (username) {
-        user = await db.getUserByUsername(username);
-      }
-    } catch (error) {
-      console.log(`[LOGIN API] User lookup error:`, error.message);
-    }
-
+    // If user doesn't exist, create test accounts on first login attempt
     if (!user) {
-      console.log(`[LOGIN API] ❌ User not found: ${email || username}`);
+      console.log(
+        `[LOGIN API] User not found, checking if this is a test account`,
+      );
 
+      const testAccounts = [
+        {
+          userId: "admin1",
+          username: "admin",
+          email: "admin@test.com",
+          password: "admin123",
+          type: "admin",
+          country,
+        },
+        {
+          userId: "premium1",
+          username: "premiumuser",
+          email: "premium@test.com",
+          password: "premium123",
+          type: "premium",
+          country,
+        },
+        {
+          userId: "free1",
+          username: "freeuser",
+          email: "free@test.com",
+          password: "free123",
+          type: "free",
+          country,
+        },
+      ];
+
+      const testAccount = testAccounts.find((acc) => acc.email === email);
+      if (testAccount) {
+        user = new User(testAccount);
+        await user.save();
+        console.log(`[LOGIN API] Created test account: ${email}`);
+      }
+    }
+
+    if (!user || user.password !== password) {
       // Log failed attempt
-      await db.logLogin({
-        user_id: null,
-        username: email || username,
-        ip_address: ip,
+      await LoginLog.create({
+        logId: Date.now().toString(),
+        userId: user?.userId || "unknown",
+        username: user?.username || email,
+        ip,
         country,
-        user_agent: userAgent,
+        userAgent,
         success: false,
       });
 
+      console.log(`[LOGIN API] ❌ Invalid credentials for ${email}`);
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid email or password",
       });
     }
 
-    // Check password
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-    if (!passwordMatch) {
-      console.log(`[LOGIN API] ❌ Invalid password for ${user.username}`);
-
-      // Log failed attempt
-      await db.logLogin({
-        user_id: user.id,
-        username: user.username,
-        ip_address: ip,
-        country,
-        user_agent: userAgent,
-        success: false,
-      });
-
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
+    // Update user login stats
+    user.lastLogin = new Date();
+    user.loginCount = (user.loginCount || 0) + 1;
+    user.country = country;
+    await user.save();
 
     // Log successful attempt
-    await db.logLogin({
-      user_id: user.id,
+    await LoginLog.create({
+      logId: Date.now().toString(),
+      userId: user.userId,
       username: user.username,
-      ip_address: ip,
+      ip,
       country,
-      user_agent: userAgent,
+      userAgent,
       success: true,
     });
 
@@ -163,12 +180,13 @@ export default async function handler(req, res) {
       success: true,
       message: "Login successful",
       user: {
-        userId: user.id,
+        userId: user.userId,
         username: user.username,
         email: user.email,
-        type: user.role,
+        type: user.type,
         country: user.country,
-        active: user.is_active,
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount,
       },
     });
   } catch (error) {
