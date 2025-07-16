@@ -10,12 +10,20 @@ export default function handler(req, res) {
   }
 
   if (req.method === "GET") {
+    const hasMongoUri = !!process.env.MONGODB_URI;
+
     return res.status(200).json({
       success: true,
       message: "Hello from Express server!",
       timestamp: new Date().toISOString(),
-      environment: "Builder.io",
+      environment: process.env.NODE_ENV || "development",
       endpoint: "/api/ping",
+      database: {
+        configured: hasMongoUri,
+        status: hasMongoUri
+          ? "MongoDB URI available"
+          : "No MongoDB URI - fallback mode",
+      },
     });
   }
 
