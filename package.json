@@ -19,12 +19,7 @@
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc",
-<<<<<<< HEAD
-    "seed": "tsx server/scripts/seed.ts",
-    "seed:force": "SEED_DB=true npm run seed"
-=======
     "vercel-build": "vite build"
->>>>>>> 1c3943905b88cd0544e0a0e5118d916b77d2ad2f
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.51.0",
