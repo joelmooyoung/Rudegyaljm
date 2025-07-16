@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { connectDB } from "./config/database";
 import { handleDemo } from "./routes/demo";
 import {
   handleLogin,
@@ -15,6 +16,7 @@ import {
   updateStory,
   deleteStory,
   togglePublishStory,
+  searchStories,
 } from "./routes/stories";
 import {
   getStoryComments,
@@ -61,6 +63,7 @@ export function createServer() {
 
   // Story routes
   app.get("/api/stories", getStories);
+  app.get("/api/stories/search", searchStories);
   app.get("/api/stories/:id", getStory);
   app.post("/api/stories", createStory);
   app.put("/api/stories/:id", updateStory);
@@ -97,4 +100,28 @@ export function createServer() {
   app.patch("/api/users/:id/toggle-active", toggleUserActive);
 
   return app;
+}
+
+// Initialize database connection and start server
+const initializeServer = async () => {
+  try {
+    // Connect to MongoDB
+    await connectDB();
+    console.log("✅ Database connected successfully");
+
+    // Check if we should seed the database
+    if (process.env.SEED_DB === "true") {
+      console.log("🌱 Seeding database...");
+      const seedDatabase = await import("./scripts/seed");
+      await seedDatabase.default();
+    }
+  } catch (error) {
+    console.error("❌ Failed to initialize database:", error);
+    process.exit(1);
+  }
+};
+
+// Start database initialization if this file is run directly
+if (require.main === module) {
+  initializeServer();
 }
