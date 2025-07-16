@@ -1,5 +1,6 @@
-export default async function handler(req, res) {
-  console.log(`[SIMPLE TEST] API endpoint working`);
+// Simple test endpoint that should always work
+export default function handler(req, res) {
+  console.log("Test endpoint called");
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -10,22 +11,12 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  try {
-    return res.status(200).json({
-      success: true,
-      message: "API endpoint is working",
-      timestamp: new Date().toISOString(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV || "not set",
-        MONGODB_URI: !!process.env.MONGODB_URI,
-      },
-    });
-  } catch (error) {
-    console.error(`[SIMPLE TEST] Error:`, error);
-    return res.status(500).json({
-      success: false,
-      message: "Error in API endpoint",
-      error: error.message,
-    });
-  }
+  return res.status(200).json({
+    success: true,
+    message: "Simple test endpoint working!",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development",
+    hasMongoUri: !!process.env.MONGODB_URI,
+    vercelRegion: process.env.VERCEL_REGION || "unknown",
+  });
 }
