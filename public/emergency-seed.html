@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Database Setup</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+        color: white;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+      }
+      .step {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        border-left: 4px solid #60a5fa;
+      }
+      .credentials {
+        background: rgba(34, 197, 94, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 1px solid rgba(34, 197, 94, 0.5);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+      }
+      .btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px;
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn:hover {
+        background: #2563eb;
+      }
+      pre {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚨 Emergency Database Setup</h1>
+
+      <div class="step error">
+        <h3>❌ Current Issue</h3>
+        <p>
+          Vercel deployment is returning 404 for API endpoints, so automatic
+          seeding isn't working.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>📋 Manual Setup Required</h3>
+        <p>
+          Since the automatic seeding failed, you need to manually configure the
+          database in Vercel:
+        </p>
+
+        <ol>
+          <li>
+            <strong>Go to Vercel Dashboard</strong>:
+            <a
+              href="https://vercel.com/dashboard"
+              target="_blank"
+              style="color: #60a5fa"
+              >vercel.com/dashboard</a
+            >
+          </li>
+          <li><strong>Find your project</strong>: Look for "rudegyaljm"</li>
+          <li><strong>Go to Settings → Environment Variables</strong></li>
+          <li><strong>Add this variable</strong>:</li>
+        </ol>
+
+        <pre>
+Variable Name: MONGODB_URI
+Value: mongodb+srv://username:password@cluster.mongodb.net/rude-gyal-confessions?retryWrites=true&w=majority
+
+(Replace username, password, and cluster with your actual MongoDB Atlas details)</pre
+        >
+
+        <p>
+          <strong>5. Redeploy</strong> your Vercel application after adding the
+          environment variable
+        </p>
+      </div>
+
+      <div class="credentials">
+        <h3>👤 Test Accounts (After Database Setup)</h3>
+        <p>
+          Once your database is properly configured, these accounts will be
+          available:
+        </p>
+        <ul>
+          <li><strong>Admin</strong>: admin@nocturne.com / admin123</li>
+          <li><strong>Premium</strong>: premium@test.com / premium123</li>
+          <li><strong>Free</strong>: free@test.com / free123</li>
+        </ul>
+      </div>
+
+      <div class="step">
+        <h3>🔧 Alternative: Use MongoDB Atlas Directly</h3>
+        <p>If you don't want to use Vercel's database, you can:</p>
+        <ol>
+          <li>Create a MongoDB Atlas cluster</li>
+          <li>Import sample data manually</li>
+          <li>Use that for both development and production</li>
+        </ol>
+      </div>
+
+      <div class="step">
+        <h3>🎯 Next Steps</h3>
+        <p>1. Configure MongoDB URI in Vercel</p>
+        <p>
+          2. Test:
+          <a
+            href="https://rudegyaljm.vercel.app/"
+            target="_blank"
+            style="color: #60a5fa"
+            >https://rudegyaljm.vercel.app/</a
+          >
+        </p>
+        <p>3. If working, try the seed button again</p>
+      </div>
+
+      <a href="/" class="btn">🏠 Back to App</a>
+      <a href="https://vercel.com/dashboard" target="_blank" class="btn"
+        >🔧 Vercel Dashboard</a
+      >
+    </div>
+  </body>
+</html>
