@@ -58,8 +58,23 @@ export default function StoryMaintenance({
       const response = await fetch("/api/stories");
       if (response.ok) {
         const data = await response.json();
+        console.log("Stories API response:", data);
+
+        // Handle different response formats and ensure data is an array
+        let storiesArray = [];
+        if (Array.isArray(data)) {
+          storiesArray = data;
+        } else if (data && Array.isArray(data.stories)) {
+          storiesArray = data.stories;
+        } else if (data && Array.isArray(data.data)) {
+          storiesArray = data.data;
+        } else {
+          console.warn("Stories API returned unexpected format:", data);
+          storiesArray = [];
+        }
+
         // Convert date strings back to Date objects and ensure data integrity
-        const storiesWithDates = (data || []).map((story: any) => ({
+        const storiesWithDates = storiesArray.map((story: any) => ({
           ...story,
           title: story.title || "Untitled",
           author: story.author || "Unknown Author",
