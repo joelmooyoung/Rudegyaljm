@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Admin Access - Rude Gyal Confessions</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 30px;
+        color: #fff;
+      }
+      .status {
+        background: rgba(34, 197, 94, 0.3);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        font-size: 1.2rem;
+      }
+      .btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 15px;
+        display: inline-block;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+      .test-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 10px;
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+      .loading {
+        background: rgba(59, 130, 246, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Direct Admin Access</h1>
+
+      <div class="status">
+        ✅ This page works - Vercel deployment is functional!
+      </div>
+
+      <p>
+        This page completely bypasses React and provides direct access to test
+        your MongoDB database and admin features.
+      </p>
+
+      <div class="test-grid">
+        <div class="test-item" id="api-test">
+          <h3>🔗 API Connectivity</h3>
+          <button class="btn" onclick="testAPI()">Test Database API</button>
+          <div id="api-result">Click to test...</div>
+        </div>
+
+        <div class="test-item" id="seed-test">
+          <h3>🌱 Database Seeding</h3>
+          <button class="btn" onclick="seedDB()">Seed Database</button>
+          <div id="seed-result">Click to seed...</div>
+        </div>
+
+        <div class="test-item" id="verify-test">
+          <h3>✅ Database Verification</h3>
+          <button class="btn" onclick="verifyDB()">Verify Data</button>
+          <div id="verify-result">Click to verify...</div>
+        </div>
+      </div>
+
+      <div class="status" style="background: rgba(59, 130, 246, 0.3)">
+        <h3>📝 Test Accounts (After Seeding)</h3>
+        <p><strong>Admin:</strong> admin@nocturne.com / admin123</p>
+        <p><strong>Premium:</strong> premium@test.com / premium123</p>
+        <p><strong>Free:</strong> free@test.com / free123</p>
+      </div>
+
+      <div style="margin-top: 40px">
+        <a href="/" class="btn">🏠 Try Main App</a>
+        <a href="/emergency-test.html" class="btn">🔧 Emergency Test</a>
+      </div>
+    </div>
+
+    <script>
+      async function makeRequest(endpoint, method = "GET") {
+        try {
+          const response = await fetch(endpoint, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await response.json();
+          return { success: response.ok, data, status: response.status };
+        } catch (error) {
+          return { success: false, error: error.message };
+        }
+      }
+
+      async function testAPI() {
+        const result = document.getElementById("api-result");
+        result.innerHTML = "Testing...";
+
+        const response = await makeRequest("/api/ping");
+
+        if (response.success) {
+          result.innerHTML = "✅ API Working!";
+          document.getElementById("api-test").className = "test-item success";
+        } else {
+          result.innerHTML =
+            "❌ API Failed: " + (response.error || response.status);
+          document.getElementById("api-test").className = "test-item error";
+        }
+      }
+
+      async function seedDB() {
+        const result = document.getElementById("seed-result");
+        result.innerHTML = "Seeding database...";
+
+        const response = await makeRequest("/api/seed-database", "POST");
+
+        if (response.success) {
+          result.innerHTML = "✅ Database seeded successfully!";
+          document.getElementById("seed-test").className = "test-item success";
+        } else {
+          result.innerHTML =
+            "❌ Seeding failed: " +
+            (response.error || "MongoDB connection issue");
+          document.getElementById("seed-test").className = "test-item error";
+        }
+      }
+
+      async function verifyDB() {
+        const result = document.getElementById("verify-result");
+        result.innerHTML = "Verifying database...";
+
+        const response = await makeRequest("/api/verify-database");
+
+        if (response.success) {
+          const users = response.data.results?.dataCount?.users || 0;
+          const stories = response.data.results?.dataCount?.stories || 0;
+          result.innerHTML = `✅ Database verified! Users: ${users}, Stories: ${stories}`;
+          document.getElementById("verify-test").className =
+            "test-item success";
+        } else {
+          result.innerHTML =
+            "❌ Verification failed: " +
+            (response.error || "Database connection issue");
+          document.getElementById("verify-test").className = "test-item error";
+        }
+      }
+
+      // Auto-test API on load
+      window.onload = () => {
+        setTimeout(testAPI, 1000);
+      };
+    </script>
+  </body>
+</html>
