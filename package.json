@@ -18,13 +18,12 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "seed": "tsx server/scripts/seed.ts",
+    "seed:force": "SEED_DB=true npm run seed"
   },
   "dependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "bcrypt": "^6.0.0",
     "express": "^4.18.2",
-    "mongoose": "^8.16.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -95,7 +94,7 @@
     "tailwindcss": "^3.4.11",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.176.0",
-    "tsx": "^4.20.3",
+    "tsx": "^4.7.0",
     "typescript": "^5.5.3",
     "vaul": "^0.9.3",
     "vite": "^6.2.2",
