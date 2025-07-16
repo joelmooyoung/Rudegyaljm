@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Seeding - Rude Gyal Confessions</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 2.5em;
+        text-align: center;
+      }
+
+      .subtitle {
+        color: #666;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 1.1em;
+      }
+
+      .button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .result {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .loading {
+        background: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #d6d8db;
+      }
+
+      .info-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .accounts {
+        margin-top: 15px;
+      }
+
+      .account {
+        background: #f1f3f4;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+      }
+
+      .status {
+        text-align: center;
+        font-weight: bold;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌱 Database Seeding</h1>
+      <p class="subtitle">Rude Gyal Confessions - Local Development</p>
+
+      <div class="info-box">
+        <h3>📊 What This Will Create:</h3>
+        <ul>
+          <li><strong>4 Users</strong> (admin, premium, free, inactive)</li>
+          <li>
+            <strong>5 Stories</strong> (romance, fantasy with rich content)
+          </li>
+          <li><strong>5 Comments</strong> (across different stories)</li>
+          <li><strong>3 Login Logs</strong> (with IP tracking)</li>
+        </ul>
+
+        <div class="accounts">
+          <h4>🔐 Test Accounts:</h4>
+          <div class="account">Admin: admin@nocturne.com / admin123</div>
+          <div class="account">Premium: premium@test.com / premium123</div>
+          <div class="account">Free: free@test.com / free123</div>
+        </div>
+      </div>
+
+      <div class="status" id="status">Ready to seed database</div>
+
+      <button class="button" onclick="seedDatabase()" id="seedBtn">
+        🌱 Seed Local Database
+      </button>
+
+      <button class="button" onclick="verifyDatabase()" id="verifyBtn">
+        🔍 Verify Database Contents
+      </button>
+
+      <button
+        class="button"
+        onclick="clearDatabase()"
+        id="clearBtn"
+        style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)"
+      >
+        🗑️ Clear All Data
+      </button>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+      const API_BASE = window.location.origin;
+
+      function updateStatus(message, type = "info") {
+        const statusEl = document.getElementById("status");
+        statusEl.textContent = message;
+        statusEl.className = `status ${type}`;
+      }
+
+      function showResult(data, isError = false) {
+        const resultEl = document.getElementById("result");
+        resultEl.textContent =
+          typeof data === "object" ? JSON.stringify(data, null, 2) : data;
+        resultEl.className = `result ${isError ? "error" : "success"}`;
+      }
+
+      function enableButtons() {
+        document.getElementById("seedBtn").disabled = false;
+        document.getElementById("verifyBtn").disabled = false;
+        document.getElementById("clearBtn").disabled = false;
+      }
+
+      function disableButtons() {
+        document.getElementById("seedBtn").disabled = true;
+        document.getElementById("verifyBtn").disabled = true;
+        document.getElementById("clearBtn").disabled = true;
+      }
+
+      async function seedDatabase() {
+        updateStatus("🌱 Seeding database...", "loading");
+        disableButtons();
+
+        try {
+          const response = await fetch(`${API_BASE}/api/seed-database`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            updateStatus("✅ Database seeded successfully!", "success");
+            showResult(data);
+          } else {
+            updateStatus("❌ Seeding failed", "error");
+            showResult(data, true);
+          }
+        } catch (error) {
+          updateStatus("❌ Network error", "error");
+          showResult(`Error: ${error.message}`, true);
+        }
+
+        enableButtons();
+      }
+
+      async function verifyDatabase() {
+        updateStatus("🔍 Verifying database...", "loading");
+        disableButtons();
+
+        try {
+          const response = await fetch(`${API_BASE}/api/verify-database`);
+          const data = await response.json();
+
+          if (response.ok) {
+            updateStatus("✅ Database verification complete", "success");
+            showResult(data);
+          } else {
+            updateStatus("❌ Verification failed", "error");
+            showResult(data, true);
+          }
+        } catch (error) {
+          updateStatus("❌ Network error", "error");
+          showResult(`Error: ${error.message}`, true);
+        }
+
+        enableButtons();
+      }
+
+      async function clearDatabase() {
+        if (
+          !confirm(
+            "Are you sure you want to clear all database data? This cannot be undone.",
+          )
+        ) {
+          return;
+        }
+
+        updateStatus("🗑️ Clearing database...", "loading");
+        disableButtons();
+
+        try {
+          const response = await fetch(`${API_BASE}/api/clear-database`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            updateStatus("✅ Database cleared successfully", "success");
+            showResult(data);
+          } else {
+            updateStatus("❌ Clear failed", "error");
+            showResult(data, true);
+          }
+        } catch (error) {
+          updateStatus("❌ Network error", "error");
+          showResult(`Error: ${error.message}`, true);
+        }
+
+        enableButtons();
+      }
+
+      // Auto-check database status on load
+      window.onload = function () {
+        updateStatus("🔍 Checking database connection...", "loading");
+        fetch(`${API_BASE}/api/ping`)
+          .then((response) => response.json())
+          .then((data) => {
+            updateStatus("✅ Ready to seed database", "success");
+          })
+          .catch((error) => {
+            updateStatus("❌ Server not responding", "error");
+          });
+      };
+    </script>
+  </body>
+</html>
