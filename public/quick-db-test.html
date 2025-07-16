@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Quick DB Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test {
+        background: #333;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      .success {
+        background: #1a5a1a;
+      }
+      .error {
+        background: #5a1a1a;
+      }
+      button {
+        background: #0066cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Quick Database Test</h1>
+    <button onclick="testAPI()">Test API Connection</button>
+    <button onclick="seedDB()">Seed Database</button>
+    <div id="results"></div>
+
+    <script>
+      async function testAPI() {
+        const results = document.getElementById("results");
+        results.innerHTML = '<div class="test">Testing API...</div>';
+
+        try {
+          const response = await fetch("/api/ping");
+          const data = await response.json();
+          results.innerHTML = `<div class="test success">✅ API Working: ${JSON.stringify(data)}</div>`;
+        } catch (error) {
+          results.innerHTML = `<div class="test error">❌ API Failed: ${error.message}</div>`;
+        }
+      }
+
+      async function seedDB() {
+        const results = document.getElementById("results");
+        results.innerHTML = '<div class="test">Seeding database...</div>';
+
+        try {
+          const response = await fetch("/api/seed-database", {
+            method: "POST",
+          });
+          const data = await response.json();
+          if (response.ok) {
+            results.innerHTML = `<div class="test success">✅ Database seeded! ${JSON.stringify(data)}</div>`;
+          } else {
+            results.innerHTML = `<div class="test error">❌ Seeding failed: ${JSON.stringify(data)}</div>`;
+          }
+        } catch (error) {
+          results.innerHTML = `<div class="test error">❌ Seeding error: ${error.message}</div>`;
+        }
+      }
+    </script>
+  </body>
+</html>
