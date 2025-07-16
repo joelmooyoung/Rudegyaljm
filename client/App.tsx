@@ -62,7 +62,7 @@ const App = () => {
         role: "admin",
         isAgeVerified: true,
         isActive: true,
-        subscriptionStatus: "premium",
+        subscriptionStatus: "active",
         createdAt: new Date(),
         lastLogin: new Date(),
       };
@@ -309,7 +309,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <AgeVerification onVerified={handleAgeVerification} />
+          <AgeVerification onVerified={() => handleAgeVerification(true)} />
         </TooltipProvider>
       </QueryClientProvider>
     );
