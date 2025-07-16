@@ -1,0 +1,1 @@
+VERCEL DEPLOYMENT TEST - If you can see this, static files are working!
