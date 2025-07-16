@@ -295,6 +295,13 @@ const App = () => {
   const skipAgeVerification = urlParams.get("dev") === "true";
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
 
+  console.log("Age verification check:", {
+    isAgeVerified,
+    skipAgeVerification,
+    isBuilderEnvironment,
+    hostname: window.location.hostname,
+  });
+
   // Always skip age verification in Builder.io environment
   if (!isAgeVerified && !skipAgeVerification && !isBuilderEnvironment) {
     return (
