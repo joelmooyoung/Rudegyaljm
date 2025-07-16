@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Rude Gyal Confessions - Authentic confessions and intimate stories from real experiences at Rudegyaljm.com"
+    />
+    <title>Rude Gyal Confessions - Rudegyaljm.com</title>
+    <style>
+      /* Fallback styles in case CSS doesn't load */
+      .fallback-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #1e40af;
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        z-index: 9999;
+        display: none;
+      }
+      .fallback-message.show {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Fallback message if React doesn't load -->
+    <div id="fallback" class="fallback-message">
+      <h2>🔧 Loading App...</h2>
+      <p>If this message persists, there may be a JavaScript loading issue.</p>
+      <p><strong>Try:</strong></p>
+      <ul style="text-align: left">
+        <li>Refreshing the page</li>
+        <li>Clearing browser cache</li>
+        <li>Using a different browser</li>
+      </ul>
+      <p>
+        <a href="/emergency-test.html" style="color: #60a5fa"
+          >Test Vercel deployment</a
+        >
+      </p>
+    </div>
+
+    <script>
+      // Show fallback message after 3 seconds if React doesn't load
+      setTimeout(function () {
+        const root = document.getElementById("root");
+        if (!root || root.innerHTML.trim() === "") {
+          console.log("🚨 React app failed to load, showing fallback");
+          document.getElementById("fallback").classList.add("show");
+        }
+      }, 3000);
+
+      // Error handling
+      window.addEventListener("error", function (e) {
+        console.error("🚨 JavaScript Error:", e.error);
+        document.getElementById("fallback").classList.add("show");
+      });
+
+      console.log("🔧 Base HTML loaded on:", window.location.hostname);
+    </script>
+  </body>
+</html>
