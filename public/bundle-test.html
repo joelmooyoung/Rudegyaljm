@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>React Bundle Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #0f172a;
+        color: white;
+      }
+      .test {
+        background: rgba(59, 130, 246, 0.3);
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      .error {
+        background: rgba(239, 68, 68, 0.3);
+      }
+      .success {
+        background: rgba(34, 197, 94, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 React Bundle Loading Test</h1>
+
+    <div id="test1" class="test">📦 Testing React bundle existence...</div>
+    <div id="test2" class="test">🔗 Testing asset loading...</div>
+    <div id="test3" class="test">⚙️ Testing bundle execution...</div>
+
+    <div class="test">
+      <h3>Manual Checks:</h3>
+      <p>1. Open Network tab in browser developer tools</p>
+      <p>2. Look for any red (failed) requests</p>
+      <p>3. Check if /assets/index-DMleW5i1.js loads (should be ~900KB)</p>
+    </div>
+
+    <script>
+      console.log("🔧 Bundle test starting...");
+
+      async function testBundleLoading() {
+        try {
+          // Test 1: Check if the main page has the bundle reference
+          const response = await fetch("/");
+          const html = await response.text();
+
+          const bundleMatch = html.match(/\/assets\/index-[^"]+\.js/);
+
+          if (bundleMatch) {
+            const bundlePath = bundleMatch[0];
+            document.getElementById("test1").innerHTML =
+              "✅ Bundle reference found: " + bundlePath;
+            document.getElementById("test1").className = "test success";
+
+            // Test 2: Try to load the actual bundle
+            const bundleResponse = await fetch(bundlePath);
+
+            if (bundleResponse.ok) {
+              const bundleSize = bundleResponse.headers.get("content-length");
+              document.getElementById("test2").innerHTML =
+                "✅ Bundle loads successfully (Size: " +
+                (bundleSize ? bundleSize + " bytes" : "unknown") +
+                ")";
+              document.getElementById("test2").className = "test success";
+
+              // Test 3: Try to evaluate a small piece
+              const bundleText = await bundleResponse.text();
+              if (
+                bundleText.includes("React") ||
+                bundleText.includes("react")
+              ) {
+                document.getElementById("test3").innerHTML =
+                  "✅ Bundle contains React code";
+                document.getElementById("test3").className = "test success";
+              } else {
+                document.getElementById("test3").innerHTML =
+                  "❌ Bundle doesn't contain React references";
+                document.getElementById("test3").className = "test error";
+              }
+            } else {
+              document.getElementById("test2").innerHTML =
+                "❌ Bundle fails to load: " + bundleResponse.status;
+              document.getElementById("test2").className = "test error";
+            }
+          } else {
+            document.getElementById("test1").innerHTML =
+              "❌ No bundle reference found in HTML";
+            document.getElementById("test1").className = "test error";
+          }
+        } catch (error) {
+          console.error("Bundle test error:", error);
+          document.body.innerHTML +=
+            '<div class="test error">❌ Test failed: ' +
+            error.message +
+            "</div>";
+        }
+      }
+
+      // Run the test
+      testBundleLoading();
+
+      // Also test direct bundle access
+      setTimeout(() => {
+        const script = document.createElement("script");
+        script.src = "/assets/index-DMleW5i1.js";
+        script.onload = () => {
+          console.log("✅ Direct bundle loading successful");
+        };
+        script.onerror = () => {
+          console.error("❌ Direct bundle loading failed");
+          document.body.innerHTML +=
+            '<div class="test error">❌ Direct bundle loading failed</div>';
+        };
+        // Don't actually append it to avoid conflicts
+      }, 2000);
+    </script>
+  </body>
+</html>
