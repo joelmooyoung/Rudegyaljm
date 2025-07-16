@@ -19,6 +19,11 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
   const [birthDate, setBirthDate] = useState("");
   const [error, setError] = useState("");
 
+  // Development bypass - uncomment for testing
+  // React.useEffect(() => {
+  //   onVerified();
+  // }, [onVerified]);
+
   const handleVerification = () => {
     if (!birthDate) {
       setError("Please enter your date of birth");
@@ -51,7 +56,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundColor: "#0f172a", color: "white" }}
+    >
       {/* Passionate background gradient */}
       <div className="absolute inset-0 bg-desire-gradient opacity-10 blur-3xl" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/10" />
@@ -65,11 +73,17 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
               alt="Rude Gyal Confessions Logo"
               className="h-16 w-16 object-contain sultry-pulse"
             />
-            <h1 className="text-5xl font-display font-bold text-passion-gradient">
+            <h1
+              className="text-5xl font-display font-bold text-passion-gradient"
+              style={{ color: "#ef4444", fontSize: "3rem" }}
+            >
               Rude Gyal Confessions
             </h1>
           </div>
-          <p className="text-2xl font-serif text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p
+            className="text-2xl font-serif text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            style={{ color: "#d1d5db", fontSize: "1.5rem" }}
+          >
             <em>Where forbidden desires meet bold confessions</em> - Enter a
             realm of authentic passion, intimate secrets, and stories that
             ignite the soul
@@ -78,7 +92,10 @@ export default function AgeVerification({ onVerified }: AgeVerificationProps) {
 
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Age verification card */}
-          <Card className="story-card-intimate passionate-shimmer seductive-border">
+          <Card
+            className="story-card-intimate passionate-shimmer seductive-border"
+            style={{ backgroundColor: "#1e293b", borderColor: "#ef4444" }}
+          >
             <CardHeader className="text-center">
               <div className="mx-auto w-20 h-20 bg-seductive-gradient rounded-full flex items-center justify-center mb-6 passionate-glow">
                 <Flame className="h-10 w-10 text-primary-foreground" />

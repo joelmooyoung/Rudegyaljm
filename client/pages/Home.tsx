@@ -315,9 +315,15 @@ export default function Home({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      style={{ backgroundColor: "#0f172a", color: "white", minHeight: "100vh" }}
+    >
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header
+        className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50"
+        style={{ backgroundColor: "#1e293b", borderColor: "#374151" }}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -326,7 +332,10 @@ export default function Home({
                 alt="Rude Gyal Confessions Logo"
                 className="h-12 w-12 object-contain sultry-pulse"
               />
-              <h1 className="text-3xl font-display font-bold text-passion-gradient">
+              <h1
+                className="text-3xl font-display font-bold text-passion-gradient"
+                style={{ color: "#ef4444", fontSize: "1.875rem" }}
+              >
                 Rude Gyal Confessions
               </h1>
             </div>
@@ -409,21 +418,30 @@ export default function Home({
       </header>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+      <main
+        className="container mx-auto px-4 py-8"
+        style={{ backgroundColor: "#0f172a" }}
+      >
         {/* Hero section */}
         <section className="mb-16 text-center relative overflow-hidden">
           {/* Passionate background gradient */}
           <div className="absolute inset-0 bg-desire-gradient opacity-5 blur-3xl"></div>
 
           <div className="relative z-10">
-            <h2 className="text-5xl md:text-6xl font-display font-bold text-passion-gradient mb-6 sultry-pulse">
+            <h2
+              className="text-5xl md:text-6xl font-display font-bold text-passion-gradient mb-6 sultry-pulse"
+              style={{ color: "#ef4444", fontSize: "3rem" }}
+            >
               {user.role === "admin"
                 ? "Forbidden Chronicles - Admin Sanctuary"
                 : user.role === "premium"
                   ? "Unlock Your Deepest Desires"
                   : "Taste Forbidden Pleasures"}
             </h2>
-            <p className="text-xl md:text-2xl font-serif text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed">
+            <p
+              className="text-xl md:text-2xl font-serif text-muted-foreground max-w-4xl mx-auto mb-8 leading-relaxed"
+              style={{ color: "#d1d5db", fontSize: "1.25rem" }}
+            >
               {user.role === "admin" ? (
                 "Command the realm of desire. Curate the most intoxicating tales that ignite souls and awaken hidden passions."
               ) : user.role === "free" ? (
@@ -502,7 +520,10 @@ export default function Home({
         {/* Search and filters */}
         <section className="mb-12">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6">
+            <h3
+              className="text-2xl font-display font-semibold text-center text-passion-gradient mb-6"
+              style={{ color: "#ef4444", fontSize: "1.5rem" }}
+            >
               Find Your Perfect Temptation
             </h3>
             <div className="flex flex-col md:flex-row gap-4">
