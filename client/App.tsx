@@ -37,13 +37,24 @@ const App = () => {
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
   useEffect(() => {
-    // Check for development mode bypass
+    // Multiple ways to detect development mode
     const urlParams = new URLSearchParams(window.location.search);
-    const devMode = urlParams.get("dev") === "true";
-    const adminDirect = window.location.hash.includes("admin-seeding");
+    const devParam = urlParams.get("dev") === "true";
+    const adminHash = window.location.hash.includes("admin-seeding");
+    const isBuilderEnv = window.location.hostname.includes("builder.my");
 
-    // For development, create admin user automatically
-    if (devMode || adminDirect) {
+    // Force dev mode in Builder.io environment
+    const devMode = devParam || adminHash || isBuilderEnv;
+
+    console.log("Dev mode checks:", {
+      devParam,
+      adminHash,
+      isBuilderEnv,
+      devMode,
+    });
+
+    // Always create admin user in Builder.io environment
+    if (devMode) {
       const devAdminUser: User = {
         id: "dev-admin-1",
         email: "admin@dev.com",
@@ -61,9 +72,11 @@ const App = () => {
       localStorage.setItem("token", "dev-admin-token");
 
       // If admin-seeding in hash, navigate there directly
-      if (adminDirect) {
+      if (adminHash) {
         setCurrentView("admin-seeding");
       }
+
+      console.log("Dev mode activated, admin user created");
     } else {
       // Check if user has already been age verified in this session
       const verified = sessionStorage.getItem("age_verified");
