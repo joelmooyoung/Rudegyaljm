@@ -37,29 +37,58 @@ const App = () => {
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
   useEffect(() => {
-    // Check if user has already been age verified in this session
-    const verified = sessionStorage.getItem("age_verified");
-    if (verified === "true") {
-      setIsAgeVerified(true);
-    }
+    // Check for development mode bypass
+    const urlParams = new URLSearchParams(window.location.search);
+    const devMode = urlParams.get("dev") === "true";
+    const adminDirect = window.location.hash.includes("admin-seeding");
 
-    // Check if user is already authenticated
-    const token = localStorage.getItem("token");
-    if (token) {
-      // In a real app, you'd verify the token with the server
-      // For now, we'll create a mock user
-      const mockUser: User = {
-        id: "mock-user-1",
-        email: "test@example.com",
-        username: "TestUser",
-        role: "admin", // Make sure they can access seeding
+    // For development, create admin user automatically
+    if (devMode || adminDirect) {
+      const devAdminUser: User = {
+        id: "dev-admin-1",
+        email: "admin@dev.com",
+        username: "DevAdmin",
+        role: "admin",
         isAgeVerified: true,
         isActive: true,
-        subscriptionStatus: "none",
+        subscriptionStatus: "premium",
         createdAt: new Date(),
         lastLogin: new Date(),
       };
-      setUser(mockUser);
+      setUser(devAdminUser);
+      setIsAgeVerified(true);
+      sessionStorage.setItem("age_verified", "true");
+      localStorage.setItem("token", "dev-admin-token");
+
+      // If admin-seeding in hash, navigate there directly
+      if (adminDirect) {
+        setCurrentView("admin-seeding");
+      }
+    } else {
+      // Check if user has already been age verified in this session
+      const verified = sessionStorage.getItem("age_verified");
+      if (verified === "true") {
+        setIsAgeVerified(true);
+      }
+
+      // Check if user is already authenticated
+      const token = localStorage.getItem("token");
+      if (token) {
+        // In a real app, you'd verify the token with the server
+        // For now, we'll create a mock user
+        const mockUser: User = {
+          id: "mock-user-1",
+          email: "test@example.com",
+          username: "TestUser",
+          role: "admin", // Make sure they can access seeding
+          isAgeVerified: true,
+          isActive: true,
+          subscriptionStatus: "none",
+          createdAt: new Date(),
+          lastLogin: new Date(),
+        };
+        setUser(mockUser);
+      }
     }
 
     setIsLoading(false);
