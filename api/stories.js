@@ -19,8 +19,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Connect to MongoDB
-    await connectToDatabase();
+    // Connect to MongoDB with fallback handling
+    const dbConnection = await connectToDatabase();
+
+    if (!dbConnection.isConnected) {
+      console.log("📊 Using fallback data - no database connection");
+
+      // Return fallback data for development
+      const fallbackStories = [
+        {
+          id: "dev-1",
+          title: "Sample Story (No Database)",
+          author: "Development",
+          excerpt: "This is sample data because no database is connected...",
+          content:
+            "Sample content for development environment when database is not available.",
+          tags: ["development", "sample"],
+          category: "Sample",
+          accessLevel: "free",
+          isPublished: true,
+          rating: 0,
+          ratingCount: 0,
+          viewCount: 0,
+          commentCount: 0,
+          image:
+            "https://images.unsplash.com/photo-1516414447565-b14be0adf13e?w=800&q=80",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      return res.status(200).json(fallbackStories);
+    }
 
     switch (req.method) {
       case "GET":
