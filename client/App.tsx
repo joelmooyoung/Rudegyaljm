@@ -60,16 +60,23 @@ const App = () => {
     const isBuilderEnv = window.location.hostname.includes("builder.my");
     const isVercelEnv = window.location.hostname.includes("vercel.app");
 
+    // Force dev mode for Builder.io environment (override for testing)
+    const forceDevMode =
+      isBuilderEnv || window.location.hostname.includes("projects.builder.my");
+
     // Force dev mode in Builder.io OR Vercel environment
-    const devMode = devParam || adminHash || isBuilderEnv || isVercelEnv;
+    const devMode =
+      devParam || adminHash || isBuilderEnv || isVercelEnv || forceDevMode;
 
     console.log("Dev mode checks:", {
       devParam,
       adminHash,
       isBuilderEnv,
       isVercelEnv,
+      forceDevMode,
       hostname: window.location.hostname,
       devMode,
+      finalResult: `devmode=${devMode}`,
     });
 
     // Always create admin user in Builder.io environment
