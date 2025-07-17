@@ -62,7 +62,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
       // Use production API for database operations from preview environment
       const isBuilderPreview = window.location.hostname.includes("builder.my");
       const apiUrl = isBuilderPreview
-        ? "https://rudegyaljm-amber.vercel.app/api/seed-database"
+        ? "https://rudegyaljm-et05yzbra-joel-moo-youngs-projects.vercel.app/api/seed-database"
         : "/api/seed-database";
 
       console.log(`🌱 Seeding database via: ${apiUrl}`);
