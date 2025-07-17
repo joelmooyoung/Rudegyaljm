@@ -352,19 +352,6 @@ const App = () => {
     );
   }
 
-  // Direct access to seed page for setup
-  if (directSeed) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <DirectSeed />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
-
   if (!user) {
     return (
       <QueryClientProvider client={queryClient}>
