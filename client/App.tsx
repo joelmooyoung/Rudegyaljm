@@ -21,7 +21,7 @@ import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
 import DatabaseSeeding from "./pages/DatabaseSeeding";
-
+import DirectSeed from "./pages/DirectSeed";
 import { User, Story } from "@shared/api";
 
 const queryClient = new QueryClient();
@@ -322,7 +322,7 @@ const App = () => {
   // For development, we'll skip age verification if a specific query param is present
   const urlParams = new URLSearchParams(window.location.search);
   const skipAgeVerification = urlParams.get("dev") === "true";
-
+  const directSeed = urlParams.get("seed") === "true";
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
   const isVercelEnvironment = window.location.hostname.includes("vercel.app");
 
@@ -347,6 +347,19 @@ const App = () => {
           <Toaster />
           <Sonner />
           <AgeVerification onVerified={() => handleAgeVerification(true)} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  // Direct access to seed page for setup
+  if (directSeed) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <DirectSeed />
         </TooltipProvider>
       </QueryClientProvider>
     );
@@ -438,6 +451,8 @@ const App = () => {
         return <ErrorLogs onBack={handleBackToHome} />;
       case "admin-seeding":
         return <DatabaseSeeding />;
+      case "direct-seed":
+        return <DirectSeed />;
       case "about":
         return <About onBack={handleBackToHome} />;
       case "contact":
