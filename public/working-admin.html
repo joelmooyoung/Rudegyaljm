@@ -295,6 +295,86 @@
         );
       }
 
+      async function loadAllComments() {
+        setStatus("Loading all comments...");
+
+        try {
+          const response = await fetch(`${API_BASE}/api/comments`);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          console.log("Comments API response:", data);
+
+          const comments = data.data || data || [];
+          displayComments(comments);
+          setStatus(`Loaded ${comments.length} comments`, "success");
+        } catch (error) {
+          setStatus(`Failed to load comments: ${error.message}`, "error");
+        }
+      }
+
+      function displayComments(comments) {
+        const container = document.getElementById("stories");
+
+        if (comments.length === 0) {
+          container.innerHTML =
+            '<div class="error">No comments found. Check database connection.</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <h2>All Comments (${comments.length})</h2>
+          ${comments
+            .map(
+              (comment, index) => `
+            <div class="story">
+                <h4>Comment by ${comment.username}</h4>
+                <div class="debug">
+                    <strong>Comment ID:</strong> ${comment.commentId}<br>
+                    <strong>Story ID:</strong> ${comment.storyId}<br>
+                    <strong>Created:</strong> ${new Date(comment.createdAt).toLocaleString()}<br>
+                </div>
+                <p><strong>Content:</strong> ${comment.comment}</p>
+
+                <button onclick="loadCommentsForStory('${comment.storyId}')">
+                    Load Comments for This Story
+                </button>
+            </div>
+        `,
+            )
+            .join("")}
+        `;
+      }
+
+      async function loadCommentsForStory(storyId) {
+        setStatus(`Loading comments for story ${storyId}...`);
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/api/comments?storyId=${storyId}`,
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          console.log(`Comments for story ${storyId}:`, data);
+
+          const comments = data.data || data || [];
+          setStatus(
+            `Found ${comments.length} comments for story ${storyId}`,
+            "success",
+          );
+          setDebug(`Comments: ${JSON.stringify(comments, null, 2)}`);
+        } catch (error) {
+          setStatus(`Failed to load story comments: ${error.message}`, "error");
+        }
+      }
+
       // Auto-load on page load
       setTimeout(loadStories, 1000);
     </script>
