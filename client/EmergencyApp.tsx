@@ -47,7 +47,7 @@ const EmergencyApp = () => {
         setStories(stories);
 
         // Load comments for each story
-        const commentsMap: any = {};
+        const commentsMap: Record<string, Comment[]> = {};
         for (const story of stories) {
           const storyId = story.storyId || story.id || story._id;
           if (storyId) {
