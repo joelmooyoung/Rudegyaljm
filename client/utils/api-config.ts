@@ -4,7 +4,7 @@ const isBuilderPreview = window.location.hostname.includes("builder.my");
 const isLocalDev = window.location.hostname.includes("localhost");
 
 // For Builder.io preview, use Vercel production APIs for database operations
-const VERCEL_PRODUCTION_URL = "https://YOUR-NEW-VERCEL-PROJECT.vercel.app";
+const VERCEL_PRODUCTION_URL = "https://rudegyaljm-amber.vercel.app";
 
 // API endpoints that need database access
 const DATABASE_ENDPOINTS = [
