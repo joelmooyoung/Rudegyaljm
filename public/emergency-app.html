@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Rude Gyal Confessions - Emergency Mode</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #1a1a1a;
+        color: #fff;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .story {
+        background: #333;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 8px;
+        border-left: 4px solid #ff6b9d;
+      }
+      .admin-panel {
+        background: #2a2a2a;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        border: 1px solid #555;
+      }
+      button {
+        background: #ff6b9d;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #e55a89;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #444;
+        color: #fff;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      .success {
+        color: #4caf50;
+      }
+      .error {
+        color: #f44336;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌹 Rude Gyal Confessions</h1>
+      <p>Emergency working version</p>
+
+      <div class="admin-panel">
+        <h2>Admin Functions</h2>
+        <button onclick="loadStories()">Load Stories</button>
+        <button onclick="showCreateForm()">Create New Story</button>
+        <div id="admin-status"></div>
+      </div>
+
+      <div id="create-form" style="display: none">
+        <h3>Create New Story</h3>
+        <input type="text" id="story-title" placeholder="Story Title" />
+        <input type="text" id="story-author" placeholder="Author" />
+        <textarea
+          id="story-content"
+          placeholder="Story content..."
+          rows="10"
+        ></textarea>
+        <button onclick="saveStory()">Save Story</button>
+        <button onclick="hideCreateForm()">Cancel</button>
+      </div>
+
+      <div id="stories-container">
+        <p>Click "Load Stories" to see content</p>
+      </div>
+    </div>
+
+    <script>
+      const VERCEL_API = "https://rudegyaljm-amber.vercel.app";
+
+      async function loadStories() {
+        const status = document.getElementById("admin-status");
+        status.innerHTML = "Loading stories...";
+
+        try {
+          const response = await fetch(`${VERCEL_API}/api/stories`);
+          const data = await response.json();
+
+          console.log("Stories response:", data);
+
+          if (data.success && data.data) {
+            displayStories(data.data);
+            status.innerHTML = `✅ Loaded ${data.data.length} stories`;
+          } else {
+            status.innerHTML = "❌ No stories found or API error";
+          }
+        } catch (error) {
+          status.innerHTML = `❌ Error: ${error.message}`;
+          console.error("Error loading stories:", error);
+        }
+      }
+
+      function displayStories(stories) {
+        const container = document.getElementById("stories-container");
+        container.innerHTML = stories
+          .map(
+            (story) => `
+                    <div class="story">
+                        <h3>${story.title || "Untitled"}</h3>
+                        <p><strong>Author:</strong> ${story.author || "Unknown"}</p>
+                        <p>${(story.content || "").substring(0, 200)}...</p>
+                        <p><small>Views: ${story.views || 0} | Likes: ${story.likeCount || 0}</small></p>
+                        <button onclick="editStory('${story.storyId}')">Edit</button>
+                    </div>
+                `,
+          )
+          .join("");
+      }
+
+      function showCreateForm() {
+        document.getElementById("create-form").style.display = "block";
+      }
+
+      function hideCreateForm() {
+        document.getElementById("create-form").style.display = "none";
+      }
+
+      async function saveStory() {
+        const status = document.getElementById("admin-status");
+        const title = document.getElementById("story-title").value;
+        const author = document.getElementById("story-author").value;
+        const content = document.getElementById("story-content").value;
+
+        if (!title || !content) {
+          status.innerHTML = "❌ Title and content required";
+          return;
+        }
+
+        status.innerHTML = "Saving story...";
+
+        try {
+          const response = await fetch(`${VERCEL_API}/api/stories`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title,
+              author: author || "Anonymous",
+              content,
+              category: "Romance",
+              tags: ["New"],
+              published: true,
+              featured: false,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            status.innerHTML = "✅ Story saved successfully!";
+            hideCreateForm();
+            // Clear form
+            document.getElementById("story-title").value = "";
+            document.getElementById("story-author").value = "";
+            document.getElementById("story-content").value = "";
+            // Reload stories
+            loadStories();
+          } else {
+            status.innerHTML = `❌ Save failed: ${result.message || "Unknown error"}`;
+          }
+        } catch (error) {
+          status.innerHTML = `❌ Save error: ${error.message}`;
+        }
+      }
+
+      function editStory(storyId) {
+        alert(`Edit functionality - Story ID: ${storyId}`);
+      }
+
+      // Auto-load stories on page load
+      setTimeout(loadStories, 1000);
+    </script>
+  </body>
+</html>
