@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {
   User,
+  UserRole,
   Story,
   Comment,
   Rating,
@@ -8,6 +9,11 @@ import {
   LoginLog,
   ErrorLog,
 } from "@shared/api";
+
+// Server-side User interface with password field
+export interface ServerUser extends Omit<User, "id"> {
+  password: string;
+}
 
 // User Schema
 const userSchema = new mongoose.Schema<User>(
