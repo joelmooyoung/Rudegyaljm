@@ -106,6 +106,11 @@ Behind the mahogany doors of power, their forbidden attraction would either bind
         author: "Scarlett Blackthorne",
         category: "Romance",
         tags: ["Office Romance", "Power", "CEO", "Forbidden", "Executive"],
+        image:
+          "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&h=400&fit=crop&q=80",
+        excerpt:
+          "Victoria Cross commanded respect in every boardroom she entered. As the youngest female CEO, she harbors secrets that could unravel everything she's built with her handsome CFO...",
+        accessLevel: "premium",
         published: true,
         featured: true,
         views: 1580,
