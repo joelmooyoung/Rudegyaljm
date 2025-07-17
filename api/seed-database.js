@@ -135,6 +135,11 @@ A chance encounter at the beach resort would lead to seven days of unbridled pas
           "Summer",
           "Passion",
         ],
+        image:
+          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=400&fit=crop&q=80",
+        excerpt:
+          "The Mediterranean sun beat down mercilessly as Isabella lounged by the infinity pool, seeking escape from heartbreak. A stranger with Aegean-blue eyes would change everything...",
+        accessLevel: "free",
         published: true,
         featured: false,
         views: 2890,
