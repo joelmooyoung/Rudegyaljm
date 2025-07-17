@@ -31,6 +31,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Story } from "@shared/api";
+import { makeApiRequest } from "@/utils/api-config";
 
 interface StoryMaintenanceProps {
   onBack: () => void;
