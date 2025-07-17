@@ -465,7 +465,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                             {comment.username}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {formatDate(comment.createdAt)}
+                            {comment.createdAt
+                              ? new Date(comment.createdAt).toLocaleDateString()
+                              : "No date"}
                           </span>
                           {comment.isEdited && (
                             <Badge variant="outline" className="text-xs">
