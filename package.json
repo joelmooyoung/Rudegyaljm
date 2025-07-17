@@ -21,7 +21,7 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc",
+    "typecheck": "tsc --noEmit",
     "vercel-build": "vite build",
     "vercel-dev": "vite",
     "deploy": "vercel --prod",
