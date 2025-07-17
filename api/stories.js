@@ -95,6 +95,9 @@ export default async function handler(req, res) {
           author,
           category,
           tags,
+          image,
+          excerpt,
+          accessLevel = "free",
           published = false,
         } = req.body;
 
