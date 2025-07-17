@@ -1,10 +1,11 @@
-import { IncomingForm } from "formidable";
 import fs from "fs";
 import path from "path";
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: "5mb",
+    },
   },
 };
 
@@ -23,45 +24,66 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    const { imageData, filename } = req.body;
 
-    const form = new IncomingForm({
-      uploadDir: uploadsDir,
-      keepExtensions: true,
-      maxFileSize: 5 * 1024 * 1024, // 5MB limit
-    });
-
-    const [fields, files] = await form.parse(req);
-
-    if (!files.image || !files.image[0]) {
-      return res.status(400).json({ error: "No image file provided" });
-    }
-
-    const file = files.image[0];
-    const fileExtension = path.extname(file.originalFilename || "");
-    const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
-    if (!allowedExtensions.includes(fileExtension.toLowerCase())) {
-      // Delete the uploaded file
-      fs.unlinkSync(file.filepath);
+    if (!imageData || !filename) {
       return res.status(400).json({
-        error:
-          "Invalid file type. Only JPG, PNG, GIF, and WebP files are allowed.",
+        error: "Missing image data or filename",
+      });
+    }
+
+    // Validate the image data is base64
+    if (!imageData.startsWith("data:image/")) {
+      return res.status(400).json({
+        error: "Invalid image data format",
+      });
+    }
+
+    // Extract base64 data
+    const base64Data = imageData.split(",")[1];
+    if (!base64Data) {
+      return res.status(400).json({
+        error: "Invalid base64 image data",
+      });
+    }
+
+    // Convert base64 to buffer
+    const buffer = Buffer.from(base64Data, "base64");
+
+    // Validate file size (5MB limit)
+    if (buffer.length > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        error: "Image too large. Maximum size is 5MB.",
+      });
+    }
+
+    // Get file extension from data URL
+    const mimeMatch = imageData.match(/data:image\/([^;]+)/);
+    const mimeType = mimeMatch ? mimeMatch[1] : "jpeg";
+
+    // Validate file type
+    const allowedTypes = ["jpeg", "jpg", "png", "gif", "webp"];
+    if (!allowedTypes.includes(mimeType.toLowerCase())) {
+      return res.status(400).json({
+        error: "Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.",
       });
     }
 
     // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 8);
-    const newFilename = `story-${timestamp}-${randomString}${fileExtension}`;
-    const newFilePath = path.join(uploadsDir, newFilename);
+    const fileExtension = mimeType === "jpeg" ? "jpg" : mimeType;
+    const newFilename = `story-${timestamp}-${randomString}.${fileExtension}`;
 
-    // Move file to final location
-    fs.renameSync(file.filepath, newFilePath);
+    // Create uploads directory if it doesn't exist
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // Write file
+    const filePath = path.join(uploadsDir, newFilename);
+    fs.writeFileSync(filePath, buffer);
 
     // Return the URL path to the uploaded image
     const imageUrl = `/uploads/${newFilename}`;
@@ -70,7 +92,7 @@ export default async function handler(req, res) {
       success: true,
       imageUrl: imageUrl,
       filename: newFilename,
-      size: file.size,
+      size: buffer.length,
       message: "Image uploaded successfully",
     });
   } catch (error) {
