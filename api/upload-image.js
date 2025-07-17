@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-
 export const config = {
   api: {
     bodyParser: {
@@ -47,7 +44,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Convert base64 to buffer
+    // Convert base64 to buffer to check size
     const buffer = Buffer.from(base64Data, "base64");
 
     // Validate file size (5MB limit)
@@ -69,36 +66,28 @@ export default async function handler(req, res) {
       });
     }
 
-    // Generate unique filename
+    // Generate unique filename for reference
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 8);
     const fileExtension = mimeType === "jpeg" ? "jpg" : mimeType;
     const newFilename = `story-${timestamp}-${randomString}.${fileExtension}`;
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
-    // Write file
-    const filePath = path.join(uploadsDir, newFilename);
-    fs.writeFileSync(filePath, buffer);
-
-    // Return the URL path to the uploaded image
-    const imageUrl = `/uploads/${newFilename}`;
+    // In serverless environment, we return the base64 data URL directly
+    // This will be stored in the database instead of as a file
+    const imageUrl = imageData; // Return the base64 data URL
 
     return res.status(200).json({
       success: true,
       imageUrl: imageUrl,
       filename: newFilename,
       size: buffer.length,
-      message: "Image uploaded successfully",
+      message: "Image processed successfully (stored as base64)",
+      isBase64: true,
     });
   } catch (error) {
     console.error("Image upload error:", error);
     return res.status(500).json({
-      error: "Failed to upload image",
+      error: "Failed to process image",
       message: error.message,
     });
   }
