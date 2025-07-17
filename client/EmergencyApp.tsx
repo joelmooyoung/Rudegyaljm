@@ -62,6 +62,13 @@ const EmergencyApp = () => {
   };
 
   const updateStory = async (storyId: string, updates: any) => {
+    console.log("Updating story:", { storyId, updates });
+
+    if (!storyId || storyId === "undefined") {
+      alert("Error: Story ID is missing");
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE}/api/stories/${storyId}`, {
         method: "PUT",
@@ -69,14 +76,20 @@ const EmergencyApp = () => {
         body: JSON.stringify(updates),
       });
 
+      const result = await response.json();
+      console.log("Update response:", result);
+
       if (response.ok) {
         alert("Story updated successfully!");
         loadData(); // Reload data
       } else {
-        alert("Failed to update story");
+        alert(
+          `Failed to update story: ${result.message || response.statusText}`,
+        );
       }
     } catch (err) {
-      alert("Error updating story");
+      console.error("Update error:", err);
+      alert(`Error updating story: ${err}`);
     }
   };
 
