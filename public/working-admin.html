@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Working Admin - Story Management</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #1a1a1a;
+        color: #fff;
+        padding: 20px;
+        margin: 0;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .story {
+        background: #333;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 8px;
+        border-left: 4px solid #ff6b9d;
+      }
+      .success {
+        background: #2a5934;
+        color: #4caf50;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .error {
+        background: #5a2a2a;
+        color: #f44336;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      button {
+        background: #ff6b9d;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #e55a89;
+      }
+      button:disabled {
+        background: #666;
+        cursor: not-allowed;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background: #444;
+        color: #fff;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      .debug {
+        background: #2a2a3a;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌹 Working Story Management</h1>
+
+      <div>
+        <button onclick="loadStories()">Load Stories</button>
+        <button onclick="debugApi()">Debug API</button>
+        <button onclick="listStoryIds()">List Story IDs</button>
+      </div>
+
+      <div id="status"></div>
+      <div id="debug"></div>
+      <div id="stories"></div>
+    </div>
+
+    <script>
+      const API_BASE = "https://rudegyaljm-amber.vercel.app";
+      let allStories = [];
+
+      function setStatus(message, type = "info") {
+        const status = document.getElementById("status");
+        const className = type === "error" ? "error" : "success";
+        status.innerHTML = `<div class="${className}">${message}</div>`;
+      }
+
+      function setDebug(message) {
+        const debug = document.getElementById("debug");
+        debug.innerHTML = `<div class="debug">${message}</div>`;
+      }
+
+      async function debugApi() {
+        setStatus("Testing API endpoints...");
+        const debug = [];
+
+        try {
+          // Test stories endpoint
+          const storiesResponse = await fetch(`${API_BASE}/api/stories`);
+          debug.push(
+            `Stories API: ${storiesResponse.status} ${storiesResponse.statusText}`,
+          );
+
+          if (storiesResponse.ok) {
+            const storiesData = await storiesResponse.json();
+            debug.push(`Stories count: ${storiesData.length || 0}`);
+            debug.push(
+              `Sample story: ${JSON.stringify(storiesData[0], null, 2)}`,
+            );
+          }
+
+          // Test debug endpoint
+          const debugResponse = await fetch(`${API_BASE}/api/debug-user`);
+          debug.push(
+            `Debug API: ${debugResponse.status} ${debugResponse.statusText}`,
+          );
+
+          if (debugResponse.ok) {
+            const debugData = await debugResponse.json();
+            debug.push(`Users in DB: ${debugData.totalUsers || 0}`);
+          }
+
+          setDebug(debug.join("<br>"));
+          setStatus("API debug completed", "success");
+        } catch (error) {
+          setStatus(`API debug failed: ${error.message}`, "error");
+          setDebug(`Error: ${error.stack}`);
+        }
+      }
+
+      async function loadStories() {
+        setStatus("Loading stories...");
+
+        try {
+          const response = await fetch(`${API_BASE}/api/stories`);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          console.log("Raw API response:", data);
+
+          // Handle different response formats
+          let stories = [];
+          if (Array.isArray(data)) {
+            stories = data;
+          } else if (data.data && Array.isArray(data.data)) {
+            stories = data.data;
+          } else if (data.stories && Array.isArray(data.stories)) {
+            stories = data.stories;
+          }
+
+          allStories = stories;
+          displayStories(stories);
+          setStatus(`Loaded ${stories.length} stories`, "success");
+        } catch (error) {
+          setStatus(`Failed to load stories: ${error.message}`, "error");
+        }
+      }
+
+      function displayStories(stories) {
+        const container = document.getElementById("stories");
+
+        if (stories.length === 0) {
+          container.innerHTML =
+            '<div class="error">No stories found. Click "Debug API" to check connection.</div>';
+          return;
+        }
+
+        container.innerHTML = stories
+          .map(
+            (story, index) => `
+            <div class="story">
+                <h3>${story.title || "Untitled"}</h3>
+                <div class="debug">
+                    <strong>Story ID:</strong> ${story.storyId || story.id || story._id || "NO_ID"}<br>
+                    <strong>Author:</strong> ${story.author || "Unknown"}<br>
+                    <strong>Views:</strong> ${story.views || 0} | 
+                    <strong>Likes:</strong> ${story.likeCount || 0}<br>
+                    <strong>All IDs:</strong> storyId: ${story.storyId}, id: ${story.id}, _id: ${story._id}
+                </div>
+                <p>${(story.content || "").substring(0, 200)}...</p>
+                
+                <button onclick="editStory('${story.storyId || story.id || story._id}', '${story.title}', ${index})">
+                    Edit Title
+                </button>
+                <button onclick="testUpdate('${story.storyId || story.id || story._id}')">
+                    Test Update API
+                </button>
+            </div>
+        `,
+          )
+          .join("");
+      }
+
+      async function editStory(storyId, currentTitle, index) {
+        if (!storyId || storyId === "undefined" || storyId === "null") {
+          setStatus(
+            `Error: No valid story ID found. Story index: ${index}`,
+            "error",
+          );
+          return;
+        }
+
+        const newTitle = prompt("New title:", currentTitle);
+        if (!newTitle || newTitle === currentTitle) {
+          return;
+        }
+
+        setStatus(`Updating story ${storyId}...`);
+
+        try {
+          const response = await fetch(`${API_BASE}/api/stories/${storyId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ title: newTitle }),
+          });
+
+          console.log("Update response:", response);
+
+          if (response.ok) {
+            setStatus("Story updated successfully!", "success");
+            loadStories(); // Reload
+          } else {
+            const errorData = await response.text();
+            setStatus(
+              `Update failed (${response.status}): ${errorData}`,
+              "error",
+            );
+          }
+        } catch (error) {
+          setStatus(`Update error: ${error.message}`, "error");
+        }
+      }
+
+      async function testUpdate(storyId) {
+        if (!storyId) {
+          setStatus("No story ID to test", "error");
+          return;
+        }
+
+        setStatus(`Testing update API for story: ${storyId}`);
+
+        try {
+          const response = await fetch(`${API_BASE}/api/stories/${storyId}`, {
+            method: "GET",
+          });
+
+          if (response.ok) {
+            const story = await response.json();
+            setStatus(`Story found: ${story.title}`, "success");
+            setDebug(`Full story data: ${JSON.stringify(story, null, 2)}`);
+          } else {
+            setStatus(
+              `Story not found (${response.status}): ${response.statusText}`,
+              "error",
+            );
+          }
+        } catch (error) {
+          setStatus(`Test failed: ${error.message}`, "error");
+        }
+      }
+
+      function listStoryIds() {
+        if (allStories.length === 0) {
+          setStatus("Load stories first", "error");
+          return;
+        }
+
+        const ids = allStories.map((story, index) => ({
+          index,
+          storyId: story.storyId,
+          id: story.id,
+          _id: story._id,
+          title: story.title,
+        }));
+
+        setDebug(
+          `Story IDs:<br>${ids.map((item) => `${item.index}: ${item.title} - storyId: ${item.storyId}, id: ${item.id}, _id: ${item._id}`).join("<br>")}`,
+        );
+      }
+
+      // Auto-load on page load
+      setTimeout(loadStories, 1000);
+    </script>
+  </body>
+</html>
