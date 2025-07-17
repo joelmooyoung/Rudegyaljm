@@ -21,6 +21,7 @@ import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
 import DatabaseSeeding from "./pages/DatabaseSeeding";
+import DirectSeed from "./pages/DirectSeed";
 import { User, Story } from "@shared/api";
 
 const queryClient = new QueryClient();
