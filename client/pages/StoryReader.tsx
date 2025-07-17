@@ -172,21 +172,21 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     setIsSubmittingComment(true);
 
     try {
-      const isBuilderPreview = window.location.hostname.includes("builder.my");
-      const apiUrl = isBuilderPreview
-        ? `https://rudegyaljm-amber.vercel.app/api/stories/${story.id}/comments`
-        : `/api/stories/${story.id}/comments`;
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // Use working comments API for both saving and loading
+      const response = await fetch(
+        "https://rudegyaljm-amber.vercel.app/api/comments",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: newComment.trim(),
+            userId: user.id,
+            username: user.username,
+          }),
         },
-        body: JSON.stringify({
-          content: newComment.trim(),
-          userId: user.id,
-          username: user.username,
-        }),
-      });
+      );
 
       if (response.ok) {
         const newCommentData = await response.json();
