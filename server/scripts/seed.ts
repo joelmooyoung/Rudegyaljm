@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { connectDB, disconnectDB } from "../config/database";
 import {
   UserModel,
@@ -528,7 +528,7 @@ But even as she lost herself in Adrian's arms, a small part of her mind wondered
     ];
 
     const createdLoginLogs = await LoginLogModel.insertMany(loginLogs);
-    console.log(`✅ Created ${createdLoginLogs.length} login logs`);
+    console.log(`��� Created ${createdLoginLogs.length} login logs`);
 
     // Create some sample comments
     console.log("💬 Creating sample comments...");
