@@ -76,7 +76,7 @@ export default function CommentsMaintenance({
       for (const story of storiesData) {
         try {
           const commentsResponse = await fetch(
-            `/api/stories/${story.id}/comments`,
+            `${baseApiUrl}/api/stories/${story.id}/comments`,
           );
           if (commentsResponse.ok) {
             const storyComments: Comment[] = await commentsResponse.json();
