@@ -1,0 +1,140 @@
+export default async function handler(req, res) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Upload Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .upload-area {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin: 20px 0;
+      }
+      .preview {
+        margin: 20px 0;
+      }
+      .preview img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .loading {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Upload Test</h1>
+    <p>Test the image upload API functionality</p>
+
+    <div class="upload-area">
+      <input type="file" id="imageInput" accept="image/*" />
+      <p>Select an image file to upload (PNG, JPG, GIF, WebP - max 5MB)</p>
+    </div>
+
+    <div id="status"></div>
+    <div id="preview" class="preview"></div>
+
+    <script>
+      const imageInput = document.getElementById("imageInput");
+      const statusDiv = document.getElementById("status");
+      const previewDiv = document.getElementById("preview");
+
+      function showStatus(message, type = "loading") {
+        statusDiv.innerHTML = '<div class="status ' + type + '">' + message + '</div>';
+      }
+
+      function showPreview(imageUrl, filename, size) {
+        previewDiv.innerHTML = 
+          '<h3>Upload Successful!</h3>' +
+          '<p><strong>Filename:</strong> ' + filename + '</p>' +
+          '<p><strong>Size:</strong> ' + Math.round(size / 1024) + ' KB</p>' +
+          '<p><strong>URL:</strong> <a href="' + imageUrl + '" target="_blank">' + imageUrl + '</a></p>' +
+          '<img src="' + imageUrl + '" alt="Uploaded image" />';
+      }
+
+      imageInput.addEventListener("change", async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        showStatus("Converting image to base64...", "loading");
+        previewDiv.innerHTML = "";
+
+        try {
+          // Convert file to base64
+          const reader = new FileReader();
+          reader.onload = async function(event) {
+            const imageData = event.target.result;
+            
+            showStatus("Uploading image...", "loading");
+
+            try {
+              const response = await fetch("/api/upload-image.js", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  imageData: imageData,
+                  filename: file.name,
+                }),
+              });
+
+              const result = await response.json();
+
+              if (response.ok && result.success) {
+                showStatus("Image uploaded successfully: " + result.message, "success");
+                showPreview(result.imageUrl, result.filename, result.size);
+              } else {
+                showStatus("Upload failed: " + result.error, "error");
+              }
+            } catch (error) {
+              showStatus("Upload error: " + error.message, "error");
+            }
+          };
+          
+          reader.onerror = function() {
+            showStatus("Failed to read file", "error");
+          };
+          
+          reader.readAsDataURL(file);
+        } catch (error) {
+          showStatus("File processing error: " + error.message, "error");
+        }
+      });
+    </script>
+  </body>
+</html>`;
+
+  res.setHeader("Content-Type", "text/html");
+  return res.status(200).send(html);
+}
