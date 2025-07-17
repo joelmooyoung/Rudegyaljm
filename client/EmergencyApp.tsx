@@ -147,9 +147,18 @@ const EmergencyApp = () => {
 
             <button
               onClick={() => {
+                console.log("Story object:", story);
+                const storyId = story.storyId || story.id || story._id;
+                console.log("Using story ID:", storyId);
+
+                if (!storyId) {
+                  alert("Error: No story ID found");
+                  return;
+                }
+
                 const newTitle = prompt("New title:", story.title);
                 if (newTitle) {
-                  updateStory(story.storyId, { title: newTitle });
+                  updateStory(storyId, { title: newTitle });
                 }
               }}
               style={{
