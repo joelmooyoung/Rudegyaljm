@@ -201,7 +201,12 @@ const App = () => {
       let response;
       if (storyMode === "add") {
         // Create new story
-        response = await fetch("/api/stories", {
+        const isBuilderPreview =
+          window.location.hostname.includes("builder.my");
+        const apiUrl = isBuilderPreview
+          ? "https://rudegyaljm-amber.vercel.app/api/stories"
+          : "/api/stories";
+        response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -210,7 +215,12 @@ const App = () => {
         });
       } else {
         // Update existing story
-        response = await fetch(`/api/stories/${storyData.id}`, {
+        const isBuilderPreview =
+          window.location.hostname.includes("builder.my");
+        const apiUrl = isBuilderPreview
+          ? `https://rudegyaljm-amber.vercel.app/api/stories/${storyData.id}`
+          : `/api/stories/${storyData.id}`;
+        response = await fetch(apiUrl, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
