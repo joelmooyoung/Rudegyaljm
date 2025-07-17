@@ -322,6 +322,7 @@ const App = () => {
   // For development, we'll skip age verification if a specific query param is present
   const urlParams = new URLSearchParams(window.location.search);
   const skipAgeVerification = urlParams.get("dev") === "true";
+  const directSeed = urlParams.get("seed") === "true";
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
   const isVercelEnvironment = window.location.hostname.includes("vercel.app");
 
