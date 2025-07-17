@@ -221,14 +221,24 @@ export default function StoryDetail({
     setImageFile(file);
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append("image", file);
+      // Convert file to base64
+      const imageData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.readAsDataURL(file);
+      });
 
       // Upload to API
       const response = await fetch("/api/upload-image.js", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageData: imageData,
+          filename: file.name,
+        }),
       });
 
       if (!response.ok) {
