@@ -22,7 +22,6 @@ import {
   Send,
 } from "lucide-react";
 import { Story, User as UserType, Comment } from "@shared/api";
-import { formatDate } from "@/utils/dateUtils";
 
 interface StoryReaderProps {
   story: Story;
