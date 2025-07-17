@@ -36,6 +36,13 @@ const EmergencyApp = () => {
   };
 
   const addComment = async (storyId: string, content: string) => {
+    console.log("Adding comment:", { storyId, content });
+
+    if (!storyId || storyId === "undefined") {
+      alert("Error: Story ID is missing");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_BASE}/api/stories/${storyId}/comments`,
@@ -50,14 +57,20 @@ const EmergencyApp = () => {
         },
       );
 
+      const result = await response.json();
+      console.log("Comment response:", result);
+
       if (response.ok) {
         alert("Comment added successfully!");
         loadData(); // Reload data
       } else {
-        alert("Failed to add comment");
+        alert(
+          `Failed to add comment: ${result.message || response.statusText}`,
+        );
       }
     } catch (err) {
-      alert("Error adding comment");
+      console.error("Comment error:", err);
+      alert(`Error adding comment: ${err}`);
     }
   };
 
