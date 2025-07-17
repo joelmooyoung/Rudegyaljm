@@ -210,7 +210,7 @@ export default function StoryDetail({
     }
   };
 
-  // Handle image file upload
+  // Handle image file upload using API
   const handleImageUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       alert("Please select a valid image file.");
@@ -221,33 +221,36 @@ export default function StoryDetail({
     setImageFile(file);
 
     try {
-      let imageData: string;
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("image", file);
 
-      // Compress image to reduce size
-      if (file.size > 1 * 1024 * 1024) {
-        // If file is larger than 1MB, compress it
-        console.log(
-          `Compressing image: ${(file.size / (1024 * 1024)).toFixed(1)}MB`,
-        );
-        imageData = await compressImage(file, 800, 0.8);
-        console.log(
-          `Compressed to approximately: ${(imageData.length / (1024 * 1024)).toFixed(1)}MB (base64)`,
-        );
-      } else {
-        // For smaller files, just convert to base64
-        imageData = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target?.result as string);
-          reader.onerror = () => reject(new Error("Failed to read file"));
-          reader.readAsDataURL(file);
-        });
+      // Upload to API
+      const response = await fetch("/api/upload-image.js", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Upload failed");
       }
 
-      setImagePreview(imageData);
-      handleInputChange("image", imageData);
+      const result = await response.json();
+
+      if (result.success) {
+        const imageUrl = result.imageUrl;
+        setImagePreview(imageUrl);
+        handleInputChange("image", imageUrl);
+        console.log(`Image uploaded successfully: ${imageUrl}`);
+      } else {
+        throw new Error(result.message || "Upload failed");
+      }
     } catch (error) {
-      console.error("Failed to process image:", error);
-      alert("Failed to process image. Please try again.");
+      console.error("Failed to upload image:", error);
+      alert(
+        `Failed to upload image: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsUploadingImage(false);
     }
