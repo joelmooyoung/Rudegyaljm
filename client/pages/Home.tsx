@@ -91,7 +91,7 @@ export default function Home({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/stories");
+      const response = await makeApiRequest("/api/stories");
       if (response.ok) {
         const data = await response.json();
         console.log("Stories API response:", data);
