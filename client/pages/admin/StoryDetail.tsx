@@ -416,7 +416,7 @@ export default function StoryDetail({
                             : "Click to upload image"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          PNG, JPG, GIF up to 5MB (will be compressed)
+                          PNG, JPG, GIF, WebP up to 5MB
                         </span>
                       </label>
                     </div>
