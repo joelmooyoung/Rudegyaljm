@@ -56,7 +56,11 @@ export default function StoryMaintenance({
   const fetchStories = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/stories");
+      const isBuilderPreview = window.location.hostname.includes("builder.my");
+      const apiUrl = isBuilderPreview
+        ? "https://rudegyaljm-amber.vercel.app/api/stories"
+        : "/api/stories";
+      const response = await fetch(apiUrl);
       if (response.ok) {
         const data = await response.json();
         console.log("Stories API response:", data);
