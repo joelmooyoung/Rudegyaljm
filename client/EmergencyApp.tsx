@@ -124,7 +124,7 @@ const EmergencyApp = () => {
     }
   };
 
-  const updateStory = async (storyId: string, updates: any) => {
+  const updateStory = async (storyId: string, updates: Partial<Story>) => {
     console.log("Updating story:", { storyId, updates });
 
     if (!storyId || storyId === "undefined") {
