@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 const EmergencyApp = () => {
   const [stories, setStories] = useState<any[]>([]);
   const [comments, setComments] = useState<any[]>([]);
+  const [storyComments, setStoryComments] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
