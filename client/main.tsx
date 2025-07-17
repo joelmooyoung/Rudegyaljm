@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import SimpleApp from "./SimpleApp";
+import App from "./App";
 import "./global.css";
 
 const container = document.getElementById("root");
@@ -11,6 +11,6 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <SimpleApp />
+    <App />
   </React.StrictMode>,
 );
