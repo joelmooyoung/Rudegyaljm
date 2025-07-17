@@ -437,6 +437,8 @@ const App = () => {
         return <ErrorLogs onBack={handleBackToHome} />;
       case "admin-seeding":
         return <DatabaseSeeding />;
+      case "direct-seed":
+        return <DirectSeed />;
       case "about":
         return <About onBack={handleBackToHome} />;
       case "contact":
