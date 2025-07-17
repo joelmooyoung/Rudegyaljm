@@ -23,7 +23,6 @@ import ErrorLogs from "./pages/admin/ErrorLogs";
 import DatabaseSeeding from "./pages/DatabaseSeeding";
 
 import { User, Story } from "@shared/api";
-import { makeApiRequest } from "@/utils/api-config";
 
 const queryClient = new QueryClient();
 
