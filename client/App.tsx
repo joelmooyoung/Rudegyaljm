@@ -424,7 +424,7 @@ const App = () => {
           />
         );
       case "admin-comments":
-        return <CommentsMaintenance onBack={handleBackToStories} />;
+        return <WorkingCommentsMaintenance onBack={handleBackToHome} />;
       case "admin-users":
         return (
           <UserMaintenance
