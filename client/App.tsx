@@ -211,7 +211,17 @@ const App = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(storyData),
+          body: JSON.stringify({
+            title: storyData.title,
+            content: storyData.content,
+            author: storyData.author,
+            category: storyData.category,
+            tags: storyData.tags || [],
+            image: storyData.image,
+            excerpt: storyData.excerpt,
+            accessLevel: storyData.accessLevel || "free",
+            published: storyData.isPublished || false,
+          }),
         });
       } else {
         // Update existing story
