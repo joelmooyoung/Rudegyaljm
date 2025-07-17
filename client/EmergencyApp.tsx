@@ -19,10 +19,33 @@ const EmergencyApp = () => {
       const storiesResponse = await fetch(`${API_BASE}/api/stories`);
       if (storiesResponse.ok) {
         const storiesData = await storiesResponse.json();
-        setStories(storiesData.data || storiesData || []);
+        const stories = storiesData.data || storiesData || [];
+        setStories(stories);
+
+        // Load comments for each story
+        const commentsMap: any = {};
+        for (const story of stories) {
+          const storyId = story.storyId || story.id || story._id;
+          if (storyId) {
+            try {
+              const commentsResponse = await fetch(
+                `${API_BASE}/api/stories/${storyId}/comments`,
+              );
+              if (commentsResponse.ok) {
+                const storyCommentsData = await commentsResponse.json();
+                commentsMap[storyId] =
+                  storyCommentsData.data || storyCommentsData || [];
+              }
+            } catch (e) {
+              console.log(`No comments for story ${storyId}`);
+              commentsMap[storyId] = [];
+            }
+          }
+        }
+        setStoryComments(commentsMap);
       }
 
-      // Load comments
+      // Load all comments for debug
       const commentsResponse = await fetch(`${API_BASE}/api/debug-comments`);
       if (commentsResponse.ok) {
         const commentsData = await commentsResponse.json();
@@ -31,6 +54,7 @@ const EmergencyApp = () => {
 
       setLoading(false);
     } catch (err) {
+      console.error("Load error:", err);
       setError("Failed to load data");
       setLoading(false);
     }
