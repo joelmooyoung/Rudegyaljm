@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Direct MongoDB Seeding</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #fff;
+      }
+      .container {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 5px;
+      }
+      button:hover {
+        background: #45a049;
+      }
+      button:disabled {
+        background: #666;
+        cursor: not-allowed;
+      }
+      .error {
+        background: #ff4444;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .success {
+        background: #44ff44;
+        color: #000;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .info {
+        background: #4444ff;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+        background: #333;
+        color: #fff;
+        border: 1px solid #555;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        background: #333;
+        color: #fff;
+        border: 1px solid #555;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌱 Direct MongoDB Database Seeding</h1>
+
+    <div class="container">
+      <h2>MongoDB Connection</h2>
+      <label for="mongoUri">MongoDB Connection String:</label>
+      <input
+        type="text"
+        id="mongoUri"
+        placeholder="mongodb+srv://username:password@cluster.mongodb.net/rude-gyal-confessions?retryWrites=true&w=majority"
+      />
+      <br /><br />
+      <button onclick="testConnection()">Test Connection</button>
+      <button onclick="createDatabase()">Create Database & Seed Data</button>
+    </div>
+
+    <div class="container">
+      <h2>Instructions</h2>
+      <div class="info">
+        <p>
+          <strong>Step 1:</strong> Enter your MongoDB connection string above
+        </p>
+        <p><strong>Step 2:</strong> Click "Test Connection" to verify</p>
+        <p>
+          <strong>Step 3:</strong> Click "Create Database & Seed Data" to
+          populate with test accounts
+        </p>
+        <p><strong>Test Accounts after seeding:</strong></p>
+        <ul>
+          <li>Admin: admin@nocturne.com / admin123</li>
+          <li>Premium: premium@test.com / premium123</li>
+          <li>Free: free@test.com / free123</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+      async function testConnection() {
+        const mongoUri = document.getElementById("mongoUri").value;
+        const results = document.getElementById("results");
+
+        if (!mongoUri) {
+          results.innerHTML =
+            '<div class="error">Please enter a MongoDB connection string</div>';
+          return;
+        }
+
+        results.innerHTML = '<div class="info">Testing connection...</div>';
+
+        // Since we can't directly connect to MongoDB from browser,
+        // we'll validate the connection string format
+        if (mongoUri.includes("mongodb+srv://") && mongoUri.includes("@")) {
+          results.innerHTML =
+            '<div class="success">✅ Connection string format is valid!</div>';
+        } else {
+          results.innerHTML =
+            '<div class="error">❌ Invalid MongoDB connection string format</div>';
+        }
+      }
+
+      async function createDatabase() {
+        const mongoUri = document.getElementById("mongoUri").value;
+        const results = document.getElementById("results");
+
+        if (!mongoUri) {
+          results.innerHTML =
+            '<div class="error">Please enter a MongoDB connection string</div>';
+          return;
+        }
+
+        results.innerHTML = '<div class="info">Creating database...</div>';
+
+        // Generate the MongoDB script
+        const script = generateMongoScript();
+
+        results.innerHTML = `
+                <div class="success">✅ Database seeding script generated!</div>
+                <div class="container">
+                    <h3>MongoDB Script (Copy and run in MongoDB Compass or CLI):</h3>
+                    <textarea readonly onclick="this.select()">${script}</textarea>
+                    <br><br>
+                    <div class="info">
+                        <strong>Instructions:</strong>
+                        <ol>
+                            <li>Copy the script above</li>
+                            <li>Open MongoDB Compass or MongoDB CLI</li>
+                            <li>Connect to your database: ${mongoUri}</li>
+                            <li>Select the "rude-gyal-confessions" database</li>
+                            <li>Run the script in the MongoDB shell</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+      }
+
+      function generateMongoScript() {
+        return `// MongoDB Seeding Script for Rude Gyal Confessions
+use('rude-gyal-confessions');
+
+// Clear existing data
+db.users.deleteMany({});
+db.stories.deleteMany({});
+db.comments.deleteMany({});
+db.loginlogs.deleteMany({});
+
+// Insert Users (passwords are hashed with bcrypt)
+db.users.insertMany([
+  {
+    userId: "admin1",
+    username: "admin",
+    email: "admin@nocturne.com",
+    password: "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeSwWKw5ZzVAGTj22", // admin123
+    type: "admin",
+    country: "Unknown",
+    active: true,
+    loginCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    userId: "premium1",
+    username: "premiumuser",
+    email: "premium@test.com",
+    password: "$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // premium123
+    type: "premium",
+    country: "Unknown",
+    active: true,
+    loginCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    userId: "free1",
+    username: "freeuser",
+    email: "free@test.com",
+    password: "$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // free123
+    type: "free",
+    country: "Unknown",
+    active: true,
+    loginCount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+]);
+
+// Insert Stories
+db.stories.insertMany([
+  {
+    storyId: "story1",
+    title: "Midnight Desires",
+    content: "The clock struck midnight as Sophia stepped onto the moonlit balcony...",
+    author: "Luna Starweaver",
+    category: "Romance",
+    tags: ["Passionate", "Forbidden Love", "Midnight", "Garden", "Desire"],
+    published: true,
+    featured: false,
+    views: 2340,
+    likeCount: 45,
+    averageRating: 4.8,
+    ratingCount: 127,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    storyId: "story2",
+    title: "The Executive's Secret",
+    content: "Victoria Cross commanded respect in every boardroom she entered...",
+    author: "Scarlett Blackthorne",
+    category: "Romance",
+    tags: ["Office Romance", "Power", "CEO", "Forbidden", "Executive"],
+    published: true,
+    featured: true,
+    views: 1580,
+    likeCount: 67,
+    averageRating: 4.9,
+    ratingCount: 89,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    storyId: "story3",
+    title: "Summer Heat",
+    content: "The Mediterranean sun beat down mercilessly on the pristine white sands...",
+    author: "Marina Solace",
+    category: "Romance",
+    tags: ["Beach Romance", "Vacation", "Mediterranean", "Summer", "Passion"],
+    published: true,
+    featured: false,
+    views: 2890,
+    likeCount: 123,
+    averageRating: 4.6,
+    ratingCount: 156,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+]);
+
+// Insert Comments
+db.comments.insertMany([
+  {
+    commentId: "comment1",
+    storyId: "story1",
+    userId: "premium1",
+    username: "premiumuser",
+    comment: "Absolutely captivating! The imagery in this story is so vivid.",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    commentId: "comment2",
+    storyId: "story1",
+    userId: "free1",
+    username: "freeuser",
+    comment: "Luna Starweaver has such a beautiful writing style. Can't wait to read more!",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+]);
+
+print("✅ Database seeded successfully!");
+print("Test accounts:");
+print("Admin: admin@nocturne.com / admin123");
+print("Premium: premium@test.com / premium123");
+print("Free: free@test.com / free123");`;
+      }
+    </script>
+  </body>
+</html>
