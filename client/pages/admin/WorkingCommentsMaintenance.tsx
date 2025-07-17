@@ -138,8 +138,17 @@ const WorkingCommentsMaintenance = ({ onBack }: { onBack: () => void }) => {
                       </span>
                     </div>
                     <p className="text-foreground">{comment.comment}</p>
-                    <div className="text-xs text-muted-foreground">
-                      ID: {comment.commentId} | User: {comment.userId}
+                    <div className="flex justify-between items-center">
+                      <div className="text-xs text-muted-foreground">
+                        ID: {comment.commentId} | User: {comment.userId}
+                      </div>
+                      <Button
+                        onClick={() => deleteComment(comment.commentId)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 ))}
