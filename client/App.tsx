@@ -263,7 +263,9 @@ const App = () => {
       }
     } catch (error) {
       console.error("Error saving story:", error);
-      alert("Error saving story. Please try again.");
+      alert(
+        `Error saving story: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
