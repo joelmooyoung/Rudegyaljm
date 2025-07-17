@@ -181,6 +181,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            storyId: story.id,
             content: newComment.trim(),
             userId: user.id,
             username: user.username,
