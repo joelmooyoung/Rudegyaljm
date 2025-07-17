@@ -255,8 +255,11 @@ const App = () => {
         // Navigate back to story maintenance
         setCurrentView("admin-stories");
       } else {
-        console.error("Failed to save story:", response.statusText);
-        alert("Failed to save story. Please try again.");
+        const errorData = await response.text();
+        console.error("Failed to save story:", response.statusText, errorData);
+        alert(
+          `Failed to save story: ${response.statusText}. Check console for details.`,
+        );
       }
     } catch (error) {
       console.error("Error saving story:", error);
