@@ -131,6 +131,7 @@ const App = () => {
       }
     }
 
+    console.log("✅ App initialization completed");
     setIsLoading(false);
   }, []);
 
