@@ -14,9 +14,12 @@ const EmergencyApp = () => {
   }, []);
 
   const loadData = async () => {
+    console.log("🔄 Starting loadData...");
     try {
       // Load stories
+      console.log("📚 Fetching stories from:", `${API_BASE}/api/stories`);
       const storiesResponse = await fetch(`${API_BASE}/api/stories`);
+      console.log("📚 Stories response status:", storiesResponse.status);
       if (storiesResponse.ok) {
         const storiesData = await storiesResponse.json();
         const stories = storiesData.data || storiesData || [];
