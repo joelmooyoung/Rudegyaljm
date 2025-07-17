@@ -139,7 +139,17 @@ export default async function handler(req, res) {
 
       case "PUT":
         console.log(`[STORIES API] Updating story`);
-        const { id: updateId } = req.body;
+        console.log(`[STORIES API] URL path:`, req.url);
+        console.log(`[STORIES API] Request body:`, req.body);
+
+        // Extract story ID from URL path /api/stories/story1
+        const urlParts = req.url?.split("/");
+        const urlStoryId = urlParts?.[urlParts.length - 1]?.split("?")[0];
+
+        // Try URL parameter first, then body
+        const updateId = urlStoryId || req.body.id;
+
+        console.log(`[STORIES API] Extracted story ID:`, updateId);
 
         if (!updateId) {
           return res.status(400).json({
