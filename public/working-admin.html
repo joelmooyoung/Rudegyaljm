@@ -193,10 +193,10 @@
                 </div>
                 <p>${(story.content || "").substring(0, 200)}...</p>
                 
-                <button onclick="editStory('${story.storyId || story.id || story._id}', '${story.title}', ${index})">
+                                <button onclick="editStory('${story.id}', '${story.title}', ${index})">
                     Edit Title
                 </button>
-                <button onclick="testUpdate('${story.storyId || story.id || story._id}')">
+                <button onclick="testUpdate('${story.id}')">
                     Test Update API
                 </button>
             </div>
