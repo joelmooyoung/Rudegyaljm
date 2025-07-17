@@ -168,7 +168,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     setIsSubmittingComment(true);
 
     try {
-      const response = await fetch(`/api/stories/${story.id}/comments`, {
+      const isBuilderPreview = window.location.hostname.includes("builder.my");
+      const apiUrl = isBuilderPreview
+        ? `https://rudegyaljm-amber.vercel.app/api/stories/${story.id}/comments`
+        : `/api/stories/${story.id}/comments`;
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
