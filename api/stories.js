@@ -65,17 +65,17 @@ export default async function handler(req, res) {
           id: story.storyId,
           title: story.title,
           author: story.author,
-          excerpt: story.content.substring(0, 200) + "...",
+          excerpt: story.excerpt || story.content.substring(0, 200) + "...",
           content: story.content,
           tags: story.tags,
           category: story.category,
-          accessLevel: "free", // Default for compatibility
+          accessLevel: story.accessLevel || "free",
           isPublished: story.published,
           rating: story.averageRating,
           ratingCount: story.ratingCount,
           viewCount: story.views,
           commentCount: 0, // Will be calculated separately if needed
-          image: `https://images.unsplash.com/photo-${Math.random().toString(36).substr(2, 9)}?w=800&q=80`,
+          image: story.image, // Use actual image from database
           createdAt: story.createdAt,
           updatedAt: story.updatedAt,
         }));
