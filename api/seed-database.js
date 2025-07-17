@@ -81,6 +81,11 @@ Their forbidden encounter under the starlit sky would ignite a passion that defi
         author: "Luna Starweaver",
         category: "Romance",
         tags: ["Passionate", "Forbidden Love", "Midnight", "Garden", "Desire"],
+        image:
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop&q=80",
+        excerpt:
+          "The clock struck midnight as Sophia stepped onto the moonlit balcony, her silk nightgown flowing in the gentle breeze. A mysterious stranger from the masquerade ball appears...",
+        accessLevel: "free",
         published: true,
         featured: false,
         views: 2340,
