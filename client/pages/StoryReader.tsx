@@ -60,9 +60,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           viewCount: prev.viewCount + 1,
         }));
 
-        // Load comments
+        // Load comments using working API
+        console.log("Loading comments for story:", story.id);
         const commentsResponse = await fetch(
-          `/api/stories/${story.id}/comments`,
+          `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${story.id}`,
         );
         if (commentsResponse.ok) {
           const commentsData = await commentsResponse.json();
