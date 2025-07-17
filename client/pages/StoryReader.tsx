@@ -485,7 +485,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm">{comment.content}</p>
+                        <p className="text-sm">
+                          {comment.comment ||
+                            comment.content ||
+                            "No comment text"}
+                        </p>
                       </div>
                     </div>
                   ))}
