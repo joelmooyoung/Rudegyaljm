@@ -62,7 +62,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
       // Use production API for database operations from preview environment
       const isBuilderPreview = window.location.hostname.includes("builder.my");
       const apiUrl = isBuilderPreview
-        ? "https://YOUR-NEW-VERCEL-PROJECT.vercel.app/api/seed-database"
+        ? "https://rudegyaljm-amber.vercel.app/api/seed-database"
         : "/api/seed-database";
 
       console.log(`🌱 Seeding database via: ${apiUrl}`);
@@ -79,7 +79,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
 
       if (response.ok && result.success) {
         setError(
-          "��� Database seeded! Login with: admin@nocturne.com / admin123",
+          "✅ Database seeded! Login with: admin@nocturne.com / admin123",
         );
         console.log("✅ Database seeding successful:", result);
       } else {
