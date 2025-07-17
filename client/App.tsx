@@ -211,7 +211,7 @@ const App = () => {
         });
       } else {
         // Update existing story
-        response = await fetch(`/api/stories/${storyData.id}`, {
+        response = await makeApiRequest(`/api/stories/${storyData.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
