@@ -1,5 +1,24 @@
 import { useState, useEffect } from "react";
 
+// Type definitions to fix TypeScript errors
+interface Story {
+  storyId?: string;
+  id?: string;
+  _id?: string;
+  title: string;
+  author: string;
+  content: string;
+  views?: number;
+  likeCount?: number;
+}
+
+interface Comment {
+  commentId?: string;
+  username: string;
+  comment: string;
+  createdAt: string;
+}
+
 const EmergencyApp = () => {
   const [stories, setStories] = useState<any[]>([]);
   const [comments, setComments] = useState<any[]>([]);
