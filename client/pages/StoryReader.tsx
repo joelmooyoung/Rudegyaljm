@@ -465,19 +465,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                             {comment.username}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {(() => {
-                              try {
-                                const date =
-                                  comment.createdAt instanceof Date
-                                    ? comment.createdAt
-                                    : new Date(comment.createdAt);
-                                return isNaN(date.getTime())
-                                  ? "Unknown date"
-                                  : date.toLocaleDateString();
-                              } catch {
-                                return "Unknown date";
-                              }
-                            })()}
+                            {new Date(comment.createdAt).toLocaleDateString()}
                           </span>
                           {comment.isEdited && (
                             <Badge variant="outline" className="text-xs">
