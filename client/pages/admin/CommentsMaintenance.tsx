@@ -60,7 +60,11 @@ export default function CommentsMaintenance({
     setIsLoading(true);
     try {
       // Fetch stories first
-      const storiesResponse = await fetch("/api/stories");
+      const isBuilderPreview = window.location.hostname.includes("builder.my");
+      const baseApiUrl = isBuilderPreview
+        ? "https://rudegyaljm-amber.vercel.app"
+        : "";
+      const storiesResponse = await fetch(`${baseApiUrl}/api/stories`);
       let storiesData: Story[] = [];
       if (storiesResponse.ok) {
         storiesData = await storiesResponse.json();
