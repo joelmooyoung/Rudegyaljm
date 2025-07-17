@@ -175,9 +175,17 @@ const EmergencyApp = () => {
 
             <button
               onClick={() => {
+                const storyId = story.storyId || story.id || story._id;
+                console.log("Adding comment to story:", storyId);
+
+                if (!storyId) {
+                  alert("Error: No story ID found");
+                  return;
+                }
+
                 const comment = prompt("Add comment:");
                 if (comment) {
-                  addComment(story.storyId, comment);
+                  addComment(storyId, comment);
                 }
               }}
               style={{
