@@ -89,16 +89,17 @@ const EmergencyApp = () => {
         body: JSON.stringify(updates),
       });
 
-      const result = await response.json();
-      console.log("Update response:", result);
+      console.log("Update response status:", response.status);
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Update response:", result);
         alert("Story updated successfully!");
         loadData(); // Reload data
       } else {
-        alert(
-          `Failed to update story: ${result.message || response.statusText}`,
-        );
+        const errorText = await response.text();
+        console.log("Update error:", errorText);
+        alert(`Failed to update story (${response.status}): ${errorText}`);
       }
     } catch (err) {
       console.error("Update error:", err);
