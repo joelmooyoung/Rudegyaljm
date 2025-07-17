@@ -48,6 +48,31 @@ const WorkingCommentsMaintenance = ({ onBack }: { onBack: () => void }) => {
     }
   };
 
+  const deleteComment = async (commentId: string) => {
+    if (!confirm("Are you sure you want to delete this comment?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://rudegyaljm-amber.vercel.app/api/comments/${commentId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (response.ok) {
+        setComments(comments.filter((c) => c.commentId !== commentId));
+        setError("Comment deleted successfully");
+      } else {
+        throw new Error(`Failed to delete: ${response.statusText}`);
+      }
+    } catch (err) {
+      console.error("Failed to delete comment:", err);
+      setError(`Failed to delete comment: ${err}`);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background p-4">
