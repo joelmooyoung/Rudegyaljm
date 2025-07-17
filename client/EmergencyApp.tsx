@@ -20,9 +20,11 @@ interface Comment {
 }
 
 const EmergencyApp = () => {
-  const [stories, setStories] = useState<any[]>([]);
-  const [comments, setComments] = useState<any[]>([]);
-  const [storyComments, setStoryComments] = useState<any>({});
+  const [stories, setStories] = useState<Story[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [storyComments, setStoryComments] = useState<Record<string, Comment[]>>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
