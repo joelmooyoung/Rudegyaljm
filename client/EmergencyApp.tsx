@@ -55,10 +55,11 @@ const EmergencyApp = () => {
         setComments(commentsData.dateAnalysis || []);
       }
 
+      console.log("✅ LoadData completed successfully");
       setLoading(false);
     } catch (err) {
-      console.error("Load error:", err);
-      setError("Failed to load data");
+      console.error("❌ Load error:", err);
+      setError(`Failed to load data: ${err}`);
       setLoading(false);
     }
   };
