@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { User, UserCreateRequest, UserUpdateRequest } from "@shared/api";
 import { UserModel, ErrorLogModel, toUserResponse } from "../models";
 
