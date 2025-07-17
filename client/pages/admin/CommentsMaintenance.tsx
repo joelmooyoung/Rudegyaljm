@@ -238,11 +238,19 @@ export default function CommentsMaintenance({
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
                           <span>
-                            {comment.createdAt instanceof Date
-                              ? comment.createdAt.toLocaleDateString()
-                              : new Date(
-                                  comment.createdAt,
-                                ).toLocaleDateString()}
+                            {(() => {
+                              try {
+                                const date =
+                                  comment.createdAt instanceof Date
+                                    ? comment.createdAt
+                                    : new Date(comment.createdAt);
+                                return isNaN(date.getTime())
+                                  ? "Unknown date"
+                                  : date.toLocaleDateString();
+                              } catch {
+                                return "Unknown date";
+                              }
+                            })()}
                           </span>
                         </div>
                         <AlertDialog>
