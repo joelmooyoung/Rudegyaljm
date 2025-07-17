@@ -66,7 +66,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${story.id}`,
         );
         if (commentsResponse.ok) {
-          const commentsData = await commentsResponse.json();
+          const commentsResponseData = await commentsResponse.json();
+          const commentsData =
+            commentsResponseData.data || commentsResponseData || [];
+          console.log("Loaded comments for story:", commentsData);
           setComments(
             commentsData.map((comment: any) => ({
               ...comment,
