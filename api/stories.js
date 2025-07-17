@@ -180,6 +180,10 @@ export default async function handler(req, res) {
         if (req.body.category) updateFields.category = req.body.category;
         if (req.body.tags)
           updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
+        if (req.body.image !== undefined) updateFields.image = req.body.image;
+        if (req.body.excerpt) updateFields.excerpt = req.body.excerpt;
+        if (req.body.accessLevel)
+          updateFields.accessLevel = req.body.accessLevel;
         if (req.body.hasOwnProperty("published"))
           updateFields.published = req.body.published;
 
