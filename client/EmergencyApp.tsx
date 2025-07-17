@@ -13,7 +13,7 @@ const EmergencyApp = () => {
     loadData();
   }, []);
 
-  const loadData = async () => {
+    const loadData = async () => {
     try {
       // Load stories
       const storiesResponse = await fetch(`${API_BASE}/api/stories`);
@@ -28,13 +28,10 @@ const EmergencyApp = () => {
           const storyId = story.storyId || story.id || story._id;
           if (storyId) {
             try {
-              const commentsResponse = await fetch(
-                `${API_BASE}/api/stories/${storyId}/comments`,
-              );
+              const commentsResponse = await fetch(`${API_BASE}/api/stories/${storyId}/comments`);
               if (commentsResponse.ok) {
                 const storyCommentsData = await commentsResponse.json();
-                commentsMap[storyId] =
-                  storyCommentsData.data || storyCommentsData || [];
+                commentsMap[storyId] = storyCommentsData.data || storyCommentsData || [];
               }
             } catch (e) {
               console.log(`No comments for story ${storyId}`);
@@ -60,7 +57,7 @@ const EmergencyApp = () => {
     }
   };
 
-  const addComment = async (storyId: string, content: string) => {
+    const addComment = async (storyId: string, content: string) => {
     console.log("Adding comment:", { storyId, content });
 
     if (!storyId || storyId === "undefined") {
@@ -89,9 +86,7 @@ const EmergencyApp = () => {
         alert("Comment added successfully!");
         loadData(); // Reload data
       } else {
-        alert(
-          `Failed to add comment: ${result.message || response.statusText}`,
-        );
+        alert(`Failed to add comment: ${result.message || response.statusText}`);
       }
     } catch (err) {
       console.error("Comment error:", err);
@@ -99,7 +94,7 @@ const EmergencyApp = () => {
     }
   };
 
-  const updateStory = async (storyId: string, updates: any) => {
+    const updateStory = async (storyId: string, updates: any) => {
     console.log("Updating story:", { storyId, updates });
 
     if (!storyId || storyId === "undefined") {
@@ -107,7 +102,7 @@ const EmergencyApp = () => {
       return;
     }
 
-    try {
+        try {
       const response = await fetch(`${API_BASE}/api/stories/${storyId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -165,13 +160,45 @@ const EmergencyApp = () => {
               <strong>Author:</strong> {story.author}
             </p>
             <p>{story.content?.substring(0, 150)}...</p>
-            <p>
+                        <p>
               <small>
                 Views: {story.views} | Likes: {story.likeCount}
               </small>
             </p>
 
-            <button
+            {/* Display comments for this story */}
+            {(() => {
+              const storyId = story.storyId || story.id || story._id;
+              const comments = storyComments[storyId] || [];
+              return (
+                <div style={{ marginTop: "10px", fontSize: "14px" }}>
+                  <strong>Comments ({comments.length}):</strong>
+                  {comments.length > 0 ? (
+                    comments.map((comment: any, idx: number) => (
+                      <div
+                        key={idx}
+                        style={{
+                          background: "#444",
+                          padding: "8px",
+                          margin: "5px 0",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <strong>{comment.username}:</strong> {comment.comment}
+                        <br />
+                        <small style={{ color: "#aaa" }}>
+                          {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Recent"}
+                        </small>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ color: "#888", fontStyle: "italic" }}>No comments yet</div>
+                  )}
+                </div>
+              );
+            })()}</p>
+
+                        <button
               onClick={() => {
                 console.log("Story object:", story);
                 const storyId = story.storyId || story.id || story._id;
@@ -199,7 +226,7 @@ const EmergencyApp = () => {
               Edit Title
             </button>
 
-            <button
+                        <button
               onClick={() => {
                 const storyId = story.storyId || story.id || story._id;
                 console.log("Adding comment to story:", storyId);
