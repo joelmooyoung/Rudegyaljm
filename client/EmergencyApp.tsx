@@ -204,7 +204,7 @@ const EmergencyApp = () => {
                 <div style={{ marginTop: "10px", fontSize: "14px" }}>
                   <strong>Comments ({comments.length}):</strong>
                   {comments.length > 0 ? (
-                    comments.map((comment: any, idx: number) => (
+                    comments.map((comment: Comment, idx: number) => (
                       <div
                         key={idx}
                         style={{
