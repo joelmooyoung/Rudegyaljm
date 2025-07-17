@@ -29,6 +29,9 @@ const storySchema = new mongoose.Schema(
     author: { type: String, required: true },
     category: { type: String, required: true },
     tags: [{ type: String }],
+    image: { type: String }, // Base64 encoded image data or image URL
+    excerpt: { type: String }, // Short description/preview text
+    accessLevel: { type: String, enum: ["free", "premium"], default: "free" },
     published: { type: Boolean, default: false },
     featured: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
