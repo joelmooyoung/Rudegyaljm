@@ -202,7 +202,7 @@ const App = () => {
       let response;
       if (storyMode === "add") {
         // Create new story
-        response = await fetch("/api/stories", {
+        response = await makeApiRequest("/api/stories", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
