@@ -165,8 +165,19 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       });
 
       if (response.ok) {
+        const result = await response.json();
         setUserRating(rating);
-        // Refresh story stats to show updated rating
+
+        // Update local stats immediately with API response data
+        if (result.data) {
+          setStoryStats((prev) => ({
+            ...prev,
+            rating: result.data.averageRating || prev.rating,
+            ratingCount: result.data.ratingCount || prev.ratingCount,
+          }));
+        }
+
+        // Also refresh story stats to sync with server
         await refreshStoryStats();
       } else {
         console.error("Failed to submit rating");
