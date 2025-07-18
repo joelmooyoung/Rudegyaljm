@@ -333,8 +333,12 @@ const App = () => {
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch("/api/users", {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: userId }), // Send ID in body
       });
 
       if (response.ok) {
@@ -342,12 +346,17 @@ const App = () => {
         // Navigate back to user maintenance
         setCurrentView("admin-users");
       } else {
-        console.error("Failed to delete user:", response.statusText);
-        alert("Failed to delete user. Please try again.");
+        const errorData = await response.text();
+        console.error("Failed to delete user:", response.statusText, errorData);
+        alert(
+          `Failed to delete user: ${response.statusText}. Check console for details.`,
+        );
       }
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("Error deleting user. Please try again.");
+      alert(
+        `Error deleting user: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
