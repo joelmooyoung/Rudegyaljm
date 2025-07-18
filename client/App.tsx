@@ -145,11 +145,6 @@ const App = () => {
     console.log("✅ User authenticated:", user.username);
   };
 
-  const handleAuthenticated = (authenticatedUser: User) => {
-    setUser(authenticatedUser);
-    localStorage.setItem("token", "mock-token");
-  };
-
   const handleLogout = () => {
     setUser(null);
     setIsAgeVerified(false);
