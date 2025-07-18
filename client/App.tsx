@@ -152,8 +152,13 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem("token");
+    setIsAgeVerified(false);
     setCurrentView("home");
+    // Clear stored authentication data
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("age_verified");
+    console.log("✅ User logged out");
   };
 
   const handleNavigateToAdmin = (section: string) => {
