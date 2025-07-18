@@ -105,6 +105,21 @@ const errorLogSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// User Story Read Schema
+const userStoryReadSchema = new mongoose.Schema(
+  {
+    readId: { type: String, required: true, unique: true },
+    userId: { type: String, required: true },
+    username: { type: String, required: true },
+    storyId: { type: String, required: true },
+    storyTitle: { type: String, required: true },
+    ip: { type: String },
+    userAgent: { type: String },
+    timestamp: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+);
+
 // Indexes for better performance
 userSchema.index({ email: 1 });
 userSchema.index({ userId: 1 });
@@ -115,6 +130,10 @@ commentSchema.index({ storyId: 1 });
 commentSchema.index({ userId: 1 });
 likeSchema.index({ storyId: 1, userId: 1 }, { unique: true });
 ratingSchema.index({ storyId: 1, userId: 1 }, { unique: true });
+userStoryReadSchema.index({ userId: 1 });
+userStoryReadSchema.index({ storyId: 1 });
+userStoryReadSchema.index({ userId: 1, storyId: 1 });
+userStoryReadSchema.index({ timestamp: -1 });
 
 // Export models
 export const User = mongoose.models.User || mongoose.model("User", userSchema);
@@ -129,3 +148,6 @@ export const LoginLog =
   mongoose.models.LoginLog || mongoose.model("LoginLog", loginLogSchema);
 export const ErrorLog =
   mongoose.models.ErrorLog || mongoose.model("ErrorLog", errorLogSchema);
+export const UserStoryRead =
+  mongoose.models.UserStoryRead ||
+  mongoose.model("UserStoryRead", userStoryReadSchema);
