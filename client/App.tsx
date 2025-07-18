@@ -405,13 +405,8 @@ const App = () => {
     hostname: window.location.hostname,
   });
 
-  // Always skip age verification in Builder.io OR Vercel environment
-  if (
-    !isAgeVerified &&
-    !skipAgeVerification &&
-    !isBuilderEnvironment &&
-    !isVercelEnvironment
-  ) {
+  // Show age verification if user hasn't been verified yet
+  if (!isAgeVerified) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
