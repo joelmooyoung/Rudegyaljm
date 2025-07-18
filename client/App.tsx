@@ -330,7 +330,9 @@ const App = () => {
       }
     } catch (error) {
       console.error("Error saving user:", error);
-      alert("Error saving user. Please try again.");
+      alert(
+        `Error saving user: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
