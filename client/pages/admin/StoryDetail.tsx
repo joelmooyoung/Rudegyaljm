@@ -46,8 +46,8 @@ import { Story } from "@shared/api";
 // Image compression utility
 const compressImage = (
   file: File,
-  maxWidth: number = 800,
-  quality: number = 0.8,
+  maxWidth: number = 600,
+  quality: number = 0.6,
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
@@ -221,23 +221,20 @@ export default function StoryDetail({
     setImageFile(file);
 
     try {
-      // Convert file to base64
-      const imageData = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.onerror = () => reject(new Error("Failed to read file"));
-        reader.readAsDataURL(file);
-      });
+      // Compress image before upload
+      const compressedImageData = await compressImage(file, 600, 0.6);
 
-      // Upload to API
+      // Upload compressed image to API
       const response = await fetch("/api/upload-image.js", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageData: imageData,
+          imageData: compressedImageData,
           filename: file.name,
+          maxWidth: 600,
+          quality: 0.6,
         }),
       });
 
