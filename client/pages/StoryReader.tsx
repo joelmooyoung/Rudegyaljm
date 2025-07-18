@@ -69,6 +69,32 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           }));
         }
 
+        // Record user story read for logged-in users
+        if (user && user.id) {
+          try {
+            const readResponse = await fetch("/api/user-story-reads", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: user.id,
+                username: user.username || user.email,
+                storyId: story.id,
+                storyTitle: story.title,
+              }),
+            });
+
+            if (readResponse.ok) {
+              const readResult = await readResponse.json();
+              console.log(
+                `📚 Story read recorded: User ${user.username} has read ${readResult.data.totalReads} stories total`,
+              );
+            }
+          } catch (error) {
+            console.error("Failed to record story read:", error);
+            // Don't break the user experience if read tracking fails
+          }
+        }
+
         // Load comments using working API
         console.log("Loading comments for story:", story.id);
         const commentsResponse = await fetch(
