@@ -136,6 +136,15 @@ const App = () => {
     }
   };
 
+  const handleAuthenticated = (user: User) => {
+    setUser(user);
+    setIsAgeVerified(true);
+    // Store user data in localStorage for session persistence
+    localStorage.setItem("user", JSON.stringify(user));
+    sessionStorage.setItem("age_verified", "true");
+    console.log("✅ User authenticated:", user.username);
+  };
+
   const handleAuthenticated = (authenticatedUser: User) => {
     setUser(authenticatedUser);
     localStorage.setItem("token", "mock-token");
