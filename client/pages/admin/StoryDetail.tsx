@@ -249,7 +249,22 @@ export default function StoryDetail({
         const imageUrl = result.imageUrl;
         setImagePreview(imageUrl);
         handleInputChange("image", imageUrl);
-        console.log(`Image uploaded successfully: ${imageUrl}`);
+
+        // Show compression info if available
+        if (
+          result.compressionRatio &&
+          result.originalSize &&
+          result.compressedSize
+        ) {
+          console.log(
+            `Image uploaded and compressed successfully:\n` +
+              `Original: ${(result.originalSize / 1024).toFixed(1)}KB\n` +
+              `Compressed: ${(result.compressedSize / 1024).toFixed(1)}KB\n` +
+              `Saved: ${result.compressionRatio}`,
+          );
+        } else {
+          console.log(`Image uploaded successfully`);
+        }
       } else {
         throw new Error(result.message || "Upload failed");
       }
@@ -423,7 +438,7 @@ export default function StoryDetail({
                             : "Click to upload image"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          PNG, JPG, GIF, WebP up to 5MB
+                          PNG, JPG, GIF, WebP - Images will be compressed
                         </span>
                       </label>
                     </div>
