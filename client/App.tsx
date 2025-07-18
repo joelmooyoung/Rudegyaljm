@@ -49,6 +49,7 @@ const App = () => {
   const [currentStory, setCurrentStory] = useState<Story | null>(null);
   const [storyMode, setStoryMode] = useState<"add" | "edit">("add");
   const [readingStory, setReadingStory] = useState<Story | null>(null);
+  const [refreshStories, setRefreshStories] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
