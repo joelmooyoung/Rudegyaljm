@@ -88,10 +88,11 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
 
   const filteredLogs = logs.filter(
     (log) =>
-      log.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.ipAddress.includes(searchTerm) ||
-      log.country.toLowerCase().includes(searchTerm.toLowerCase()),
+      log.userId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.ipAddress?.includes(searchTerm) ||
+      log.country?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
