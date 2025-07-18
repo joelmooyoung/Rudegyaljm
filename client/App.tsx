@@ -394,49 +394,18 @@ const App = () => {
     );
   }
 
-  // For development, we'll skip age verification if a specific query param is present
-  const urlParams = new URLSearchParams(window.location.search);
-  const devParam = urlParams.get("dev") === "true";
-  const adminParam = urlParams.get("admin") === "true";
-
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
   const isVercelEnvironment = window.location.hostname.includes("vercel.app");
 
-  // Skip age verification for dev environments or admin access
-  const skipAgeVerification =
-    devParam || adminParam || isBuilderEnvironment || isVercelEnvironment;
-
   console.log("Age verification check:", {
     isAgeVerified,
-    skipAgeVerification,
     isBuilderEnvironment,
     isVercelEnvironment,
     hostname: window.location.hostname,
   });
 
-  // If we're skipping age verification but haven't set up the admin user yet
-  if (skipAgeVerification && !isAgeVerified) {
-    console.log("⚡ Bypassing age verification for admin access");
-    const adminUser: User = {
-      id: "admin-bypass-1",
-      email: "admin@app.com",
-      username: "Admin",
-      role: "admin",
-      isAgeVerified: true,
-      isActive: true,
-      subscriptionStatus: "active",
-      createdAt: new Date(),
-      lastLogin: new Date(),
-    };
-    setUser(adminUser);
-    setIsAgeVerified(true);
-    sessionStorage.setItem("age_verified", "true");
-    localStorage.setItem("token", "admin-bypass-token");
-  }
-
   // Show age verification if user hasn't been verified yet
-  // Skip age verification in dev mode or for admin access
-  if (!isAgeVerified && !skipAgeVerification) {
+  if (!isAgeVerified) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
