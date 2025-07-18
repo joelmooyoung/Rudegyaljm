@@ -26,16 +26,18 @@ export default async function handler(req, res) {
           .limit(100)
           .select("-__v");
 
-        // Transform to expected format
+        // Transform to expected format (map backend fields to frontend fields)
         const transformedLogs = logs.map((log) => ({
           id: log.logId,
           userId: log.userId,
           username: log.username,
-          ip: log.ip,
+          email: log.username, // Use username as email fallback since email isn't stored in LoginLog
+          ipAddress: log.ip, // Map ip to ipAddress
           country: log.country,
           userAgent: log.userAgent,
           success: log.success,
-          timestamp: log.timestamp,
+          createdAt: log.timestamp, // Map timestamp to createdAt
+          timestamp: log.timestamp, // Keep timestamp for backward compatibility
         }));
 
         console.log(`[LOGIN-LOGS API] Found ${transformedLogs.length} logs`);
