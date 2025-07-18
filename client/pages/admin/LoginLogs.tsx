@@ -219,9 +219,9 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
                   No login logs
                 </h3>
                 <p className="text-muted-foreground font-serif">
-                  {isLoading
-                    ? "Loading passionate login activity..."
-                    : "No successful login activity found"}
+                  {searchTerm
+                    ? "No login logs match your search criteria"
+                    : "No login logs found. Users will appear here when they log in."}
                 </p>
               </div>
             )}
