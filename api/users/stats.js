@@ -1,38 +1,48 @@
-// User statistics endpoint
-const users = [
-  { role: "admin", isActive: true },
-  { role: "premium", isActive: true },
-  { role: "free", isActive: true },
-  { role: "free", isActive: false },
-  { role: "premium", isActive: true },
-];
+import { connectToDatabase } from "../../lib/mongodb.js";
+import { User } from "../../models/index.js";
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
+    await connectToDatabase();
+
+    // Calculate user statistics
+    const totalUsers = await User.countDocuments();
+    const activeUsers = await User.countDocuments({ active: true });
+    const inactiveUsers = await User.countDocuments({ active: false });
+    const adminUsers = await User.countDocuments({ type: "admin" });
+    const premiumUsers = await User.countDocuments({ type: "premium" });
+    const freeUsers = await User.countDocuments({ type: "free" });
+
     const stats = {
-      totalUsers: users.length,
-      adminUsers: users.filter((u) => u.role === "admin").length,
-      premiumUsers: users.filter((u) => u.role === "premium").length,
-      activeUsers: users.filter((u) => u.isActive).length,
+      total: totalUsers,
+      active: activeUsers,
+      inactive: inactiveUsers,
+      admins: adminUsers,
+      premium: premiumUsers,
+      free: freeUsers,
+      activeSubscriptions: premiumUsers, // Assuming premium users have active subscriptions
+      expiredSubscriptions: 0, // Could be calculated based on subscription expiry dates
     };
 
-    res.json(stats);
+    return res.status(200).json(stats);
   } catch (error) {
-    console.error("Stats error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("User stats error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+      message: error.message,
+    });
   }
 }
