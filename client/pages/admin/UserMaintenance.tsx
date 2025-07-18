@@ -84,8 +84,13 @@ export default function UserMaintenance({
       ]);
 
       if (usersResponse.ok && statsResponse.ok) {
-        const usersData = await usersResponse.json();
+        const usersResponse_data = await usersResponse.json();
         const statsData = await statsResponse.json();
+
+        // Extract users array from API response
+        const usersData = usersResponse_data.success
+          ? usersResponse_data.data
+          : usersResponse_data;
 
         // Convert date strings back to Date objects
         const usersWithDates = (usersData || []).map((user: any) => ({
