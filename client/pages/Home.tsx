@@ -413,12 +413,6 @@ export default function Home({
                       <Users className="h-4 w-4 mr-2" />
                       User Management
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onNavigateToAdmin("seeding")}
-                    >
-                      <Database className="h-4 w-4 mr-2" />
-                      Database Seeding
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onNavigateToAdmin("login-logs")}
