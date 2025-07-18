@@ -73,8 +73,12 @@ export default async function handler(req, res) {
       });
 
       await newComment.save();
+
+      // Increment comment count on story
+      await Story.findOneAndUpdate({ storyId }, { $inc: { commentCount: 1 } });
+
       console.log(
-        `[COMMENTS API] ✅ Created comment ${commentId} for story ${storyId}`,
+        `[COMMENTS API] ✅ Created comment ${commentId} for story ${storyId} and incremented comment count`,
       );
 
       return res.status(201).json({
