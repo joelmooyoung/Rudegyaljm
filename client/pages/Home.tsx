@@ -141,6 +141,13 @@ export default function Home({
     fetchStories();
   }, []);
 
+  // Refresh stories when returning from story reader
+  useEffect(() => {
+    if (refreshTrigger && refreshTrigger > 0) {
+      fetchStories();
+    }
+  }, [refreshTrigger]);
+
   // Filter and sort stories
   const filteredStories = stories
     .filter((story) => {
