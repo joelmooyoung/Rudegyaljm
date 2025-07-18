@@ -222,11 +222,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       );
 
       if (response.ok) {
-        const newCommentData = await response.json();
+        const responseData = await response.json();
+        const newCommentData = responseData.data || responseData;
+
         const comment: Comment = {
-          ...newCommentData,
+          id: newCommentData.commentId,
+          userId: newCommentData.userId,
+          username: newCommentData.username,
+          comment: newCommentData.comment,
+          content: newCommentData.comment, // For compatibility
+          storyId: newCommentData.storyId,
           createdAt: new Date(newCommentData.createdAt),
-          updatedAt: new Date(newCommentData.updatedAt),
+          updatedAt: new Date(newCommentData.createdAt),
         };
         setComments([comment, ...comments]);
         setNewComment("");
