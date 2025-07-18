@@ -55,6 +55,7 @@ interface HomeProps {
   onNavigateToAbout?: () => void;
   onNavigateToContact?: () => void;
   onNavigateToHelp?: () => void;
+  refreshTrigger?: number;
 }
 
 export default function Home({
