@@ -110,12 +110,14 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     try {
       const statsResponse = await fetch(`/api/stories/${story.id}/stats`);
       if (statsResponse.ok) {
-        const stats = await statsResponse.json();
+        const response = await statsResponse.json();
+        const stats = response.data || response;
         setStoryStats((prev) => ({
-          rating: stats.averageRating,
-          ratingCount: stats.totalRatings,
-          viewCount: prev.viewCount, // Keep current view count, server handles increment
-          commentCount: stats.totalComments,
+          rating: stats.averageRating || prev.rating,
+          ratingCount: stats.ratingCount || prev.ratingCount,
+          viewCount: stats.viewCount || prev.viewCount,
+          commentCount: stats.commentCount || prev.commentCount,
+          likeCount: stats.likeCount || prev.likeCount,
         }));
       }
     } catch (error) {
