@@ -1,95 +1,20 @@
-<<<<<<< HEAD
-// User registration API with MongoDB integration
+import bcrypt from "bcryptjs";
 import { connectToDatabase } from "../../lib/mongodb.js";
 import { User } from "../../models/index.js";
 
 export default async function handler(req, res) {
   console.log(`[REGISTER API] ${req.method} /api/auth/register`);
-=======
-import bcrypt from "bcryptjs";
-import { db } from "../../lib/supabase.js";
-
-export default async function handler(req, res) {
-  console.log(`[AUTH REGISTER] ${req.method} /api/auth/register`);
->>>>>>> 5a56b8ea6e425b9ec097296fbb24a05ee5163ac4
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
   if (req.method !== "POST") {
-<<<<<<< HEAD
-    return res
-      .status(405)
-      .json({ success: false, message: "Method not allowed" });
-  }
-
-  try {
-    await connectToDatabase();
-
-    const { username, email, password, type = "free" } = req.body;
-    console.log(`[REGISTER API] Registration attempt for: ${email}`);
-
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Username, email and password are required",
-      });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
-    });
-
-    if (existingUser) {
-      console.log(`[REGISTER API] ❌ User already exists: ${email}`);
-      return res.status(409).json({
-        success: false,
-        message: "User with this email or username already exists",
-      });
-    }
-
-    // Create new user
-    const userId = Date.now().toString();
-    const newUser = new User({
-      userId,
-      username,
-      email,
-      password,
-      type,
-      country: "Unknown",
-      active: true,
-      loginCount: 0,
-    });
-
-    await newUser.save();
-    console.log(`[REGISTER API] ✅ Created user: ${username}`);
-
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user: {
-        userId: newUser.userId,
-        username: newUser.username,
-        email: newUser.email,
-        type: newUser.type,
-        country: newUser.country,
-        active: newUser.active,
-      },
-    });
-  } catch (error) {
-    console.error(`[REGISTER API] Error:`, error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-=======
     return res.status(405).json({
       success: false,
       message: "Method not allowed",
@@ -97,8 +22,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { username, email, password, role = "free" } = req.body;
-    console.log(`[AUTH REGISTER] Registration attempt for: ${username}`);
+    await connectToDatabase();
+
+    const { username, email, password, dateOfBirth, role = "free" } = req.body;
+    console.log(`[REGISTER API] Registration attempt for: ${email}`);
 
     // Validation
     if (!username || !email || !password) {
@@ -115,6 +42,21 @@ export default async function handler(req, res) {
       });
     }
 
+    // Validate age (must be 18+)
+    if (dateOfBirth) {
+      const birthDate = new Date(dateOfBirth);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (age < 18 || (age === 18 && monthDiff < 0)) {
+        return res.status(400).json({
+          success: false,
+          message: "You must be at least 18 years old to register",
+        });
+      }
+    }
+
     // Validate role
     const validRoles = ["admin", "premium", "free"];
     if (!validRoles.includes(role)) {
@@ -125,77 +67,62 @@ export default async function handler(req, res) {
     }
 
     // Check if user already exists
-    const existingUser = await db.getUserByUsername(username);
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }],
+    });
+
     if (existingUser) {
-      console.log(`[AUTH REGISTER] Username already exists: ${username}`);
+      console.log(`[REGISTER API] ❌ User already exists: ${email}`);
       return res.status(409).json({
         success: false,
-        message: "Username already exists",
+        message: "User with this email or username already exists",
       });
     }
 
     // Hash password
-    const saltRounds = 10;
+    const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create user
-    const newUser = await db.createUser({
+    // Create new user
+    const userId = Date.now().toString();
+    const newUser = new User({
+      userId,
       username,
       email,
-      password_hash: hashedPassword,
-      role,
-      country: "United States", // Default country
-      is_active: true,
+      password: hashedPassword,
+      type: role, // Map role to type for database
+      country: "Unknown",
+      active: true,
+      loginCount: 0,
     });
 
-    console.log(
-      `[AUTH REGISTER] ✅ User created successfully: ${username} (${role})`,
-    );
+    await newUser.save();
+    console.log(`[REGISTER API] ✅ Created user: ${username}`);
 
-    // Remove sensitive data
-    const { password_hash, ...userResponse } = newUser;
+    // Generate simple token (in production, use JWT)
+    const token = `auth_${newUser.userId}_${Date.now()}`;
 
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user: userResponse,
+      token: token,
+      user: {
+        id: newUser.userId,
+        email: newUser.email,
+        username: newUser.username,
+        role: newUser.type, // Map type back to role for frontend
+        isActive: newUser.active,
+        isAgeVerified: true,
+        subscriptionStatus: newUser.type === "premium" ? "active" : "none",
+        createdAt: newUser.createdAt,
+      },
     });
   } catch (error) {
-    console.error(`[AUTH REGISTER] Error:`, error);
-
-    // Log error to database
-    try {
-      await db.logError({
-        error_type: "REGISTER_ERROR",
-        error_message: error.message,
-        stack_trace: error.stack,
-        request_path: "/api/auth/register",
-      });
-    } catch (logError) {
-      console.error(`[AUTH REGISTER] Failed to log error:`, logError);
-    }
-
-    // Handle duplicate constraints
-    if (error.code === "23505") {
-      // PostgreSQL unique violation
-      if (error.detail?.includes("username")) {
-        return res.status(409).json({
-          success: false,
-          message: "Username already exists",
-        });
-      }
-      if (error.detail?.includes("email")) {
-        return res.status(409).json({
-          success: false,
-          message: "Email already exists",
-        });
-      }
-    }
-
+    console.error(`[REGISTER API] Error:`, error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
->>>>>>> 5a56b8ea6e425b9ec097296fbb24a05ee5163ac4
+      error: error.message,
     });
   }
 }
