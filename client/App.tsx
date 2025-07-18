@@ -20,6 +20,7 @@ import UserDetail from "./pages/admin/UserDetail";
 import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
+import UserReadingStats from "./pages/admin/UserReadingStats";
 
 import { User, Story } from "@shared/api";
 
@@ -501,6 +502,8 @@ const App = () => {
         return <LoginLogs onBack={handleBackToHome} />;
       case "admin-error-logs":
         return <ErrorLogs onBack={handleBackToHome} />;
+      case "admin-reading-stats":
+        return <UserReadingStats onBack={handleBackToHome} />;
 
       case "about":
         return <About onBack={handleBackToHome} />;
