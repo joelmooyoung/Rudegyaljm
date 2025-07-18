@@ -45,8 +45,14 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
     try {
       const response = await fetch("/api/admin/login-logs");
       if (response.ok) {
-        const data = await response.json();
-        setLogs(data);
+        const responseData = await response.json();
+        // Extract logs array from API response
+        const logsData = responseData.success
+          ? responseData.data
+          : responseData;
+        setLogs(logsData || []);
+      } else {
+        console.error("Failed to fetch login logs:", response.statusText);
       }
     } catch (error) {
       console.error("Failed to fetch login logs:", error);
