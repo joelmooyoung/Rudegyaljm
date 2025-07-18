@@ -74,7 +74,8 @@ export default async function handler(req, res) {
           rating: story.averageRating,
           ratingCount: story.ratingCount,
           viewCount: story.views,
-          commentCount: 0, // Will be calculated separately if needed
+          commentCount: story.commentCount || 0,
+          likeCount: story.likeCount || 0,
           image: story.image, // Use actual image from database
           createdAt: story.createdAt,
           updatedAt: story.updatedAt,
