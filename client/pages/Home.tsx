@@ -422,6 +422,12 @@ export default function Home({
                       <Users className="h-4 w-4 mr-2" />
                       User Management
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("reading-stats")}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Reading Statistics
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onNavigateToAdmin("login-logs")}
