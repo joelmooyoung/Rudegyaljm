@@ -65,9 +65,25 @@ export default async function handler(req, res) {
         "featured",
       ];
 
+      // Handle statistics fields with mapping
+      const statisticsMapping = {
+        viewCount: "views",
+        rating: "averageRating",
+        ratingCount: "ratingCount",
+      };
+
       for (const field of allowedFields) {
         if (req.body[field] !== undefined) {
           updateFields[field] = req.body[field];
+        }
+      }
+
+      // Handle statistics fields separately
+      for (const [frontendField, dbField] of Object.entries(
+        statisticsMapping,
+      )) {
+        if (req.body[frontendField] !== undefined) {
+          updateFields[dbField] = req.body[frontendField];
         }
       }
 
