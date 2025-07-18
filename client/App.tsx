@@ -410,7 +410,8 @@ const App = () => {
   });
 
   // Show age verification if user hasn't been verified yet
-  if (!isAgeVerified) {
+  // Skip age verification in dev mode or for admin access
+  if (!isAgeVerified && !skipAgeVerification) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
