@@ -156,7 +156,14 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {filteredLogs.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-muted-foreground font-serif">
+                  Loading login logs...
+                </p>
+              </div>
+            ) : filteredLogs.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
