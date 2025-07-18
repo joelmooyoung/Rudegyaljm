@@ -396,10 +396,15 @@ const App = () => {
 
   // For development, we'll skip age verification if a specific query param is present
   const urlParams = new URLSearchParams(window.location.search);
-  const skipAgeVerification = urlParams.get("dev") === "true";
+  const devParam = urlParams.get("dev") === "true";
+  const adminParam = urlParams.get("admin") === "true";
 
   const isBuilderEnvironment = window.location.hostname.includes("builder.my");
   const isVercelEnvironment = window.location.hostname.includes("vercel.app");
+
+  // Skip age verification for dev environments or admin access
+  const skipAgeVerification =
+    devParam || adminParam || isBuilderEnvironment || isVercelEnvironment;
 
   console.log("Age verification check:", {
     isAgeVerified,
