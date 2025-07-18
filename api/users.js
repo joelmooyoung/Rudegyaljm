@@ -1,6 +1,7 @@
 // Users management API with MongoDB integration
 import { connectToDatabase } from "../lib/mongodb.js";
 import { User } from "../models/index.js";
+import bcrypt from "bcryptjs";
 
 export default async function handler(req, res) {
   console.log(`[USERS API] ${req.method} /api/users`);
@@ -29,17 +30,18 @@ export default async function handler(req, res) {
           .sort({ createdAt: -1 })
           .select("-password -__v");
 
-        // Transform to expected format
+        // Transform to expected format (map database fields to frontend fields)
         const transformedUsers = users.map((user) => ({
           id: user.userId,
           username: user.username,
           email: user.email,
-          type: user.type,
+          role: user.type, // Map type to role
+          isActive: user.active, // Map active to isActive
           country: user.country,
-          active: user.active,
           lastLogin: user.lastLogin,
           loginCount: user.loginCount,
-          joinedAt: user.createdAt,
+          createdAt: user.createdAt, // Use createdAt instead of joinedAt
+          subscriptionStatus: user.type === "premium" ? "active" : "none",
         }));
 
         console.log(`[USERS API] Found ${transformedUsers.length} users`);
@@ -51,7 +53,16 @@ export default async function handler(req, res) {
 
       case "POST":
         console.log(`[USERS API] Creating new user`);
-        const { username, email, password, type = "free" } = req.body;
+
+        // Map frontend fields to backend fields
+        const {
+          username,
+          email,
+          password,
+          role = "free", // Frontend sends 'role'
+          isActive = true, // Frontend sends 'isActive'
+          country = "Unknown",
+        } = req.body;
 
         if (!username || !email || !password) {
           return res.status(400).json({
@@ -72,21 +83,26 @@ export default async function handler(req, res) {
           });
         }
 
+        // Hash password
+        const saltRounds = 12;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const userId = Date.now().toString();
         const newUser = new User({
           userId,
           username,
           email,
-          password,
-          type,
-          country: "Unknown",
-          active: true,
+          password: hashedPassword, // Store hashed password
+          type: role, // Map role to type for database
+          active: isActive, // Map isActive to active for database
+          country,
           loginCount: 0,
         });
 
         await newUser.save();
         console.log(`[USERS API] ✅ Created user: ${username}`);
 
+        // Return transformed data
         return res.status(201).json({
           success: true,
           message: "User created successfully",
@@ -94,8 +110,11 @@ export default async function handler(req, res) {
             id: newUser.userId,
             username: newUser.username,
             email: newUser.email,
-            type: newUser.type,
-            active: newUser.active,
+            role: newUser.type, // Map back to frontend format
+            isActive: newUser.active, // Map back to frontend format
+            country: newUser.country,
+            createdAt: newUser.createdAt,
+            subscriptionStatus: newUser.type === "premium" ? "active" : "none",
           },
         });
 
@@ -118,13 +137,23 @@ export default async function handler(req, res) {
           });
         }
 
-        // Update fields
+        // Update fields with proper field mapping
         const updateFields = {};
         if (req.body.username) updateFields.username = req.body.username;
         if (req.body.email) updateFields.email = req.body.email;
-        if (req.body.type) updateFields.type = req.body.type;
-        if (req.body.hasOwnProperty("active"))
-          updateFields.active = req.body.active;
+        if (req.body.role) updateFields.type = req.body.role; // Map role to type
+        if (req.body.hasOwnProperty("isActive"))
+          updateFields.active = req.body.isActive; // Map isActive to active
+        if (req.body.country) updateFields.country = req.body.country;
+
+        // Hash password if provided
+        if (req.body.password) {
+          const saltRounds = 12;
+          updateFields.password = await bcrypt.hash(
+            req.body.password,
+            saltRounds,
+          );
+        }
 
         const updatedUser = await User.findOneAndUpdate(
           { userId: updateId },
@@ -134,6 +163,7 @@ export default async function handler(req, res) {
 
         console.log(`[USERS API] ✅ Updated user ${updateId}`);
 
+        // Return transformed data
         return res.status(200).json({
           success: true,
           message: "User updated successfully",
@@ -141,8 +171,12 @@ export default async function handler(req, res) {
             id: updatedUser.userId,
             username: updatedUser.username,
             email: updatedUser.email,
-            type: updatedUser.type,
-            active: updatedUser.active,
+            role: updatedUser.type, // Map back to frontend format
+            isActive: updatedUser.active, // Map back to frontend format
+            country: updatedUser.country,
+            createdAt: updatedUser.createdAt,
+            subscriptionStatus:
+              updatedUser.type === "premium" ? "active" : "none",
           },
         });
 
