@@ -123,6 +123,20 @@ export default function AgeVerificationSimple({
               >
                 Skip for Testing
               </Button>
+
+              {/* Admin access bypass */}
+              <Button
+                onClick={() => {
+                  // Set admin mode in URL and reload
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("admin", "true");
+                  window.location.href = url.toString();
+                }}
+                variant="ghost"
+                className="w-full text-xs text-blue-400 hover:text-blue-300"
+              >
+                Admin Access
+              </Button>
             </div>
 
             <div className="text-xs text-gray-400 text-center space-y-1">
