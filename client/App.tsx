@@ -282,6 +282,16 @@ const App = () => {
 
   const handleSaveUser = async (userData: Partial<User>) => {
     try {
+      // Transform frontend data to backend format
+      const backendData = {
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role || "free", // Frontend uses 'role'
+        isActive: userData.isActive !== undefined ? userData.isActive : true, // Frontend uses 'isActive'
+        country: userData.country || "Unknown",
+      };
+
       let response;
       if (userMode === "add") {
         // Create new user
@@ -290,16 +300,19 @@ const App = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(backendData),
         });
       } else {
-        // Update existing user
-        response = await fetch(`/api/users/${userData.id}`, {
+        // Update existing user - include ID in body for main API
+        response = await fetch("/api/users", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify({
+            ...backendData,
+            id: userData.id, // Include ID in body for main API
+          }),
         });
       }
 
