@@ -1,7 +1,7 @@
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "5mb",
+      sizeLimit: "3mb", // Reduced from 5mb since we're compressing
     },
   },
 };
@@ -79,11 +79,11 @@ export default async function handler(req, res) {
     const buffer = Buffer.from(base64Data, "base64");
     const originalSize = buffer.length;
 
-    // Validate file size (2MB limit for compressed images)
-    if (buffer.length > 2 * 1024 * 1024) {
+    // Validate file size (1.5MB limit for compressed images)
+    if (buffer.length > 1.5 * 1024 * 1024) {
       return res.status(400).json({
         error:
-          "Image too large even after compression. Please choose a smaller image or compress it further.",
+          "Image too large. Please ensure your image is compressed to under 1.5MB.",
       });
     }
 
