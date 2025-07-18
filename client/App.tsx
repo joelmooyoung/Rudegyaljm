@@ -322,8 +322,11 @@ const App = () => {
         // Navigate back to user maintenance
         setCurrentView("admin-users");
       } else {
-        console.error("Failed to save user:", response.statusText);
-        alert("Failed to save user. Please try again.");
+        const errorData = await response.text();
+        console.error("Failed to save user:", response.statusText, errorData);
+        alert(
+          `Failed to save user: ${response.statusText}. Check console for details.`,
+        );
       }
     } catch (error) {
       console.error("Error saving user:", error);
