@@ -228,6 +228,9 @@ const App = () => {
             excerpt: storyData.excerpt,
             accessLevel: storyData.accessLevel || "free",
             published: storyData.isPublished || false,
+            viewCount: storyData.viewCount || 0,
+            rating: storyData.rating || 0,
+            ratingCount: storyData.ratingCount || 0,
           }),
         });
       } else {
@@ -252,6 +255,9 @@ const App = () => {
             excerpt: storyData.excerpt,
             accessLevel: storyData.accessLevel || "free",
             published: storyData.isPublished || false,
+            viewCount: storyData.viewCount || 0,
+            rating: storyData.rating || 0,
+            ratingCount: storyData.ratingCount || 0,
           }),
         });
       }
