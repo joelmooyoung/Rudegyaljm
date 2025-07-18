@@ -64,16 +64,20 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
   const clearLogs = async () => {
     if (confirm("Are you sure you want to clear all login logs?")) {
       try {
-        const response = await fetch("/api/admin/clear-logs", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "login" }),
+        const response = await fetch("/api/admin/login-logs", {
+          method: "DELETE",
         });
         if (response.ok) {
+          const result = await response.json();
+          console.log("Logs cleared:", result.message);
           setLogs([]);
+        } else {
+          console.error("Failed to clear logs:", response.statusText);
+          alert("Failed to clear logs. Please try again.");
         }
       } catch (error) {
         console.error("Failed to clear logs:", error);
+        alert("Error clearing logs. Please try again.");
       }
     }
   };
