@@ -127,6 +127,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       if (response.ok) {
         const result = await response.json();
         setIsLiked(result.liked);
+
+        // Update local stats immediately
+        setStoryStats((prev) => ({
+          ...prev,
+          // likeCount should reflect the actual count from the API response
+          likeCount:
+            result.likeCount ||
+            (result.liked ? prev.likeCount + 1 : prev.likeCount - 1),
+        }));
+
+        // Also refresh story stats to sync with server
+        await refreshStoryStats();
       } else {
         console.error("Failed to toggle like");
       }
