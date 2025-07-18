@@ -66,6 +66,7 @@ export default function Home({
   onNavigateToAbout,
   onNavigateToContact,
   onNavigateToHelp,
+  refreshTrigger,
 }: HomeProps) {
   const [stories, setStories] = useState<Story[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
