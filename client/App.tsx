@@ -97,11 +97,6 @@ const App = () => {
       sessionStorage.setItem("age_verified", "true");
       localStorage.setItem("token", "dev-admin-token");
 
-      // If admin-seeding in hash, navigate there directly
-      if (adminHash) {
-        setCurrentView("admin-seeding");
-      }
-
       console.log("Dev mode activated, admin user created");
     } else {
       // Check if user has already been age verified in this session
