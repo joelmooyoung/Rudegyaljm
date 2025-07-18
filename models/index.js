@@ -36,6 +36,7 @@ const storySchema = new mongoose.Schema(
     featured: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
     likeCount: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
     averageRating: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
   },
