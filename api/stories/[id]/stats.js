@@ -1,13 +1,16 @@
-// Story stats API - get comprehensive story statistics
+// Get current story statistics
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Story, Like, Comment, Rating } from "../../../models/index.js";
+
 export default async function handler(req, res) {
   const { id: storyId } = req.query;
 
-  console.log(`[STATS API] GET /api/stories/${storyId}/stats`);
+  console.log(`[STORY STATS API] ${req.method} /api/stories/${storyId}/stats`);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -16,24 +19,52 @@ export default async function handler(req, res) {
   if (req.method !== "GET") {
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} not allowed`,
+      message: "Method not allowed",
     });
   }
 
   try {
-    // Mock stats data - in production this would come from database
+    await connectToDatabase();
+
+    // Get story from database
+    const story = await Story.findOne({ storyId });
+    if (!story) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    // Get actual counts from related collections to ensure accuracy
+    const [likeCount, commentCount, ratingCount] = await Promise.all([
+      Like.countDocuments({ storyId }),
+      Comment.countDocuments({ storyId }),
+      Rating.countDocuments({ storyId }),
+    ]);
+
+    // Calculate average rating
+    const ratings = await Rating.find({ storyId });
+    let averageRating = 0;
+    if (ratings.length > 0) {
+      const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+      averageRating = Math.round((sum / ratings.length) * 10) / 10;
+    }
+
     const stats = {
       storyId,
-      views: Math.floor(Math.random() * 10000) + 1000,
-      likes: Math.floor(Math.random() * 500) + 50,
-      comments: Math.floor(Math.random() * 100) + 10,
-      averageRating: (Math.random() * 2 + 3).toFixed(1), // 3.0 - 5.0
-      ratingCount: Math.floor(Math.random() * 200) + 20,
-      shares: Math.floor(Math.random() * 50) + 5,
-      bookmarks: Math.floor(Math.random() * 100) + 15,
+      viewCount: story.views || 0,
+      likeCount,
+      commentCount,
+      averageRating,
+      ratingCount,
+      totalComments: commentCount, // Alias for compatibility
+      totalRatings: ratingCount, // Alias for compatibility
     };
 
-    console.log(`[STATS API] ✅ Retrieved stats for story ${storyId}`);
+    console.log(
+      `[STORY STATS API] ✅ Retrieved stats for story ${storyId}:`,
+      stats,
+    );
 
     return res.status(200).json({
       success: true,
@@ -41,7 +72,7 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error(`[STATS API] Error:`, error);
+    console.error(`[STORY STATS API] Error:`, error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
