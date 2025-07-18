@@ -29,8 +29,6 @@ import {
   Star,
   Calendar,
   MessageSquare,
-  Image,
-  Loader2,
 } from "lucide-react";
 import { Story } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
@@ -51,7 +49,6 @@ export default function StoryMaintenance({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-  const [isCompressing, setIsCompressing] = useState(false);
 
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
@@ -191,51 +188,6 @@ export default function StoryMaintenance({
     return div.textContent || div.innerText || "";
   };
 
-  const handleCompressImages = async () => {
-    if (
-      !confirm(
-        "This will compress all existing story images to reduce database size. This action cannot be undone. Continue?",
-      )
-    ) {
-      return;
-    }
-
-    setIsCompressing(true);
-    try {
-      const response = await fetch("/api/compress-existing-images", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert(
-          `Image compression completed!\n\n` +
-            `Stories processed: ${result.stats.totalStories}\n` +
-            `Stories compressed: ${result.stats.storiesCompressed}\n` +
-            `Space saved: ${(result.stats.totalSaved / 1024 / 1024).toFixed(2)}MB\n` +
-            `Compression ratio: ${result.stats.compressionRatio}`,
-        );
-        // Refresh the stories list
-        fetchStories();
-      } else {
-        const errorData = await response.json();
-        alert(
-          `Failed to compress images: ${errorData.error || response.statusText}`,
-        );
-      }
-    } catch (error) {
-      console.error("Error compressing images:", error);
-      alert(
-        `Error compressing images: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
-    } finally {
-      setIsCompressing(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -256,18 +208,6 @@ export default function StoryMaintenance({
               </Badge>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={handleCompressImages}
-                disabled={isCompressing}
-              >
-                {isCompressing ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Image className="h-4 w-4 mr-2" />
-                )}
-                {isCompressing ? "Compressing..." : "Compress Images"}
-              </Button>
               <Button variant="outline" onClick={onCommentsMaintenance}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Comments
