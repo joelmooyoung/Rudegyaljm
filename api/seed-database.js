@@ -181,6 +181,57 @@ A chance encounter at the beach resort would lead to seven days of unbridled pas
     const createdComments = await Comment.insertMany(comments);
     console.log(`✅ Created ${createdComments.length} comments`);
 
+    // Create sample login logs
+    console.log("🔐 Creating sample login logs...");
+    const loginLogs = [
+      {
+        logId: "log1",
+        userId: "admin1",
+        username: "admin",
+        ip: "192.168.1.100",
+        country: "United States",
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        success: true,
+        timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+      },
+      {
+        logId: "log2",
+        userId: "premium1",
+        username: "premiumuser",
+        ip: "203.0.113.45",
+        country: "Canada",
+        userAgent:
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
+        success: true,
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+      },
+      {
+        logId: "log3",
+        userId: "free1",
+        username: "freeuser",
+        ip: "198.51.100.123",
+        country: "United Kingdom",
+        userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+        success: true,
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
+      },
+      {
+        logId: "log4",
+        userId: "premium1",
+        username: "premiumuser",
+        ip: "203.0.113.45",
+        country: "Canada",
+        userAgent:
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
+        success: false,
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago (failed login)
+      },
+    ];
+
+    const createdLoginLogs = await LoginLog.insertMany(loginLogs);
+    console.log(`✅ Created ${createdLoginLogs.length} login logs`);
+
     // Return success response
     res.status(200).json({
       success: true,
