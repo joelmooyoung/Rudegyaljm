@@ -49,16 +49,25 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     const loadInitialData = async () => {
       try {
         // Increment view count
-        await fetch(`/api/stories/${story.id}/view`, {
+        const viewResponse = await fetch(`/api/stories/${story.id}/view`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });
 
         // Update local view count
-        setStoryStats((prev) => ({
-          ...prev,
-          viewCount: prev.viewCount + 1,
-        }));
+        if (viewResponse.ok) {
+          const viewResult = await viewResponse.json();
+          setStoryStats((prev) => ({
+            ...prev,
+            viewCount: viewResult.data?.viewCount || prev.viewCount + 1,
+          }));
+        } else {
+          // Fallback to local increment if API fails
+          setStoryStats((prev) => ({
+            ...prev,
+            viewCount: prev.viewCount + 1,
+          }));
+        }
 
         // Load comments using working API
         console.log("Loading comments for story:", story.id);
