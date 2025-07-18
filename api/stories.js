@@ -100,6 +100,9 @@ export default async function handler(req, res) {
           excerpt,
           accessLevel = "free",
           published = false,
+          viewCount = 0,
+          rating = 0,
+          ratingCount = 0,
         } = req.body;
 
         if (!title || !content || !author || !category) {
@@ -123,10 +126,10 @@ export default async function handler(req, res) {
           accessLevel,
           published,
           featured: false,
-          views: 0,
+          views: viewCount,
           likeCount: 0,
-          averageRating: 0,
-          ratingCount: 0,
+          averageRating: rating,
+          ratingCount: ratingCount,
         });
 
         await newStory.save();
@@ -187,6 +190,12 @@ export default async function handler(req, res) {
           updateFields.accessLevel = req.body.accessLevel;
         if (req.body.hasOwnProperty("published"))
           updateFields.published = req.body.published;
+        if (req.body.hasOwnProperty("viewCount"))
+          updateFields.views = req.body.viewCount;
+        if (req.body.hasOwnProperty("rating"))
+          updateFields.averageRating = req.body.rating;
+        if (req.body.hasOwnProperty("ratingCount"))
+          updateFields.ratingCount = req.body.ratingCount;
 
         const updatedStory = await Story.findOneAndUpdate(
           { storyId: updateId },
