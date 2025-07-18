@@ -20,7 +20,6 @@ import UserDetail from "./pages/admin/UserDetail";
 import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
-import DatabaseSeeding from "./pages/DatabaseSeeding";
 
 import { User, Story } from "@shared/api";
 
