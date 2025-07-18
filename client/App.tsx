@@ -499,8 +499,7 @@ const App = () => {
         return <LoginLogs onBack={handleBackToHome} />;
       case "admin-error-logs":
         return <ErrorLogs onBack={handleBackToHome} />;
-      case "admin-seeding":
-        return <DatabaseSeeding />;
+
       case "about":
         return <About onBack={handleBackToHome} />;
       case "contact":
