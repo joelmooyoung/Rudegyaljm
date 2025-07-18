@@ -186,6 +186,8 @@ const App = () => {
   const handleBackFromReader = () => {
     setReadingStory(null);
     setCurrentView("home");
+    // Set a flag to trigger stories refresh in Home component
+    setRefreshStories(Date.now());
   };
 
   const handleNavigateToAbout = () => {
