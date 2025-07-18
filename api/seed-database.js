@@ -240,6 +240,7 @@ A chance encounter at the beach resort would lead to seven days of unbridled pas
         users: createdUsers.length,
         stories: createdStories.length,
         comments: createdComments.length,
+        loginLogs: createdLoginLogs.length,
       },
       testAccounts: {
         admin: { email: "admin@nocturne.com", password: "admin123" },
