@@ -86,6 +86,16 @@ export default function UserDetail({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Password change states
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordChangeResult, setPasswordChangeResult] = useState<
+    string | null
+  >(null);
+  const [copiedPassword, setCopiedPassword] = useState(false);
+
   useEffect(() => {
     if (user && mode === "edit") {
       setFormData({
