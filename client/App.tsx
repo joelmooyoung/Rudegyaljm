@@ -446,6 +446,7 @@ const App = () => {
           user={user}
           onLogout={handleLogout}
           onNavigateToAdmin={handleNavigateToAdmin}
+          onNavigateToProfile={handleNavigateToProfile}
         />
       );
     }
@@ -484,6 +485,7 @@ const App = () => {
             onNavigateToAbout={handleNavigateToAbout}
             onNavigateToContact={handleNavigateToContact}
             onNavigateToHelp={handleNavigateToHelp}
+            onNavigateToProfile={handleNavigateToProfile}
           />
         );
       case "admin-comments":
@@ -540,6 +542,7 @@ const App = () => {
             onNavigateToAbout={handleNavigateToAbout}
             onNavigateToContact={handleNavigateToContact}
             onNavigateToHelp={handleNavigateToHelp}
+            onNavigateToProfile={handleNavigateToProfile}
           />
         );
     }
