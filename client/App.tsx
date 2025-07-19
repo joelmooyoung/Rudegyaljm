@@ -205,6 +205,12 @@ const App = () => {
     setCurrentView("help");
   };
 
+  const handleNavigateToProfile = (section: string) => {
+    if (section === "change-password") {
+      setCurrentView("change-password");
+    }
+  };
+
   const handleSaveStory = async (storyData: Partial<Story>) => {
     try {
       let response;
