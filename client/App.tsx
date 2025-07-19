@@ -21,6 +21,7 @@ import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
 import UserReadingStats from "./pages/admin/UserReadingStats";
+import ChangePassword from "./pages/ChangePassword";
 
 import { User, Story } from "@shared/api";
 
@@ -504,6 +505,17 @@ const App = () => {
         return <ErrorLogs onBack={handleBackToHome} />;
       case "admin-reading-stats":
         return <UserReadingStats onBack={handleBackToHome} />;
+      case "change-password":
+        return (
+          <ChangePassword
+            user={user!}
+            onBack={handleBackToHome}
+            onPasswordChanged={() => {
+              // Could show a success message or logout user to force re-login
+              console.log("Password changed successfully");
+            }}
+          />
+        );
 
       case "about":
         return <About onBack={handleBackToHome} />;
