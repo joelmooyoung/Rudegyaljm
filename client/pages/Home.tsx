@@ -56,6 +56,7 @@ interface HomeProps {
   onNavigateToAbout?: () => void;
   onNavigateToContact?: () => void;
   onNavigateToHelp?: () => void;
+  onNavigateToProfile?: (section: string) => void;
   refreshTrigger?: number;
 }
 
@@ -67,6 +68,7 @@ export default function Home({
   onNavigateToAbout,
   onNavigateToContact,
   onNavigateToHelp,
+  onNavigateToProfile,
   refreshTrigger,
 }: HomeProps) {
   const [stories, setStories] = useState<Story[]>([]);
@@ -373,28 +375,53 @@ export default function Home({
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <User className="h-4 w-4" />
-                <span className="font-serif">{user.username}</span>
-                <Badge
-                  variant={user.role === "premium" ? "default" : "secondary"}
-                  className={
-                    user.role === "premium"
-                      ? "bg-seductive-gradient text-primary-foreground passionate-glow"
-                      : user.role === "admin"
-                        ? "bg-destructive text-destructive-foreground"
-                        : ""
-                  }
-                >
-                  {user.role === "premium" && (
-                    <Crown className="h-3 w-3 mr-1" />
-                  )}
-                  {user.role === "admin" && (
-                    <Settings className="h-3 w-3 mr-1" />
-                  )}
-                  {user.role}
-                </Badge>
-              </div>
+              {/* User Profile Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="font-serif">{user.username}</span>
+                    <Badge
+                      variant={
+                        user.role === "premium" ? "default" : "secondary"
+                      }
+                      className={
+                        user.role === "premium"
+                          ? "bg-seductive-gradient text-primary-foreground passionate-glow"
+                          : user.role === "admin"
+                            ? "bg-destructive text-destructive-foreground"
+                            : ""
+                      }
+                    >
+                      {user.role === "premium" && (
+                        <Crown className="h-3 w-3 mr-1" />
+                      )}
+                      {user.role === "admin" && (
+                        <Settings className="h-3 w-3 mr-1" />
+                      )}
+                      {user.role}
+                    </Badge>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => onNavigateToProfile?.("change-password")}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Change Password
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Admin Menu */}
               {user.role === "admin" && onNavigateToAdmin && (
@@ -445,11 +472,6 @@ export default function Home({
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-
-              <Button variant="ghost" size="sm" onClick={onLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
             </div>
           </div>
         </div>
