@@ -169,6 +169,90 @@ export default function UserDetail({
     }
   };
 
+  const generateStrongPassword = () => {
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+    // Ensure at least one character from each category
+    let password = "";
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+
+    // Fill the rest randomly
+    const allChars = uppercase + lowercase + numbers + symbols;
+    for (let i = password.length; i < 16; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+
+    // Shuffle the password to avoid predictable patterns
+    return password
+      .split("")
+      .sort(() => Math.random() - 0.5)
+      .join("");
+  };
+
+  const handleGeneratePassword = () => {
+    const generated = generateStrongPassword();
+    setNewPassword(generated);
+    setGeneratedPassword(generated);
+  };
+
+  const handleChangePassword = async () => {
+    if (!user || !newPassword) return;
+
+    setIsChangingPassword(true);
+    setPasswordChangeResult(null);
+
+    try {
+      const response = await fetch("/api/admin/change-user-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          adminUserId: "admin-current", // Should be current admin user ID
+          targetUserId: user.id,
+          newPassword: newPassword,
+          generatePassword: false,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setPasswordChangeResult(
+          `Password changed successfully for ${user.username}`,
+        );
+        setNewPassword("");
+        setGeneratedPassword("");
+      } else {
+        throw new Error(result.message || "Failed to change password");
+      }
+    } catch (err) {
+      setPasswordChangeResult(
+        `Error: ${err instanceof Error ? err.message : "Failed to change password"}`,
+      );
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const copyPasswordToClipboard = async () => {
+    if (!generatedPassword) return;
+
+    try {
+      await navigator.clipboard.writeText(generatedPassword);
+      setCopiedPassword(true);
+      setTimeout(() => setCopiedPassword(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy password:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
