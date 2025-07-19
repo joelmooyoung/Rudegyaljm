@@ -559,7 +559,119 @@ export default function UserDetail({
 
               {/* Action Buttons */}
               <div className="flex justify-between pt-6">
-                <div>
+                <div className="flex gap-3">
+                  {mode === "edit" && user && (
+                    <Dialog
+                      open={isPasswordDialogOpen}
+                      onOpenChange={setIsPasswordDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button variant="outline">
+                          <Key className="h-4 w-4 mr-2" />
+                          Change Password
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Change User Password</DialogTitle>
+                          <DialogDescription>
+                            Change password for <strong>{user.username}</strong>
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="new-password">New Password</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                id="new-password"
+                                type="text"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Enter new password"
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleGeneratePassword}
+                              >
+                                <RefreshCw className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {generatedPassword && (
+                            <div className="space-y-2">
+                              <Label>Generated Password</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="text"
+                                  value={generatedPassword}
+                                  readOnly
+                                  className="flex-1 font-mono text-sm"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={copyPasswordToClipboard}
+                                >
+                                  {copiedPassword ? (
+                                    <Check className="h-4 w-4" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                Make sure to copy this password as it won't be
+                                shown again.
+                              </p>
+                            </div>
+                          )}
+
+                          {passwordChangeResult && (
+                            <div
+                              className={`p-3 rounded text-sm ${
+                                passwordChangeResult.startsWith("Error")
+                                  ? "bg-destructive/10 text-destructive"
+                                  : "bg-green-500/10 text-green-600"
+                              }`}
+                            >
+                              {passwordChangeResult}
+                            </div>
+                          )}
+
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsPasswordDialogOpen(false);
+                                setNewPassword("");
+                                setGeneratedPassword("");
+                                setPasswordChangeResult(null);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleChangePassword}
+                              disabled={!newPassword || isChangingPassword}
+                            >
+                              {isChangingPassword ? (
+                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Key className="h-4 w-4 mr-2" />
+                              )}
+                              Change Password
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+
                   {mode === "edit" && user && onDelete && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
