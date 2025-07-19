@@ -28,6 +28,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   User,
@@ -42,6 +51,10 @@ import {
   UserCheck,
   UserX,
   Trash2,
+  Key,
+  RefreshCw,
+  Copy,
+  Check,
 } from "lucide-react";
 import { User as UserType, UserUpdateRequest } from "@shared/api";
 
