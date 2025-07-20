@@ -60,6 +60,7 @@ import { User as UserType, UserUpdateRequest } from "@shared/api";
 
 interface UserDetailProps {
   user: UserType | null;
+  currentAdminUser?: UserType | null;
   mode: "add" | "edit";
   onBack: () => void;
   onSave: (userData: Partial<UserType>) => Promise<void>;
@@ -68,6 +69,7 @@ interface UserDetailProps {
 
 export default function UserDetail({
   user,
+  currentAdminUser,
   mode,
   onBack,
   onSave,
@@ -214,7 +216,7 @@ export default function UserDetail({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          adminUserId: "admin-current", // Should be current admin user ID
+          adminUserId: currentAdminUser?.id || "unknown-admin",
           targetUserId: user.id,
           newPassword: newPassword,
           generatePassword: false,
