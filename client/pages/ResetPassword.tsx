@@ -153,19 +153,22 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex flex-col gap-3">
-                <Link to="/forgot-password">
-                  <Button className="w-full bg-primary hover:bg-primary/90">
-                    Request New Reset Link
-                  </Button>
-                </Link>
+                            <div className="flex flex-col gap-3">
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90"
+                  onClick={onNavigateToForgotPassword}
+                >
+                  Request New Reset Link
+                </Button>
 
-                <Link to="/auth">
-                  <Button variant="ghost" className="w-full">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Login
-                  </Button>
-                </Link>
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={onNavigateToAuth}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Login
+                </Button>
               </div>
             </CardContent>
           </Card>
