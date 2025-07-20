@@ -33,7 +33,7 @@ interface AuthProps {
   onNavigateToForgotPassword?: () => void;
 }
 
-export default function Auth({ onAuthenticated }: AuthProps) {
+export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
