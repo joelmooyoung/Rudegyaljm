@@ -99,15 +99,29 @@ export default async function handler(req, res) {
     }
 
     // Verify admin user exists and has admin role
-    const adminUser = await User.findOne({ userId: adminUserId });
+    let adminUser = await User.findOne({ userId: adminUserId });
+
+    // If not found by userId, try other methods
     if (!adminUser) {
+      adminUser = await User.findById(adminUserId);
+    }
+
+    if (!adminUser) {
+      console.log(
+        `[ADMIN CHANGE PASSWORD] Admin user not found with ID: ${adminUserId}`,
+      );
       return res.status(404).json({
         success: false,
         message: "Admin user not found",
       });
     }
 
-    if (adminUser.type !== "admin") {
+    // Check admin permissions (handle both 'type' and 'role' fields)
+    const userRole = adminUser.type || adminUser.role;
+    if (userRole !== "admin") {
+      console.log(
+        `[ADMIN CHANGE PASSWORD] User ${adminUserId} has role '${userRole}', not admin`,
+      );
       return res.status(403).json({
         success: false,
         message: "Insufficient permissions. Admin role required.",
@@ -115,8 +129,17 @@ export default async function handler(req, res) {
     }
 
     // Find the target user
-    const targetUser = await User.findOne({ userId: targetUserId });
+    let targetUser = await User.findOne({ userId: targetUserId });
+
+    // If not found by userId, try other methods
     if (!targetUser) {
+      targetUser = await User.findById(targetUserId);
+    }
+
+    if (!targetUser) {
+      console.log(
+        `[ADMIN CHANGE PASSWORD] Target user not found with ID: ${targetUserId}`,
+      );
       return res.status(404).json({
         success: false,
         message: "Target user not found",
@@ -189,9 +212,9 @@ export default async function handler(req, res) {
     const saltRounds = 12; // Strong salt rounds
     const hashedNewPassword = await bcrypt.hash(finalPassword, saltRounds);
 
-    // Update the target user's password
+    // Update the target user's password using the correct identifier
     await User.findOneAndUpdate(
-      { userId: targetUserId },
+      { _id: targetUser._id },
       {
         password: hashedNewPassword,
         updatedAt: new Date(),
