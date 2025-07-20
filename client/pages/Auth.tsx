@@ -315,13 +315,14 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
 
-                  <div className="text-center">
-                    <a
-                      href="/forgot-password"
-                      className="text-sm text-accent hover:text-accent/80 font-medium"
+                                    <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={onNavigateToForgotPassword}
+                      className="text-sm text-accent hover:text-accent/80 font-medium underline-offset-4 hover:underline"
                     >
                       Forgot your password?
-                    </a>
+                    </button>
                   </div>
                 </form>
 
