@@ -314,15 +314,15 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+                        <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Remember your password?{" "}
-                <Link
-                  to="/auth"
-                  className="text-accent hover:text-accent/80 font-medium"
+                <button
+                  onClick={onNavigateToAuth}
+                  className="text-accent hover:text-accent/80 font-medium underline-offset-4 hover:underline"
                 >
                   Sign in instead
-                </Link>
+                </button>
               </p>
             </div>
           </CardContent>
