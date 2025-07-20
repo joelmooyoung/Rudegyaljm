@@ -209,18 +209,47 @@ export default function UserDetail({
     setIsChangingPassword(true);
     setPasswordChangeResult(null);
 
+    console.log("Admin password change attempt:", {
+      currentAdminUser: currentAdminUser
+        ? {
+            id: currentAdminUser.id,
+            username: currentAdminUser.username,
+            role: currentAdminUser.role,
+          }
+        : null,
+      targetUser: {
+        id: user.id,
+        username: user.username,
+      },
+    });
+
+    if (!currentAdminUser?.id) {
+      setPasswordChangeResult(
+        "Error: No admin user found. Please log in as an administrator.",
+      );
+      setIsChangingPassword(false);
+      return;
+    }
+
     try {
+      const requestBody = {
+        adminUserId: currentAdminUser.id,
+        targetUserId: user.id,
+        newPassword: newPassword,
+        generatePassword: false,
+      };
+
+      console.log("Sending password change request:", {
+        ...requestBody,
+        newPassword: "[REDACTED]",
+      });
+
       const response = await fetch("/api/admin/change-user-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          adminUserId: currentAdminUser?.id || "unknown-admin",
-          targetUserId: user.id,
-          newPassword: newPassword,
-          generatePassword: false,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const result = await response.json();
