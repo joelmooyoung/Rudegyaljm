@@ -118,7 +118,7 @@ export default async function handler(req, res) {
           },
         });
 
-            case "PUT":
+      case "PUT":
         console.log(`[USERS API] Updating user`);
         console.log(`[USERS API] Request body keys:`, Object.keys(req.body));
         console.log(`[USERS API] Request body id field:`, req.body.id);
@@ -134,20 +134,31 @@ export default async function handler(req, res) {
 
         console.log(`[USERS API] Updating user with ID: ${updateId}`);
 
-                console.log(`[USERS API] Looking for user with userId: ${updateId}`);
+        console.log(`[USERS API] Looking for user with userId: ${updateId}`);
         const userToUpdate = await User.findOne({ userId: updateId });
         if (!userToUpdate) {
           console.log(`[USERS API] ❌ User not found with userId: ${updateId}`);
           // Try to find any users to see what IDs exist
-          const sampleUsers = await User.find({}, 'userId username email').limit(3);
-          console.log(`[USERS API] Sample users in database:`, sampleUsers.map(u => ({ userId: u.userId, username: u.username })));
+          const sampleUsers = await User.find(
+            {},
+            "userId username email",
+          ).limit(3);
+          console.log(
+            `[USERS API] Sample users in database:`,
+            sampleUsers.map((u) => ({
+              userId: u.userId,
+              username: u.username,
+            })),
+          );
           return res.status(404).json({
             success: false,
             message: "User not found",
           });
         }
 
-        console.log(`[USERS API] Found user: ${userToUpdate.username} (${userToUpdate.userId})`);
+        console.log(
+          `[USERS API] Found user: ${userToUpdate.username} (${userToUpdate.userId})`,
+        );
 
         // Update fields with proper field mapping
         const updateFields = {};

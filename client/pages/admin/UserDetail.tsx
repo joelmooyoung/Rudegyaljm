@@ -135,21 +135,21 @@ export default function UserDetail({
         return;
       }
 
-            const userData: Partial<UserType> = {
+      const userData: Partial<UserType> = {
         ...formData,
         ...(password && { password }),
         // Include user ID for edit mode
         ...(mode === "edit" && user?.id && { id: user.id }),
       };
 
-      console.log('Saving user data:', {
+      console.log("Saving user data:", {
         mode,
         userId: user?.id,
         hasPassword: !!password,
         userData: {
           ...userData,
-          password: password ? '[REDACTED]' : undefined
-        }
+          password: password ? "[REDACTED]" : undefined,
+        },
       });
 
       await onSave(userData);
