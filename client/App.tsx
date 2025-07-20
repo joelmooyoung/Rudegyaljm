@@ -501,6 +501,7 @@ const App = () => {
         return (
           <UserDetail
             user={currentUser}
+            currentAdminUser={user}
             mode={userMode}
             onBack={handleBackToUsers}
             onSave={handleSaveUser}
