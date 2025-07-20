@@ -227,8 +227,12 @@ const App = () => {
     setCurrentView("forgot-password");
   };
 
-  const handleNavigateToResetPassword = () => {
+    const handleNavigateToResetPassword = () => {
     setCurrentView("reset-password");
+  };
+
+  const handleNavigateToAuth = () => {
+    setCurrentView("auth");
   };
 
   const handleSaveStory = async (storyData: Partial<Story>) => {
