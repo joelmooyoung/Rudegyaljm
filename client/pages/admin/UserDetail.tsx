@@ -199,8 +199,8 @@ export default function UserDetail({
 
   const handleGeneratePassword = () => {
     const generated = generateStrongPassword();
-    setNewPassword(generated);
-    setGeneratedPassword(generated);
+    setPassword(generated);
+    setConfirmPassword(generated);
   };
 
   const handleChangePassword = async () => {
