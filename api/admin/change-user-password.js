@@ -91,6 +91,12 @@ export default async function handler(req, res) {
     const { adminUserId, targetUserId, newPassword, generatePassword } =
       req.body;
 
+    console.log(`[ADMIN CHANGE PASSWORD API] Request:`, {
+      adminUserId,
+      targetUserId,
+      generatePassword,
+    });
+
     if (!adminUserId || !targetUserId) {
       return res.status(400).json({
         success: false,
