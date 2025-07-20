@@ -124,11 +124,14 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
       <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10" />
 
       <div className="relative z-10 w-full max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <Link to="/auth" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <div className="text-center mb-8">
+          <button
+            onClick={onNavigateToAuth}
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Login
-          </Link>
+          </button>
         </div>
 
         <Card className="story-card-intimate passionate-shimmer seductive-border">
