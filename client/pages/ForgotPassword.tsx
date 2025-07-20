@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail, Heart, CheckCircle } from "lucide-react";
 
-export default function ForgotPassword() {
+interface ForgotPasswordProps {
+  onNavigateToAuth?: () => void;
+}
+
+export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps) {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
