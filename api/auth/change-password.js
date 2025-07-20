@@ -58,6 +58,11 @@ function validatePassword(password) {
 
 export default async function handler(req, res) {
   console.log(`[CHANGE PASSWORD API] ${req.method} /api/auth/change-password`);
+  console.log(`[CHANGE PASSWORD API] Request body:`, {
+    userId,
+    newPassword: newPassword ? "[REDACTED]" : undefined,
+    currentPassword: currentPassword ? "[REDACTED]" : undefined,
+  });
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -118,26 +123,25 @@ export default async function handler(req, res) {
       });
     }
 
-    // Find the user - try both userId and match with id field
-    let user = await User.findOne({ userId });
-
-    // If not found by userId, try finding by the id field (for compatibility)
-    if (!user) {
-      user = await User.findOne({ _id: userId });
-    }
-
-    // If still not found, try finding where userId matches the provided id
-    if (!user) {
-      user = await User.findById(userId);
-    }
+    // Find the user - the userId from frontend should match the userId field in database
+    console.log(`[CHANGE PASSWORD] Looking for user with userId: ${userId}`);
+    const user = await User.findOne({ userId });
 
     if (!user) {
-      console.log(`[CHANGE PASSWORD] User not found with ID: ${userId}`);
+      console.log(`[CHANGE PASSWORD] User not found with userId: ${userId}`);
+      console.log(
+        `[CHANGE PASSWORD] Available users:`,
+        await User.find({}, "userId username email").limit(5),
+      );
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
+
+    console.log(
+      `[CHANGE PASSWORD] Found user: ${user.username} (${user.userId})`,
+    );
 
     // For non-admin requests, verify current password
     if (!isAdminRequest) {
@@ -166,14 +170,22 @@ export default async function handler(req, res) {
     const saltRounds = 12; // Strong salt rounds
     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    // Update the user's password using the correct identifier
-    await User.findOneAndUpdate(
-      { _id: user._id },
+    // Update the user's password using the userId field
+    const updateResult = await User.findOneAndUpdate(
+      { userId: user.userId },
       {
         password: hashedNewPassword,
         updatedAt: new Date(),
       },
+      { new: true },
     );
+
+    if (!updateResult) {
+      console.log(
+        `[CHANGE PASSWORD] Failed to update password for user: ${user.userId}`,
+      );
+      throw new Error("Failed to update password in database");
+    }
 
     console.log(
       `[CHANGE PASSWORD] ✅ Password changed for user: ${user.username} (${userId})`,
