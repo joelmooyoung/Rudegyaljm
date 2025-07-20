@@ -30,6 +30,7 @@ import {
 
 interface AuthProps {
   onAuthenticated: (user: UserType) => void;
+  onNavigateToForgotPassword?: () => void;
 }
 
 export default function Auth({ onAuthenticated }: AuthProps) {
