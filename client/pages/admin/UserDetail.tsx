@@ -337,14 +337,27 @@ export default function UserDetail({
 
               {/* Password Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-display font-semibold text-passion-gradient">
-                  {mode === "add" ? "Set Password" : "Change Password"}
-                </h3>
-                <p className="text-sm font-serif text-muted-foreground">
-                  {mode === "add"
-                    ? "Set a secure password for the new user account"
-                    : "Leave blank to keep current password unchanged"}
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-display font-semibold text-passion-gradient">
+                      {mode === "add" ? "Set Password" : "Change Password"}
+                    </h3>
+                    <p className="text-sm font-serif text-muted-foreground">
+                      {mode === "add"
+                        ? "Set a secure password for the new user account"
+                        : "Leave blank to keep current password unchanged"}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGeneratePassword}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Generate Strong Password
+                  </Button>
+                </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
