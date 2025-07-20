@@ -80,10 +80,10 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
       const data = await response.json();
 
       if (response.ok) {
-        setIsSuccess(true);
+                setIsSuccess(true);
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate("/auth");
+          onNavigateToAuth?.();
         }, 3000);
       } else {
         setError(data.message || "Failed to reset password");
