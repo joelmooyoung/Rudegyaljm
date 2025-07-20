@@ -118,9 +118,21 @@ export default async function handler(req, res) {
       });
     }
 
-    // Find the user
-    const user = await User.findOne({ userId });
+    // Find the user - try both userId and match with id field
+    let user = await User.findOne({ userId });
+
+    // If not found by userId, try finding by the id field (for compatibility)
     if (!user) {
+      user = await User.findOne({ _id: userId });
+    }
+
+    // If still not found, try finding where userId matches the provided id
+    if (!user) {
+      user = await User.findById(userId);
+    }
+
+    if (!user) {
+      console.log(`[CHANGE PASSWORD] User not found with ID: ${userId}`);
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -154,9 +166,9 @@ export default async function handler(req, res) {
     const saltRounds = 12; // Strong salt rounds
     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    // Update the user's password
+    // Update the user's password using the correct identifier
     await User.findOneAndUpdate(
-      { userId },
+      { _id: user._id },
       {
         password: hashedNewPassword,
         updatedAt: new Date(),
