@@ -210,17 +210,12 @@ export default function UserDetail({
     setPasswordChangeResult(null);
 
     console.log("Admin password change attempt:", {
-      currentAdminUser: currentAdminUser
-        ? {
-            id: currentAdminUser.id,
-            username: currentAdminUser.username,
-            role: currentAdminUser.role,
-          }
-        : null,
-      targetUser: {
-        id: user.id,
-        username: user.username,
-      },
+      currentAdminUser: currentAdminUser,
+      targetUser: user,
+      currentAdminUserKeys: currentAdminUser
+        ? Object.keys(currentAdminUser)
+        : [],
+      targetUserKeys: user ? Object.keys(user) : [],
     });
 
     if (!currentAdminUser?.id) {
