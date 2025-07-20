@@ -118,16 +118,21 @@ export default async function handler(req, res) {
           },
         });
 
-      case "PUT":
+            case "PUT":
         console.log(`[USERS API] Updating user`);
+        console.log(`[USERS API] Request body keys:`, Object.keys(req.body));
+        console.log(`[USERS API] Request body id field:`, req.body.id);
         const { id: updateId } = req.body;
 
         if (!updateId) {
+          console.log(`[USERS API] ❌ No user ID provided in request body`);
           return res.status(400).json({
             success: false,
             message: "User ID is required",
           });
         }
+
+        console.log(`[USERS API] Updating user with ID: ${updateId}`);
 
         const userToUpdate = await User.findOne({ userId: updateId });
         if (!userToUpdate) {
