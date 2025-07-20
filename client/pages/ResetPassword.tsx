@@ -13,10 +13,15 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle, Heart, RefreshCw } from "lucide-react";
 import { validatePassword, generateStrongPassword } from "@/utils/passwordValidation";
 
-export default function ResetPassword() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const token = searchParams.get("token");
+interface ResetPasswordProps {
+  onNavigateToAuth?: () => void;
+  onNavigateToForgotPassword?: () => void;
+}
+
+export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPassword }: ResetPasswordProps) {
+  // Get token from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
