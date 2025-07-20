@@ -300,7 +300,7 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                     </div>
                   </div>
 
-                  {error && (
+                                    {error && (
                     <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
                       {error}
                     </div>
@@ -313,6 +313,15 @@ export default function Auth({ onAuthenticated }: AuthProps) {
                   >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
+
+                  <div className="text-center">
+                    <a
+                      href="/forgot-password"
+                      className="text-sm text-accent hover:text-accent/80 font-medium"
+                    >
+                      Forgot your password?
+                    </a>
+                  </div>
                 </form>
 
                 <Button
