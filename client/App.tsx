@@ -22,6 +22,8 @@ import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
 import UserReadingStats from "./pages/admin/UserReadingStats";
 import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import { User, Story } from "@shared/api";
 
