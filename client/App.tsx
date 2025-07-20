@@ -57,9 +57,19 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
-  useEffect(() => {
-    // Multiple ways to detect development mode
+    useEffect(() => {
+    // Check if this is a reset password URL
     const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get("token");
+
+    if (resetToken && window.location.pathname.includes("reset-password")) {
+      setCurrentView("reset-password");
+      setIsAgeVerified(true); // Allow access to reset password without age verification
+      setIsLoading(false);
+      return;
+    }
+
+    // Multiple ways to detect development mode
     const devParam = urlParams.get("dev") === "true";
     const adminHash = window.location.hash.includes("admin-seeding");
     const isBuilderEnv = window.location.hostname.includes("builder.my");
