@@ -12,10 +12,12 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "premium", "free"],
       default: "free",
     },
-    country: { type: String, default: "Unknown" },
+        country: { type: String, default: "Unknown" },
     active: { type: Boolean, default: true },
     lastLogin: { type: Date },
     loginCount: { type: Number, default: 0 },
+    resetToken: { type: String }, // Password reset token
+    resetTokenExpiry: { type: Date }, // Token expiration time
   },
   { timestamps: true },
 );
