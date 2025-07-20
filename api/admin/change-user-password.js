@@ -137,22 +137,24 @@ export default async function handler(req, res) {
     }
 
     // Find the target user
-    let targetUser = await User.findOne({ userId: targetUserId });
-
-    // If not found by userId, try other methods
-    if (!targetUser) {
-      targetUser = await User.findById(targetUserId);
-    }
+    console.log(
+      `[ADMIN CHANGE PASSWORD] Looking for target user: ${targetUserId}`,
+    );
+    const targetUser = await User.findOne({ userId: targetUserId });
 
     if (!targetUser) {
       console.log(
-        `[ADMIN CHANGE PASSWORD] Target user not found with ID: ${targetUserId}`,
+        `[ADMIN CHANGE PASSWORD] Target user not found with userId: ${targetUserId}`,
       );
       return res.status(404).json({
         success: false,
         message: "Target user not found",
       });
     }
+
+    console.log(
+      `[ADMIN CHANGE PASSWORD] Found target user: ${targetUser.username} (${targetUser.userId})`,
+    );
 
     let finalPassword = newPassword;
 
