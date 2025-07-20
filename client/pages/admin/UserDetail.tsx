@@ -254,6 +254,12 @@ export default function UserDetail({
 
       const result = await response.json();
 
+      console.log("Password change API response:", {
+        status: response.status,
+        success: result.success,
+        message: result.message,
+      });
+
       if (response.ok) {
         setPasswordChangeResult(
           `Password changed successfully for ${user.username}`,
@@ -261,12 +267,17 @@ export default function UserDetail({
         setNewPassword("");
         setGeneratedPassword("");
       } else {
-        throw new Error(result.message || "Failed to change password");
+        const errorMessage =
+          result.message ||
+          `HTTP ${response.status}: Failed to change password`;
+        console.error("Password change failed:", errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (err) {
-      setPasswordChangeResult(
-        `Error: ${err instanceof Error ? err.message : "Failed to change password"}`,
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to change password";
+      console.error("Password change error:", err);
+      setPasswordChangeResult(`Error: ${errorMessage}`);
     } finally {
       setIsChangingPassword(false);
     }
