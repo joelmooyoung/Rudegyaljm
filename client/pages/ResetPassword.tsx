@@ -121,11 +121,12 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                   Redirecting to login page in 3 seconds...
                 </p>
                 
-                <Link to="/auth">
-                  <Button className="w-full bg-primary hover:bg-primary/90">
-                    Go to Login Now
-                  </Button>
-                </Link>
+                                <Button
+                  className="w-full bg-primary hover:bg-primary/90"
+                  onClick={onNavigateToAuth}
+                >
+                  Go to Login Now
+                </Button>
               </div>
             </CardContent>
           </Card>
