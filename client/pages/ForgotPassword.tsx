@@ -101,12 +101,14 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
                   Try Different Email
                 </Button>
 
-                <Link to="/auth">
-                  <Button variant="ghost" className="w-full">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Login
-                  </Button>
-                </Link>
+                                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={onNavigateToAuth}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Login
+                </Button>
               </div>
             </CardContent>
           </Card>
