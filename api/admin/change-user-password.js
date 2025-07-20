@@ -105,22 +105,24 @@ export default async function handler(req, res) {
     }
 
     // Verify admin user exists and has admin role
-    let adminUser = await User.findOne({ userId: adminUserId });
-
-    // If not found by userId, try other methods
-    if (!adminUser) {
-      adminUser = await User.findById(adminUserId);
-    }
+    console.log(
+      `[ADMIN CHANGE PASSWORD] Looking for admin user: ${adminUserId}`,
+    );
+    const adminUser = await User.findOne({ userId: adminUserId });
 
     if (!adminUser) {
       console.log(
-        `[ADMIN CHANGE PASSWORD] Admin user not found with ID: ${adminUserId}`,
+        `[ADMIN CHANGE PASSWORD] Admin user not found with userId: ${adminUserId}`,
       );
       return res.status(404).json({
         success: false,
         message: "Admin user not found",
       });
     }
+
+    console.log(
+      `[ADMIN CHANGE PASSWORD] Found admin user: ${adminUser.username} (${adminUser.userId})`,
+    );
 
     // Check admin permissions (handle both 'type' and 'role' fields)
     const userRole = adminUser.type || adminUser.role;
