@@ -222,14 +222,22 @@ export default async function handler(req, res) {
     const saltRounds = 12; // Strong salt rounds
     const hashedNewPassword = await bcrypt.hash(finalPassword, saltRounds);
 
-    // Update the target user's password using the correct identifier
-    await User.findOneAndUpdate(
-      { _id: targetUser._id },
+    // Update the target user's password using the userId field
+    const updateResult = await User.findOneAndUpdate(
+      { userId: targetUser.userId },
       {
         password: hashedNewPassword,
         updatedAt: new Date(),
       },
+      { new: true },
     );
+
+    if (!updateResult) {
+      console.log(
+        `[ADMIN CHANGE PASSWORD] Failed to update password for user: ${targetUser.userId}`,
+      );
+      throw new Error("Failed to update password in database");
+    }
 
     console.log(
       `[ADMIN CHANGE PASSWORD] ✅ Admin ${adminUser.username} changed password for user: ${targetUser.username} (${targetUserId})`,
