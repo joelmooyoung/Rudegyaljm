@@ -441,7 +441,10 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <Auth onAuthenticated={handleAuthenticated} />
+                    <Auth
+            onAuthenticated={handleAuthenticated}
+            onNavigateToForgotPassword={handleNavigateToForgotPassword}
+          />
         </TooltipProvider>
       </QueryClientProvider>
     );
