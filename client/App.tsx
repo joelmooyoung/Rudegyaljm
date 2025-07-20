@@ -575,15 +575,8 @@ const App = () => {
         return <About onBack={handleBackToHome} />;
       case "contact":
         return <Contact onBack={handleBackToHome} />;
-            case "help":
+                        case "help":
         return <Help onBack={handleBackToHome} />;
-            case "forgot-password":
-        return <ForgotPassword onNavigateToAuth={handleNavigateToAuth} />;
-      case "reset-password":
-        return <ResetPassword
-          onNavigateToAuth={handleNavigateToAuth}
-          onNavigateToForgotPassword={handleNavigateToForgotPassword}
-        />;
       case "home":
       default:
         return (
