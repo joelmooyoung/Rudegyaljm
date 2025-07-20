@@ -449,16 +449,34 @@ const App = () => {
     );
   }
 
-  if (!user) {
+    if (!user) {
+    // Handle views that don't require authentication
+    const renderNonAuthenticatedView = () => {
+      switch (currentView) {
+        case "forgot-password":
+          return <ForgotPassword onNavigateToAuth={handleNavigateToAuth} />;
+        case "reset-password":
+          return <ResetPassword
+            onNavigateToAuth={handleNavigateToAuth}
+            onNavigateToForgotPassword={handleNavigateToForgotPassword}
+          />;
+        case "auth":
+        default:
+          return (
+            <Auth
+              onAuthenticated={handleAuthenticated}
+              onNavigateToForgotPassword={handleNavigateToForgotPassword}
+            />
+          );
+      }
+    };
+
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-                    <Auth
-            onAuthenticated={handleAuthenticated}
-            onNavigateToForgotPassword={handleNavigateToForgotPassword}
-          />
+          {renderNonAuthenticatedView()}
         </TooltipProvider>
       </QueryClientProvider>
     );
