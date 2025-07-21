@@ -324,7 +324,7 @@ export default function UserDetail({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="free">🆓 Free User</SelectItem>
-                        <SelectItem value="premium">�� Premium User</SelectItem>
+                        <SelectItem value="premium">💎 Premium User</SelectItem>
                         <SelectItem value="admin">👑 Administrator</SelectItem>
                       </SelectContent>
                     </Select>
