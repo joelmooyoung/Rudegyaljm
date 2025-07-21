@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { connectToDatabase } from "../../lib/mongodb.js";
 import { User } from "../../models/index.js";
+import { Resend } from "resend";
 
 export default async function handler(req, res) {
   console.log(`[FORGOT PASSWORD API] ${req.method} /api/auth/forgot-password`);
