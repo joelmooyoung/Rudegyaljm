@@ -438,7 +438,11 @@ const App = () => {
   });
 
   // Show age verification if user hasn't been verified yet
-  if (!isAgeVerified) {
+  // DEV MODE: Add bypass for testing
+  const urlParams = new URLSearchParams(window.location.search);
+  const devBypass = urlParams.get("bypass") === "true";
+
+  if (!isAgeVerified && !devBypass) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
