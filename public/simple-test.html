@@ -1,131 +1,77 @@
 <!doctype html>
 <html>
-  <head>
-    <title>MongoDB & API Test</title>
+<head>
+    <title>Simple API Test</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: #fff;
-        padding: 20px;
-      }
-      .test-section {
-        background: #222;
-        padding: 15px;
-        margin: 15px 0;
-        border-radius: 5px;
-      }
-      button {
-        background: #007acc;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        margin: 5px;
-        cursor: pointer;
-        border-radius: 3px;
-      }
-      .result {
-        background: #333;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 3px;
-        white-space: pre-wrap;
-      }
-      .success {
-        color: #4f4;
-      }
-      .error {
-        color: #f44;
-      }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .box { padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
     </style>
-  </head>
-  <body>
-    <h1>🔧 Simple API & Database Test</h1>
-
-    <div class="test-section">
-      <h2>1. Test API Endpoints</h2>
-      <button onclick="testAPI('/api/ping')">Test /api/ping</button>
-      <button onclick="testAPI('/api/stories')">Test /api/stories</button>
-      <button onclick="testAPI('/api/debug-connection')">
-        Test /api/debug-connection
-      </button>
-      <div id="api-results" class="result"></div>
-    </div>
-
-    <div class="test-section">
-      <h2>2. Test Login</h2>
-      <p>
-        Email: admin@nocturne.com<br />
-        Password: admin123
-      </p>
-      <button onclick="testLogin()">Test Admin Login</button>
-      <div id="login-results" class="result"></div>
-    </div>
-
-    <div class="test-section">
-      <h2>3. MongoDB Commands</h2>
-      <p>Run these in MongoDB Compass to verify your data:</p>
-      <div class="result">
-        use('rude-gyal-confessions'); db.users.countDocuments();
-        db.stories.countDocuments(); db.users.findOne({email:
-        "admin@nocturne.com"});
-      </div>
-    </div>
+</head>
+<body>
+    <h1>Simple API Test</h1>
+    <button onclick="testAPI()">Test API Directly</button>
+    <div id="result">Click button to test...</div>
 
     <script>
-      async function testAPI(endpoint) {
-        const results = document.getElementById("api-results");
-        const url = window.location.origin + endpoint;
-
-        results.innerHTML = `Testing: ${url}\n`;
-
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-
-          if (response.ok) {
-            results.innerHTML += `✅ SUCCESS: ${endpoint}\n${JSON.stringify(data, null, 2)}`;
-            results.className = "result success";
-          } else {
-            results.innerHTML += `❌ FAILED: ${response.status} ${response.statusText}\n${JSON.stringify(data, null, 2)}`;
-            results.className = "result error";
-          }
-        } catch (error) {
-          results.innerHTML += `❌ ERROR: ${error.message}`;
-          results.className = "result error";
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Making API request to /api/test-env');
+                
+                const response = await fetch('/api/test-env', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Invalid JSON response: ${text}`);
+                }
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="box success">
+                            <h3>✅ API Success</h3>
+                            <p><strong>RESEND_API_KEY:</strong> ${data.env.hasResendKey ? 'SET (' + data.env.resendKeyFirst10 + '...)' : 'NOT SET'}</p>
+                            <p><strong>FROM_EMAIL:</strong> ${data.env.fromEmail}</p>
+                            <p><strong>FRONTEND_URL:</strong> ${data.env.frontendUrl}</p>
+                            <p><strong>NODE_ENV:</strong> ${data.env.nodeEnv}</p>
+                            <p><strong>Resend Keys Found:</strong> ${data.env.allEnvKeys.join(', ') || 'None'}</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="box error">
+                            <h3>❌ API Failed</h3>
+                            <p>Error: ${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="box error">
+                        <h3>❌ Request Failed</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Check browser console for details</p>
+                    </div>
+                `;
+            }
         }
-      }
-
-      async function testLogin() {
-        const results = document.getElementById("login-results");
-        const url = window.location.origin + "/api/auth/login";
-
-        results.innerHTML = "Testing login...\n";
-
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: "admin@nocturne.com",
-              password: "admin123",
-            }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            results.innerHTML = `✅ LOGIN SUCCESS!\n${JSON.stringify(data, null, 2)}`;
-            results.className = "result success";
-          } else {
-            results.innerHTML = `❌ LOGIN FAILED: ${response.status}\n${JSON.stringify(data, null, 2)}`;
-            results.className = "result error";
-          }
-        } catch (error) {
-          results.innerHTML = `❌ LOGIN ERROR: ${error.message}`;
-          results.className = "result error";
-        }
-      }
     </script>
-  </body>
+</body>
 </html>
