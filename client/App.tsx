@@ -25,6 +25,7 @@ import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EmailTest from "./pages/admin/EmailTest";
+import DirectEmailTest from "./pages/DirectEmailTest";
 
 import { User, Story } from "@shared/api";
 
