@@ -24,6 +24,7 @@ import UserReadingStats from "./pages/admin/UserReadingStats";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import EmailTest from "./pages/admin/EmailTest";
 
 import { User, Story } from "@shared/api";
 
