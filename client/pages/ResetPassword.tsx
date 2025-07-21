@@ -256,7 +256,7 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">Password Strength</span>
                       <span className={`font-medium ${
-                        passwordValidation.strength === "very_strong" ? "text-green-500" :
+                        passwordValidation.strength === "very-strong" ? "text-green-500" :
                         passwordValidation.strength === "strong" ? "text-green-400" :
                         passwordValidation.strength === "medium" ? "text-yellow-500" :
                         "text-red-500"
