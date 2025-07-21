@@ -44,6 +44,7 @@ import {
   Flame,
   Database,
   BookOpen,
+  Mail,
 } from "lucide-react";
 import { Story, User as UserType } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
