@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+    <title>Direct Email Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/resend@2.1.1/dist/index.umd.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .box { padding: 15px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        input { width: 300px; padding: 8px; margin: 5px 0; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Direct Email Test</h1>
+    
+    <div class="box warning">
+        <h3>⚠️ Direct Resend Test</h3>
+        <p>This bypasses all API routing and tests Resend directly from the browser.</p>
+        <p><strong>Note:</strong> This requires CORS to be enabled on Resend's side.</p>
+    </div>
+
+    <div>
+        <label>Email Address:</label><br>
+        <input type="email" id="email" placeholder="your@email.com" value="test@example.com">
+    </div>
+    
+    <div>
+        <button onclick="testDirectResend()">Test Direct Resend</button>
+        <button onclick="testViaAPI()">Test Via API</button>
+        <button onclick="testEnvironment()">Test Environment</button>
+    </div>
+
+    <div id="result">Ready to test...</div>
+
+    <script>
+        function log(message) {
+            console.log(message);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `<div class="box">${message}</div>`;
+        }
+
+        async function testDirectResend() {
+            const email = document.getElementById('email').value;
+            log('🧪 Testing Direct Resend (will likely fail due to CORS)...');
+            
+            try {
+                // This will likely fail due to CORS, but let's try
+                const response = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer re_5y74v57Z_Hkfro8qVsR2aqGXzRhvG1eW3',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'noreply@rudegyaljm.com',
+                        to: email,
+                        subject: 'Direct Test Email',
+                        html: '<h1>Direct Test Successful!</h1><p>This email was sent directly from the browser.</p>'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Direct Resend Success! Email ID: ${data.id}`);
+                } else {
+                    const error = await response.text();
+                    log(`❌ Direct Resend Failed: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Direct Resend Error: ${error.message} (Expected - CORS issue)`);
+            }
+        }
+
+        async function testViaAPI() {
+            const email = document.getElementById('email').value;
+            log('🔗 Testing via /api/test-email...');
+            
+            try {
+                const response = await fetch('/api/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const text = await response.text();
+                log(`Response status: ${response.status}`);
+                log(`Response text: ${text}`);
+
+                if (response.ok) {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        log(`✅ API Test Success! Email ID: ${data.emailId}`);
+                    } else {
+                        log(`❌ API Test Failed: ${data.message}`);
+                    }
+                } else {
+                    log(`❌ API Request Failed: ${response.status} - ${text}`);
+                }
+            } catch (error) {
+                log(`❌ API Test Error: ${error.message}`);
+            }
+        }
+
+        async function testEnvironment() {
+            log('🔍 Testing environment variables...');
+            
+            try {
+                const response = await fetch('/api/test-env');
+                const text = await response.text();
+                log(`Env Response: ${response.status} - ${text}`);
+
+                if (response.ok) {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        const env = data.env;
+                        log(`✅ Environment Check:`);
+                        log(`- RESEND_API_KEY: ${env.hasResendKey ? 'SET (' + env.resendKeyFirst10 + '...)' : 'NOT SET'}`);
+                        log(`- FROM_EMAIL: ${env.fromEmail}`);
+                        log(`- FRONTEND_URL: ${env.frontendUrl}`);
+                        log(`- NODE_ENV: ${env.nodeEnv}`);
+                    } else {
+                        log(`❌ Environment Failed: ${data.error}`);
+                    }
+                } else {
+                    log(`❌ Environment Request Failed: ${response.status} - ${text}`);
+                }
+            } catch (error) {
+                log(`❌ Environment Error: ${error.message}`);
+            }
+        }
+
+        // Auto-test environment on load
+        window.onload = function() {
+            log('🚀 Page loaded, auto-testing environment...');
+            testEnvironment();
+        };
+    </script>
+</body>
+</html>
