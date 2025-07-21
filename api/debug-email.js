@@ -21,7 +21,9 @@ export default async function handler(req, res) {
     const debugInfo = {
       nodeEnv: process.env.NODE_ENV,
       hasResendKey: !!process.env.RESEND_API_KEY,
-      resendKeyPrefix: process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.substring(0, 8) + "..." : "NOT SET",
+      resendKeyPrefix: process.env.RESEND_API_KEY
+        ? process.env.RESEND_API_KEY.substring(0, 8) + "..."
+        : "NOT SET",
       fromEmail: process.env.RESEND_FROM_EMAIL || "NOT SET",
       frontendUrl: process.env.FRONTEND_URL || "NOT SET",
       timestamp: new Date().toISOString(),
@@ -32,15 +34,14 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: "Email configuration debug info",
-      debug: debugInfo
+      debug: debugInfo,
     });
-
   } catch (error) {
     console.error("[DEBUG EMAIL] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Debug failed",
-      error: error.message
+      error: error.message,
     });
   }
 }
