@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email - Rude Gyal Confessions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f3e8ff, #fdf2f8);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        h1 {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #374151;
+        }
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #ec4899;
+        }
+        button {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #166534;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1d4ed8;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Email Service Test</h1>
+        
+        <div class="info result" style="display: block;">
+            <strong>📧 Email Integration Test</strong><br>
+            Use this tool to test if Resend email service is working correctly. 
+            Enter your email address and we'll send you a test email.
+        </div>
+
+        <form id="testForm">
+            <div class="form-group">
+                <label for="email">Your Email Address:</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="your@email.com">
+            </div>
+
+            <button type="submit" id="testBtn">Send Test Email</button>
+            <button type="button" id="resetBtn" onclick="testPasswordReset()">Test Password Reset Email</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('testForm');
+        const testBtn = document.getElementById('testBtn');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await sendTestEmail();
+        });
+
+        async function sendTestEmail() {
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showResult('Please enter an email address', 'error');
+                return;
+            }
+
+            testBtn.disabled = true;
+            testBtn.textContent = 'Sending...';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult(`✅ Test email sent successfully to ${email}!<br>Email ID: ${data.emailId}<br>Check your inbox (and spam folder).`, 'success');
+                } else {
+                    showResult(`❌ Failed to send email: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+
+            testBtn.disabled = false;
+            testBtn.textContent = 'Send Test Email';
+        }
+
+        async function testPasswordReset() {
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showResult('Please enter an email address', 'error');
+                return;
+            }
+
+            testBtn.disabled = true;
+            document.getElementById('resetBtn').disabled = true;
+            document.getElementById('resetBtn').textContent = 'Sending...';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let message = `✅ Password reset email sent successfully!<br>Check your inbox (and spam folder).`;
+                    
+                    // In development, show the reset token
+                    if (data.resetToken) {
+                        message += `<br><br><strong>Development Mode:</strong><br>Reset Token: ${data.resetToken}<br>Reset URL: <a href="${data.resetUrl}" target="_blank">${data.resetUrl}</a>`;
+                    }
+                    
+                    showResult(message, 'success');
+                } else {
+                    showResult(`❌ Failed to send password reset: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+
+            testBtn.disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+            document.getElementById('resetBtn').textContent = 'Test Password Reset Email';
+        }
+
+        function showResult(message, type) {
+            result.innerHTML = message;
+            result.className = `result ${type}`;
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
