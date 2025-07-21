@@ -469,6 +469,13 @@ export default function Home({
                       <AlertTriangle className="h-4 w-4 mr-2" />
                       Error Logs
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("email-test")}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Email Test
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
