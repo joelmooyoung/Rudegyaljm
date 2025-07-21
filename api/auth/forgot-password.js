@@ -56,12 +56,12 @@ export default async function handler(req, res) {
       // Send password reset email using Resend
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
-        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/reset-password?token=${resetToken}`;
+        const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/reset-password?token=${resetToken}`;
 
         const emailResult = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'noreply@rudegyaljm.com',
+          from: process.env.RESEND_FROM_EMAIL || "noreply@rudegyaljm.com",
           to: user.email,
-          subject: 'Password Reset - Rude Gyal Confessions',
+          subject: "Password Reset - Rude Gyal Confessions",
           html: `
             <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
               <div style="background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -117,12 +117,18 @@ export default async function handler(req, res) {
                 </p>
               </div>
             </div>
-          `
+          `,
         });
 
-        console.log(`[FORGOT PASSWORD API] ✅ Email sent successfully to ${email}:`, emailResult.data?.id);
+        console.log(
+          `[FORGOT PASSWORD API] ✅ Email sent successfully to ${email}:`,
+          emailResult.data?.id,
+        );
       } catch (emailError) {
-        console.error(`[FORGOT PASSWORD API] ❌ Email sending failed:`, emailError);
+        console.error(
+          `[FORGOT PASSWORD API] ❌ Email sending failed:`,
+          emailError,
+        );
         // Don't fail the request if email fails - still generate token for security
       }
 
@@ -131,20 +137,23 @@ export default async function handler(req, res) {
         console.log(`[FORGOT PASSWORD API] Reset token: ${resetToken}`);
       }
     } else {
-      console.log(`[FORGOT PASSWORD API] User not found: ${email} (still returning success)`);
+      console.log(
+        `[FORGOT PASSWORD API] User not found: ${email} (still returning success)`,
+      );
     }
 
     // Always return success message for security
     return res.status(200).json({
       success: true,
-      message: "If an account with that email exists, a password reset link has been sent.",
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
       // Remove this in production - for testing only
-      ...(process.env.NODE_ENV === "development" && user && {
-        resetToken: user.resetToken,
-        resetUrl: `/reset-password?token=${user.resetToken}`
-      })
+      ...(process.env.NODE_ENV === "development" &&
+        user && {
+          resetToken: user.resetToken,
+          resetUrl: `/reset-password?token=${user.resetToken}`,
+        }),
     });
-
   } catch (error) {
     console.error("[FORGOT PASSWORD API] Error:", error);
     return res.status(500).json({

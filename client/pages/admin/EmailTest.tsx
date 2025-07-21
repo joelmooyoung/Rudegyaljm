@@ -28,7 +28,7 @@ export default function EmailTest({ onBack }: EmailTestProps) {
     if (!email) {
       setResult({
         message: "Please enter an email address",
-        type: "error"
+        type: "error",
       });
       return;
     }
@@ -50,18 +50,18 @@ export default function EmailTest({ onBack }: EmailTestProps) {
       if (data.success) {
         setResult({
           message: `✅ Test email sent successfully to ${email}! Check your inbox (and spam folder). Email ID: ${data.emailId}`,
-          type: "success"
+          type: "success",
         });
       } else {
         setResult({
           message: `❌ Failed to send email: ${data.message}`,
-          type: "error"
+          type: "error",
         });
       }
     } catch (error) {
       setResult({
         message: `❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        type: "error"
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -72,7 +72,7 @@ export default function EmailTest({ onBack }: EmailTestProps) {
     if (!email) {
       setResult({
         message: "Please enter an email address",
-        type: "error"
+        type: "error",
       });
       return;
     }
@@ -93,26 +93,26 @@ export default function EmailTest({ onBack }: EmailTestProps) {
 
       if (data.success) {
         let message = `✅ Password reset email sent successfully! Check your inbox (and spam folder).`;
-        
+
         // In development, show the reset token
         if (data.resetToken) {
           message += `\n\nDevelopment Mode:\nReset Token: ${data.resetToken}\nReset URL: ${data.resetUrl}`;
         }
-        
+
         setResult({
           message,
-          type: "success"
+          type: "success",
         });
       } else {
         setResult({
           message: `❌ Failed to send password reset: ${data.message}`,
-          type: "error"
+          type: "error",
         });
       }
     } catch (error) {
       setResult({
         message: `❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        type: "error"
+        type: "error",
       });
     } finally {
       setTestLoading(false);
@@ -141,7 +141,6 @@ export default function EmailTest({ onBack }: EmailTestProps) {
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          
           {/* Info Card */}
           <Card className="story-card-intimate seductive-border">
             <CardHeader>
@@ -150,18 +149,42 @@ export default function EmailTest({ onBack }: EmailTestProps) {
                 Email Integration Status
               </CardTitle>
               <CardDescription className="font-serif">
-                Test your Resend email service integration and password reset functionality.
+                Test your Resend email service integration and password reset
+                functionality.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">📧 Setup Instructions:</h3>
+                  <h3 className="font-semibold text-blue-900 mb-2">
+                    📧 Setup Instructions:
+                  </h3>
                   <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                    <li>Sign up at <a href="https://resend.com" target="_blank" className="underline">resend.com</a></li>
+                    <li>
+                      Sign up at{" "}
+                      <a
+                        href="https://resend.com"
+                        target="_blank"
+                        className="underline"
+                      >
+                        resend.com
+                      </a>
+                    </li>
                     <li>Get your API key from the dashboard</li>
-                    <li>Add <code className="bg-blue-100 px-1 rounded">RESEND_API_KEY</code> to your .env.local file</li>
-                    <li>Configure <code className="bg-blue-100 px-1 rounded">RESEND_FROM_EMAIL</code> with your domain</li>
+                    <li>
+                      Add{" "}
+                      <code className="bg-blue-100 px-1 rounded">
+                        RESEND_API_KEY
+                      </code>{" "}
+                      to your .env.local file
+                    </li>
+                    <li>
+                      Configure{" "}
+                      <code className="bg-blue-100 px-1 rounded">
+                        RESEND_FROM_EMAIL
+                      </code>{" "}
+                      with your domain
+                    </li>
                     <li>Test below to verify everything works!</li>
                   </ol>
                 </div>
@@ -176,7 +199,8 @@ export default function EmailTest({ onBack }: EmailTestProps) {
                 Test Email Functionality
               </CardTitle>
               <CardDescription className="font-serif">
-                Send test emails to verify your Resend integration is working correctly.
+                Send test emails to verify your Resend integration is working
+                correctly.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -237,9 +261,13 @@ export default function EmailTest({ onBack }: EmailTestProps) {
               )}
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-semibold text-yellow-900 mb-2">🔍 What to Check:</h4>
+                <h4 className="font-semibold text-yellow-900 mb-2">
+                  🔍 What to Check:
+                </h4>
                 <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">
-                  <li>Check your inbox (email should arrive within 30 seconds)</li>
+                  <li>
+                    Check your inbox (email should arrive within 30 seconds)
+                  </li>
                   <li>Check spam/junk folder if not in inbox</li>
                   <li>Verify the email design looks good</li>
                   <li>Test the password reset link functionality</li>

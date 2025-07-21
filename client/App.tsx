@@ -58,7 +58,7 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
-    useEffect(() => {
+  useEffect(() => {
     // Check if this is a reset password URL
     const urlParams = new URLSearchParams(window.location.search);
     const resetToken = urlParams.get("token");
@@ -218,7 +218,7 @@ const App = () => {
     setCurrentView("help");
   };
 
-    const handleNavigateToProfile = (section: string) => {
+  const handleNavigateToProfile = (section: string) => {
     if (section === "change-password") {
       setCurrentView("change-password");
     }
@@ -228,7 +228,7 @@ const App = () => {
     setCurrentView("forgot-password");
   };
 
-    const handleNavigateToResetPassword = () => {
+  const handleNavigateToResetPassword = () => {
     setCurrentView("reset-password");
   };
 
@@ -450,17 +450,19 @@ const App = () => {
     );
   }
 
-    if (!user) {
+  if (!user) {
     // Handle views that don't require authentication
     const renderNonAuthenticatedView = () => {
       switch (currentView) {
         case "forgot-password":
           return <ForgotPassword onNavigateToAuth={handleNavigateToAuth} />;
         case "reset-password":
-          return <ResetPassword
-            onNavigateToAuth={handleNavigateToAuth}
-            onNavigateToForgotPassword={handleNavigateToForgotPassword}
-          />;
+          return (
+            <ResetPassword
+              onNavigateToAuth={handleNavigateToAuth}
+              onNavigateToForgotPassword={handleNavigateToForgotPassword}
+            />
+          );
         case "auth":
         default:
           return (
@@ -578,7 +580,7 @@ const App = () => {
         return <About onBack={handleBackToHome} />;
       case "contact":
         return <Contact onBack={handleBackToHome} />;
-                        case "help":
+      case "help":
         return <Help onBack={handleBackToHome} />;
       case "home":
       default:

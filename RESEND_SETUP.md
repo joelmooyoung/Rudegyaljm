@@ -76,6 +76,7 @@ For production emails, you need to:
 ## 📧 What Users Will Receive
 
 ### Password Reset Email Features:
+
 - 🎨 Beautiful gradient design matching your brand
 - 🔒 Secure 15-minute expiring links
 - 📱 Mobile-responsive HTML
@@ -83,6 +84,7 @@ For production emails, you need to:
 - 🎯 Professional branding
 
 ### Email Content:
+
 - Branded header with your logo concept
 - Clear call-to-action button
 - Fallback link if button doesn't work
@@ -94,17 +96,20 @@ For production emails, you need to:
 ### Common Issues:
 
 **"Resend API key not configured"**
+
 - Check your `.env.local` file has `RESEND_API_KEY`
 - Restart your development server
 - Verify the API key starts with `re_`
 
 **Emails not arriving**
+
 - Check spam/junk folder
 - Verify the email address exists in your user database
 - Check browser console for error messages
 - Check Resend dashboard for delivery logs
 
 **"Failed to send email" error**
+
 - Verify your API key is correct
 - Check domain verification (for production)
 - Review server console logs for detailed errors
@@ -112,6 +117,7 @@ For production emails, you need to:
 ## 📊 Free Tier Limits
 
 Resend free tier includes:
+
 - ✅ 3,000 emails per month
 - ✅ 100 emails per day
 - ✅ Full API access
@@ -140,6 +146,7 @@ Resend free tier includes:
 ## 📈 Monitoring & Analytics
 
 Resend provides:
+
 - ✅ Delivery tracking
 - ✅ Open rates
 - ✅ Click tracking
@@ -151,6 +158,7 @@ Access these in your Resend dashboard under **Analytics**.
 ## 🎯 Next Steps
 
 After setup:
+
 1. Test thoroughly in development
 2. Configure domain for production
 3. Monitor email delivery rates

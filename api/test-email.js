@@ -40,11 +40,11 @@ export default async function handler(req, res) {
     console.log(`[TEST EMAIL API] Testing email to: ${email}`);
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    
+
     const emailResult = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'noreply@rudegyaljm.com',
+      from: process.env.RESEND_FROM_EMAIL || "noreply@rudegyaljm.com",
       to: email,
-      subject: 'Test Email - Rude Gyal Confessions',
+      subject: "Test Email - Rude Gyal Confessions",
       html: `
         <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
           <div style="background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -84,24 +84,26 @@ export default async function handler(req, res) {
             </p>
           </div>
         </div>
-      `
+      `,
     });
 
-    console.log(`[TEST EMAIL API] ��� Test email sent successfully:`, emailResult.data?.id);
+    console.log(
+      `[TEST EMAIL API] ��� Test email sent successfully:`,
+      emailResult.data?.id,
+    );
 
     return res.status(200).json({
       success: true,
       message: "Test email sent successfully!",
       emailId: emailResult.data?.id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[TEST EMAIL API] ❌ Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to send test email",
-      error: error.message
+      error: error.message,
     });
   }
 }
