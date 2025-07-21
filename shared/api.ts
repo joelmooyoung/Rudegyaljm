@@ -9,9 +9,11 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  password?: string; // Optional for security - only included when needed
   role: UserRole;
   isAgeVerified: boolean;
   isActive: boolean;
+  country?: string;
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionExpiry?: Date;
   createdAt: Date;
