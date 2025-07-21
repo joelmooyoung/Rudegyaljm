@@ -569,6 +569,8 @@ const App = () => {
         return <UserReadingStats onBack={handleBackToHome} />;
       case "admin-email-test":
         return <EmailTest onBack={handleBackToHome} />;
+      case "direct-email-test":
+        return <DirectEmailTest />;
       case "change-password":
         return (
           <ChangePassword
