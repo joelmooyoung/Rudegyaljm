@@ -12,10 +12,12 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  console.log(`[TEST EMAIL API] Method: ${req.method}`);
+
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed",
+      message: `Method not allowed. Got ${req.method}, expected POST`,
     });
   }
 
