@@ -66,7 +66,8 @@ const App = () => {
     const urlHash = window.location.hash.substring(1); // Remove the #
 
     // Handle direct email test via hash OR parameter
-    const emailTest = urlParams.get("email-test") === "true" || urlHash === "direct-email-test";
+    const emailTest =
+      urlParams.get("email-test") === "true" || urlHash === "direct-email-test";
     if (emailTest) {
       setCurrentView("direct-email-test");
       setIsAgeVerified(true); // Allow access without age verification
