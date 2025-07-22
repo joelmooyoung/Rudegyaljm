@@ -60,9 +60,18 @@ const App = () => {
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
 
   useEffect(() => {
-    // Check if this is a reset password URL
+    // Check URL parameters and hash for special views
     const urlParams = new URLSearchParams(window.location.search);
     const resetToken = urlParams.get("token");
+    const urlHash = window.location.hash.substring(1); // Remove the #
+
+    // Handle direct email test via hash
+    if (urlHash === "direct-email-test") {
+      setCurrentView("direct-email-test");
+      setIsAgeVerified(true); // Allow access without age verification
+      setIsLoading(false);
+      return;
+    }
 
     if (resetToken && window.location.pathname.includes("reset-password")) {
       setCurrentView("reset-password");
