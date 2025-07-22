@@ -468,6 +468,8 @@ const App = () => {
               onNavigateToForgotPassword={handleNavigateToForgotPassword}
             />
           );
+        case "direct-email-test":
+          return <DirectEmailTest />;
         case "auth":
         default:
           return (
