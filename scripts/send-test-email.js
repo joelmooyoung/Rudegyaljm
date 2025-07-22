@@ -1,16 +1,16 @@
 // Simple email test script that can be run directly
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
-const resend = new Resend('re_5y74v57Z_Hkfro8qVsR2aqGXzRhvG1eW3');
+const resend = new Resend("re_5y74v57Z_Hkfro8qVsR2aqGXzRhvG1eW3");
 
-async function sendTestEmail(email = 'test@example.com') {
+async function sendTestEmail(email = "test@example.com") {
   try {
     console.log(`🧪 Testing email to: ${email}`);
-    
+
     const result = await resend.emails.send({
-      from: 'noreply@rudegyaljm.com',
+      from: "noreply@rudegyaljm.com",
       to: email,
-      subject: 'Test Email - Rude Gyal Confessions',
+      subject: "Test Email - Rude Gyal Confessions",
       html: `
         <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
           <div style="background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -62,11 +62,11 @@ async function sendTestEmail(email = 'test@example.com') {
     }
   } catch (error) {
     console.error(`❌ Email test failed:`, error.message);
-    console.error('Full error:', error);
+    console.error("Full error:", error);
     return false;
   }
 }
 
 // Get email from command line argument or use default
-const emailArg = process.argv[2] || 'test@example.com';
+const emailArg = process.argv[2] || "test@example.com";
 sendTestEmail(emailArg);
