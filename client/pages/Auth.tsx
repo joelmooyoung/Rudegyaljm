@@ -112,8 +112,14 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        let errorMessage = "Login failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.message || "Login failed";
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError);
+        }
+        throw new Error(errorMessage);
       }
 
       const data: AuthResponse = await response.json();
