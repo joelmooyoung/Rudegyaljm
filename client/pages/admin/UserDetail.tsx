@@ -324,9 +324,7 @@ export default function UserDetail({
                     <Input
                       id="username"
                       value={formData.username}
-                      onChange={(e) =>
-                        setFormData({ ...formData, username: e.target.value })
-                      }
+                      onChange={handleUsernameChange}
                       className="seductive-border font-serif"
                       placeholder="username"
                     />
