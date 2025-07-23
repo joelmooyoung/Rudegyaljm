@@ -310,9 +310,7 @@ export default function UserDetail({
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
+                      onChange={handleEmailChange}
                       className="seductive-border font-serif"
                       placeholder="user@example.com"
                     />
