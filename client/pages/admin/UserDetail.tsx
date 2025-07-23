@@ -88,6 +88,34 @@ export default function UserDetail({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Memoize form change handlers to prevent delays
+  const handleRoleChange = useCallback((value: "admin" | "premium" | "free") => {
+    setFormData(prev => ({ ...prev, role: value }));
+  }, []);
+
+  const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, email: e.target.value }));
+  }, []);
+
+  const handleUsernameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, username: e.target.value }));
+  }, []);
+
+  const handleActiveChange = useCallback((checked: boolean) => {
+    setFormData(prev => ({ ...prev, isActive: checked }));
+  }, []);
+
+  const handleSubscriptionStatusChange = useCallback((value: "active" | "expired" | "none") => {
+    setFormData(prev => ({ ...prev, subscriptionStatus: value }));
+  }, []);
+
+  const handleSubscriptionExpiryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      subscriptionExpiry: e.target.value ? new Date(e.target.value) : undefined,
+    }));
+  }, []);
+
   useEffect(() => {
     if (user && mode === "edit") {
       setFormData({
