@@ -68,22 +68,29 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
 
       console.log(`🌱 Seeding database via: ${apiUrl}`);
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors", // Enable CORS for cross-origin requests
-      });
+      let response;
+      try {
+        response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors", // Enable CORS for cross-origin requests
+        });
+      } catch (fetchError) {
+        console.error("Seeding fetch failed:", fetchError);
+        throw new Error(`Cannot connect to seeding API: ${fetchError.message}`);
+      }
 
       let result = null;
       try {
         result = await response.json();
       } catch (parseError) {
         console.error("Failed to parse seeding response:", parseError);
-        setError("❌ Invalid response from seeding API");
-        return;
+        throw new Error("Invalid response from seeding API");
       }
+
+      console.log("Seeding response:", { status: response.status, result });
 
       if (response.ok && result && result.success) {
         setError(
@@ -91,14 +98,14 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
         );
         console.log("✅ Database seeding successful:", result);
       } else {
-        setError("❌ Seeding failed: " + (result?.message || "Unknown error"));
-        console.error("❌ Database seeding failed:", result);
+        const errorMsg = result?.message || `Server returned ${response.status}`;
+        setError(`❌ Seeding failed: ${errorMsg}`);
+        console.error("❌ Database seeding failed:", { status: response.status, result });
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setError("❌ Seeding error: " + errorMessage);
       console.error("❌ Database seeding error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown seeding error";
+      setError(`❌ Seeding error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
