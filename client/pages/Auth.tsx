@@ -110,6 +110,20 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
     setError("");
 
     try {
+      console.log("Attempting login with:", { email: loginData.email });
+
+      // Test API connectivity first
+      try {
+        const testResponse = await fetch("/api/test-connectivity");
+        if (!testResponse.ok) {
+          throw new Error("API server not responding");
+        }
+        console.log("API connectivity confirmed");
+      } catch (connectError) {
+        console.error("API connectivity failed:", connectError);
+        throw new Error("Cannot connect to server. Please try again later.");
+      }
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -118,33 +132,58 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
         body: JSON.stringify(loginData),
       });
 
+      console.log("Login response status:", response.status);
+
       if (!response.ok) {
-        let errorMessage = "Login failed";
+        let errorMessage = `Login failed (${response.status})`;
         try {
           const errorData = await response.json();
-          errorMessage = errorData?.message || "Login failed";
+          errorMessage = errorData?.message || errorMessage;
+          console.log("Login error data:", errorData);
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
+          errorMessage = `Server error (${response.status}): ${response.statusText}`;
         }
         throw new Error(errorMessage);
       }
 
-      const data: AuthResponse = await response.json();
+      let data;
+      try {
+        data = await response.json();
+        console.log("Login response data:", { success: data?.success, hasUser: !!data?.user });
+      } catch (parseError) {
+        console.error("Failed to parse login response:", parseError);
+        throw new Error("Invalid response from login server");
+      }
 
       // Validate response data
+      if (!data || typeof data !== 'object') {
+        throw new Error("Invalid response format from server");
+      }
+
       if (!data.success) {
-        throw new Error(data.message || "Login failed");
+        throw new Error(data.message || "Login was not successful");
       }
 
-      if (!data.user || !data.user.username) {
-        throw new Error("Invalid user data received from server");
+      if (!data.user) {
+        throw new Error("No user data received from server");
       }
 
+      if (!data.user.username) {
+        throw new Error("Incomplete user data - missing username");
+      }
+
+      if (!data.token) {
+        throw new Error("No authentication token received");
+      }
+
+      console.log("Login successful for user:", data.user.username);
       localStorage.setItem("token", data.token);
       onAuthenticated(data.user);
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err instanceof Error ? err.message : "Login failed");
+      console.error("Login error details:", err);
+      const errorMessage = err instanceof Error ? err.message : "Unknown login error";
+      setError(`Login failed: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
