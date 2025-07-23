@@ -357,9 +357,7 @@ export default function UserDetail({
                     <div className="flex items-center space-x-3 p-3 rounded-lg bg-card/50 seductive-border">
                       <Switch
                         checked={formData.isActive}
-                        onCheckedChange={(checked) =>
-                          setFormData({ ...formData, isActive: checked })
-                        }
+                        onCheckedChange={handleActiveChange}
                       />
                       <span className="font-serif">
                         {formData.isActive ? "Active" : "Inactive"}
