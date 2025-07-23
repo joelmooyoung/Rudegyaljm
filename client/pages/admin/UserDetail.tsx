@@ -339,9 +339,7 @@ export default function UserDetail({
                     </Label>
                     <Select
                       value={formData.role}
-                      onValueChange={(value: "admin" | "premium" | "free") =>
-                        setFormData({ ...formData, role: value })
-                      }
+                      onValueChange={handleRoleChange}
                     >
                       <SelectTrigger className="seductive-border font-serif">
                         <SelectValue />
