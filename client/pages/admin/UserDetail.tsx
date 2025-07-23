@@ -492,14 +492,7 @@ export default function UserDetail({
                                   .split("T")[0]
                               : ""
                           }
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              subscriptionExpiry: e.target.value
-                                ? new Date(e.target.value)
-                                : undefined,
-                            })
-                          }
+                          onChange={handleSubscriptionExpiryChange}
                           className="seductive-border font-serif"
                         />
                       </div>
