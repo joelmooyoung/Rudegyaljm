@@ -78,13 +78,13 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok && result && result.success) {
         setError(
           "✅ Database seeded! Login with: admin@nocturne.com / admin123",
         );
         console.log("✅ Database seeding successful:", result);
       } else {
-        setError("❌ Seeding failed: " + (result.message || "Unknown error"));
+        setError("❌ Seeding failed: " + (result?.message || "Unknown error"));
         console.error("❌ Database seeding failed:", result);
       }
     } catch (error) {
