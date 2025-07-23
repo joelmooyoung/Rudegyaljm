@@ -76,7 +76,14 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
         mode: "cors", // Enable CORS for cross-origin requests
       });
 
-      const result = await response.json();
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error("Failed to parse seeding response:", parseError);
+        setError("❌ Invalid response from seeding API");
+        return;
+      }
 
       if (response.ok && result && result.success) {
         setError(
