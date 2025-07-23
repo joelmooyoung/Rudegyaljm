@@ -117,9 +117,20 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
       }
 
       const data: AuthResponse = await response.json();
+
+      // Validate response data
+      if (!data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      if (!data.user || !data.user.username) {
+        throw new Error("Invalid user data received from server");
+      }
+
       localStorage.setItem("token", data.token);
       onAuthenticated(data.user);
     } catch (err) {
+      console.error("Login error:", err);
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setIsLoading(false);
