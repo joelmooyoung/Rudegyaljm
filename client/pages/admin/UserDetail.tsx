@@ -460,12 +460,7 @@ export default function UserDetail({
                       </Label>
                       <Select
                         value={formData.subscriptionStatus}
-                        onValueChange={(value: "active" | "expired" | "none") =>
-                          setFormData({
-                            ...formData,
-                            subscriptionStatus: value,
-                          })
-                        }
+                        onValueChange={handleSubscriptionStatusChange}
                       >
                         <SelectTrigger className="seductive-border font-serif">
                           <SelectValue />
