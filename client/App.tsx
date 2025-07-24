@@ -96,7 +96,6 @@ const App = () => {
 
     console.log("Dev mode checks:", {
       devParam,
-      adminHash,
       isBuilderEnv,
       isVercelEnv,
       forceDevMode,
