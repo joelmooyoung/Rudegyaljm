@@ -60,9 +60,7 @@ async function checkDatabase() {
     console.log("\n✅ Database check completed successfully");
 
     if (userCount === 0) {
-      console.log("\n💡 No users found. You can:");
-      console.log("   1. Use the admin seeding interface to create test users");
-      console.log("   2. Visit: http://localhost:8080/?dev=true#admin-seeding");
+      console.log("\n💡 No users found. Create users through the registration process.");
     }
   } catch (error) {
     console.error("❌ Database check failed:", error.message);
