@@ -79,11 +79,14 @@ export default async function handler(req, res) {
         if (userRole !== "admin") {
           return res.status(403).json({
             success: false,
-            message: "Insufficient permissions. Admin role required for role changes.",
+            message:
+              "Insufficient permissions. Admin role required for role changes.",
           });
         }
 
-        console.log(`[USER API] Role change authorized by admin: ${adminUser.username}`);
+        console.log(
+          `[USER API] Role change authorized by admin: ${adminUser.username}`,
+        );
       }
 
       // Find the user
