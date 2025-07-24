@@ -56,68 +56,7 @@ export default function Auth({
   });
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSeedDatabase = async () => {
-    setIsLoading(true);
-    setError("");
 
-    try {
-      console.log("🌱 Attempting to seed database...");
-
-      // Use production API for database operations from preview environment
-      const isBuilderPreview = window.location.hostname.includes("builder.my");
-      const apiUrl = isBuilderPreview
-        ? "https://rudegyaljm-amber.vercel.app/api/seed-database"
-        : "/api/seed-database";
-
-      console.log(`🌱 Seeding database via: ${apiUrl}`);
-
-      let response;
-      try {
-        response = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          mode: "cors", // Enable CORS for cross-origin requests
-        });
-      } catch (fetchError) {
-        console.error("Seeding fetch failed:", fetchError);
-        throw new Error(`Cannot connect to seeding API: ${fetchError.message}`);
-      }
-
-      let result = null;
-      try {
-        result = await response.json();
-      } catch (parseError) {
-        console.error("Failed to parse seeding response:", parseError);
-        throw new Error("Invalid response from seeding API");
-      }
-
-      console.log("Seeding response:", { status: response.status, result });
-
-      if (response.ok && result && result.success) {
-        setError(
-          "✅ Database seeded! Login with: admin@nocturne.com / admin123",
-        );
-        console.log("✅ Database seeding successful:", result);
-      } else {
-        const errorMsg =
-          result?.message || `Server returned ${response.status}`;
-        setError(`❌ Seeding failed: ${errorMsg}`);
-        console.error("❌ Database seeding failed:", {
-          status: response.status,
-          result,
-        });
-      }
-    } catch (error) {
-      console.error("❌ Database seeding error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown seeding error";
-      setError(`❌ Seeding error: ${errorMessage}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
