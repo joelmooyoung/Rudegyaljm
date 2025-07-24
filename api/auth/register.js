@@ -24,8 +24,11 @@ export default async function handler(req, res) {
   try {
     await connectToDatabase();
 
-    const { username, email, password, dateOfBirth, role = "free" } = req.body;
+    const { username, email, password, dateOfBirth } = req.body;
     console.log(`[REGISTER API] Registration attempt for: ${email}`);
+
+    // All new users are assigned 'free' role by default - admin privileges must be granted by existing admin
+    const role = "free";
 
     // Validation
     if (!username || !email || !password) {
@@ -55,15 +58,6 @@ export default async function handler(req, res) {
           message: "You must be at least 18 years old to register",
         });
       }
-    }
-
-    // Validate role
-    const validRoles = ["admin", "premium", "free"];
-    if (!validRoles.includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid role specified",
-      });
     }
 
     // Check if user already exists
