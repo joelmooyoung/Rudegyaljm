@@ -164,7 +164,7 @@ export default async function handler(req, res) {
         const updateFields = {};
         if (req.body.username) updateFields.username = req.body.username;
         if (req.body.email) updateFields.email = req.body.email;
-        if (req.body.role) updateFields.type = req.body.role; // Map role to type
+        // Role changes removed for security - admin privileges must be granted by existing admin
         if (req.body.hasOwnProperty("isActive"))
           updateFields.active = req.body.isActive; // Map isActive to active
         if (req.body.country) updateFields.country = req.body.country;
