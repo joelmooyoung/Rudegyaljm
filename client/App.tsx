@@ -84,7 +84,6 @@ const App = () => {
 
     // Multiple ways to detect development mode
     const devParam = urlParams.get("dev") === "true";
-    const adminHash = window.location.hash.includes("admin-seeding");
     const isBuilderEnv = window.location.hostname.includes("builder.my");
     const isVercelEnv = window.location.hostname.includes("vercel.app");
 
