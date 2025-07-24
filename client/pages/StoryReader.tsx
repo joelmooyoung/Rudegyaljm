@@ -44,6 +44,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     commentCount: story.commentCount || 0,
   });
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
