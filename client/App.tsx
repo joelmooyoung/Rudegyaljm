@@ -92,8 +92,7 @@ const App = () => {
       isBuilderEnv || window.location.hostname.includes("projects.builder.my");
 
     // Force dev mode in Builder.io OR Vercel environment
-    const devMode =
-      devParam || adminHash || isBuilderEnv || isVercelEnv || forceDevMode;
+    const devMode = devParam || isBuilderEnv || isVercelEnv || forceDevMode;
 
     console.log("Dev mode checks:", {
       devParam,
