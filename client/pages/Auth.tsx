@@ -56,8 +56,6 @@ export default function Auth({
   });
   const [confirmPassword, setConfirmPassword] = useState("");
 
-
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -346,8 +344,6 @@ export default function Auth({
                     </button>
                   </div>
                 </form>
-
-
               </TabsContent>
 
               <TabsContent value="register">

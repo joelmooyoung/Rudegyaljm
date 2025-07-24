@@ -60,7 +60,9 @@ async function checkDatabase() {
     console.log("\n✅ Database check completed successfully");
 
     if (userCount === 0) {
-      console.log("\n💡 No users found. Create users through the registration process.");
+      console.log(
+        "\n💡 No users found. Create users through the registration process.",
+      );
     }
   } catch (error) {
     console.error("❌ Database check failed:", error.message);
