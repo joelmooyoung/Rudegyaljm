@@ -8,9 +8,7 @@ const VERCEL_PRODUCTION_URL = "https://rudegyaljm-amber.vercel.app";
 
 // API endpoints that need database access
 const DATABASE_ENDPOINTS = [
-  "/api/seed-database",
   "/api/verify-database",
-  "/api/clear-database",
   "/api/stories",
   "/api/users",
   "/api/auth/login",
