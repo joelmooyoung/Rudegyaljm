@@ -347,14 +347,7 @@ export default function Auth({
                   </div>
                 </form>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full mt-2 text-xs text-muted-foreground"
-                  onClick={handleSeedDatabase}
-                >
-                  🌱 Seed Database (First Time Setup)
-                </Button>
+
               </TabsContent>
 
               <TabsContent value="register">
