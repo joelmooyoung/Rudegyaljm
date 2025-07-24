@@ -54,6 +54,38 @@ export default async function handler(req, res) {
       console.log(`[USER API] Updating user: ${userId}`);
       console.log(`[USER API] Request body:`, req.body);
 
+      // Check if role change is being attempted - requires admin authentication
+      if (req.body.role !== undefined) {
+        const { adminUserId } = req.body;
+
+        if (!adminUserId) {
+          return res.status(401).json({
+            success: false,
+            message: "Admin authentication required for role changes",
+          });
+        }
+
+        // Verify admin user exists and has admin role
+        const adminUser = await User.findOne({ userId: adminUserId });
+        if (!adminUser) {
+          return res.status(404).json({
+            success: false,
+            message: "Admin user not found",
+          });
+        }
+
+        // Check admin permissions (handle both 'type' and 'role' fields)
+        const userRole = adminUser.type || adminUser.role;
+        if (userRole !== "admin") {
+          return res.status(403).json({
+            success: false,
+            message: "Insufficient permissions. Admin role required for role changes.",
+          });
+        }
+
+        console.log(`[USER API] Role change authorized by admin: ${adminUser.username}`);
+      }
+
       // Find the user
       const existingUser = await User.findOne({ userId });
       if (!existingUser) {
