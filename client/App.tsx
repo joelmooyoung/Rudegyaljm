@@ -140,7 +140,7 @@ const App = () => {
           id: "mock-user-1",
           email: "test@example.com",
           username: "TestUser",
-          role: "admin", // Make sure they can access seeding
+          role: "admin",
           isAgeVerified: true,
           isActive: true,
           subscriptionStatus: "none",
