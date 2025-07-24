@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
     // Get all users (limit to 10 for safety)
     const users = await User.find({})
-      .select('userId username email type active createdAt')
+      .select("userId username email type active createdAt")
       .limit(10)
       .sort({ createdAt: -1 });
 
@@ -34,22 +34,21 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       userCount,
-      users: users.map(user => ({
+      users: users.map((user) => ({
         userId: user.userId,
         username: user.username,
         email: user.email,
         type: user.type,
         active: user.active,
-        createdAt: user.createdAt
-      }))
+        createdAt: user.createdAt,
+      })),
     });
-
   } catch (error) {
     console.error("[DEBUG USERS API] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch users",
-      error: error.message
+      error: error.message,
     });
   }
 }

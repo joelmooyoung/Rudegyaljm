@@ -16,14 +16,14 @@ export default async function handler(req, res) {
       message: "API connectivity working",
       method: req.method,
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || "unknown"
+      environment: process.env.NODE_ENV || "unknown",
     });
   } catch (error) {
     console.error("[TEST CONNECTIVITY] Error:", error);
     return res.status(500).json({
       success: false,
       message: "API connectivity failed",
-      error: error.message
+      error: error.message,
     });
   }
 }

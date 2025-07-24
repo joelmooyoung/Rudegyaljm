@@ -33,7 +33,10 @@ interface AuthProps {
   onNavigateToForgotPassword?: () => void;
 }
 
-export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: AuthProps) {
+export default function Auth({
+  onAuthenticated,
+  onNavigateToForgotPassword,
+}: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -98,13 +101,18 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
         );
         console.log("✅ Database seeding successful:", result);
       } else {
-        const errorMsg = result?.message || `Server returned ${response.status}`;
+        const errorMsg =
+          result?.message || `Server returned ${response.status}`;
         setError(`❌ Seeding failed: ${errorMsg}`);
-        console.error("❌ Database seeding failed:", { status: response.status, result });
+        console.error("❌ Database seeding failed:", {
+          status: response.status,
+          result,
+        });
       }
     } catch (error) {
       console.error("❌ Database seeding error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown seeding error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown seeding error";
       setError(`❌ Seeding error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
@@ -157,14 +165,17 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
       let data;
       try {
         data = await response.json();
-        console.log("Login response data:", { success: data?.success, hasUser: !!data?.user });
+        console.log("Login response data:", {
+          success: data?.success,
+          hasUser: !!data?.user,
+        });
       } catch (parseError) {
         console.error("Failed to parse login response:", parseError);
         throw new Error("Invalid response from login server");
       }
 
       // Validate response data
-      if (!data || typeof data !== 'object') {
+      if (!data || typeof data !== "object") {
         throw new Error("Invalid response format from server");
       }
 
@@ -189,7 +200,8 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
       onAuthenticated(data.user);
     } catch (err) {
       console.error("Login error details:", err);
-      const errorMessage = err instanceof Error ? err.message : "Unknown login error";
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown login error";
       setError(`Login failed: ${errorMessage}`);
     } finally {
       setIsLoading(false);
@@ -371,7 +383,7 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
                     </div>
                   </div>
 
-                                    {error && (
+                  {error && (
                     <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
                       {error}
                     </div>
@@ -385,7 +397,7 @@ export default function Auth({ onAuthenticated, onNavigateToForgotPassword }: Au
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
 
-                                    <div className="text-center">
+                  <div className="text-center">
                     <button
                       type="button"
                       onClick={onNavigateToForgotPassword}
