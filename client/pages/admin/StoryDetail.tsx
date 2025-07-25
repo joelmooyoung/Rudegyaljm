@@ -211,6 +211,27 @@ export default function StoryDetail({
 
   const handlePlainTextConfirm = () => {
     try {
+      // For very large texts, show loading and process asynchronously
+      if (plainTextInput.length > 10000) {
+        setError("Processing large text...");
+        // Use setTimeout to prevent UI blocking
+        setTimeout(() => {
+          try {
+            const htmlContent = convertPlainTextToHTML(plainTextInput);
+            handleInputChange("content", htmlContent);
+            setPlainTextInput("");
+            setError("");
+            if (typeof setIsPlainTextDialogOpen === "function") {
+              setIsPlainTextDialogOpen(false);
+            }
+          } catch (err) {
+            setError("Failed to convert large text. Try breaking it into smaller sections.");
+            console.error("Text conversion error:", err);
+          }
+        }, 10);
+        return;
+      }
+
       const htmlContent = convertPlainTextToHTML(plainTextInput);
       handleInputChange("content", htmlContent);
       setPlainTextInput("");
