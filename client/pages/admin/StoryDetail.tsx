@@ -225,7 +225,9 @@ export default function StoryDetail({
               setIsPlainTextDialogOpen(false);
             }
           } catch (err) {
-            setError("Failed to convert large text. Try breaking it into smaller sections.");
+            setError(
+              "Failed to convert large text. Try breaking it into smaller sections.",
+            );
             console.error("Text conversion error:", err);
           }
         }, 10);
@@ -579,7 +581,9 @@ export default function StoryDetail({
                           <Label>HTML Preview</Label>
                           <div className="border rounded-md p-3 bg-muted/50 text-sm">
                             <code className="text-xs text-muted-foreground block mb-2">
-                              HTML Output: {plainTextInput.length > 10000 && "(Preview limited for performance)"}
+                              HTML Output:{" "}
+                              {plainTextInput.length > 10000 &&
+                                "(Preview limited for performance)"}
                             </code>
                             <div
                               className="prose prose-sm max-w-none"
