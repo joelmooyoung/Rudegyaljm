@@ -558,12 +558,12 @@ export default function StoryDetail({
                           <Label>HTML Preview</Label>
                           <div className="border rounded-md p-3 bg-muted/50 text-sm">
                             <code className="text-xs text-muted-foreground block mb-2">
-                              HTML Output:
+                              HTML Output: {plainTextInput.length > 10000 && "(Preview limited for performance)"}
                             </code>
                             <div
                               className="prose prose-sm max-w-none"
                               dangerouslySetInnerHTML={{
-                                __html: convertPlainTextToHTML(plainTextInput),
+                                __html: htmlPreview,
                               }}
                             />
                           </div>
