@@ -117,7 +117,10 @@ export default function Auth({
           }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
-          errorMessage = `Server communication error (${response.status}): ${response.statusText}`;
+          // Safely access response properties in case they're undefined
+          const status = response?.status || 'unknown';
+          const statusText = response?.statusText || 'unknown error';
+          errorMessage = `Server communication error (${status}): ${statusText}`;
         }
         throw new Error(errorMessage);
       }
