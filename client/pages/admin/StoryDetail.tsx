@@ -197,6 +197,18 @@ export default function StoryDetail({
       .join("\n");
   };
 
+  // Memoized HTML preview to prevent freezing on large text inputs
+  const htmlPreview = useMemo(() => {
+    if (!plainTextInput) return "";
+
+    // Only process if text is not too long to prevent freezing
+    if (plainTextInput.length > 10000) {
+      return "<p><em>Preview disabled for large text (>10,000 characters) to prevent interface freezing. Click 'Convert & Use' to process.</em></p>";
+    }
+
+    return convertPlainTextToHTML(plainTextInput);
+  }, [plainTextInput]);
+
   const handlePlainTextConfirm = () => {
     try {
       const htmlContent = convertPlainTextToHTML(plainTextInput);
