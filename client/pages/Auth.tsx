@@ -98,14 +98,19 @@ export default function Auth({
           } else {
             // Server returned non-JSON response (likely HTML error page)
             const textResponse = await response.text();
-            console.log("Non-JSON error response:", textResponse.substring(0, 200));
+            console.log(
+              "Non-JSON error response:",
+              textResponse.substring(0, 200),
+            );
             errorMessage = `Server error (${response.status}): ${response.statusText}`;
 
             // Check if it's a common server error
             if (response.status === 502) {
-              errorMessage = "Server temporarily unavailable. Please try again.";
+              errorMessage =
+                "Server temporarily unavailable. Please try again.";
             } else if (response.status === 503) {
-              errorMessage = "Service temporarily unavailable. Please try again later.";
+              errorMessage =
+                "Service temporarily unavailable. Please try again later.";
             } else if (response.status >= 500) {
               errorMessage = "Internal server error. Please try again.";
             }
@@ -123,7 +128,11 @@ export default function Auth({
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           const textResponse = await response.text();
-          console.error("Expected JSON but got:", contentType, textResponse.substring(0, 200));
+          console.error(
+            "Expected JSON but got:",
+            contentType,
+            textResponse.substring(0, 200),
+          );
           throw new Error("Server returned invalid response format");
         }
 
