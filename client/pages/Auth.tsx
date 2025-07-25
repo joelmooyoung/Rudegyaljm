@@ -146,7 +146,9 @@ export default function Auth({
         });
       } catch (parseError) {
         console.error("Failed to parse login response:", parseError);
-        if (parseError.message.includes("JSON")) {
+        // Safely check error message
+        const errorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        if (errorMsg.includes("JSON")) {
           throw new Error("Server returned invalid JSON response");
         }
         throw new Error("Invalid response from login server");
