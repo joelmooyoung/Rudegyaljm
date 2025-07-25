@@ -119,6 +119,14 @@ export default function Auth({
 
       let data;
       try {
+        // Check if successful response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const textResponse = await response.text();
+          console.error("Expected JSON but got:", contentType, textResponse.substring(0, 200));
+          throw new Error("Server returned invalid response format");
+        }
+
         data = await response.json();
         console.log("Login response data:", {
           success: data?.success,
@@ -126,6 +134,9 @@ export default function Auth({
         });
       } catch (parseError) {
         console.error("Failed to parse login response:", parseError);
+        if (parseError.message.includes("JSON")) {
+          throw new Error("Server returned invalid JSON response");
+        }
         throw new Error("Invalid response from login server");
       }
 
