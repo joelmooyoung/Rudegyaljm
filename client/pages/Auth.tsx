@@ -89,12 +89,30 @@ export default function Auth({
       if (!response.ok) {
         let errorMessage = `Login failed (${response.status})`;
         try {
-          const errorData = await response.json();
-          errorMessage = errorData?.message || errorMessage;
-          console.log("Login error data:", errorData);
+          // Check if response is JSON by looking at content-type
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            errorMessage = errorData?.message || errorMessage;
+            console.log("Login error data:", errorData);
+          } else {
+            // Server returned non-JSON response (likely HTML error page)
+            const textResponse = await response.text();
+            console.log("Non-JSON error response:", textResponse.substring(0, 200));
+            errorMessage = `Server error (${response.status}): ${response.statusText}`;
+
+            // Check if it's a common server error
+            if (response.status === 502) {
+              errorMessage = "Server temporarily unavailable. Please try again.";
+            } else if (response.status === 503) {
+              errorMessage = "Service temporarily unavailable. Please try again later.";
+            } else if (response.status >= 500) {
+              errorMessage = "Internal server error. Please try again.";
+            }
+          }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
-          errorMessage = `Server error (${response.status}): ${response.statusText}`;
+          errorMessage = `Server communication error (${response.status}): ${response.statusText}`;
         }
         throw new Error(errorMessage);
       }
