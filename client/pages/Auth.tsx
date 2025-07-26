@@ -118,8 +118,8 @@ export default function Auth({
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
           // Safely access response properties in case they're undefined
-          const status = response?.status || 'unknown';
-          const statusText = response?.statusText || 'unknown error';
+          const status = response?.status || "unknown";
+          const statusText = response?.statusText || "unknown error";
           errorMessage = `Server communication error (${status}): ${statusText}`;
         }
         throw new Error(errorMessage);
@@ -147,7 +147,8 @@ export default function Auth({
       } catch (parseError) {
         console.error("Failed to parse login response:", parseError);
         // Safely check error message
-        const errorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        const errorMsg =
+          parseError instanceof Error ? parseError.message : String(parseError);
         if (errorMsg.includes("JSON")) {
           throw new Error("Server returned invalid JSON response");
         }
@@ -263,7 +264,9 @@ export default function Auth({
           </div>
           <p className="text-lg font-serif text-muted-foreground">
             <em>Your gateway to forbidden desires</em> awaits at{" "}
-            <span className="text-accent font-semibold">Rudegyalconfessions.com</span>
+            <span className="text-accent font-semibold">
+              Rudegyalconfessions.com
+            </span>
           </p>
         </div>
 
@@ -530,7 +533,8 @@ export default function Auth({
         <div className="container mx-auto px-4 py-4">
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights reserved
+              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights
+              reserved
             </p>
           </div>
         </div>

@@ -59,7 +59,8 @@ export default async function handler(req, res) {
         const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/reset-password?token=${resetToken}`;
 
         const emailResult = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || "noreply@Rudegyalconfessions.com",
+          from:
+            process.env.RESEND_FROM_EMAIL || "noreply@Rudegyalconfessions.com",
           to: user.email,
           subject: "Password Reset - Rude Gyal Confessions",
           html: `

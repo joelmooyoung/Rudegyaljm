@@ -748,8 +748,12 @@ export default function Home({
             <div className="space-y-4">
               <h4 className="text-sm font-semibold font-display">Contact</h4>
               <div className="space-y-3 text-xs text-muted-foreground font-serif">
-                <div className="break-all">📧 hello@Rudegyalconfessions.com</div>
-                <div className="break-all">🛠️ support@Rudegyalconfessions.com</div>
+                <div className="break-all">
+                  📧 hello@Rudegyalconfessions.com
+                </div>
+                <div className="break-all">
+                  🛠️ support@Rudegyalconfessions.com
+                </div>
                 <div className="break-all">🌐 Rudegyalconfessions.com</div>
               </div>
             </div>
@@ -757,7 +761,8 @@ export default function Home({
 
           <div className="border-t border-border/50 mt-8 pt-6 text-center">
             <p className="text-xs text-muted-foreground font-serif">
-              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights reserved
+              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights
+              reserved
             </p>
           </div>
         </div>
