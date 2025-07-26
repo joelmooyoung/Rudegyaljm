@@ -31,7 +31,7 @@ export default function DirectEmailTest() {
       const resend = new Resend("re_5y74v57Z_Hkfro8qVsR2aqGXzRhvG1eW3");
 
       const emailResult = await resend.emails.send({
-        from: "noreply@rudegyaljm.com",
+        from: "noreply@Rudegyalconfessions.com",
         to: email,
         subject: "Test Email - Rude Gyal Confessions",
         html: `
