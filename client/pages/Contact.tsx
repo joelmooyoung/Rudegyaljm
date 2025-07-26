@@ -186,7 +186,7 @@ export default function Contact({ onBack }: ContactProps) {
                     <div>
                       <p className="font-medium">Support</p>
                       <a
-                        href="mailto:support@rudegyaljm.com"
+                        href="mailto:support@Rudegyalconfessions.com"
                         className="text-sm text-muted-foreground hover:text-primary"
                       >
                         support@rudegyaljm.com
