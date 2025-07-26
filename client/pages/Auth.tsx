@@ -459,7 +459,7 @@ export default function Auth({
                       <Input
                         id="register-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="•••••••���"
+                        placeholder="••••••••"
                         value={registerData.password}
                         onChange={(e) =>
                           setRegisterData({
@@ -530,7 +530,7 @@ export default function Auth({
         <div className="container mx-auto px-4 py-4">
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              © {new Date().getFullYear()} Rudegyaljm.com - All rights reserved
+              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights reserved
             </p>
           </div>
         </div>
