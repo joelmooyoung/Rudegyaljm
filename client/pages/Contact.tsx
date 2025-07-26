@@ -243,7 +243,7 @@ export default function Contact({ onBack }: ContactProps) {
                       <span className="text-sm font-medium">Facebook</span>
                     </a>
                     <a
-                      href="https://youtube.com/@rudegyaljm"
+                      href="https://youtube.com/@Rudegyalconfessions"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/10 transition-colors"
