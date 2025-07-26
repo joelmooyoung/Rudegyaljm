@@ -748,9 +748,9 @@ export default function Home({
             <div className="space-y-4">
               <h4 className="text-sm font-semibold font-display">Contact</h4>
               <div className="space-y-3 text-xs text-muted-foreground font-serif">
-                <div className="break-all">📧 hello@rudegyaljm.com</div>
-                <div className="break-all">🛠️ support@rudegyaljm.com</div>
-                <div className="break-all">🌐 Rudegyaljm.com</div>
+                <div className="break-all">📧 hello@Rudegyalconfessions.com</div>
+                <div className="break-all">🛠️ support@Rudegyalconfessions.com</div>
+                <div className="break-all">🌐 Rudegyalconfessions.com</div>
               </div>
             </div>
           </div>
