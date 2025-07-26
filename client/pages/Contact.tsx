@@ -177,7 +177,7 @@ export default function Contact({ onBack }: ContactProps) {
                         href="mailto:hello@Rudegyalconfessions.com"
                         className="text-sm text-muted-foreground hover:text-primary"
                       >
-                        hello@rudegyaljm.com
+                        hello@Rudegyalconfessions.com
                       </a>
                     </div>
                   </div>
