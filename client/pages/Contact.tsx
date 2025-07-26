@@ -216,7 +216,7 @@ export default function Contact({ onBack }: ContactProps) {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <a
-                      href="https://instagram.com/rudegyaljm"
+                      href="https://instagram.com/Rudegyalconfessions"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/10 transition-colors"
