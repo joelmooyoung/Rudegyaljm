@@ -1,1 +1,1 @@
-MY project for Rudegyaljm.com.  A story reading webapp
+MY project for Rudegyalconfessions.com.  A story reading webapp
