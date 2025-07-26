@@ -263,7 +263,7 @@ export default function Auth({
           </div>
           <p className="text-lg font-serif text-muted-foreground">
             <em>Your gateway to forbidden desires</em> awaits at{" "}
-            <span className="text-accent font-semibold">Rudegyaljm.com</span>
+            <span className="text-accent font-semibold">Rudegyalconfessions.com</span>
           </p>
         </div>
 
@@ -459,7 +459,7 @@ export default function Auth({
                       <Input
                         id="register-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="•••••••���"
                         value={registerData.password}
                         onChange={(e) =>
                           setRegisterData({
