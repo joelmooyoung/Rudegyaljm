@@ -189,7 +189,7 @@ export default function Contact({ onBack }: ContactProps) {
                         href="mailto:support@Rudegyalconfessions.com"
                         className="text-sm text-muted-foreground hover:text-primary"
                       >
-                        support@rudegyaljm.com
+                        support@Rudegyalconfessions.com
                       </a>
                     </div>
                   </div>
