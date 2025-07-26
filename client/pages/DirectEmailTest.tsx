@@ -127,7 +127,7 @@ Error details: ${JSON.stringify(error)}`);
       const resetUrl = `https://rudegyaljm-amber.vercel.app/reset-password?token=${testToken}`;
 
       const emailResult = await resend.emails.send({
-        from: "noreply@rudegyaljm.com",
+        from: "noreply@Rudegyalconfessions.com",
         to: email,
         subject: "Password Reset Test - Rude Gyal Confessions",
         html: `
