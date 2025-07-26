@@ -572,7 +572,7 @@ export default function StoryDetail({
                           placeholder="Paste your story text here..."
                           value={plainTextInput}
                           onChange={(e) => setPlainTextInput(e.target.value)}
-                          className="min-h-32"
+                          className="min-h-80 max-h-96 overflow-y-auto resize-y"
                         />
                       </div>
 
