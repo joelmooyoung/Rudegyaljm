@@ -57,7 +57,7 @@ export default function AgeVerificationSimple({
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-red-400 mb-4">
-            Rude Gyal ConfessionsXXX
+            Rude Gyal Confessions
           </h1>
           <p className="text-xl text-gray-300">
             Adult Content - Age Verification Required
