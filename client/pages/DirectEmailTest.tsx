@@ -250,7 +250,7 @@ Check your inbox for the password reset test email.
                   ✅ Resend API key: <code>re_5y74v5...</code> (valid format)
                 </li>
                 <li>
-                  ✅ From email: <code>noreply@rudegyaljm.com</code>
+                  ✅ From email: <code>noreply@Rudegyalconfessions.com</code>
                 </li>
                 <li>✅ Email templates: Created and beautiful</li>
                 <li>✅ Password reset system: Fully implemented</li>
