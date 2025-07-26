@@ -757,7 +757,7 @@ export default function Home({
 
           <div className="border-t border-border/50 mt-8 pt-6 text-center">
             <p className="text-xs text-muted-foreground font-serif">
-              © {new Date().getFullYear()} Rudegyaljm.com - All rights reserved
+              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights reserved
             </p>
           </div>
         </div>
