@@ -166,8 +166,8 @@ export default function Auth({
         // Check if successful response is JSON
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
-          // Simplified logging - avoid complex string operations that keep failing
-          console.error("Server returned non-JSON response, content-type:", contentType || "unknown");
+          // Ultra-safe logging - avoid logging potentially problematic values
+          console.error("Server returned non-JSON response");
           throw new Error("Server returned invalid response format");
         }
 
