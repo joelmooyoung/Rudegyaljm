@@ -120,6 +120,27 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
     }
   };
 
+  // Test database connectivity
+  const testDatabase = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/test-db");
+      const data = await response.json();
+
+      if (data.success) {
+        setError(`✅ Database connected! Found ${data.userCount} users in database`);
+      } else {
+        setError(`❌ Database error: ${data.message}`);
+      }
+    } catch (err) {
+      setError(`❌ Cannot reach database API: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Create admin user for testing
   const createAdminUser = async () => {
     setIsLoading(true);
@@ -139,7 +160,7 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
         setError(`❌ Failed to create admin: ${data.message}`);
       }
     } catch (err) {
-      setError("Failed to create admin user");
+      setError(`❌ Failed to create admin user: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
