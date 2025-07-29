@@ -322,16 +322,28 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
                   </Button>
 
                   <div className="text-center space-y-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={createAdminUser}
-                      disabled={isLoading}
-                      className="w-full text-xs"
-                    >
-                      🔧 Create Admin User (admin@nocturne.com)
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={testDatabase}
+                        disabled={isLoading}
+                        className="text-xs"
+                      >
+                        🔍 Test DB
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={createAdminUser}
+                        disabled={isLoading}
+                        className="text-xs"
+                      >
+                        🔧 Create Admin
+                      </Button>
+                    </div>
 
                     <button
                       type="button"
