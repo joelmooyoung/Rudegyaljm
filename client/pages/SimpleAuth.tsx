@@ -156,24 +156,36 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
 
   // Create admin user for testing
   const createAdminUser = async () => {
+    // Immediate feedback
+    alert("🔧 Create Admin button clicked!");
+    setError("🔧 Creating admin user...");
     setIsLoading(true);
-    setError("");
 
     try {
+      alert("📡 Fetching /api/create-admin...");
       const response = await fetch("/api/create-admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
 
+      alert(`📥 Response status: ${response.status}`);
       const data = await response.json();
 
+      alert(`📊 Response data: ${JSON.stringify(data)}`);
+
       if (data.success) {
-        setError(`✅ ${data.message} - You can now login with admin@nocturne.com / admin123`);
+        const msg = `✅ ${data.message} - You can now login with admin@nocturne.com / admin123`;
+        alert(msg);
+        setError(msg);
       } else {
-        setError(`❌ Failed to create admin: ${data.message}`);
+        const msg = `❌ Failed to create admin: ${data.message}`;
+        alert(msg);
+        setError(msg);
       }
     } catch (err) {
-      setError(`❌ Failed to create admin user: ${err.message}`);
+      const msg = `❌ Failed to create admin user: ${err.message}`;
+      alert(msg);
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
