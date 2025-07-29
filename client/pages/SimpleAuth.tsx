@@ -95,6 +95,31 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
     }
   };
 
+  // Create admin user for testing
+  const createAdminUser = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/create-admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setError(`✅ ${data.message} - You can now login with admin@nocturne.com / admin123`);
+      } else {
+        setError(`❌ Failed to create admin: ${data.message}`);
+      }
+    } catch (err) {
+      setError("Failed to create admin user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Simple register function
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
