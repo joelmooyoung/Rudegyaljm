@@ -84,6 +84,11 @@ export default function Auth({
         body: JSON.stringify(loginData),
       });
 
+      // Validate response object exists
+      if (!response) {
+        throw new Error("No response received from server");
+      }
+
       console.log("Login response status:", response?.status || 'unknown');
 
       if (!response.ok) {
