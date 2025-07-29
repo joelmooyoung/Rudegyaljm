@@ -117,10 +117,10 @@ export default function Auth({
           }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
-          // Safely access response properties in case they're undefined
-          const status = response?.status || "unknown";
-          const statusText = response?.statusText || "unknown error";
-          errorMessage = `Server communication error (${status}): ${statusText}`;
+          // Safely access response properties with proper type checking
+          const status = (response && typeof response.status === 'number') ? response.status : "unknown";
+          const statusText = (response && typeof response.statusText === 'string') ? response.statusText : "unknown error";
+          errorMessage = `Server communication error (${String(status)}): ${String(statusText)}`;
         }
         throw new Error(errorMessage);
       }
