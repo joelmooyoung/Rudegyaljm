@@ -92,8 +92,12 @@ export default function Auth({
       console.log("Login response status:", response?.status || 'unknown');
 
       if (!response.ok) {
-        let errorMessage = `Login failed (${response?.status || 'unknown'})`;
+        // Declare errorMessage in outer scope to ensure accessibility
+        let errorMessage;
+
         try {
+          errorMessage = `Login failed (${response?.status || 'unknown'})`;
+
           // Check if response is JSON by looking at content-type
           const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
           if (contentType && contentType.includes("application/json")) {
@@ -133,7 +137,9 @@ export default function Auth({
             errorMessage = "Server communication error occurred";
           }
         }
-        throw new Error(errorMessage);
+
+        // Ensure errorMessage has a value before throwing
+        throw new Error(errorMessage || "Login failed with unknown error");
       }
 
       let data;
