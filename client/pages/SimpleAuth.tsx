@@ -93,6 +93,11 @@ export default function SimpleAuth({
 
       const data = await response.json();
 
+      // Show full response data for debugging
+      const fullResponseMsg = `📊 Full API Response: ${JSON.stringify(data, null, 2)}`;
+      alert(fullResponseMsg);
+      console.log("[DEBUGGING] Full API Response:", data);
+
       // Show detailed response info
       const detailMsg = `📊 Response details: status=${response.status}, ok=${response.ok}, success=${!!data.success}, user=${!!data.user}, token=${!!data.token}`;
       alert(detailMsg);
@@ -100,8 +105,8 @@ export default function SimpleAuth({
 
       if (!response.ok) {
         const errorMsg = data.message || `Login failed (${response.status})`;
-        alert(`❌ ${errorMsg}`);
-        setError(errorMsg);
+        alert(`❌ API Error: ${errorMsg}`);
+        setError(`❌ API Error: ${errorMsg} | Full response: ${JSON.stringify(data)}`);
         return;
       }
 
