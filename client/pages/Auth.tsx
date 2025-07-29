@@ -169,13 +169,22 @@ export default function Auth({
         // Check if successful response is JSON
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
-          const textResponse = await response.text();
+          let textResponse = "";
+          try {
+            textResponse = await response.text();
+          } catch (textError) {
+            textResponse = "Failed to read response text";
+          }
+
           // Safely log content type error
           try {
+            const safeTextResponse = (typeof textResponse === 'string')
+              ? textResponse.substring(0, 200)
+              : String(textResponse).substring(0, 200);
             console.error(
               "Expected JSON but got:",
-              contentType,
-              textResponse.substring(0, 200),
+              contentType || "unknown",
+              safeTextResponse,
             );
           } catch (logError) {
             console.error("Error logging content type mismatch");
