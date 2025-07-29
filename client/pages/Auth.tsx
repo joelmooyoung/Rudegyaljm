@@ -63,7 +63,6 @@ export default function Auth({
 
     try {
       console.log("🔓 Starting login process for:", loginData.email);
-      setError("Attempting to login..."); // Temporary debug message
 
       // Test API connectivity first
       try {
