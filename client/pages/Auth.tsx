@@ -417,6 +417,19 @@ export default function Auth({
                     </div>
                   )}
 
+                  {/* Debug: Test error display functionality */}
+                  <div className="text-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setError("🔧 Debug: Error display is working!")}
+                      className="text-xs mb-2"
+                    >
+                      Test Error Display
+                    </Button>
+                  </div>
+
                   <Button
                     type="submit"
                     className="w-full bg-primary hover:bg-primary/90"
