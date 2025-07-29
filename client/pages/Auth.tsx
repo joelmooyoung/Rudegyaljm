@@ -105,13 +105,14 @@ export default function Auth({
             errorMessage = `Server error (${response?.status || 'unknown'}): ${response?.statusText || 'unknown error'}`;
 
             // Check if it's a common server error
-            if (response.status === 502) {
+            const statusCode = response?.status;
+            if (statusCode === 502) {
               errorMessage =
                 "Server temporarily unavailable. Please try again.";
-            } else if (response.status === 503) {
+            } else if (statusCode === 503) {
               errorMessage =
                 "Service temporarily unavailable. Please try again later.";
-            } else if (response.status >= 500) {
+            } else if (statusCode && statusCode >= 500) {
               errorMessage = "Internal server error. Please try again.";
             }
           }
