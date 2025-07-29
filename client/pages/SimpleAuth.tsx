@@ -275,7 +275,18 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
 
-                  <div className="text-center">
+                  <div className="text-center space-y-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={createAdminUser}
+                      disabled={isLoading}
+                      className="w-full text-xs"
+                    >
+                      🔧 Create Admin User (admin@nocturne.com)
+                    </Button>
+
                     <button
                       type="button"
                       onClick={onNavigateToForgotPassword}
