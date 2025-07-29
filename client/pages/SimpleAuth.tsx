@@ -122,20 +122,33 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
 
   // Test database connectivity
   const testDatabase = async () => {
+    // Immediate feedback
+    alert("🔍 Test DB button clicked!");
+    setError("🔍 Testing database...");
     setIsLoading(true);
-    setError("");
 
     try {
+      alert("📡 Fetching /api/test-db...");
       const response = await fetch("/api/test-db");
+
+      alert(`📥 Response status: ${response.status}`);
       const data = await response.json();
 
+      alert(`📊 Response data: ${JSON.stringify(data)}`);
+
       if (data.success) {
-        setError(`✅ Database connected! Found ${data.userCount} users in database`);
+        const msg = `✅ Database connected! Found ${data.userCount} users in database`;
+        alert(msg);
+        setError(msg);
       } else {
-        setError(`❌ Database error: ${data.message}`);
+        const msg = `❌ Database error: ${data.message}`;
+        alert(msg);
+        setError(msg);
       }
     } catch (err) {
-      setError(`❌ Cannot reach database API: ${err.message}`);
+      const msg = `❌ Cannot reach database API: ${err.message}`;
+      alert(msg);
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
