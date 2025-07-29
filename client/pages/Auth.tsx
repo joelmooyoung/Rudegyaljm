@@ -182,7 +182,12 @@ export default function Auth({
           hasUser: !!data?.user,
         });
       } catch (parseError) {
-        console.error("Failed to parse login response:", parseError);
+        // Safely log JSON parsing error
+        try {
+          console.error("Failed to parse login response:", parseError);
+        } catch (logError) {
+          console.error("Error logging JSON parse failure");
+        }
         // Safely check error message
         const errorMsg =
           parseError instanceof Error ? parseError.message : String(parseError);
