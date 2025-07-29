@@ -149,12 +149,6 @@ export default function Auth({
 
         data = await response.json();
       } catch (parseError) {
-        // Safely log JSON parsing error
-        try {
-          console.error("Failed to parse login response:", parseError);
-        } catch (logError) {
-          console.error("Error logging JSON parse failure");
-        }
         // Safely check error message
         const errorMsg =
           parseError instanceof Error ? parseError.message : String(parseError);
