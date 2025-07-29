@@ -163,11 +163,16 @@ export default function Auth({
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
           const textResponse = await response.text();
-          console.error(
-            "Expected JSON but got:",
-            contentType,
-            textResponse.substring(0, 200),
-          );
+          // Safely log content type error
+          try {
+            console.error(
+              "Expected JSON but got:",
+              contentType,
+              textResponse.substring(0, 200),
+            );
+          } catch (logError) {
+            console.error("Error logging content type mismatch");
+          }
           throw new Error("Server returned invalid response format");
         }
 
