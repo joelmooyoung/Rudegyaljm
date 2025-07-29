@@ -365,26 +365,33 @@ export default function SimpleAuth({
                   </Button>
 
                   <div className="text-center space-y-2">
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="text-xs text-muted-foreground mb-2">
+                      Database Error Detected - Try these test credentials:
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={testDatabase}
-                        disabled={isLoading}
+                        onClick={() => {
+                          setLoginEmail("joelmooyoung@me.com");
+                          setLoginPassword("admin123");
+                        }}
                         className="text-xs"
                       >
-                        🔍 Test DB
+                        📧 Joel's Account
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={createAdminUser}
-                        disabled={isLoading}
+                        onClick={() => {
+                          setLoginEmail("admin@nocturne.com");
+                          setLoginPassword("admin123");
+                        }}
                         className="text-xs"
                       >
-                        🔧 Create Admin
+                        👑 Admin Account
                       </Button>
                     </div>
 
