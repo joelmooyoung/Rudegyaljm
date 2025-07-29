@@ -223,10 +223,12 @@ export default function Auth({
       localStorage.setItem("token", data.token);
       onAuthenticated(data.user);
     } catch (err) {
-      console.error("Login error details:", err);
+      console.error("🚨 Login error caught:", err);
       const errorMessage =
         err instanceof Error ? err.message : "Unknown login error";
-      setError(`Login failed: ${errorMessage}`);
+      const finalErrorMessage = `Login failed: ${errorMessage}`;
+      console.log("🔧 Setting error message:", finalErrorMessage);
+      setError(finalErrorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -382,7 +384,7 @@ export default function Auth({
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="••••••���•"
                         value={loginData.password}
                         onChange={(e) =>
                           setLoginData({
