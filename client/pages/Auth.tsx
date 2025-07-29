@@ -191,34 +191,8 @@ export default function Auth({
         // Check if successful response is JSON
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
-          let textResponse = "";
-          try {
-            textResponse = await response.text();
-          } catch (textError) {
-            textResponse = "Failed to read response text";
-          }
-
-          // Safely log content type error with maximum protection
-          try {
-            let safeTextResponse = "unknown response";
-            try {
-              if (typeof textResponse === 'string') {
-                safeTextResponse = textResponse.substring(0, 200);
-              } else {
-                safeTextResponse = String(textResponse || "").substring(0, 200);
-              }
-            } catch (stringError) {
-              safeTextResponse = "failed to process response text";
-            }
-
-            console.error(
-              "Expected JSON but got:",
-              contentType || "unknown",
-              safeTextResponse,
-            );
-          } catch (logError) {
-            console.error("Error logging content type mismatch");
-          }
+          // Simplified logging - avoid complex string operations that keep failing
+          console.error("Server returned non-JSON response, content-type:", contentType || "unknown");
           throw new Error("Server returned invalid response format");
         }
 
