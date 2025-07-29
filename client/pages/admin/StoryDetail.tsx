@@ -611,7 +611,17 @@ export default function StoryDetail({
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Plain Text Input</Label>
+                        <div className="flex justify-between items-center">
+                          <Label>Plain Text Input</Label>
+                          <span className="text-xs text-muted-foreground">
+                            {plainTextInput.length.toLocaleString()} characters
+                            {plainTextInput.length > 5000 && (
+                              <span className="text-orange-600 ml-2">
+                                ⚠️ Large text - chunked processing will be used
+                              </span>
+                            )}
+                          </span>
+                        </div>
                         <Textarea
                           placeholder="Paste your story text here..."
                           value={plainTextInput}
