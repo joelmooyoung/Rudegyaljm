@@ -118,10 +118,15 @@ export default function Auth({
           }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
-          // Safely access response properties with proper type checking
-          const status = (response && typeof response.status === 'number') ? response.status : "unknown";
-          const statusText = (response && typeof response.statusText === 'string') ? response.statusText : "unknown error";
-          errorMessage = `Server communication error (${String(status)}): ${String(statusText)}`;
+          // Safely create error message with maximum defensive programming
+          try {
+            const status = (response && typeof response.status === 'number') ? response.status : "unknown";
+            const statusText = (response && typeof response.statusText === 'string') ? response.statusText : "unknown error";
+            errorMessage = "Server communication error (" + String(status) + "): " + String(statusText);
+          } catch (templateError) {
+            console.error("Error creating error message:", templateError);
+            errorMessage = "Server communication error occurred";
+          }
         }
         throw new Error(errorMessage);
       }
