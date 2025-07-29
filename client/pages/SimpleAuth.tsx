@@ -39,27 +39,41 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerDateOfBirth, setRegisterDateOfBirth] = useState("");
 
-  // Simple login function with visible debugging
+  // Simple login function with robust debugging
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Use alerts to ensure we can see what's happening
+    alert("🔧 Login form submitted - starting debug process");
+
     setIsLoading(true);
     setError("");
 
     try {
-      // First test if API is reachable
-      setError("Testing API connection...");
+      // Alert and set error message
+      alert("📡 Testing API connection...");
+      setError("📡 Testing API connection...");
 
       try {
         const pingResponse = await fetch("/api/ping");
         if (!pingResponse.ok) {
-          setError(`API not reachable - ping returned ${pingResponse.status}`);
+          const msg = `❌ API not reachable - ping returned ${pingResponse.status}`;
+          alert(msg);
+          setError(msg);
           return;
         }
-        setError("API connected, attempting login...");
+
+        const msg = "✅ API connected, attempting login...";
+        alert(msg);
+        setError(msg);
       } catch (pingError) {
-        setError("Cannot reach API server - network error");
+        const msg = "❌ Cannot reach API server - network error";
+        alert(msg);
+        setError(msg);
         return;
       }
+
+      alert(`📤 Sending login request for: ${loginEmail}`);
 
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -70,26 +84,37 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
         }),
       });
 
-      setError(`Login API responded with status: ${response.status}`);
+      const statusMsg = `📥 Login API responded with status: ${response.status}`;
+      alert(statusMsg);
+      setError(statusMsg);
 
       const data = await response.json();
 
-      // Show detailed response info in the error area for debugging
-      setError(`Response: status=${response.status}, ok=${response.ok}, success=${!!data.success}, user=${!!data.user}, token=${!!data.token}`);
+      // Show detailed response info
+      const detailMsg = `📊 Response details: status=${response.status}, ok=${response.ok}, success=${!!data.success}, user=${!!data.user}, token=${!!data.token}`;
+      alert(detailMsg);
+      setError(detailMsg);
 
       if (!response.ok) {
-        setError(data.message || `Login failed (${response.status})`);
+        const errorMsg = data.message || `Login failed (${response.status})`;
+        alert(`❌ ${errorMsg}`);
+        setError(errorMsg);
         return;
       }
 
       if (data.success && data.user && data.token) {
+        alert("🎉 Login successful! Redirecting...");
         localStorage.setItem("token", data.token);
         onAuthenticated(data.user);
       } else {
-        setError(`Missing fields - success: ${!!data.success}, user: ${!!data.user}, token: ${!!data.token}`);
+        const missingMsg = `❌ Missing fields - success: ${!!data.success}, user: ${!!data.user}, token: ${!!data.token}`;
+        alert(missingMsg);
+        setError(missingMsg);
       }
     } catch (err) {
-      setError(`Network error: ${err.message}`);
+      const errorMsg = `❌ Network error: ${err.message}`;
+      alert(errorMsg);
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
