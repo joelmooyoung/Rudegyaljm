@@ -90,7 +90,7 @@ export default function Auth({
         let errorMessage = `Login failed (${response?.status || 'unknown'})`;
         try {
           // Check if response is JSON by looking at content-type
-          const contentType = response.headers.get("content-type");
+          const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
           if (contentType && contentType.includes("application/json")) {
             const errorData = await response.json();
             errorMessage = errorData?.message || errorMessage;
