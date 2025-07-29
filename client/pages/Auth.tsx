@@ -126,7 +126,12 @@ export default function Auth({
             }
           }
         } catch (parseError) {
-          console.error("Failed to parse error response:", parseError);
+          // Safely log parse error
+          try {
+            console.error("Failed to parse error response:", parseError);
+          } catch (logError) {
+            console.error("Error logging parse error");
+          }
           // Safely create error message with maximum defensive programming
           try {
             const status = (response && typeof response.status === 'number') ? response.status : "unknown";
