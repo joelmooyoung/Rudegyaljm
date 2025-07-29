@@ -158,7 +158,8 @@ export default function Auth({
         throw new Error(errorMessage || "Login failed with unknown error");
       }
 
-      let data;
+      // Safely declare data variable with proper initialization
+      let data = null;
       try {
         // Check if successful response is JSON
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
