@@ -39,13 +39,28 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerDateOfBirth, setRegisterDateOfBirth] = useState("");
 
-  // Simple login function without complex error handling
+  // Simple login function with visible debugging
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
+      // First test if API is reachable
+      setError("Testing API connection...");
+
+      try {
+        const pingResponse = await fetch("/api/ping");
+        if (!pingResponse.ok) {
+          setError(`API not reachable - ping returned ${pingResponse.status}`);
+          return;
+        }
+        setError("API connected, attempting login...");
+      } catch (pingError) {
+        setError("Cannot reach API server - network error");
+        return;
+      }
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,17 +70,12 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
         }),
       });
 
+      setError(`Login API responded with status: ${response.status}`);
+
       const data = await response.json();
 
-      // Debug: Log the actual response
-      console.log("Login API Response:", {
-        ok: response.ok,
-        status: response.status,
-        data: data,
-        hasSuccess: !!data.success,
-        hasUser: !!data.user,
-        hasToken: !!data.token
-      });
+      // Show detailed response info in the error area for debugging
+      setError(`Response: status=${response.status}, ok=${response.ok}, success=${!!data.success}, user=${!!data.user}, token=${!!data.token}`);
 
       if (!response.ok) {
         setError(data.message || `Login failed (${response.status})`);
@@ -76,10 +86,10 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
         localStorage.setItem("token", data.token);
         onAuthenticated(data.user);
       } else {
-        setError(`Invalid response - success: ${!!data.success}, user: ${!!data.user}, token: ${!!data.token}`);
+        setError(`Missing fields - success: ${!!data.success}, user: ${!!data.user}, token: ${!!data.token}`);
       }
     } catch (err) {
-      setError("Cannot connect to server. Please try again.");
+      setError(`Network error: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
