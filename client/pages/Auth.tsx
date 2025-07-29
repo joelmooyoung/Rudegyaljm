@@ -128,7 +128,7 @@ export default function Auth({
       let data;
       try {
         // Check if successful response is JSON
-        const contentType = response.headers.get("content-type");
+        const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
           const textResponse = await response.text();
           console.error(
