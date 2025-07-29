@@ -203,24 +203,25 @@ export default function Auth({
         throw new Error("Invalid response from login server");
       }
 
-      // Validate response data
+      // Validate response data with comprehensive checks
       if (!data || typeof data !== "object") {
         throw new Error("Invalid response format from server");
       }
 
       if (!data.success) {
-        throw new Error(data.message || "Login was not successful");
+        const errorMsg = (data && typeof data.message === 'string') ? data.message : "Login was not successful";
+        throw new Error(errorMsg);
       }
 
-      if (!data.user) {
+      if (!data.user || typeof data.user !== "object") {
         throw new Error("No user data received from server");
       }
 
-      if (!data.user.username) {
+      if (!data.user.username || typeof data.user.username !== "string") {
         throw new Error("Incomplete user data - missing username");
       }
 
-      if (!data.token) {
+      if (!data.token || typeof data.token !== "string") {
         throw new Error("No authentication token received");
       }
 
