@@ -120,12 +120,6 @@ export default function Auth({
             const statusText = (response && typeof response.statusText === 'string') ? response.statusText : "unknown error";
             errorMessage = "Server communication error (" + String(status) + "): " + String(statusText);
           } catch (templateError) {
-            // Safely log error without risking additional errors
-            try {
-              console.error("Error creating error message:", templateError);
-            } catch (logError) {
-              console.error("Multiple error handling failures occurred");
-            }
             errorMessage = "Server communication error occurred";
           }
         }
