@@ -161,6 +161,11 @@ export default function Auth({
       // Safely declare data variable with proper initialization
       let data = null;
       try {
+        // Validate response object before processing successful response
+        if (!response || typeof response !== 'object') {
+          throw new Error("Invalid response object received");
+        }
+
         // Check if successful response is JSON
         const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
         if (!contentType || !contentType.includes("application/json")) {
