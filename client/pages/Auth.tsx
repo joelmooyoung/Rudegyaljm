@@ -84,7 +84,7 @@ export default function Auth({
         body: JSON.stringify(loginData),
       });
 
-      console.log("Login response status:", response.status);
+      console.log("Login response status:", response?.status || 'unknown');
 
       if (!response.ok) {
         let errorMessage = `Login failed (${response?.status || 'unknown'})`;
