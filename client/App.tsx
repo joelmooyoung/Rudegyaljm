@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AgeVerification from "./pages/AgeVerificationSimple";
-import Auth from "./pages/Auth";
+import SimpleAuth from "./pages/SimpleAuth";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
