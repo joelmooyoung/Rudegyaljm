@@ -235,9 +235,17 @@ export default function StoryDetail({
   const htmlPreview = useMemo(() => {
     if (!plainTextInput) return "";
 
-    // Only process if text is not too long to prevent freezing
-    if (plainTextInput.length > 10000) {
-      return "<p><em>Preview disabled for large text (>10,000 characters) to prevent interface freezing. Click 'Convert & Use' to process.</em></p>";
+    // Be more conservative with preview to prevent any freezing
+    if (plainTextInput.length > 5000) {
+      const characterCount = plainTextInput.length.toLocaleString();
+      return `<p><em>Preview disabled for large text (${characterCount} characters) to prevent interface freezing. Click 'Convert & Use' to process safely.</em></p>`;
+    }
+
+    // For medium-sized text, show a warning
+    if (plainTextInput.length > 2000) {
+      const characterCount = plainTextInput.length.toLocaleString();
+      return `<p><em>Large text detected (${characterCount} characters). Preview shown but conversion may take a moment...</em></p><hr/>` +
+             convertPlainTextToHTML(plainTextInput);
     }
 
     return convertPlainTextToHTML(plainTextInput);
