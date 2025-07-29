@@ -481,7 +481,7 @@ const App = () => {
         case "auth":
         default:
           return (
-            <Auth
+            <SimpleAuth
               onAuthenticated={handleAuthenticated}
               onNavigateToForgotPassword={handleNavigateToForgotPassword}
             />
