@@ -102,7 +102,7 @@ export default function Auth({
               "Non-JSON error response:",
               textResponse.substring(0, 200),
             );
-            errorMessage = `Server error (${response.status}): ${response.statusText}`;
+            errorMessage = `Server error (${response?.status || 'unknown'}): ${response?.statusText || 'unknown error'}`;
 
             // Check if it's a common server error
             if (response.status === 502) {
