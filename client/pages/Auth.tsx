@@ -148,16 +148,6 @@ export default function Auth({
         }
 
         data = await response.json();
-
-        // Safely log response data
-        try {
-          console.log("Login response data:", {
-            success: data?.success,
-            hasUser: !!data?.user,
-          });
-        } catch (logError) {
-          console.error("Error logging response data");
-        }
       } catch (parseError) {
         // Safely log JSON parsing error
         try {
