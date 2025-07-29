@@ -190,11 +190,19 @@ export default function Auth({
             textResponse = "Failed to read response text";
           }
 
-          // Safely log content type error
+          // Safely log content type error with maximum protection
           try {
-            const safeTextResponse = (typeof textResponse === 'string')
-              ? textResponse.substring(0, 200)
-              : String(textResponse).substring(0, 200);
+            let safeTextResponse = "unknown response";
+            try {
+              if (typeof textResponse === 'string') {
+                safeTextResponse = textResponse.substring(0, 200);
+              } else {
+                safeTextResponse = String(textResponse || "").substring(0, 200);
+              }
+            } catch (stringError) {
+              safeTextResponse = "failed to process response text";
+            }
+
             console.error(
               "Expected JSON but got:",
               contentType || "unknown",
