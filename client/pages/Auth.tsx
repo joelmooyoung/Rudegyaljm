@@ -64,21 +64,14 @@ export default function Auth({
     try {
       console.log("🔓 Starting login process for:", loginData.email);
 
-      // Test API connectivity first
+      // Basic connectivity test
       try {
-        const testResponse = await fetch("/api/test-connectivity");
-        if (!testResponse.ok) {
-          throw new Error("API server not responding");
-        }
-        console.log("API connectivity confirmed");
+        await fetch("/api/ping");
+        console.log("Basic connectivity confirmed");
       } catch (connectError) {
-        // Safely log connectivity error
-        try {
-          console.error("API connectivity failed:", connectError);
-        } catch (logError) {
-          console.error("Error logging connectivity failure");
-        }
-        throw new Error("Cannot connect to server. Please try again later.");
+        console.error("Network connectivity failed");
+        setError("Cannot connect to server. Please check your internet connection.");
+        return;
       }
 
       const response = await fetch("/api/auth/login", {
