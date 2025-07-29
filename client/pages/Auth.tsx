@@ -62,14 +62,10 @@ export default function Auth({
     setError("");
 
     try {
-      console.log("🔓 Starting login process for:", loginData.email);
-
       // Basic connectivity test
       try {
         await fetch("/api/ping");
-        console.log("Basic connectivity confirmed");
       } catch (connectError) {
-        console.error("Network connectivity failed");
         setError("Cannot connect to server. Please check your internet connection.");
         return;
       }
