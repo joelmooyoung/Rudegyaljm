@@ -66,7 +66,9 @@ export default function Auth({
       try {
         await fetch("/api/ping");
       } catch (connectError) {
-        setError("Cannot connect to server. Please check your internet connection.");
+        setError(
+          "Cannot connect to server. Please check your internet connection.",
+        );
         return;
       }
 
@@ -83,23 +85,25 @@ export default function Auth({
         throw new Error("No response received from server");
       }
 
-      console.log("Login response status:", response?.status || 'unknown');
+      console.log("Login response status:", response?.status || "unknown");
 
       if (!response.ok) {
         // Declare errorMessage in outer scope to ensure accessibility
         let errorMessage;
 
         try {
-          errorMessage = `Login failed (${response?.status || 'unknown'})`;
+          errorMessage = `Login failed (${response?.status || "unknown"})`;
 
           // Check if response is JSON by looking at content-type
-          const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
+          const contentType = response?.headers?.get
+            ? response.headers.get("content-type")
+            : null;
           if (contentType && contentType.includes("application/json")) {
             const errorData = await response.json();
             errorMessage = errorData?.message || errorMessage;
           } else {
             // Server returned non-JSON response (likely HTML error page)
-            errorMessage = `Server error (${response?.status || 'unknown'}): ${response?.statusText || 'unknown error'}`;
+            errorMessage = `Server error (${response?.status || "unknown"}): ${response?.statusText || "unknown error"}`;
 
             // Check if it's a common server error
             const statusCode = response?.status;
@@ -116,9 +120,19 @@ export default function Auth({
         } catch (parseError) {
           // Safely create error message with maximum defensive programming
           try {
-            const status = (response && typeof response.status === 'number') ? response.status : "unknown";
-            const statusText = (response && typeof response.statusText === 'string') ? response.statusText : "unknown error";
-            errorMessage = "Server communication error (" + String(status) + "): " + String(statusText);
+            const status =
+              response && typeof response.status === "number"
+                ? response.status
+                : "unknown";
+            const statusText =
+              response && typeof response.statusText === "string"
+                ? response.statusText
+                : "unknown error";
+            errorMessage =
+              "Server communication error (" +
+              String(status) +
+              "): " +
+              String(statusText);
           } catch (templateError) {
             errorMessage = "Server communication error occurred";
           }
@@ -132,18 +146,20 @@ export default function Auth({
       let data = null;
       try {
         // Validate response object before processing successful response
-        if (!response || typeof response !== 'object') {
+        if (!response || typeof response !== "object") {
           throw new Error("Invalid response object received");
         }
 
         // Check if successful response is JSON
-        const contentType = response?.headers?.get ? response.headers.get("content-type") : null;
+        const contentType = response?.headers?.get
+          ? response.headers.get("content-type")
+          : null;
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("Server returned invalid response format");
         }
 
         // Safely parse JSON response
-        if (!response.json || typeof response.json !== 'function') {
+        if (!response.json || typeof response.json !== "function") {
           throw new Error("Response object does not have json() method");
         }
 
@@ -164,7 +180,10 @@ export default function Auth({
       }
 
       if (!data.success) {
-        const errorMsg = (data && typeof data.message === 'string') ? data.message : "Login was not successful";
+        const errorMsg =
+          data && typeof data.message === "string"
+            ? data.message
+            : "Login was not successful";
         throw new Error(errorMsg);
       }
 
@@ -382,7 +401,9 @@ export default function Auth({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => setError("🔧 Debug: Error display is working!")}
+                      onClick={() =>
+                        setError("🔧 Debug: Error display is working!")
+                      }
                       className="text-xs mb-2"
                     >
                       Test Error Display

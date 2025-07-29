@@ -23,16 +23,19 @@ interface SimpleAuthProps {
   onNavigateToForgotPassword: () => void;
 }
 
-export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword }: SimpleAuthProps) {
+export default function SimpleAuth({
+  onAuthenticated,
+  onNavigateToForgotPassword,
+}: SimpleAuthProps) {
   // State
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Login form
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  
+
   // Register form
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
@@ -234,7 +237,7 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
       {/* Background */}
       <div className="absolute inset-0 bg-desire-gradient opacity-10 blur-3xl" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10" />
-      
+
       {/* Content */}
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Header */}
@@ -251,7 +254,9 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
           </div>
           <p className="text-lg font-serif text-muted-foreground">
             <em>Your gateway to forbidden desires</em> awaits at{" "}
-            <span className="text-accent font-semibold">Rudegyalconfessions.com</span>
+            <span className="text-accent font-semibold">
+              Rudegyalconfessions.com
+            </span>
           </p>
         </div>
 
@@ -265,17 +270,24 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
               Welcome, Seeker of Desires
             </CardTitle>
             <p className="text-base font-serif text-muted-foreground mt-2">
-              Enter your sanctuary of passion or begin your journey into temptation
+              Enter your sanctuary of passion or begin your journey into
+              temptation
             </p>
           </CardHeader>
 
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-8 seductive-border bg-card/50">
-                <TabsTrigger value="login" className="font-serif data-[state=active]:text-passion-gradient">
+                <TabsTrigger
+                  value="login"
+                  className="font-serif data-[state=active]:text-passion-gradient"
+                >
                   Login
                 </TabsTrigger>
-                <TabsTrigger value="register" className="font-serif data-[state=active]:text-passion-gradient">
+                <TabsTrigger
+                  value="register"
+                  className="font-serif data-[state=active]:text-passion-gradient"
+                >
                   Register
                 </TabsTrigger>
               </TabsList>
@@ -284,7 +296,10 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <div className="space-y-3">
-                    <Label htmlFor="login-email" className="text-base font-serif">
+                    <Label
+                      htmlFor="login-email"
+                      className="text-base font-serif"
+                    >
                       Your Secret Identity
                     </Label>
                     <div className="relative">
@@ -302,7 +317,10 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="login-password" className="text-base font-serif">
+                    <Label
+                      htmlFor="login-password"
+                      className="text-base font-serif"
+                    >
                       Your Secret Key
                     </Label>
                     <div className="relative">
@@ -466,7 +484,10 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
       <footer className="absolute bottom-0 left-0 right-0 border-t border-border/50 bg-card/30">
         <div className="container mx-auto px-4 py-4">
           <div className="text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Rudegyalconfessions.com - All rights reserved</p>
+            <p>
+              © {new Date().getFullYear()} Rudegyalconfessions.com - All rights
+              reserved
+            </p>
           </div>
         </div>
       </footer>
