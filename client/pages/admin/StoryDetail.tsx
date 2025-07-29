@@ -197,6 +197,40 @@ export default function StoryDetail({
       .join("\n");
   };
 
+  // Chunked text processing to prevent UI freezing
+  const processLargeTextInChunks = async (text: string): Promise<string> => {
+    const paragraphs = text.split("\n\n");
+    const chunkSize = 50; // Process 50 paragraphs at a time
+    let result = "";
+
+    for (let i = 0; i < paragraphs.length; i += chunkSize) {
+      const chunk = paragraphs.slice(i, i + chunkSize);
+
+      // Process chunk
+      const processedChunk = chunk
+        .map((paragraph) => {
+          if (!paragraph.trim()) return "";
+
+          let formatted = paragraph
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+            .replace(/\*(.+?)\*/g, "<em>$1</em>")
+            .replace(/`(.+?)`/g, "<code>$1</code>")
+            .replace(/\n/g, "<br>");
+
+          return `<p>${formatted}</p>`;
+        })
+        .filter((p) => p !== "")
+        .join("\n");
+
+      result += processedChunk;
+
+      // Yield control back to the browser to prevent freezing
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
+    return result;
+  };
+
   // Memoized HTML preview to prevent freezing on large text inputs
   const htmlPreview = useMemo(() => {
     if (!plainTextInput) return "";
