@@ -180,11 +180,9 @@ export default function Auth({
         throw new Error("No authentication token received");
       }
 
-      console.log("Login successful for user:", data.user.username);
       localStorage.setItem("token", data.token);
       onAuthenticated(data.user);
     } catch (err) {
-      console.error("🚨 Login error caught:", err);
       const errorMessage =
         err instanceof Error ? err.message : "Unknown login error";
       const finalErrorMessage = `Login failed: ${errorMessage}`;
