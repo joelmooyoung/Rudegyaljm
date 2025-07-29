@@ -112,33 +112,8 @@ export default function Auth({
             console.log("Login error data:", errorData);
           } else {
             // Server returned non-JSON response (likely HTML error page)
-            let textResponse = "";
-            try {
-              textResponse = await response.text();
-            } catch (textError) {
-              textResponse = "Failed to read response text";
-            }
-
-            // Safely log non-JSON response with maximum protection
-            try {
-              let safeTextResponse = "unknown response";
-              try {
-                if (typeof textResponse === 'string') {
-                  safeTextResponse = textResponse.substring(0, 200);
-                } else {
-                  safeTextResponse = String(textResponse || "").substring(0, 200);
-                }
-              } catch (stringError) {
-                safeTextResponse = "failed to process response text";
-              }
-
-              console.log(
-                "Non-JSON error response:",
-                safeTextResponse,
-              );
-            } catch (logError) {
-              console.error("Error logging non-JSON response");
-            }
+            // Simplified logging - avoid complex operations that keep failing
+            console.log("Server returned non-JSON error response");
             errorMessage = `Server error (${response?.status || 'unknown'}): ${response?.statusText || 'unknown error'}`;
 
             // Check if it's a common server error
