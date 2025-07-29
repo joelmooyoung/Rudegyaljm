@@ -57,16 +57,26 @@ export default function SimpleAuth({ onAuthenticated, onNavigateToForgotPassword
 
       const data = await response.json();
 
+      // Debug: Log the actual response
+      console.log("Login API Response:", {
+        ok: response.ok,
+        status: response.status,
+        data: data,
+        hasSuccess: !!data.success,
+        hasUser: !!data.user,
+        hasToken: !!data.token
+      });
+
       if (!response.ok) {
-        setError(data.message || "Login failed");
+        setError(data.message || `Login failed (${response.status})`);
         return;
       }
 
-      if (data.success && data.user) {
+      if (data.success && data.user && data.token) {
         localStorage.setItem("token", data.token);
         onAuthenticated(data.user);
       } else {
-        setError("Invalid login response");
+        setError(`Invalid response - success: ${!!data.success}, user: ${!!data.user}, token: ${!!data.token}`);
       }
     } catch (err) {
       setError("Cannot connect to server. Please try again.");
