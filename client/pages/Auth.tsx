@@ -72,7 +72,12 @@ export default function Auth({
         }
         console.log("API connectivity confirmed");
       } catch (connectError) {
-        console.error("API connectivity failed:", connectError);
+        // Safely log connectivity error
+        try {
+          console.error("API connectivity failed:", connectError);
+        } catch (logError) {
+          console.error("Error logging connectivity failure");
+        }
         throw new Error("Cannot connect to server. Please try again later.");
       }
 
