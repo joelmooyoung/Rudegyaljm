@@ -183,11 +183,22 @@ export default function Auth({
           throw new Error("Server returned invalid response format");
         }
 
+        // Safely parse JSON response
+        if (!response.json || typeof response.json !== 'function') {
+          throw new Error("Response object does not have json() method");
+        }
+
         data = await response.json();
-        console.log("Login response data:", {
-          success: data?.success,
-          hasUser: !!data?.user,
-        });
+
+        // Safely log response data
+        try {
+          console.log("Login response data:", {
+            success: data?.success,
+            hasUser: !!data?.user,
+          });
+        } catch (logError) {
+          console.error("Error logging response data");
+        }
       } catch (parseError) {
         // Safely log JSON parsing error
         try {
