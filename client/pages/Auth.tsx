@@ -97,11 +97,8 @@ export default function Auth({
           if (contentType && contentType.includes("application/json")) {
             const errorData = await response.json();
             errorMessage = errorData?.message || errorMessage;
-            console.log("Login error data:", errorData);
           } else {
             // Server returned non-JSON response (likely HTML error page)
-            // Simplified logging - avoid complex operations that keep failing
-            console.log("Server returned non-JSON error response");
             errorMessage = `Server error (${response?.status || 'unknown'}): ${response?.statusText || 'unknown error'}`;
 
             // Check if it's a common server error
