@@ -243,31 +243,33 @@ export default function StoryDetail({
     return convertPlainTextToHTML(plainTextInput);
   }, [plainTextInput]);
 
-  const handlePlainTextConfirm = () => {
+  const handlePlainTextConfirm = async () => {
     try {
-      // For very large texts, show loading and process asynchronously
+      // For very large texts, use chunked processing to prevent freezing
       if (plainTextInput.length > 10000) {
-        setError("Processing large text...");
-        // Use setTimeout to prevent UI blocking
-        setTimeout(() => {
-          try {
-            const htmlContent = convertPlainTextToHTML(plainTextInput);
-            handleInputChange("content", htmlContent);
-            setPlainTextInput("");
-            setError("");
-            if (typeof setIsPlainTextDialogOpen === "function") {
-              setIsPlainTextDialogOpen(false);
-            }
-          } catch (err) {
-            setError(
-              "Failed to convert large text. Try breaking it into smaller sections.",
-            );
-            console.error("Text conversion error:", err);
+        setError("Processing large text... Please wait.");
+        setIsLoading?.(true);
+
+        try {
+          const htmlContent = await processLargeTextInChunks(plainTextInput);
+          handleInputChange("content", htmlContent);
+          setPlainTextInput("");
+          setError("");
+          if (typeof setIsPlainTextDialogOpen === "function") {
+            setIsPlainTextDialogOpen(false);
           }
-        }, 10);
+        } catch (err) {
+          setError(
+            "Failed to convert large text. Try breaking it into smaller sections.",
+          );
+          console.error("Text conversion error:", err);
+        } finally {
+          setIsLoading?.(false);
+        }
         return;
       }
 
+      // For smaller texts, use regular processing
       const htmlContent = convertPlainTextToHTML(plainTextInput);
       handleInputChange("content", htmlContent);
       setPlainTextInput("");
