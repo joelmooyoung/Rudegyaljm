@@ -63,68 +63,86 @@ export function createServer() {
     });
   });
 
-  // WORKING LOGIN ENDPOINT WITH FALLBACK
+  // REAL DATABASE LOGIN
   app.post("/api/auth/login", async (req, res) => {
-    console.log("[LOGIN] Login attempt");
+    console.log("[LOGIN] Attempting login with real database");
 
-    const { email, password } = req.body;
+    try {
+      await connectToDatabase();
+      console.log("[LOGIN] Database connected successfully");
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required"
-      });
-    }
+      const { email, password } = req.body;
 
-    // Hardcoded accounts while MongoDB is unreachable
-    const accounts = {
-      'joelmooyoung@me.com': {
-        password: 'password123',
-        user: {
-          id: 'joel-001',
-          email: 'joelmooyoung@me.com',
-          username: 'joelmooyoung',
-          role: 'admin',
-          isActive: true,
-          isAgeVerified: true,
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-01-01'),
-          lastLogin: new Date()
-        }
-      },
-      'admin@nocturne.com': {
-        password: 'admin123',
-        user: {
-          id: 'admin-001',
-          email: 'admin@nocturne.com',
-          username: 'admin',
-          role: 'admin',
-          isActive: true,
-          isAgeVerified: true,
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-01-01'),
-          lastLogin: new Date()
-        }
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Email and password are required"
+        });
       }
-    };
 
-    const account = accounts[email.toLowerCase()];
+      console.log(`[LOGIN] Looking for user: ${email}`);
+      const user = await User.findOne({ email: email.toLowerCase() });
 
-    if (!account || account.password !== password) {
-      return res.status(401).json({
+      if (!user) {
+        console.log("[LOGIN] User not found");
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
+        });
+      }
+
+      console.log(`[LOGIN] User found: ${user.username}, active: ${user.active}`);
+
+      if (!user.active) {
+        return res.status(401).json({
+          success: false,
+          message: "Account is inactive"
+        });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      console.log(`[LOGIN] Password valid: ${isValidPassword}`);
+
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
+        });
+      }
+
+      // Update login stats
+      user.lastLogin = new Date();
+      user.loginCount = (user.loginCount || 0) + 1;
+      await user.save();
+
+      const token = `token_${user.userId}_${Date.now()}`;
+
+      console.log("[LOGIN] Login successful, returning user data");
+
+      res.json({
+        success: true,
+        message: "Login successful",
+        token: token,
+        user: {
+          id: user.userId,
+          email: user.email,
+          username: user.username,
+          role: user.type,
+          isActive: user.active,
+          isAgeVerified: true,
+          subscriptionStatus: user.type === "premium" ? "active" : "none",
+          createdAt: user.createdAt,
+          lastLogin: user.lastLogin,
+        }
+      });
+
+    } catch (error) {
+      console.error("[LOGIN] Database connection failed:", error.message);
+      res.status(500).json({
         success: false,
-        message: "Invalid email or password"
+        message: "Database connection failed. Please try again."
       });
     }
-
-    const token = `token_${account.user.id}_${Date.now()}`;
-
-    res.json({
-      success: true,
-      message: "Login successful",
-      token: token,
-      user: account.user
-    });
   });
 
   // Import and set up API routes for development
