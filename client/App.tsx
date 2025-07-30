@@ -481,9 +481,8 @@ const App = () => {
         case "auth":
         default:
           return (
-            <SimpleAuth
+            <CleanAuth
               onAuthenticated={handleAuthenticated}
-              onNavigateToForgotPassword={handleNavigateToForgotPassword}
             />
           );
       }
