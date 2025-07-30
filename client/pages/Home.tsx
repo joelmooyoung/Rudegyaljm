@@ -97,11 +97,8 @@ export default function Home({
     setIsLoading(true);
     setError(null);
     try {
-      // Route to production API when in preview environment
-      const isBuilderPreview = window.location.hostname.includes("builder.my");
-      const apiUrl = isBuilderPreview
-        ? "https://rudegyaljm-amber.vercel.app/api/stories"
-        : "/api/stories";
+      // Use hardcoded stories endpoint to avoid database issues
+      const apiUrl = "/api/stories-hardcoded";
       const response = await fetch(apiUrl);
       if (response.ok) {
         const data = await response.json();
