@@ -63,6 +63,80 @@ export function createServer() {
     });
   });
 
+  // WORKING LOGIN ENDPOINT
+  app.post("/api/auth/login", async (req, res) => {
+    console.log("[LOGIN] Login attempt");
+
+    try {
+      await connectToDatabase();
+
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Email and password are required"
+        });
+      }
+
+      const user = await User.findOne({ email: email.toLowerCase() });
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
+        });
+      }
+
+      if (!user.active) {
+        return res.status(401).json({
+          success: false,
+          message: "Account is inactive"
+        });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
+        });
+      }
+
+      // Update login stats
+      user.lastLogin = new Date();
+      user.loginCount = (user.loginCount || 0) + 1;
+      await user.save();
+
+      const token = `token_${user.userId}_${Date.now()}`;
+
+      res.json({
+        success: true,
+        message: "Login successful",
+        token: token,
+        user: {
+          id: user.userId,
+          email: user.email,
+          username: user.username,
+          role: user.type,
+          isActive: user.active,
+          isAgeVerified: true,
+          subscriptionStatus: user.type === "premium" ? "active" : "none",
+          createdAt: user.createdAt,
+          lastLogin: user.lastLogin,
+        }
+      });
+
+    } catch (error) {
+      console.error("[LOGIN] Error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
