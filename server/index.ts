@@ -13,7 +13,9 @@ async function connectToDatabase() {
 
   connectionPromise = (async () => {
     try {
-      const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/rude-gyal-confessions";
+      const MONGODB_URI =
+        process.env.MONGODB_URI ||
+        "mongodb://localhost:27017/rude-gyal-confessions";
 
       console.log("[MongoDB] Attempting connection...");
 
@@ -28,8 +30,10 @@ async function connectToDatabase() {
       await mongoose.connection.db.admin().ping();
 
       isConnected = true;
-      console.log("[MongoDB] Connected successfully to:", mongoose.connection.db.databaseName);
-
+      console.log(
+        "[MongoDB] Connected successfully to:",
+        mongoose.connection.db.databaseName,
+      );
     } catch (error) {
       console.error("[MongoDB] Connection failed:", error.message);
       isConnected = false;
@@ -51,10 +55,10 @@ const userSchema = new mongoose.Schema({
   active: Boolean,
   loginCount: Number,
   lastLogin: Date,
-  createdAt: Date
+  createdAt: Date,
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 // Story schema
 const storySchema = new mongoose.Schema({
@@ -73,10 +77,10 @@ const storySchema = new mongoose.Schema({
   viewCount: Number,
   rating: Number,
   ratingCount: Number,
-  image: String
+  image: String,
 });
 
-const Story = mongoose.models.Story || mongoose.model('Story', storySchema);
+const Story = mongoose.models.Story || mongoose.model("Story", storySchema);
 
 export function createServer() {
   const app = express();
@@ -117,7 +121,7 @@ export function createServer() {
       if (!email || !password) {
         return res.status(400).json({
           success: false,
-          message: "Email and password are required"
+          message: "Email and password are required",
         });
       }
 
@@ -128,16 +132,18 @@ export function createServer() {
         console.log("[LOGIN] User not found");
         return res.status(401).json({
           success: false,
-          message: "Invalid email or password"
+          message: "Invalid email or password",
         });
       }
 
-      console.log(`[LOGIN] User found: ${user.username}, active: ${user.active}`);
+      console.log(
+        `[LOGIN] User found: ${user.username}, active: ${user.active}`,
+      );
 
       if (!user.active) {
         return res.status(401).json({
           success: false,
-          message: "Account is inactive"
+          message: "Account is inactive",
         });
       }
 
@@ -147,7 +153,7 @@ export function createServer() {
       if (!isValidPassword) {
         return res.status(401).json({
           success: false,
-          message: "Invalid email or password"
+          message: "Invalid email or password",
         });
       }
 
@@ -174,14 +180,13 @@ export function createServer() {
           subscriptionStatus: user.type === "premium" ? "active" : "none",
           createdAt: user.createdAt,
           lastLogin: user.lastLogin,
-        }
+        },
       });
-
     } catch (error) {
       console.error("[LOGIN] Database connection failed:", error.message);
       res.status(500).json({
         success: false,
-        message: "Database connection failed. Please try again."
+        message: "Database connection failed. Please try again.",
       });
     }
   });
@@ -201,7 +206,7 @@ export function createServer() {
       console.log(`[STORIES] Found ${stories.length} published stories`);
 
       // Transform for frontend
-      const transformedStories = stories.map(story => ({
+      const transformedStories = stories.map((story) => ({
         id: story.storyId || story._id.toString(),
         title: story.title || "Untitled",
         content: story.content || "",
@@ -217,16 +222,15 @@ export function createServer() {
         viewCount: story.viewCount || 0,
         rating: story.rating || 0,
         ratingCount: story.ratingCount || 0,
-        image: story.image || null
+        image: story.image || null,
       }));
 
       res.json(transformedStories);
-
     } catch (error) {
       console.error("[STORIES] Database error:", error.message);
       res.status(500).json({
         success: false,
-        message: "Failed to load stories from database"
+        message: "Failed to load stories from database",
       });
     }
   });
@@ -236,7 +240,7 @@ export function createServer() {
   app.use("/api", async (req, res, next) => {
     try {
       // Try to dynamically import the API handler based on the path
-      const pathSegments = req.path.split('/').filter(Boolean);
+      const pathSegments = req.path.split("/").filter(Boolean);
 
       if (pathSegments.length === 0) {
         return next();
@@ -256,7 +260,9 @@ export function createServer() {
       const { default: handler } = await import(modulePath);
       return handler(req, res);
     } catch (error) {
-      console.log(`No handler found for ${req.path}, continuing to next middleware`);
+      console.log(
+        `No handler found for ${req.path}, continuing to next middleware`,
+      );
       next();
     }
   });

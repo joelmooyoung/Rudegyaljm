@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface User {
   id: string;
@@ -13,39 +13,41 @@ interface CleanAuthProps {
 
 export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const endpoint = isLogin ? '/api/auth/bypass-login' : '/api/auth/simple-register';
-      const body = isLogin 
+      const endpoint = isLogin
+        ? "/api/auth/bypass-login"
+        : "/api/auth/simple-register";
+      const body = isLogin
         ? { email, password }
         : { email, password, username };
 
       const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem("authToken", data.token);
         onAuthenticated(data.user);
       } else {
-        setError(data.message || 'Authentication failed');
+        setError(data.message || "Authentication failed");
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,15 +65,18 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isLogin ? 'Sign in to your account' : 'Create new account'}
+            {isLogin ? "Sign in to your account" : "Create new account"}
           </h2>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {!isLogin && (
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Username
                 </label>
                 <input
@@ -86,9 +91,12 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
                 />
               </div>
             )}
-            
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <input
@@ -102,9 +110,12 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
                 placeholder="Email address"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -132,7 +143,7 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {loading ? 'Processing...' : (isLogin ? 'Sign in' : 'Sign up')}
+              {loading ? "Processing..." : isLogin ? "Sign in" : "Sign up"}
             </button>
           </div>
 
@@ -142,24 +153,30 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
               onClick={() => setIsLogin(!isLogin)}
               className="text-indigo-600 hover:text-indigo-500 text-sm"
             >
-              {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
+              {isLogin
+                ? "Need an account? Sign up"
+                : "Already have an account? Sign in"}
             </button>
           </div>
 
           {/* Test accounts for quick access */}
           <div className="border-t pt-4">
-            <p className="text-center text-sm text-gray-600 mb-2">Quick Test Accounts:</p>
+            <p className="text-center text-sm text-gray-600 mb-2">
+              Quick Test Accounts:
+            </p>
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => useTestAccount('admin@nocturne.com', 'admin123')}
+                onClick={() => useTestAccount("admin@nocturne.com", "admin123")}
                 className="w-full text-sm py-1 px-2 bg-blue-100 hover:bg-blue-200 rounded"
               >
                 👑 Admin Account
               </button>
               <button
                 type="button"
-                onClick={() => useTestAccount('joelmooyoung@me.com', 'password123')}
+                onClick={() =>
+                  useTestAccount("joelmooyoung@me.com", "password123")
+                }
                 className="w-full text-sm py-1 px-2 bg-green-100 hover:bg-green-200 rounded"
               >
                 📧 Joel's Account

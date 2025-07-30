@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -25,21 +25,21 @@ export default async function handler(req, res) {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Email and password are required"
+      message: "Email and password are required",
     });
   }
 
   try {
     // Connect to database
     await connectToDatabase();
-    
+
     // Find user
     const user = await User.findOne({ email: email.toLowerCase() });
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password"
+        message: "Invalid email or password",
       });
     }
 
@@ -47,17 +47,17 @@ export default async function handler(req, res) {
     if (!user.active) {
       return res.status(401).json({
         success: false,
-        message: "Account is inactive"
+        message: "Account is inactive",
       });
     }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
-    
+
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password"
+        message: "Invalid email or password",
       });
     }
 
@@ -79,15 +79,14 @@ export default async function handler(req, res) {
         email: user.email,
         username: user.username,
         role: user.type,
-        isActive: user.active
-      }
+        isActive: user.active,
+      },
     });
-
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error"
+      message: "Internal server error",
     });
   }
 }

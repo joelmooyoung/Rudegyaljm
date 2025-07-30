@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface User {
   id: string;
@@ -12,51 +12,51 @@ interface FinalAuthProps {
 }
 
 export default function FinalAuth({ onAuthenticated }: FinalAuthProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Hardcoded accounts - no API needed
   const accounts = {
-    'admin@nocturne.com': {
-      password: 'admin123',
+    "admin@nocturne.com": {
+      password: "admin123",
       user: {
-        id: 'admin-001',
-        email: 'admin@nocturne.com',
-        username: 'admin',
-        role: 'admin'
-      }
+        id: "admin-001",
+        email: "admin@nocturne.com",
+        username: "admin",
+        role: "admin",
+      },
     },
-    'joelmooyoung@me.com': {
-      password: 'password123',
+    "joelmooyoung@me.com": {
+      password: "password123",
       user: {
-        id: 'joel-001',
-        email: 'joelmooyoung@me.com', 
-        username: 'joelmooyoung',
-        role: 'admin'
-      }
-    }
+        id: "joel-001",
+        email: "joelmooyoung@me.com",
+        username: "joelmooyoung",
+        role: "admin",
+      },
+    },
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     // Simulate loading
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const account = accounts[email.toLowerCase() as keyof typeof accounts];
-    
+
     if (!account || account.password !== password) {
-      setError('Invalid email or password');
+      setError("Invalid email or password");
       setLoading(false);
       return;
     }
 
     // Success - store token and authenticate
-    localStorage.setItem('authToken', `token_${account.user.id}_${Date.now()}`);
+    localStorage.setItem("authToken", `token_${account.user.id}_${Date.now()}`);
     onAuthenticated(account.user);
     setLoading(false);
   };
@@ -77,11 +77,14 @@ export default function FinalAuth({ onAuthenticated }: FinalAuthProps) {
             Hardcoded authentication - no database required
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </label>
               <input
@@ -95,9 +98,12 @@ export default function FinalAuth({ onAuthenticated }: FinalAuthProps) {
                 placeholder="Email address"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -125,24 +131,28 @@ export default function FinalAuth({ onAuthenticated }: FinalAuthProps) {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
 
           {/* Test accounts */}
           <div className="border-t pt-4">
-            <p className="text-center text-sm text-gray-600 mb-2">Test Accounts (Click to fill):</p>
+            <p className="text-center text-sm text-gray-600 mb-2">
+              Test Accounts (Click to fill):
+            </p>
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => useTestAccount('admin@nocturne.com', 'admin123')}
+                onClick={() => useTestAccount("admin@nocturne.com", "admin123")}
                 className="w-full text-sm py-2 px-3 bg-blue-100 hover:bg-blue-200 rounded border"
               >
                 👑 Admin Account
               </button>
               <button
                 type="button"
-                onClick={() => useTestAccount('joelmooyoung@me.com', 'password123')}
+                onClick={() =>
+                  useTestAccount("joelmooyoung@me.com", "password123")
+                }
                 className="w-full text-sm py-2 px-3 bg-green-100 hover:bg-green-200 rounded border"
               >
                 📧 Joel's Account

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -25,33 +25,33 @@ export default async function handler(req, res) {
   if (!email || !password || !username) {
     return res.status(400).json({
       success: false,
-      message: "Email, password, and username are required"
+      message: "Email, password, and username are required",
     });
   }
 
   if (password.length < 6) {
     return res.status(400).json({
       success: false,
-      message: "Password must be at least 6 characters"
+      message: "Password must be at least 6 characters",
     });
   }
 
   try {
     // Connect to database
     await connectToDatabase();
-    
+
     // Check if user already exists
-    const existingUser = await User.findOne({ 
+    const existingUser = await User.findOne({
       $or: [
         { email: email.toLowerCase() },
-        { username: username.toLowerCase() }
-      ]
+        { username: username.toLowerCase() },
+      ],
     });
-    
+
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "Email or username already exists"
+        message: "Email or username already exists",
       });
     }
 
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       country: "Unknown",
       active: true,
       loginCount: 0,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     await newUser.save();
@@ -87,15 +87,14 @@ export default async function handler(req, res) {
         email: newUser.email,
         username: newUser.username,
         role: newUser.type,
-        isActive: newUser.active
-      }
+        isActive: newUser.active,
+      },
     });
-
   } catch (error) {
     console.error("Registration error:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error"
+      message: "Internal server error",
     });
   }
 }

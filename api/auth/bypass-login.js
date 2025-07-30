@@ -14,7 +14,7 @@ export default function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -24,7 +24,7 @@ export default function handler(req, res) {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Email and password are required"
+      message: "Email and password are required",
     });
   }
 
@@ -37,27 +37,27 @@ export default function handler(req, res) {
         email: "admin@nocturne.com",
         username: "admin",
         role: "admin",
-        isActive: true
-      }
+        isActive: true,
+      },
     },
     "joelmooyoung@me.com": {
       password: "password123",
       user: {
-        id: "joel-001", 
+        id: "joel-001",
         email: "joelmooyoung@me.com",
         username: "joelmooyoung",
         role: "admin",
-        isActive: true
-      }
-    }
+        isActive: true,
+      },
+    },
   };
 
   const account = testAccounts[email.toLowerCase()];
-  
+
   if (!account || account.password !== password) {
     return res.status(401).json({
       success: false,
-      message: "Invalid email or password"
+      message: "Invalid email or password",
     });
   }
 
@@ -66,6 +66,6 @@ export default function handler(req, res) {
     success: true,
     message: "Login successful",
     token: `bypass_token_${account.user.id}_${Date.now()}`,
-    user: account.user
+    user: account.user,
   });
 }
