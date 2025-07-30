@@ -636,9 +636,19 @@ export default function StoryDetail({
                           <Label>Plain Text Input</Label>
                           <span className="text-xs text-muted-foreground">
                             {plainTextInput.length.toLocaleString()} characters
-                            {plainTextInput.length > 5000 && (
+                            {isProcessingPreview && (
+                              <span className="text-blue-600 ml-2">
+                                🔄 Processing...
+                              </span>
+                            )}
+                            {!isProcessingPreview && plainTextInput.length > 5000 && (
                               <span className="text-orange-600 ml-2">
                                 ⚠️ Large text - chunked processing will be used
+                              </span>
+                            )}
+                            {!isProcessingPreview && plainTextInput.length > 3000 && plainTextInput.length <= 5000 && (
+                              <span className="text-yellow-600 ml-2">
+                                ⚠️ Preview disabled for performance
                               </span>
                             )}
                           </span>
