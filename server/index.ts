@@ -37,6 +37,28 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
+// Story schema
+const storySchema = new mongoose.Schema({
+  storyId: String,
+  title: String,
+  content: String,
+  excerpt: String,
+  author: String,
+  category: String,
+  tags: [String],
+  accessLevel: String,
+  published: Boolean,
+  publishedAt: Date,
+  createdAt: Date,
+  updatedAt: Date,
+  viewCount: Number,
+  rating: Number,
+  ratingCount: Number,
+  image: String
+});
+
+const Story = mongoose.models.Story || mongoose.model('Story', storySchema);
+
 export function createServer() {
   const app = express();
 
