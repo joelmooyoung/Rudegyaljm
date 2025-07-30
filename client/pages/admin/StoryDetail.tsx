@@ -271,10 +271,12 @@ export default function StoryDetail({
     try {
       // For large texts, use chunked processing to prevent freezing
       if (plainTextInput.length > 5000) {
-        setError("Processing large text in chunks... Please wait and do not close this dialog.");
+        setError(
+          "Processing large text in chunks... Please wait and do not close this dialog.",
+        );
 
         // Use setTimeout to ensure UI updates before heavy processing
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         try {
           const htmlContent = await processLargeTextInChunks(plainTextInput);
@@ -294,7 +296,7 @@ export default function StoryDetail({
       }
 
       // For smaller texts, use regular processing with delay to prevent blocking
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
       const htmlContent = convertPlainTextToHTML(plainTextInput);
       handleInputChange("content", htmlContent);
       setPlainTextInput("");
@@ -641,16 +643,20 @@ export default function StoryDetail({
                                 🔄 Processing...
                               </span>
                             )}
-                            {!isProcessingPreview && plainTextInput.length > 5000 && (
-                              <span className="text-orange-600 ml-2">
-                                ⚠️ Large text - chunked processing will be used
-                              </span>
-                            )}
-                            {!isProcessingPreview && plainTextInput.length > 3000 && plainTextInput.length <= 5000 && (
-                              <span className="text-yellow-600 ml-2">
-                                ⚠️ Preview disabled for performance
-                              </span>
-                            )}
+                            {!isProcessingPreview &&
+                              plainTextInput.length > 5000 && (
+                                <span className="text-orange-600 ml-2">
+                                  ⚠️ Large text - chunked processing will be
+                                  used
+                                </span>
+                              )}
+                            {!isProcessingPreview &&
+                              plainTextInput.length > 3000 &&
+                              plainTextInput.length <= 5000 && (
+                                <span className="text-yellow-600 ml-2">
+                                  ⚠️ Preview disabled for performance
+                                </span>
+                              )}
                           </span>
                         </div>
                         <Textarea
@@ -694,7 +700,9 @@ export default function StoryDetail({
                         </Button>
                         <Button
                           onClick={handlePlainTextConfirm}
-                          disabled={isProcessingPreview || !plainTextInput.trim()}
+                          disabled={
+                            isProcessingPreview || !plainTextInput.trim()
+                          }
                         >
                           {isProcessingPreview ? (
                             <>
