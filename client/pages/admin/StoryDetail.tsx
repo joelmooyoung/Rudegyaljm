@@ -231,27 +231,39 @@ export default function StoryDetail({
     return result;
   };
 
-  // Memoized HTML preview to prevent freezing on large text inputs
-  const htmlPreview = useMemo(() => {
-    if (!plainTextInput) return "";
+  // Debounced preview calculation to prevent freezing during typing
+  const [debouncedPlainText, setDebouncedPlainText] = useState("");
+  const [isProcessingPreview, setIsProcessingPreview] = useState(false);
 
-    // Be more conservative with preview to prevent any freezing
-    if (plainTextInput.length > 5000) {
-      const characterCount = plainTextInput.length.toLocaleString();
-      return `<p><em>Preview disabled for large text (${characterCount} characters) to prevent interface freezing. Click 'Convert & Use' to process safely.</em></p>`;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPlainText(plainTextInput);
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [plainTextInput]);
+
+  // Memoized HTML preview with better performance protection
+  const htmlPreview = useMemo(() => {
+    if (!debouncedPlainText) return "";
+
+    // Disable preview for large text to prevent freezing
+    if (debouncedPlainText.length > 3000) {
+      const characterCount = debouncedPlainText.length.toLocaleString();
+      return `<p><em>Preview disabled for large text (${characterCount} characters) to prevent interface freezing. Text is ready for conversion.</em></p>`;
     }
 
-    // For medium-sized text, show a warning
-    if (plainTextInput.length > 2000) {
-      const characterCount = plainTextInput.length.toLocaleString();
+    // For medium text, show preview but with warning
+    if (debouncedPlainText.length > 1000) {
+      const characterCount = debouncedPlainText.length.toLocaleString();
       return (
-        `<p><em>Large text detected (${characterCount} characters). Preview shown but conversion may take a moment...</em></p><hr/>` +
-        convertPlainTextToHTML(plainTextInput)
+        `<p><em>Large text (${characterCount} characters). Preview may be slow to update.</em></p><hr/>` +
+        convertPlainTextToHTML(debouncedPlainText)
       );
     }
 
-    return convertPlainTextToHTML(plainTextInput);
-  }, [plainTextInput]);
+    return convertPlainTextToHTML(debouncedPlainText);
+  }, [debouncedPlainText]);
 
   const handlePlainTextConfirm = async () => {
     try {
