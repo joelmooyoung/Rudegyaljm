@@ -246,7 +246,7 @@ export function createServer() {
       if (!email) {
         return res.status(400).json({
           success: false,
-          message: "Email is required"
+          message: "Email is required",
         });
       }
 
@@ -258,7 +258,7 @@ export function createServer() {
         console.error("[EMAIL TEST] RESEND_API_KEY not found");
         return res.status(500).json({
           success: false,
-          message: "Resend API key not configured"
+          message: "Resend API key not configured",
         });
       }
 
@@ -307,10 +307,12 @@ export function createServer() {
               </p>
             </div>
           </div>
-        `
+        `,
       });
 
-      console.log(`[EMAIL TEST] ✅ Email sent successfully! ID: ${emailResult.data?.id}`);
+      console.log(
+        `[EMAIL TEST] ✅ Email sent successfully! ID: ${emailResult.data?.id}`,
+      );
 
       res.json({
         success: true,
@@ -318,15 +320,14 @@ export function createServer() {
         emailId: emailResult.data?.id,
         to: email,
         from: fromEmail,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       console.error("[EMAIL TEST] ❌ Error sending email:", error);
       res.status(500).json({
         success: false,
         message: "Failed to send test email",
-        error: error.message
+        error: error.message,
       });
     }
   });
