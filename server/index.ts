@@ -238,7 +238,11 @@ export function createServer() {
 
   // WORKING EMAIL TEST ENDPOINT
   app.post("/api/test-email", async (req, res) => {
-    console.log("[EMAIL TEST] Test email request received");
+    console.log("🚀 [EMAIL TEST] ==========================================");
+    console.log("🚀 [EMAIL TEST] Test email request received!");
+    console.log("🚀 [EMAIL TEST] Method:", req.method);
+    console.log("🚀 [EMAIL TEST] Headers:", req.headers);
+    console.log("🚀 [EMAIL TEST] Body:", req.body);
 
     try {
       const { email } = req.body;
