@@ -1,5 +1,41 @@
 import express from "express";
 import cors from "cors";
+import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
+
+// MongoDB connection
+let isConnected = false;
+async function connectToDatabase() {
+  if (isConnected) return;
+
+  try {
+    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/rude-gyal-confessions";
+    await mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+      dbName: "rude-gyal-confessions",
+    });
+    isConnected = true;
+    console.log("[MongoDB] Connected successfully");
+  } catch (error) {
+    console.error("[MongoDB] Connection error:", error);
+    throw error;
+  }
+}
+
+// User schema
+const userSchema = new mongoose.Schema({
+  userId: String,
+  username: String,
+  email: String,
+  password: String,
+  type: String,
+  active: Boolean,
+  loginCount: Number,
+  lastLogin: Date,
+  createdAt: Date
+});
+
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export function createServer() {
   const app = express();
