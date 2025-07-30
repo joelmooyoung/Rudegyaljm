@@ -266,11 +266,15 @@ export default function StoryDetail({
   }, [debouncedPlainText]);
 
   const handlePlainTextConfirm = async () => {
+    setIsProcessingPreview(true);
+
     try {
-      // For very large texts, use chunked processing to prevent freezing
-      if (plainTextInput.length > 10000) {
-        setError("Processing large text... Please wait.");
-        setIsLoading?.(true);
+      // For large texts, use chunked processing to prevent freezing
+      if (plainTextInput.length > 5000) {
+        setError("Processing large text in chunks... Please wait and do not close this dialog.");
+
+        // Use setTimeout to ensure UI updates before heavy processing
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
           const htmlContent = await processLargeTextInChunks(plainTextInput);
@@ -282,24 +286,27 @@ export default function StoryDetail({
           }
         } catch (err) {
           setError(
-            "Failed to convert large text. Try breaking it into smaller sections.",
+            "Failed to convert large text. Try breaking it into smaller sections or reduce text size.",
           );
           console.error("Text conversion error:", err);
-        } finally {
-          setIsLoading?.(false);
         }
         return;
       }
 
-      // For smaller texts, use regular processing
+      // For smaller texts, use regular processing with delay to prevent blocking
+      await new Promise(resolve => setTimeout(resolve, 50));
       const htmlContent = convertPlainTextToHTML(plainTextInput);
       handleInputChange("content", htmlContent);
       setPlainTextInput("");
+      setError("");
       if (typeof setIsPlainTextDialogOpen === "function") {
         setIsPlainTextDialogOpen(false);
       }
     } catch (error) {
+      setError("Error converting text. Please try again.");
       console.error("Error in handlePlainTextConfirm:", error);
+    } finally {
+      setIsProcessingPreview(false);
     }
   };
 
