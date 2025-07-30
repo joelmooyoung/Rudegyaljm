@@ -229,10 +229,30 @@ export default function StoryDetail({
     for (let i = 0; i < paragraphs.length; i += chunkSize) {
       const chunk = paragraphs.slice(i, i + chunkSize);
 
-      // Process chunk
+      // Process chunk with enhanced formatting
       const processedChunk = chunk
         .map((paragraph) => {
           if (!paragraph.trim()) return "";
+
+          const trimmed = paragraph.trim();
+
+          // Detect headers in chunked processing too
+          if (
+            (trimmed.length < 60 &&
+             (trimmed === trimmed.toUpperCase() ||
+              /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed))) &&
+            !trimmed.includes('.')
+          ) {
+            return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
+          }
+
+          if (
+            (trimmed.endsWith(':') ||
+             (trimmed.length < 80 && !trimmed.includes('.') && !trimmed.includes(','))) &&
+            trimmed.length > 10
+          ) {
+            return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
+          }
 
           let formatted = paragraph
             .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -240,7 +260,7 @@ export default function StoryDetail({
             .replace(/`(.+?)`/g, "<code>$1</code>")
             .replace(/\n/g, "<br>");
 
-          return `<p>${formatted}</p>`;
+          return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
         })
         .filter((p) => p !== "")
         .join("\n");
