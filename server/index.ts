@@ -120,6 +120,73 @@ export function createServer() {
     });
   });
 
+  // CREATE ADMIN USER ENDPOINT
+  app.post("/api/create-admin", async (req, res) => {
+    console.log("👑 [CREATE ADMIN] Creating admin user...");
+
+    try {
+      await connectToDatabase();
+      console.log("👑 [CREATE ADMIN] Database connected");
+
+      // Check if admin already exists
+      const existingAdmin = await User.findOne({ email: "admin@rudegyalconfessions.com" });
+
+      if (existingAdmin) {
+        console.log("👑 [CREATE ADMIN] Admin already exists");
+        return res.json({
+          success: true,
+          message: "Admin user already exists",
+          credentials: {
+            email: "admin@rudegyalconfessions.com",
+            password: "admin123"
+          }
+        });
+      }
+
+      // Create new admin user
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash("admin123", saltRounds);
+
+      const adminUser = new User({
+        userId: "admin_" + Date.now(),
+        username: "admin",
+        email: "admin@rudegyalconfessions.com",
+        password: hashedPassword,
+        type: "admin",
+        country: "Unknown",
+        active: true,
+        loginCount: 0,
+        createdAt: new Date()
+      });
+
+      await adminUser.save();
+
+      console.log("👑 [CREATE ADMIN] ✅ Admin user created successfully");
+
+      res.json({
+        success: true,
+        message: "Admin user created successfully!",
+        credentials: {
+          email: "admin@rudegyalconfessions.com",
+          password: "admin123"
+        },
+        user: {
+          email: adminUser.email,
+          username: adminUser.username,
+          role: adminUser.type
+        }
+      });
+
+    } catch (error) {
+      console.error("👑 [CREATE ADMIN] ❌ Error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to create admin user",
+        error: error.message
+      });
+    }
+  });
+
   // REAL DATABASE LOGIN
   app.post("/api/auth/login", async (req, res) => {
     console.log("[LOGIN] Attempting login with real database");
