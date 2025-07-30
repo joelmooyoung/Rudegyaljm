@@ -189,10 +189,10 @@ export default function StoryDetail({
         // Detect headers (lines that are shorter and look like titles)
         // Main headers: ALL CAPS or Title Case with no periods
         if (
-          (trimmed.length < 60 &&
-           (trimmed === trimmed.toUpperCase() ||
-            /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed))) &&
-          !trimmed.includes('.')
+          trimmed.length < 60 &&
+          (trimmed === trimmed.toUpperCase() ||
+            /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
+          !trimmed.includes(".")
         ) {
           // Large header
           return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
@@ -200,8 +200,10 @@ export default function StoryDetail({
 
         // Sub headers: Lines ending with colon or shorter declarative sentences
         if (
-          (trimmed.endsWith(':') ||
-           (trimmed.length < 80 && !trimmed.includes('.') && !trimmed.includes(','))) &&
+          (trimmed.endsWith(":") ||
+            (trimmed.length < 80 &&
+              !trimmed.includes(".") &&
+              !trimmed.includes(","))) &&
           trimmed.length > 10
         ) {
           return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
@@ -238,17 +240,19 @@ export default function StoryDetail({
 
           // Detect headers in chunked processing too
           if (
-            (trimmed.length < 60 &&
-             (trimmed === trimmed.toUpperCase() ||
-              /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed))) &&
-            !trimmed.includes('.')
+            trimmed.length < 60 &&
+            (trimmed === trimmed.toUpperCase() ||
+              /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
+            !trimmed.includes(".")
           ) {
             return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
           }
 
           if (
-            (trimmed.endsWith(':') ||
-             (trimmed.length < 80 && !trimmed.includes('.') && !trimmed.includes(','))) &&
+            (trimmed.endsWith(":") ||
+              (trimmed.length < 80 &&
+                !trimmed.includes(".") &&
+                !trimmed.includes(","))) &&
             trimmed.length > 10
           ) {
             return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
