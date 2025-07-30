@@ -585,6 +585,32 @@ export default function Home({
           )}
         </section>
 
+        {/* Mobile App CTA */}
+        <section className="mb-12">
+          <div className="max-w-2xl mx-auto">
+            <div className="mobile-app-cta bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 rounded-xl text-center border border-purple-500/30 shadow-2xl">
+              <h3 className="text-2xl font-bold mb-3 text-passion-gradient">
+                📱 Get Our Mobile App!
+              </h3>
+              <p className="text-gray-300 mb-6 font-serif leading-relaxed">
+                Install Rude Gyal Confessions to your phone for the ultimate intimate reading experience.
+                Enjoy your favorite seductive tales anytime, anywhere.
+              </p>
+              <a
+                href="https://app.rudegyalconfessions.com"
+                className="inline-block bg-gradient-to-r from-purple-600 to-cyan-500 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:from-purple-700 hover:to-cyan-600 hover:transform hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-500/50"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                🚀 Install Rude Gyal App
+              </a>
+              <div className="mt-4 text-sm text-gray-400">
+                ✨ Offline reading • 🔔 New story notifications • 💖 Favorite stories
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Search and filters */}
         <section className="mb-12">
           <div className="max-w-4xl mx-auto">
