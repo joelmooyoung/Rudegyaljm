@@ -175,7 +175,7 @@ export default function StoryDetail({
     handleInputChange("tags", tagsArray);
   };
 
-  // Simple plain text to HTML converter
+  // Enhanced plain text to HTML converter with headers and spacing
   const convertPlainTextToHTML = (text: string): string => {
     if (!text) return "";
 
@@ -184,14 +184,37 @@ export default function StoryDetail({
       .map((paragraph) => {
         if (!paragraph.trim()) return "";
 
-        // Basic formatting
+        const trimmed = paragraph.trim();
+
+        // Detect headers (lines that are shorter and look like titles)
+        // Main headers: ALL CAPS or Title Case with no periods
+        if (
+          (trimmed.length < 60 &&
+           (trimmed === trimmed.toUpperCase() ||
+            /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed))) &&
+          !trimmed.includes('.')
+        ) {
+          // Large header
+          return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
+        }
+
+        // Sub headers: Lines ending with colon or shorter declarative sentences
+        if (
+          (trimmed.endsWith(':') ||
+           (trimmed.length < 80 && !trimmed.includes('.') && !trimmed.includes(','))) &&
+          trimmed.length > 10
+        ) {
+          return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
+        }
+
+        // Regular paragraph formatting
         let formatted = paragraph
           .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") // Bold
           .replace(/\*(.+?)\*/g, "<em>$1</em>") // Italic
           .replace(/`(.+?)`/g, "<code>$1</code>") // Code
           .replace(/\n/g, "<br>"); // Line breaks
 
-        return `<p>${formatted}</p>`;
+        return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
       })
       .filter((p) => p !== "")
       .join("\n");
