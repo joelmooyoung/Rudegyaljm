@@ -678,12 +678,25 @@ export default function StoryDetail({
                         <Button
                           variant="outline"
                           onClick={() => setIsPlainTextDialogOpen(false)}
+                          disabled={isProcessingPreview}
                         >
                           Cancel
                         </Button>
-                        <Button onClick={handlePlainTextConfirm}>
-                          <Code className="h-4 w-4 mr-2" />
-                          Convert & Use
+                        <Button
+                          onClick={handlePlainTextConfirm}
+                          disabled={isProcessingPreview || !plainTextInput.trim()}
+                        >
+                          {isProcessingPreview ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 mr-2 border-2 border-current border-t-transparent rounded-full" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Code className="h-4 w-4 mr-2" />
+                              Convert & Use
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
