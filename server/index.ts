@@ -109,6 +109,17 @@ export function createServer() {
     });
   });
 
+  // Email endpoint health check
+  app.get("/api/test-email", (req, res) => {
+    console.log("🔍 [EMAIL TEST] GET request to /api/test-email");
+    res.json({
+      message: "Email test endpoint is available",
+      method: "POST required",
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      fromEmail: process.env.RESEND_FROM_EMAIL || "not set"
+    });
+  });
+
   // REAL DATABASE LOGIN
   app.post("/api/auth/login", async (req, res) => {
     console.log("[LOGIN] Attempting login with real database");
