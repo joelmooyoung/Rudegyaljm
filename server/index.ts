@@ -236,6 +236,101 @@ export function createServer() {
     }
   });
 
+  // WORKING EMAIL TEST ENDPOINT
+  app.post("/api/test-email", async (req, res) => {
+    console.log("[EMAIL TEST] Test email request received");
+
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is required"
+        });
+      }
+
+      // Check Resend configuration
+      const resendKey = process.env.RESEND_API_KEY;
+      const fromEmail = process.env.RESEND_FROM_EMAIL;
+
+      if (!resendKey) {
+        console.error("[EMAIL TEST] RESEND_API_KEY not found");
+        return res.status(500).json({
+          success: false,
+          message: "Resend API key not configured"
+        });
+      }
+
+      console.log(`[EMAIL TEST] Sending test email to: ${email}`);
+      console.log(`[EMAIL TEST] From email: ${fromEmail}`);
+      console.log(`[EMAIL TEST] API key present: ${!!resendKey}`);
+
+      const resend = new Resend(resendKey);
+
+      const emailResult = await resend.emails.send({
+        from: fromEmail || "noreply@rudegyalconfessions.com",
+        to: email,
+        subject: "✅ Test Email - Rude Gyal Confessions",
+        html: `
+          <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+            <div style="background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">✅ Email Test Successful!</h1>
+              <p style="color: #fce7f3; margin: 10px 0 0 0;">Rude Gyal Confessions</p>
+            </div>
+
+            <div style="background: white; padding: 40px;">
+              <h2 style="color: #374151; margin-bottom: 20px;">🎉 Great News!</h2>
+
+              <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                Your Resend email integration is working perfectly! This test email confirms that:
+              </p>
+
+              <div style="background: #dcfce7; border: 1px solid #16a34a; border-radius: 6px; padding: 15px; margin: 25px 0;">
+                <p style="margin: 0; color: #166534; font-size: 14px;">
+                  ✅ <strong>Email service is fully operational</strong>
+                </p>
+              </div>
+
+              <ul style="color: #6b7280; font-size: 14px; margin: 20px 0;">
+                <li>✅ Resend API connection established</li>
+                <li>✅ Email delivery confirmed</li>
+                <li>✅ Template rendering correctly</li>
+                <li>✅ Ready for production use</li>
+              </ul>
+
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+              <p style="color: #9ca3af; font-size: 13px; margin: 0;">
+                Test sent: ${new Date().toLocaleString()}<br>
+                From: ${fromEmail || "noreply@rudegyalconfessions.com"}
+              </p>
+            </div>
+          </div>
+        `
+      });
+
+      console.log(`[EMAIL TEST] ✅ Email sent successfully! ID: ${emailResult.data?.id}`);
+
+      res.json({
+        success: true,
+        message: "Test email sent successfully!",
+        emailId: emailResult.data?.id,
+        to: email,
+        from: fromEmail,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error("[EMAIL TEST] ❌ Error sending email:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to send test email",
+        error: error.message
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
