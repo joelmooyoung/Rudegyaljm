@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AgeVerification from "./pages/AgeVerificationSimple";
-import FinalAuth from "./pages/FinalAuth";
+import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -481,8 +481,9 @@ const App = () => {
         case "auth":
         default:
           return (
-            <FinalAuth
+            <Auth
               onAuthenticated={handleAuthenticated}
+              onNavigateToForgotPassword={handleNavigateToForgotPassword}
             />
           );
       }
