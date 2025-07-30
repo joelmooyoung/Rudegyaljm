@@ -481,7 +481,7 @@ const App = () => {
         case "auth":
         default:
           return (
-            <CleanAuth
+            <FinalAuth
               onAuthenticated={handleAuthenticated}
             />
           );
