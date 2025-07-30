@@ -593,8 +593,9 @@ export default function Home({
                 📱 Get Our Mobile App!
               </h3>
               <p className="text-gray-300 mb-6 font-serif leading-relaxed">
-                Install Rude Gyal Confessions to your phone for the ultimate intimate reading experience.
-                Enjoy your favorite seductive tales anytime, anywhere.
+                Install Rude Gyal Confessions to your phone for the ultimate
+                intimate reading experience. Enjoy your favorite seductive tales
+                anytime, anywhere.
               </p>
               <a
                 href="https://app.rudegyalconfessions.com"
@@ -605,7 +606,8 @@ export default function Home({
                 🚀 Install Rude Gyal App
               </a>
               <div className="mt-4 text-sm text-gray-400">
-                ✨ Offline reading • 🔔 New story notifications • 💖 Favorite stories
+                ✨ Offline reading • 🔔 New story notifications • 💖 Favorite
+                stories
               </div>
             </div>
           </div>
