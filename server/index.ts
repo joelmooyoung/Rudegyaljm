@@ -3,23 +3,42 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
-// MongoDB connection
+// MongoDB connection with retry logic
 let isConnected = false;
+let connectionPromise = null;
+
 async function connectToDatabase() {
   if (isConnected) return;
+  if (connectionPromise) return connectionPromise;
 
-  try {
-    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/rude-gyal-confessions";
-    await mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-      dbName: "rude-gyal-confessions",
-    });
-    isConnected = true;
-    console.log("[MongoDB] Connected successfully");
-  } catch (error) {
-    console.error("[MongoDB] Connection error:", error);
-    throw error;
-  }
+  connectionPromise = (async () => {
+    try {
+      const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/rude-gyal-confessions";
+
+      console.log("[MongoDB] Attempting connection...");
+
+      await mongoose.connect(MONGODB_URI, {
+        bufferCommands: true, // Enable buffering temporarily
+        serverSelectionTimeoutMS: 5000, // 5 second timeout
+        socketTimeoutMS: 45000,
+        dbName: "rude-gyal-confessions",
+      });
+
+      // Wait for connection to be ready
+      await mongoose.connection.db.admin().ping();
+
+      isConnected = true;
+      console.log("[MongoDB] Connected successfully to:", mongoose.connection.db.databaseName);
+
+    } catch (error) {
+      console.error("[MongoDB] Connection failed:", error.message);
+      isConnected = false;
+      connectionPromise = null;
+      throw new Error("Database connection failed");
+    }
+  })();
+
+  return connectionPromise;
 }
 
 // User schema
