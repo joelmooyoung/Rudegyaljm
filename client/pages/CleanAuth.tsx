@@ -25,7 +25,7 @@ export default function CleanAuth({ onAuthenticated }: CleanAuthProps) {
     setError('');
 
     try {
-      const endpoint = isLogin ? '/api/auth/simple-login' : '/api/auth/simple-register';
+      const endpoint = isLogin ? '/api/auth/bypass-login' : '/api/auth/simple-register';
       const body = isLogin 
         ? { email, password }
         : { email, password, username };
