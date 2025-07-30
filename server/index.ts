@@ -167,6 +167,51 @@ export function createServer() {
     }
   });
 
+  // REAL STORIES ENDPOINT
+  app.get("/api/stories", async (req, res) => {
+    console.log("[STORIES] Fetching stories from real database");
+
+    try {
+      await connectToDatabase();
+      console.log("[STORIES] Database connected successfully");
+
+      const stories = await Story.find({ published: true })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      console.log(`[STORIES] Found ${stories.length} published stories`);
+
+      // Transform for frontend
+      const transformedStories = stories.map(story => ({
+        id: story.storyId || story._id.toString(),
+        title: story.title || "Untitled",
+        content: story.content || "",
+        excerpt: story.excerpt || "",
+        author: story.author || "Unknown Author",
+        category: story.category || "Romance",
+        tags: Array.isArray(story.tags) ? story.tags : [],
+        accessLevel: story.accessLevel || "free",
+        isPublished: story.published || false,
+        publishedAt: story.publishedAt || story.createdAt,
+        createdAt: story.createdAt || new Date(),
+        updatedAt: story.updatedAt || new Date(),
+        viewCount: story.viewCount || 0,
+        rating: story.rating || 0,
+        ratingCount: story.ratingCount || 0,
+        image: story.image || null
+      }));
+
+      res.json(transformedStories);
+
+    } catch (error) {
+      console.error("[STORIES] Database error:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Failed to load stories from database"
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
