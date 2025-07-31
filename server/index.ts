@@ -187,6 +187,98 @@ export function createServer() {
     }
   });
 
+  // RESET ADMIN PASSWORD ENDPOINT
+  app.post("/api/reset-admin", async (req, res) => {
+    console.log("🔑 [RESET ADMIN] Resetting admin password...");
+
+    try {
+      await connectToDatabase();
+      console.log("🔑 [RESET ADMIN] Database connected");
+
+      // Find the admin user
+      const adminUser = await User.findOne({ email: "admin@rudegyalconfessions.com" });
+
+      if (!adminUser) {
+        return res.json({
+          success: false,
+          message: "Admin user not found"
+        });
+      }
+
+      // Reset password to admin123
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash("admin123", saltRounds);
+
+      adminUser.password = hashedPassword;
+      adminUser.active = true; // Make sure user is active
+      await adminUser.save();
+
+      console.log("🔑 [RESET ADMIN] ✅ Password reset successfully");
+
+      res.json({
+        success: true,
+        message: "Admin password reset successfully!",
+        credentials: {
+          email: "admin@rudegyalconfessions.com",
+          password: "admin123"
+        },
+        userInfo: {
+          email: adminUser.email,
+          username: adminUser.username,
+          type: adminUser.type,
+          active: adminUser.active
+        }
+      });
+
+    } catch (error) {
+      console.error("🔑 [RESET ADMIN] ❌ Error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to reset admin password",
+        error: error.message
+      });
+    }
+  });
+
+  // CHECK USERS ENDPOINT
+  app.get("/api/check-users", async (req, res) => {
+    console.log("👥 [CHECK USERS] Checking existing users...");
+
+    try {
+      await connectToDatabase();
+
+      const users = await User.find({}, {
+        email: 1,
+        username: 1,
+        type: 1,
+        active: 1,
+        createdAt: 1
+      }).limit(10);
+
+      console.log(`👥 [CHECK USERS] Found ${users.length} users`);
+
+      res.json({
+        success: true,
+        userCount: users.length,
+        users: users.map(user => ({
+          email: user.email,
+          username: user.username,
+          type: user.type,
+          active: user.active,
+          createdAt: user.createdAt
+        }))
+      });
+
+    } catch (error) {
+      console.error("👥 [CHECK USERS] ❌ Error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to check users",
+        error: error.message
+      });
+    }
+  });
+
   // REAL DATABASE LOGIN
   app.post("/api/auth/login", async (req, res) => {
     console.log("[LOGIN] Attempting login with real database");
