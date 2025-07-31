@@ -10,15 +10,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle, Heart, RefreshCw } from "lucide-react";
-import { validatePassword, generateStrongPassword } from "@/utils/passwordValidation";
+import {
+  ArrowLeft,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  Heart,
+  RefreshCw,
+} from "lucide-react";
+import {
+  validatePassword,
+  generateStrongPassword,
+} from "@/utils/passwordValidation";
 
 interface ResetPasswordProps {
   onNavigateToAuth?: () => void;
   onNavigateToForgotPassword?: () => void;
 }
 
-export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPassword }: ResetPasswordProps) {
+export default function ResetPassword({
+  onNavigateToAuth,
+  onNavigateToForgotPassword,
+}: ResetPasswordProps) {
   // Get token from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
@@ -46,7 +60,7 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
       setError("Invalid reset token");
       return;
@@ -80,7 +94,7 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
       const data = await response.json();
 
       if (response.ok) {
-                setIsSuccess(true);
+        setIsSuccess(true);
         // Redirect to login after 3 seconds
         setTimeout(() => {
           onNavigateToAuth?.();
@@ -112,7 +126,8 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                 Password Reset Successfully!
               </CardTitle>
               <CardDescription className="text-base font-serif text-muted-foreground mt-2">
-                Your password has been updated. You can now login with your new password.
+                Your password has been updated. You can now login with your new
+                password.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -120,8 +135,8 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                 <p className="text-sm text-muted-foreground mb-4">
                   Redirecting to login page in 3 seconds...
                 </p>
-                
-                                <Button
+
+                <Button
                   className="w-full bg-primary hover:bg-primary/90"
                   onClick={onNavigateToAuth}
                 >
@@ -153,7 +168,7 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3">
                 <Button
                   className="w-full bg-primary hover:bg-primary/90"
                   onClick={onNavigateToForgotPassword}
@@ -184,7 +199,7 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
       <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10" />
 
       <div className="relative z-10 w-full max-w-md mx-auto">
-                <div className="text-center mb-8">
+        <div className="text-center mb-8">
           <button
             onClick={onNavigateToAuth}
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -210,7 +225,10 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="new-password" className="text-base font-serif">
+                  <Label
+                    htmlFor="new-password"
+                    className="text-base font-serif"
+                  >
                     New Password
                   </Label>
                   <Button
@@ -254,18 +272,30 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                 {newPassword && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Password Strength</span>
-                      <span className={`font-medium ${
-                        passwordValidation.strength === "very-strong" ? "text-green-500" :
-                        passwordValidation.strength === "strong" ? "text-green-400" :
-                        passwordValidation.strength === "medium" ? "text-yellow-500" :
-                        "text-red-500"
-                      }`}>
-                        {passwordValidation.strength?.replace("_", " ").toUpperCase()}
+                      <span className="text-muted-foreground">
+                        Password Strength
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          passwordValidation.strength === "very-strong"
+                            ? "text-green-500"
+                            : passwordValidation.strength === "strong"
+                              ? "text-green-400"
+                              : passwordValidation.strength === "medium"
+                                ? "text-yellow-500"
+                                : "text-red-500"
+                        }`}
+                      >
+                        {passwordValidation.strength
+                          ?.replace("_", " ")
+                          .toUpperCase()}
                       </span>
                     </div>
-                    <Progress value={passwordValidation.score * 20} className="h-2" />
-                    
+                    <Progress
+                      value={passwordValidation.score * 20}
+                      className="h-2"
+                    />
+
                     {passwordValidation.errors.length > 0 && (
                       <ul className="text-xs text-destructive space-y-1">
                         {passwordValidation.errors.map((error, index) => (
@@ -278,7 +308,10 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="confirm-password" className="text-base font-serif">
+                <Label
+                  htmlFor="confirm-password"
+                  className="text-base font-serif"
+                >
                   Confirm Password
                 </Label>
                 <div className="relative">
@@ -293,9 +326,11 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
                     required
                   />
                 </div>
-                
+
                 {confirmPassword && newPassword !== confirmPassword && (
-                  <p className="text-xs text-destructive">Passwords do not match</p>
+                  <p className="text-xs text-destructive">
+                    Passwords do not match
+                  </p>
                 )}
               </div>
 
@@ -308,13 +343,17 @@ export default function ResetPassword({ onNavigateToAuth, onNavigateToForgotPass
               <Button
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90"
-                disabled={isLoading || !passwordValidation.isValid || newPassword !== confirmPassword}
+                disabled={
+                  isLoading ||
+                  !passwordValidation.isValid ||
+                  newPassword !== confirmPassword
+                }
               >
                 {isLoading ? "Resetting Password..." : "Reset Password"}
               </Button>
             </form>
 
-                        <div className="mt-6 text-center">
+            <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Remember your password?{" "}
                 <button

@@ -15,7 +15,9 @@ interface ForgotPasswordProps {
   onNavigateToAuth?: () => void;
 }
 
-export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps) {
+export default function ForgotPassword({
+  onNavigateToAuth,
+}: ForgotPasswordProps) {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -71,7 +73,8 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
                 Check Your Email
               </CardTitle>
               <CardDescription className="text-base font-serif text-muted-foreground mt-2">
-                If an account with that email exists, we've sent you a password reset link.
+                If an account with that email exists, we've sent you a password
+                reset link.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -79,11 +82,12 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
                 <p className="text-sm text-muted-foreground">
                   Didn't receive an email? Check your spam folder or try again.
                 </p>
-                
+
                 {process.env.NODE_ENV === "development" && (
                   <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
                     <p className="text-xs text-yellow-600 dark:text-yellow-400">
-                      <strong>Development Mode:</strong> Check the browser console for the reset link.
+                      <strong>Development Mode:</strong> Check the browser
+                      console for the reset link.
                     </p>
                   </div>
                 )}
@@ -101,7 +105,7 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
                   Try Different Email
                 </Button>
 
-                                <Button
+                <Button
                   variant="ghost"
                   className="w-full"
                   onClick={onNavigateToAuth}
@@ -124,7 +128,7 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
       <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-background to-accent/10" />
 
       <div className="relative z-10 w-full max-w-md mx-auto">
-                <div className="text-center mb-8">
+        <div className="text-center mb-8">
           <button
             onClick={onNavigateToAuth}
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -181,7 +185,7 @@ export default function ForgotPassword({ onNavigateToAuth }: ForgotPasswordProps
               </Button>
             </form>
 
-                        <div className="mt-6 text-center">
+            <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Remember your password?{" "}
                 <button

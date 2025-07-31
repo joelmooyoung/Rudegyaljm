@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   if (!email) {
     return res.status(400).json({
       success: false,
-      message: "Email is required"
+      message: "Email is required",
     });
   }
 
@@ -34,35 +34,38 @@ export default async function handler(req, res) {
 
   // RELIABLE ACCOUNTS THAT SUPPORT PASSWORD RESET
   const reliableAccounts = {
-    'admin@rudegyalconfessions.com': {
-      email: 'admin@rudegyalconfessions.com',
-      username: 'admin'
+    "admin@rudegyalconfessions.com": {
+      email: "admin@rudegyalconfessions.com",
+      username: "admin",
     },
-    'joelmooyoung@me.com': {
-      email: 'joelmooyoung@me.com', 
-      username: 'joelmooyoung'
-    }
+    "joelmooyoung@me.com": {
+      email: "joelmooyoung@me.com",
+      username: "joelmooyoung",
+    },
   };
 
   const account = reliableAccounts[email.toLowerCase()];
-  
+
   if (account) {
     try {
       // Generate secure reset token
       const resetToken = crypto.randomBytes(32).toString("hex");
-      
+
       // Store token temporarily (in a real app, you'd store this in Redis or database)
       // For now, we'll create a predictable token for testing
-      const testResetToken = `reset_${Buffer.from(email).toString('base64')}_${Date.now()}`;
-      
-      console.log(`🔐 [PRODUCTION FORGOT PASSWORD] Generated token for: ${email}`);
+      const testResetToken = `reset_${Buffer.from(email).toString("base64")}_${Date.now()}`;
+
+      console.log(
+        `🔐 [PRODUCTION FORGOT PASSWORD] Generated token for: ${email}`,
+      );
 
       // Send password reset email using Resend
       const resend = new Resend(process.env.RESEND_API_KEY);
       const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/reset-password?token=${testResetToken}`;
 
       const emailResult = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "noreply@rudegyalconfessions.com",
+        from:
+          process.env.RESEND_FROM_EMAIL || "noreply@rudegyalconfessions.com",
         to: account.email,
         subject: "🔑 Password Reset - Rude Gyal Confessions",
         html: `
@@ -126,31 +129,40 @@ export default async function handler(req, res) {
               </div>
             </div>
           </div>
-        `
+        `,
       });
 
-      console.log(`🔐 [PRODUCTION FORGOT PASSWORD] ✅ Email sent successfully to ${email}:`, emailResult.data?.id);
+      console.log(
+        `🔐 [PRODUCTION FORGOT PASSWORD] ✅ Email sent successfully to ${email}:`,
+        emailResult.data?.id,
+      );
 
       return res.status(200).json({
         success: true,
-        message: "Password reset email sent successfully! Check your inbox and spam folder.",
+        message:
+          "Password reset email sent successfully! Check your inbox and spam folder.",
         emailId: emailResult.data?.id,
-        resetToken: testResetToken // For testing purposes
+        resetToken: testResetToken, // For testing purposes
       });
-
     } catch (emailError) {
-      console.error(`🔐 [PRODUCTION FORGOT PASSWORD] ❌ Email sending failed:`, emailError);
+      console.error(
+        `🔐 [PRODUCTION FORGOT PASSWORD] ❌ Email sending failed:`,
+        emailError,
+      );
       return res.status(500).json({
         success: false,
-        message: "Failed to send password reset email"
+        message: "Failed to send password reset email",
       });
     }
   }
 
   // Always return success for security (don't reveal if email exists)
-  console.log(`🔐 [PRODUCTION FORGOT PASSWORD] Email not found: ${email} (returning success for security)`);
+  console.log(
+    `🔐 [PRODUCTION FORGOT PASSWORD] Email not found: ${email} (returning success for security)`,
+  );
   return res.status(200).json({
     success: true,
-    message: "If an account with that email exists, a password reset link has been sent."
+    message:
+      "If an account with that email exists, a password reset link has been sent.",
   });
 }
