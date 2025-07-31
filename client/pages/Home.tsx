@@ -585,8 +585,6 @@ export default function Home({
           )}
         </section>
 
-
-
         {/* Search and filters */}
         <section className="mb-12">
           <div className="max-w-4xl mx-auto">
