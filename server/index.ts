@@ -129,7 +129,9 @@ export function createServer() {
       console.log("👑 [CREATE ADMIN] Database connected");
 
       // Check if admin already exists
-      const existingAdmin = await User.findOne({ email: "admin@rudegyalconfessions.com" });
+      const existingAdmin = await User.findOne({
+        email: "admin@rudegyalconfessions.com",
+      });
 
       if (existingAdmin) {
         console.log("👑 [CREATE ADMIN] Admin already exists");
@@ -138,8 +140,8 @@ export function createServer() {
           message: "Admin user already exists",
           credentials: {
             email: "admin@rudegyalconfessions.com",
-            password: "admin123"
-          }
+            password: "admin123",
+          },
         });
       }
 
@@ -156,7 +158,7 @@ export function createServer() {
         country: "Unknown",
         active: true,
         loginCount: 0,
-        createdAt: new Date()
+        createdAt: new Date(),
       });
 
       await adminUser.save();
@@ -168,21 +170,20 @@ export function createServer() {
         message: "Admin user created successfully!",
         credentials: {
           email: "admin@rudegyalconfessions.com",
-          password: "admin123"
+          password: "admin123",
         },
         user: {
           email: adminUser.email,
           username: adminUser.username,
-          role: adminUser.type
-        }
+          role: adminUser.type,
+        },
       });
-
     } catch (error) {
       console.error("👑 [CREATE ADMIN] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to create admin user",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -196,12 +197,14 @@ export function createServer() {
       console.log("🔑 [RESET ADMIN] Database connected");
 
       // Find the admin user
-      const adminUser = await User.findOne({ email: "admin@rudegyalconfessions.com" });
+      const adminUser = await User.findOne({
+        email: "admin@rudegyalconfessions.com",
+      });
 
       if (!adminUser) {
         return res.json({
           success: false,
-          message: "Admin user not found"
+          message: "Admin user not found",
         });
       }
 
@@ -220,22 +223,21 @@ export function createServer() {
         message: "Admin password reset successfully!",
         credentials: {
           email: "admin@rudegyalconfessions.com",
-          password: "admin123"
+          password: "admin123",
         },
         userInfo: {
           email: adminUser.email,
           username: adminUser.username,
           type: adminUser.type,
-          active: adminUser.active
-        }
+          active: adminUser.active,
+        },
       });
-
     } catch (error) {
       console.error("🔑 [RESET ADMIN] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to reset admin password",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -247,34 +249,36 @@ export function createServer() {
     try {
       await connectToDatabase();
 
-      const users = await User.find({}, {
-        email: 1,
-        username: 1,
-        type: 1,
-        active: 1,
-        createdAt: 1
-      }).limit(10);
+      const users = await User.find(
+        {},
+        {
+          email: 1,
+          username: 1,
+          type: 1,
+          active: 1,
+          createdAt: 1,
+        },
+      ).limit(10);
 
       console.log(`👥 [CHECK USERS] Found ${users.length} users`);
 
       res.json({
         success: true,
         userCount: users.length,
-        users: users.map(user => ({
+        users: users.map((user) => ({
           email: user.email,
           username: user.username,
           type: user.type,
           active: user.active,
-          createdAt: user.createdAt
-        }))
+          createdAt: user.createdAt,
+        })),
       });
-
     } catch (error) {
       console.error("👥 [CHECK USERS] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to check users",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -297,34 +301,34 @@ export function createServer() {
 
     // RELIABLE ACCOUNTS THAT ALWAYS WORK - NO DATABASE REQUIRED
     const reliableAccounts = {
-      'admin@rudegyalconfessions.com': {
-        password: 'admin123',
+      "admin@rudegyalconfessions.com": {
+        password: "admin123",
         user: {
-          id: 'admin-reliable-001',
-          email: 'admin@rudegyalconfessions.com',
-          username: 'admin',
-          role: 'admin',
+          id: "admin-reliable-001",
+          email: "admin@rudegyalconfessions.com",
+          username: "admin",
+          role: "admin",
           isActive: true,
           isAgeVerified: true,
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-01-01'),
-          lastLogin: new Date()
-        }
+          subscriptionStatus: "active",
+          createdAt: new Date("2024-01-01"),
+          lastLogin: new Date(),
+        },
       },
-      'joelmooyoung@me.com': {
-        password: 'password123',
+      "joelmooyoung@me.com": {
+        password: "password123",
         user: {
-          id: 'joel-reliable-001',
-          email: 'joelmooyoung@me.com',
-          username: 'joelmooyoung',
-          role: 'admin',
+          id: "joel-reliable-001",
+          email: "joelmooyoung@me.com",
+          username: "joelmooyoung",
+          role: "admin",
           isActive: true,
           isAgeVerified: true,
-          subscriptionStatus: 'active',
-          createdAt: new Date('2024-01-01'),
-          lastLogin: new Date()
-        }
-      }
+          subscriptionStatus: "active",
+          createdAt: new Date("2024-01-01"),
+          lastLogin: new Date(),
+        },
+      },
     };
 
     // Check reliable accounts first - these ALWAYS work
@@ -337,7 +341,7 @@ export function createServer() {
         success: true,
         message: "Login successful",
         token: token,
-        user: reliableAccount.user
+        user: reliableAccount.user,
       });
     }
 

@@ -3,7 +3,10 @@ import React, { useState } from "react";
 export default function DirectEmailTest() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [result, setResult] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   const sendTestEmail = async () => {
     if (!email) {
@@ -18,7 +21,7 @@ export default function DirectEmailTest() {
       const response = await fetch("/api/test-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -26,18 +29,18 @@ export default function DirectEmailTest() {
       if (response.ok && data.success) {
         setResult({
           message: `✅ Test email sent successfully to ${email}! Check your inbox (and spam folder). Email ID: ${data.emailId}`,
-          type: "success"
+          type: "success",
         });
       } else {
         setResult({
           message: `❌ Failed to send email: ${data.message || "Unknown error"}`,
-          type: "error"
+          type: "error",
         });
       }
     } catch (error) {
       setResult({
         message: `❌ Network error: ${error.message}`,
-        type: "error"
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -55,10 +58,13 @@ export default function DirectEmailTest() {
             Test Resend email integration directly
           </p>
         </div>
-        
+
         <div className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Test Email Address
             </label>
             <input
@@ -74,11 +80,13 @@ export default function DirectEmailTest() {
           </div>
 
           {result && (
-            <div className={`text-sm p-3 rounded-md ${
-              result.type === "success" 
-                ? "text-green-800 bg-green-100 border border-green-200" 
-                : "text-red-800 bg-red-100 border border-red-200"
-            }`}>
+            <div
+              className={`text-sm p-3 rounded-md ${
+                result.type === "success"
+                  ? "text-green-800 bg-green-100 border border-green-200"
+                  : "text-red-800 bg-red-100 border border-red-200"
+              }`}
+            >
               {result.message}
             </div>
           )}
@@ -101,7 +109,9 @@ export default function DirectEmailTest() {
           </div>
 
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Debug Info</h3>
+            <h3 className="text-sm font-medium text-blue-800 mb-2">
+              Debug Info
+            </h3>
             <ul className="text-xs text-blue-700 space-y-1">
               <li>• This page bypasses authentication</li>
               <li>• Tests Resend email integration directly</li>
