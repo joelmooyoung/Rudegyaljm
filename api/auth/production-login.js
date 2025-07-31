@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Email and password are required"
+      message: "Email and password are required",
     });
   }
 
@@ -31,34 +31,34 @@ export default async function handler(req, res) {
 
   // RELIABLE ACCOUNTS THAT ALWAYS WORK
   const reliableAccounts = {
-    'admin@rudegyalconfessions.com': {
-      password: 'admin123',
+    "admin@rudegyalconfessions.com": {
+      password: "admin123",
       user: {
-        id: 'admin-prod-001',
-        email: 'admin@rudegyalconfessions.com',
-        username: 'admin',
-        role: 'admin',
+        id: "admin-prod-001",
+        email: "admin@rudegyalconfessions.com",
+        username: "admin",
+        role: "admin",
         isActive: true,
         isAgeVerified: true,
-        subscriptionStatus: 'active',
-        createdAt: new Date('2024-01-01'),
-        lastLogin: new Date()
-      }
+        subscriptionStatus: "active",
+        createdAt: new Date("2024-01-01"),
+        lastLogin: new Date(),
+      },
     },
-    'joelmooyoung@me.com': {
-      password: 'password123',
+    "joelmooyoung@me.com": {
+      password: "password123",
       user: {
-        id: 'joel-prod-001',
-        email: 'joelmooyoung@me.com',
-        username: 'joelmooyoung',
-        role: 'admin',
+        id: "joel-prod-001",
+        email: "joelmooyoung@me.com",
+        username: "joelmooyoung",
+        role: "admin",
         isActive: true,
         isAgeVerified: true,
-        subscriptionStatus: 'active',
-        createdAt: new Date('2024-01-01'),
-        lastLogin: new Date()
-      }
-    }
+        subscriptionStatus: "active",
+        createdAt: new Date("2024-01-01"),
+        lastLogin: new Date(),
+      },
+    },
   };
 
   // Check reliable accounts
@@ -66,18 +66,18 @@ export default async function handler(req, res) {
   if (reliableAccount && reliableAccount.password === password) {
     console.log("🔐 [PRODUCTION LOGIN] ✅ Reliable account login successful");
     const token = `prod_token_${reliableAccount.user.id}_${Date.now()}`;
-    
+
     return res.json({
       success: true,
       message: "Login successful",
       token: token,
-      user: reliableAccount.user
+      user: reliableAccount.user,
     });
   }
 
   console.log("🔐 [PRODUCTION LOGIN] ❌ Authentication failed");
   return res.status(401).json({
     success: false,
-    message: "Invalid email or password"
+    message: "Invalid email or password",
   });
 }
