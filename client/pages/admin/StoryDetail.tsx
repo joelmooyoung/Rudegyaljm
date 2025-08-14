@@ -445,8 +445,12 @@ export default function StoryDetail({
 
   // Handle audio file upload
   const handleAudioUpload = async (file: File) => {
-    if (!file.type.startsWith("audio/")) {
-      alert("Please select a valid audio file.");
+    // Check if file is audio by MIME type or file extension
+    const isAudioByType = file.type.startsWith("audio/");
+    const isAudioByExtension = /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name);
+
+    if (!isAudioByType && !isAudioByExtension) {
+      alert("Please select a valid audio file (MP3, WAV, OGG, M4A, AAC, FLAC).");
       return;
     }
 
