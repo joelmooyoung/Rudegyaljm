@@ -476,13 +476,17 @@ export default function StoryDetail({
         console.log("Audio uploaded successfully:", result);
       } else {
         const errorData = await response.text();
-        console.error("Failed to upload audio:", response.statusText, errorData);
+        console.error(
+          "Failed to upload audio:",
+          response.statusText,
+          errorData,
+        );
         alert(`Failed to upload audio: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Failed to upload audio:", error);
       alert(
-        `Failed to upload audio: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Failed to upload audio: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
       setIsUploadingAudio(false);
@@ -746,11 +750,7 @@ export default function StoryDetail({
 
                     {audioUrl ? (
                       <div className="border rounded-md p-4 bg-muted/20">
-                        <audio
-                          controls
-                          className="w-full"
-                          preload="metadata"
-                        >
+                        <audio controls className="w-full" preload="metadata">
                           <source src={audioUrl} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>

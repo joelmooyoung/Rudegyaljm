@@ -456,8 +456,16 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 <div className="mt-6 p-4 bg-muted/20 rounded-lg border">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center gap-2 text-sm font-medium">
-                      <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.814L4.746 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.746l3.637-3.814a1 1 0 011.617.814zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.896-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.414A3.983 3.983 0 0013 10a3.983 3.983 0 00-1.172-2.829 1 1 0 010-1.414z" clipRule="evenodd" />
+                      <svg
+                        className="h-5 w-5 text-primary"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.814L4.746 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.746l3.637-3.814a1 1 0 011.617.814zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.896-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.414A3.983 3.983 0 0013 10a3.983 3.983 0 00-1.172-2.829 1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>🎧 Listen to Audio Version</span>
                     </div>
@@ -474,7 +482,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                     Your browser does not support the audio element.
                   </audio>
                   <p className="text-xs text-muted-foreground mt-2">
-                    🎙️ Narrated version available - Listen while you read or enjoy hands-free
+                    🎙️ Narrated version available - Listen while you read or
+                    enjoy hands-free
                   </p>
                 </div>
               )}

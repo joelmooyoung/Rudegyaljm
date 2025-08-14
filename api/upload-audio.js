@@ -1,6 +1,6 @@
-import formidable from 'formidable';
-import { createReadStream, promises as fs } from 'fs';
-import path from 'path';
+import formidable from "formidable";
+import { createReadStream, promises as fs } from "fs";
+import path from "path";
 
 export const config = {
   api: {
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -34,25 +34,27 @@ export default async function handler(req, res) {
       allowEmptyFiles: false,
       filter: function ({ mimetype }) {
         // Accept audio files
-        return mimetype && mimetype.startsWith('audio/');
-      }
+        return mimetype && mimetype.startsWith("audio/");
+      },
     });
 
     const [fields, files] = await form.parse(req);
-    
+
     const audioFile = Array.isArray(files.audio) ? files.audio[0] : files.audio;
-    
+
     if (!audioFile) {
       return res.status(400).json({
         success: false,
-        message: "No audio file provided"
+        message: "No audio file provided",
       });
     }
 
-    console.log(`[AUDIO UPLOAD API] Processing audio: ${audioFile.originalFilename} (${audioFile.size} bytes)`);
+    console.log(
+      `[AUDIO UPLOAD API] Processing audio: ${audioFile.originalFilename} (${audioFile.size} bytes)`,
+    );
 
     // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'audio');
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
     try {
       await fs.access(uploadsDir);
     } catch {
@@ -61,14 +63,14 @@ export default async function handler(req, res) {
 
     // Generate unique filename
     const timestamp = Date.now();
-    const originalName = audioFile.originalFilename || 'audio';
+    const originalName = audioFile.originalFilename || "audio";
     const extension = path.extname(originalName);
     const filename = `story-audio-${timestamp}${extension}`;
     const finalPath = path.join(uploadsDir, filename);
 
     // Copy file to final destination
     await fs.copyFile(audioFile.filepath, finalPath);
-    
+
     // Clean up temp file
     try {
       await fs.unlink(audioFile.filepath);
@@ -77,8 +79,10 @@ export default async function handler(req, res) {
     }
 
     const audioUrl = `/uploads/audio/${filename}`;
-    
-    console.log(`[AUDIO UPLOAD API] ✅ Audio uploaded successfully: ${audioUrl}`);
+
+    console.log(
+      `[AUDIO UPLOAD API] ✅ Audio uploaded successfully: ${audioUrl}`,
+    );
 
     return res.status(200).json({
       success: true,
@@ -86,15 +90,14 @@ export default async function handler(req, res) {
       audioUrl: audioUrl,
       originalName: audioFile.originalFilename,
       size: audioFile.size,
-      mimeType: audioFile.mimetype
+      mimeType: audioFile.mimetype,
     });
-
   } catch (error) {
     console.error("[AUDIO UPLOAD API] ❌ Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to upload audio file",
-      error: error.message
+      error: error.message,
     });
   }
 }
