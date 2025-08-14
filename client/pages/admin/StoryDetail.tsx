@@ -139,6 +139,11 @@ export default function StoryDetail({
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
+  // Audio state
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>("");
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+
   useEffect(() => {
     if (story) {
       setFormData(story);
