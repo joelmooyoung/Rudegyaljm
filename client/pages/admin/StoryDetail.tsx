@@ -443,6 +443,59 @@ export default function StoryDetail({
     handleInputChange("image", "");
   };
 
+  // Handle audio file upload
+  const handleAudioUpload = async (file: File) => {
+    if (!file.type.startsWith("audio/")) {
+      alert("Please select a valid audio file.");
+      return;
+    }
+
+    // Check file size (max 50MB for audio)
+    if (file.size > 50 * 1024 * 1024) {
+      alert("Audio file must be smaller than 50MB.");
+      return;
+    }
+
+    setIsUploadingAudio(true);
+    setAudioFile(file);
+
+    try {
+      // Create FormData for audio upload
+      const formData = new FormData();
+      formData.append("audio", file);
+
+      const response = await fetch("/api/upload-audio", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAudioUrl(result.audioUrl);
+        handleInputChange("audioUrl", result.audioUrl);
+        console.log("Audio uploaded successfully:", result);
+      } else {
+        const errorData = await response.text();
+        console.error("Failed to upload audio:", response.statusText, errorData);
+        alert(`Failed to upload audio: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Failed to upload audio:", error);
+      alert(
+        `Failed to upload audio: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    } finally {
+      setIsUploadingAudio(false);
+    }
+  };
+
+  // Remove audio
+  const removeAudio = () => {
+    setAudioFile(null);
+    setAudioUrl("");
+    handleInputChange("audioUrl", "");
+  };
+
   const handleSave = () => {
     const storyData: Partial<Story> = {
       ...formData,
