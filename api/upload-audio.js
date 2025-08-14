@@ -1,15 +1,9 @@
 import formidable from "formidable";
-import { createReadStream, promises as fs } from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export default async function handler(req, res) {
-  console.log(`[AUDIO UPLOAD API] ${req.method} /api/upload-audio`);
+  console.log(`[AUDIO UPLOAD API] ${req.method} ${req.url}`);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -28,21 +22,29 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log("[AUDIO UPLOAD API] Creating formidable form parser");
+
     // Parse the multipart form data
     const form = formidable({
       maxFileSize: 50 * 1024 * 1024, // 50MB limit
       allowEmptyFiles: false,
       filter: function ({ mimetype }) {
+        console.log(`[AUDIO UPLOAD API] Checking file type: ${mimetype}`);
         // Accept audio files
         return mimetype && mimetype.startsWith("audio/");
       },
     });
 
+    console.log("[AUDIO UPLOAD API] Parsing form data");
     const [fields, files] = await form.parse(req);
+
+    console.log("[AUDIO UPLOAD API] Files parsed:", Object.keys(files));
+    console.log("[AUDIO UPLOAD API] Fields parsed:", Object.keys(fields));
 
     const audioFile = Array.isArray(files.audio) ? files.audio[0] : files.audio;
 
     if (!audioFile) {
+      console.error("[AUDIO UPLOAD API] No audio file found in upload");
       return res.status(400).json({
         success: false,
         message: "No audio file provided",
@@ -55,9 +57,13 @@ export default async function handler(req, res) {
 
     // Create uploads directory if it doesn't exist
     const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
+    console.log(`[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`);
+
     try {
       await fs.access(uploadsDir);
+      console.log("[AUDIO UPLOAD API] Uploads directory exists");
     } catch {
+      console.log("[AUDIO UPLOAD API] Creating uploads directory");
       await fs.mkdir(uploadsDir, { recursive: true });
     }
 
@@ -68,14 +74,21 @@ export default async function handler(req, res) {
     const filename = `story-audio-${timestamp}${extension}`;
     const finalPath = path.join(uploadsDir, filename);
 
+    console.log(`[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`);
+
     // Copy file to final destination
     await fs.copyFile(audioFile.filepath, finalPath);
+
+    // Verify file was copied successfully
+    const stats = await fs.stat(finalPath);
+    console.log(`[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`);
 
     // Clean up temp file
     try {
       await fs.unlink(audioFile.filepath);
+      console.log("[AUDIO UPLOAD API] Temp file cleaned up");
     } catch (error) {
-      console.warn("Could not clean up temp file:", error);
+      console.warn("[AUDIO UPLOAD API] Could not clean up temp file:", error);
     }
 
     const audioUrl = `/uploads/audio/${filename}`;
