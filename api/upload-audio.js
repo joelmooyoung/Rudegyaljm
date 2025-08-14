@@ -55,37 +55,59 @@ export default async function handler(req, res) {
       `[AUDIO UPLOAD API] Processing audio: ${audioFile.originalFilename} (${audioFile.size} bytes)`,
     );
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
-    console.log(`[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`);
+    // Check if running on Vercel (production) or local development
+    const isVercel = process.env.VERCEL || process.env.NODE_ENV === "production";
 
-    try {
-      await fs.access(uploadsDir);
-      console.log("[AUDIO UPLOAD API] Uploads directory exists");
-    } catch {
-      console.log("[AUDIO UPLOAD API] Creating uploads directory");
-      await fs.mkdir(uploadsDir, { recursive: true });
+    let audioUrl;
+
+    if (isVercel) {
+      // Vercel/Production: Convert audio to base64 data URL (like images)
+      console.log("[AUDIO UPLOAD API] Running on Vercel - using base64 encoding");
+
+      const audioBuffer = await fs.readFile(audioFile.filepath);
+      const base64Audio = audioBuffer.toString('base64');
+      const mimeType = audioFile.mimetype || 'audio/mpeg';
+
+      audioUrl = `data:${mimeType};base64,${base64Audio}`;
+      console.log(`[AUDIO UPLOAD API] ✅ Audio encoded as base64 (${audioBuffer.length} bytes)`);
+
+    } else {
+      // Development: Save to filesystem
+      console.log("[AUDIO UPLOAD API] Running locally - saving to filesystem");
+
+      const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
+      console.log(`[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`);
+
+      try {
+        await fs.access(uploadsDir);
+        console.log("[AUDIO UPLOAD API] Uploads directory exists");
+      } catch {
+        console.log("[AUDIO UPLOAD API] Creating uploads directory");
+        await fs.mkdir(uploadsDir, { recursive: true });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const originalName = audioFile.originalFilename || "audio";
+      const extension = path.extname(originalName);
+      const filename = `story-audio-${timestamp}${extension}`;
+      const finalPath = path.join(uploadsDir, filename);
+
+      console.log(
+        `[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`,
+      );
+
+      // Copy file to final destination
+      await fs.copyFile(audioFile.filepath, finalPath);
+
+      // Verify file was copied successfully
+      const stats = await fs.stat(finalPath);
+      console.log(
+        `[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`,
+      );
+
+      audioUrl = `/uploads/audio/${filename}`;
     }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const originalName = audioFile.originalFilename || "audio";
-    const extension = path.extname(originalName);
-    const filename = `story-audio-${timestamp}${extension}`;
-    const finalPath = path.join(uploadsDir, filename);
-
-    console.log(
-      `[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`,
-    );
-
-    // Copy file to final destination
-    await fs.copyFile(audioFile.filepath, finalPath);
-
-    // Verify file was copied successfully
-    const stats = await fs.stat(finalPath);
-    console.log(
-      `[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`,
-    );
 
     // Clean up temp file
     try {
@@ -94,8 +116,6 @@ export default async function handler(req, res) {
     } catch (error) {
       console.warn("[AUDIO UPLOAD API] Could not clean up temp file:", error);
     }
-
-    const audioUrl = `/uploads/audio/${filename}`;
 
     console.log(
       `[AUDIO UPLOAD API] ✅ Audio uploaded successfully: ${audioUrl}`,
