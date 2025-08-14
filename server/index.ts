@@ -413,6 +413,7 @@ export function createServer() {
         rating: 4.8,
         ratingCount: 89,
         image: null,
+        audioUrl: "/uploads/audio/sample-midnight-whispers.mp3", // Sample audio for testing
       },
       {
         id: "story-reliable-002",
