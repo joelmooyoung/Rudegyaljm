@@ -303,6 +303,7 @@ const App = () => {
             viewCount: storyData.viewCount || 0,
             rating: storyData.rating || 0,
             ratingCount: storyData.ratingCount || 0,
+            audioUrl: storyData.audioUrl,
           }),
         });
       }
