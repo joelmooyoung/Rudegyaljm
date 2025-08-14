@@ -234,7 +234,7 @@ export default function Home({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-red-900/20 group-hover:to-red-900/50 transition-all duration-700" />
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
             <Badge
               className={`${
                 story.accessLevel === "premium"
@@ -247,6 +247,16 @@ export default function Home({
               )}
               {story.accessLevel}
             </Badge>
+
+            {/* Audio indicator */}
+            {story.audioUrl && (
+              <Badge className="bg-black/60 text-white shadow-lg font-medium backdrop-blur-sm">
+                <svg className="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.814L4.746 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.746l3.637-3.814a1 1 0 011.617.814zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.896-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.414A3.983 3.983 0 0013 10a3.983 3.983 0 00-1.172-2.829 1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+                Audio
+              </Badge>
+            )}
           </div>
           <div className="absolute bottom-4 left-4 right-4">
             <h3 className="text-white font-display font-bold text-xl line-clamp-2 mb-2 drop-shadow-lg group-hover:text-accent transition-colors duration-500">
