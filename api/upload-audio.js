@@ -1,13 +1,9 @@
-import formidable from "formidable";
-import { promises as fs } from "fs";
-import path from "path";
-
-// Vercel-specific configuration
+// Vercel-compatible audio upload using JSON base64 data (like image upload)
 export const config = {
   api: {
-    bodyParser: false, // Disable default body parser for file uploads
-    responseLimit: false, // Allow large responses
-    maxDuration: 30, // Maximum function duration (seconds) - use max available
+    bodyParser: {
+      sizeLimit: "100mb", // Allow large base64 data
+    },
   },
 };
 
@@ -31,124 +27,107 @@ export default async function handler(req, res) {
   }
 
   try {
+    const { audioData, filename, mimeType, size } = req.body;
+
+    if (!audioData || !filename) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing audio data or filename",
+      });
+    }
+
+    // Validate the audio data is base64
+    if (!audioData.startsWith("data:audio/")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid audio data format",
+      });
+    }
+
+    console.log(
+      `[AUDIO UPLOAD API] Processing audio: ${filename} (${size} bytes)`,
+    );
+
     // Check if running on Vercel (production) or local development
-    const isVercel =
-      process.env.VERCEL || process.env.NODE_ENV === "production";
-    console.log(
-      `[AUDIO UPLOAD API] Environment: ${isVercel ? "Vercel" : "Local"}`,
-    );
+    const isVercel = process.env.VERCEL || process.env.NODE_ENV === "production";
+    console.log(`[AUDIO UPLOAD API] Environment: ${isVercel ? "Vercel" : "Local"}`);
 
-    // Vercel has much stricter limits, so we need to be more conservative
-    const maxFileSize = isVercel ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB for Vercel, 50MB for local
-
-    console.log(
-      `[AUDIO UPLOAD API] Max file size: ${maxFileSize / 1024 / 1024}MB`,
-    );
-    console.log("[AUDIO UPLOAD API] Creating formidable form parser");
-
-    // Parse the multipart form data with stricter limits for Vercel
-    const form = formidable({
-      maxFileSize: maxFileSize,
-      allowEmptyFiles: false,
-      maxFiles: 1, // Only allow one file
-      maxFields: 5, // Limit number of form fields
-      maxFieldsSize: 1024, // Limit size of form fields
-      filter: function ({ mimetype }) {
-        console.log(`[AUDIO UPLOAD API] Checking file type: ${mimetype}`);
-        // Accept audio files
-        return mimetype && mimetype.startsWith("audio/");
-      },
-    });
-
-    console.log("[AUDIO UPLOAD API] Parsing form data");
-    const [fields, files] = await form.parse(req);
-
-    console.log("[AUDIO UPLOAD API] Files parsed:", Object.keys(files));
-    console.log("[AUDIO UPLOAD API] Fields parsed:", Object.keys(fields));
-
-    const audioFile = Array.isArray(files.audio) ? files.audio[0] : files.audio;
-
-    if (!audioFile) {
-      console.error("[AUDIO UPLOAD API] No audio file found in upload");
+    // File size validation
+    const maxSize = isVercel ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB for Vercel, 50MB for local
+    
+    if (size > maxSize) {
+      console.error(`[AUDIO UPLOAD API] File too large: ${size} bytes (max: ${maxSize})`);
       return res.status(400).json({
         success: false,
-        message: "No audio file provided",
+        message: `Audio file too large. Maximum size is ${Math.floor(maxSize / 1024 / 1024)}MB for ${isVercel ? 'production' : 'development'} uploads.`,
+        maxSize: maxSize,
+        actualSize: size,
       });
     }
 
-    // Additional file size check
-    if (audioFile.size > maxFileSize) {
-      console.error(
-        `[AUDIO UPLOAD API] File too large: ${audioFile.size} bytes (max: ${maxFileSize})`,
-      );
+    // Extract base64 data
+    const base64Data = audioData.split(",")[1];
+    if (!base64Data) {
       return res.status(400).json({
         success: false,
-        message: `Audio file too large. Maximum size is ${Math.floor(maxFileSize / 1024 / 1024)}MB for production uploads.`,
-        maxSize: maxFileSize,
-        actualSize: audioFile.size,
+        message: "Invalid base64 audio data",
       });
     }
 
-    console.log(
-      `[AUDIO UPLOAD API] Processing audio: ${audioFile.originalFilename} (${audioFile.size} bytes)`,
+    // Convert base64 to buffer to verify size
+    const buffer = Buffer.from(base64Data, "base64");
+    const actualSize = buffer.length;
+
+    // Validate buffer size matches reported size
+    if (Math.abs(actualSize - size) > 1024) { // Allow 1KB difference for encoding overhead
+      console.warn(`[AUDIO UPLOAD API] Size mismatch: reported ${size}, actual ${actualSize}`);
+    }
+
+    // Validate file type
+    const allowedTypes = ["mpeg", "mp3", "wav", "ogg", "m4a", "aac", "flac"];
+    const mimeTypeLower = (mimeType || "").toLowerCase();
+    const isValidType = allowedTypes.some(type => 
+      mimeTypeLower.includes(type) || audioData.includes(`audio/${type}`)
     );
+
+    if (!isValidType) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid audio file type. Only MP3, WAV, OGG, M4A, AAC, and FLAC are allowed.",
+      });
+    }
 
     let audioUrl;
 
     if (isVercel) {
-      // Vercel/Production: Convert audio to base64 data URL (no filesystem)
-      console.log(
-        "[AUDIO UPLOAD API] Running on Vercel - using base64 encoding",
-      );
+      // Vercel/Production: Use the base64 data directly (no filesystem)
+      console.log("[AUDIO UPLOAD API] Vercel environment - using base64 data URL");
+      
+      // Verify base64 size isn't too large for storage/response
+      const base64SizeMB = actualSize / 1024 / 1024;
+      console.log(`[AUDIO UPLOAD API] Base64 size: ${base64SizeMB.toFixed(2)}MB`);
 
-      try {
-        const audioBuffer = await fs.readFile(audioFile.filepath);
-        const base64Audio = audioBuffer.toString("base64");
-        const mimeType = audioFile.mimetype || "audio/mpeg";
-
-        audioUrl = `data:${mimeType};base64,${base64Audio}`;
-        console.log(
-          `[AUDIO UPLOAD API] ✅ Audio encoded as base64 (${audioBuffer.length} bytes)`,
-        );
-
-        // Verify base64 size isn't too large for database/response
-        const base64Size = base64Audio.length;
-        const base64SizeMB = base64Size / 1024 / 1024;
-        console.log(
-          `[AUDIO UPLOAD API] Base64 size: ${base64SizeMB.toFixed(2)}MB`,
-        );
-
-        if (base64Size > 10 * 1024 * 1024) {
-          // 10MB base64 limit
-          console.error(
-            `[AUDIO UPLOAD API] Base64 too large: ${base64SizeMB.toFixed(2)}MB`,
-          );
-          return res.status(400).json({
-            success: false,
-            message: `Audio file creates base64 data that is too large (${base64SizeMB.toFixed(2)}MB). Please use a smaller file.`,
-            base64Size: base64Size,
-          });
-        }
-      } catch (base64Error) {
-        console.error(
-          "[AUDIO UPLOAD API] Base64 conversion failed:",
-          base64Error,
-        );
-        return res.status(500).json({
+      if (actualSize > 10 * 1024 * 1024) { // 10MB base64 limit
+        console.error(`[AUDIO UPLOAD API] Base64 too large: ${base64SizeMB.toFixed(2)}MB`);
+        return res.status(400).json({
           success: false,
-          message: "Failed to process audio file",
-          error: base64Error.message,
+          message: `Audio file creates base64 data that is too large (${base64SizeMB.toFixed(2)}MB). Please use a smaller file.`,
+          base64Size: actualSize,
         });
       }
+
+      audioUrl = audioData; // Use the complete data URL
+      console.log(`[AUDIO UPLOAD API] ✅ Using base64 data URL (${base64SizeMB.toFixed(2)}MB)`);
+      
     } else {
       // Development: Save to filesystem
-      console.log("[AUDIO UPLOAD API] Running locally - saving to filesystem");
-
+      console.log("[AUDIO UPLOAD API] Local environment - saving to filesystem");
+      
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      
       const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
-      console.log(
-        `[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`,
-      );
-
+      
       try {
         await fs.access(uploadsDir);
         console.log("[AUDIO UPLOAD API] Uploads directory exists");
@@ -159,60 +138,40 @@ export default async function handler(req, res) {
 
       // Generate unique filename
       const timestamp = Date.now();
-      const originalName = audioFile.originalFilename || "audio";
-      const extension = path.extname(originalName);
-      const filename = `story-audio-${timestamp}${extension}`;
-      const finalPath = path.join(uploadsDir, filename);
+      const extension = path.extname(filename) || '.mp3';
+      const uniqueFilename = `story-audio-${timestamp}${extension}`;
+      const finalPath = path.join(uploadsDir, uniqueFilename);
 
-      console.log(
-        `[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`,
-      );
-
-      // Copy file to final destination
-      await fs.copyFile(audioFile.filepath, finalPath);
-
-      // Verify file was copied successfully
+      // Write buffer to file
+      await fs.writeFile(finalPath, buffer);
+      
+      // Verify file was written successfully
       const stats = await fs.stat(finalPath);
-      console.log(
-        `[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`,
-      );
+      console.log(`[AUDIO UPLOAD API] File saved successfully, size: ${stats.size} bytes`);
 
-      audioUrl = `/uploads/audio/${filename}`;
+      audioUrl = `/uploads/audio/${uniqueFilename}`;
     }
 
-    // Clean up temp file
-    try {
-      await fs.unlink(audioFile.filepath);
-      console.log("[AUDIO UPLOAD API] Temp file cleaned up");
-    } catch (error) {
-      console.warn("[AUDIO UPLOAD API] Could not clean up temp file:", error);
-    }
-
-    console.log(
-      `[AUDIO UPLOAD API] ✅ Audio uploaded successfully: ${audioUrl?.substring(0, 100)}...`,
-    );
+    console.log(`[AUDIO UPLOAD API] ✅ Audio processed successfully`);
 
     return res.status(200).json({
       success: true,
       message: "Audio uploaded successfully",
       audioUrl: audioUrl,
-      originalName: audioFile.originalFilename,
-      size: audioFile.size,
-      mimeType: audioFile.mimetype,
+      originalName: filename,
+      size: size,
+      mimeType: mimeType,
       environment: isVercel ? "production" : "development",
     });
   } catch (error) {
     console.error("[AUDIO UPLOAD API] ❌ Error:", error);
 
-    // Provide more specific error messages for debugging
+    // Provide more specific error messages
     let userMessage = "Failed to upload audio file";
-    if (error.message?.includes("maxFileSize")) {
+    if (error.message?.includes("JSON")) {
+      userMessage = "Invalid audio data format. Please try again.";
+    } else if (error.message?.includes("size")) {
       userMessage = "Audio file is too large. Please use a smaller file.";
-    } else if (error.message?.includes("timeout")) {
-      userMessage = "Upload timeout. Please try with a smaller file.";
-    } else if (error.message?.includes("LIMIT_FILE_SIZE")) {
-      userMessage =
-        "File size limit exceeded. Maximum size is 4MB for production.";
     }
 
     return res.status(500).json({
