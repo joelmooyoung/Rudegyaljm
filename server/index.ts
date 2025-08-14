@@ -690,6 +690,74 @@ export function createServer() {
     }
   });
 
+  // Add story view tracking route
+  app.post("/api/stories/:id/view", async (req, res) => {
+    console.log(`[SERVER] Story view request for ID: ${req.params.id}`);
+    try {
+      req.query = { id: req.params.id };
+      const { default: handler } = await import("../api/stories/[id]/view.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import view handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "View handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add story stats route
+  app.get("/api/stories/:id/stats", async (req, res) => {
+    console.log(`[SERVER] Story stats request for ID: ${req.params.id}`);
+    try {
+      req.query = { id: req.params.id };
+      const { default: handler } = await import("../api/stories/[id]/stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add story like route
+  app.post("/api/stories/:id/like", async (req, res) => {
+    console.log(`[SERVER] Story like request for ID: ${req.params.id}`);
+    try {
+      req.query = { id: req.params.id };
+      const { default: handler } = await import("../api/stories/[id]/like.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import like handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Like handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add story rating route
+  app.post("/api/stories/:id/rating", async (req, res) => {
+    console.log(`[SERVER] Story rating request for ID: ${req.params.id}`);
+    try {
+      req.query = { id: req.params.id };
+      const { default: handler } = await import("../api/stories/[id]/rating.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import rating handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Rating handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
