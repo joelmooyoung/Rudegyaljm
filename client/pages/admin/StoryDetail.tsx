@@ -706,7 +706,7 @@ export default function StoryDetail({
                     <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                       <input
                         type="file"
-                        accept="audio/*"
+                        accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) handleAudioUpload(file);
