@@ -77,6 +77,7 @@ export default async function handler(req, res) {
           commentCount: story.commentCount || 0,
           likeCount: story.likeCount || 0,
           image: story.image, // Use actual image from database
+          audioUrl: story.audioUrl, // Use actual audio from database
           createdAt: story.createdAt,
           updatedAt: story.updatedAt,
         }));
@@ -97,6 +98,7 @@ export default async function handler(req, res) {
           category,
           tags,
           image,
+          audioUrl,
           excerpt,
           accessLevel = "free",
           published = false,
@@ -122,6 +124,7 @@ export default async function handler(req, res) {
           category,
           tags: Array.isArray(tags) ? tags : [],
           image,
+          audioUrl,
           excerpt,
           accessLevel,
           published,
