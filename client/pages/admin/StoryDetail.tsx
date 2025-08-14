@@ -456,9 +456,13 @@ export default function StoryDetail({
       return;
     }
 
-    // Check file size (max 50MB for audio)
-    if (file.size > 50 * 1024 * 1024) {
-      alert("Audio file must be smaller than 50MB.");
+    // Check file size - different limits for production vs development
+    const isProduction = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('fly.dev');
+    const maxSize = isProduction ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB prod, 50MB dev
+    const maxSizeMB = Math.floor(maxSize / 1024 / 1024);
+
+    if (file.size > maxSize) {
+      alert(`Audio file must be smaller than ${maxSizeMB}MB for ${isProduction ? 'production' : 'development'} uploads.`);
       return;
     }
 
