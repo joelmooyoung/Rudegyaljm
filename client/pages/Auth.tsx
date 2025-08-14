@@ -72,7 +72,7 @@ export default function Auth({
         return;
       }
 
-      const response = await fetch("/api/auth/production-login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
