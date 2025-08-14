@@ -443,7 +443,7 @@ export default function StoryDetail({
     handleInputChange("image", "");
   };
 
-  // Handle audio file upload
+  // Handle audio file upload - client-side base64 conversion for Vercel compatibility
   const handleAudioUpload = async (file: File) => {
     // Check if file is audio by MIME type or file extension
     const isAudioByType = file.type.startsWith("audio/");
@@ -474,13 +474,31 @@ export default function StoryDetail({
     setAudioFile(file);
 
     try {
-      // Create FormData for audio upload
-      const formData = new FormData();
-      formData.append("audio", file);
+      console.log("Converting audio to base64 on client side for Vercel compatibility...");
 
+      // Convert audio to base64 on client side (Vercel-compatible approach)
+      const base64Audio = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = () => reject(new Error("Failed to read audio file"));
+        reader.readAsDataURL(file);
+      });
+
+      // Send base64 data as JSON (much more reliable on Vercel)
       const response = await fetch("/api/upload-audio", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          audioData: base64Audio,
+          filename: file.name,
+          mimeType: file.type,
+          size: file.size,
+        }),
       });
 
       if (response.ok) {
