@@ -1,6 +1,6 @@
 export default function handler(req, res) {
   console.log(`[TEST AUDIO API] ${req.method} ${req.url}`);
-  
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");

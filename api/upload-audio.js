@@ -74,14 +74,18 @@ export default async function handler(req, res) {
     const filename = `story-audio-${timestamp}${extension}`;
     const finalPath = path.join(uploadsDir, filename);
 
-    console.log(`[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`);
+    console.log(
+      `[AUDIO UPLOAD API] Copying file from ${audioFile.filepath} to ${finalPath}`,
+    );
 
     // Copy file to final destination
     await fs.copyFile(audioFile.filepath, finalPath);
 
     // Verify file was copied successfully
     const stats = await fs.stat(finalPath);
-    console.log(`[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`);
+    console.log(
+      `[AUDIO UPLOAD API] File copied successfully, size: ${stats.size} bytes`,
+    );
 
     // Clean up temp file
     try {

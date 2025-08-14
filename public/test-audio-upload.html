@@ -1,85 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Audio Upload Test</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .upload-area { border: 2px dashed #ccc; padding: 20px; margin: 20px 0; border-radius: 8px; }
-        .status { margin: 20px 0; padding: 10px; border-radius: 4px; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .loading { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+      }
+      .upload-area {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      .status {
+        margin: 20px 0;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .loading {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Audio Upload Test</h1>
     <p>Test the audio upload API functionality</p>
 
     <div class="upload-area">
-        <input type="file" id="audioInput" accept="audio/*" />
-        <p>Select an audio file to upload (MP3, WAV, OGG - max 50MB)</p>
+      <input type="file" id="audioInput" accept="audio/*" />
+      <p>Select an audio file to upload (MP3, WAV, OGG - max 50MB)</p>
     </div>
 
     <div id="status"></div>
     <div id="preview"></div>
 
     <script>
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.innerHTML = '<div class="status ' + type + '">' + message + '</div>';
-        }
+      function showStatus(message, type) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerHTML =
+          '<div class="status ' + type + '">' + message + "</div>";
+      }
 
-        function showPreview(audioUrl, filename, size) {
-            const previewDiv = document.getElementById('preview');
-            previewDiv.innerHTML = 
-                '<h3>Upload Successful!</h3>' +
-                '<p><strong>Filename:</strong> ' + filename + '</p>' +
-                '<p><strong>Size:</strong> ' + Math.round(size / 1024) + ' KB</p>' +
-                '<p><strong>URL:</strong> <a href="' + audioUrl + '" target="_blank">' + audioUrl + '</a></p>' +
-                '<audio controls><source src="' + audioUrl + '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
-        }
+      function showPreview(audioUrl, filename, size) {
+        const previewDiv = document.getElementById("preview");
+        previewDiv.innerHTML =
+          "<h3>Upload Successful!</h3>" +
+          "<p><strong>Filename:</strong> " +
+          filename +
+          "</p>" +
+          "<p><strong>Size:</strong> " +
+          Math.round(size / 1024) +
+          " KB</p>" +
+          '<p><strong>URL:</strong> <a href="' +
+          audioUrl +
+          '" target="_blank">' +
+          audioUrl +
+          "</a></p>" +
+          '<audio controls><source src="' +
+          audioUrl +
+          '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
+      }
 
-        document.getElementById('audioInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+      document
+        .getElementById("audioInput")
+        .addEventListener("change", async function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
 
-            console.log('Selected audio file:', {
-                name: file.name,
-                size: file.size,
-                type: file.type
+          console.log("Selected audio file:", {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          });
+
+          showStatus("Uploading audio...", "loading");
+
+          try {
+            const formData = new FormData();
+            formData.append("audio", file);
+
+            console.log("Making request to /api/upload-audio");
+            const response = await fetch("/api/upload-audio", {
+              method: "POST",
+              body: formData,
             });
-            
-            showStatus("Uploading audio...", "loading");
 
-            try {
-                const formData = new FormData();
-                formData.append('audio', file);
+            console.log("Response status:", response.status);
+            console.log(
+              "Response headers:",
+              Object.fromEntries(response.headers.entries()),
+            );
 
-                console.log('Making request to /api/upload-audio');
-                const response = await fetch("/api/upload-audio", {
-                    method: "POST",
-                    body: formData
-                });
+            const result = await response.json();
+            console.log("Response result:", result);
 
-                console.log('Response status:', response.status);
-                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
-                const result = await response.json();
-                console.log('Response result:', result);
-
-                if (response.ok && result.success) {
-                    showStatus("Audio uploaded successfully: " + result.message, "success");
-                    showPreview(result.audioUrl, result.originalName, result.size);
-                } else {
-                    showStatus("Upload failed: " + (result.error || result.message), "error");
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                showStatus("Upload error: " + error.message, "error");
+            if (response.ok && result.success) {
+              showStatus(
+                "Audio uploaded successfully: " + result.message,
+                "success",
+              );
+              showPreview(result.audioUrl, result.originalName, result.size);
+            } else {
+              showStatus(
+                "Upload failed: " + (result.error || result.message),
+                "error",
+              );
             }
+          } catch (error) {
+            console.error("Upload error:", error);
+            showStatus("Upload error: " + error.message, "error");
+          }
         });
     </script>
-</body>
+  </body>
 </html>
