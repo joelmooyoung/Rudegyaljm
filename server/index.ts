@@ -746,7 +746,9 @@ export function createServer() {
     console.log(`[SERVER] Story rating request for ID: ${req.params.id}`);
     try {
       req.query = { id: req.params.id };
-      const { default: handler } = await import("../api/stories/[id]/rating.js");
+      const { default: handler } = await import(
+        "../api/stories/[id]/rating.js"
+      );
       return handler(req, res);
     } catch (error) {
       console.error(`[SERVER] Failed to import rating handler:`, error);

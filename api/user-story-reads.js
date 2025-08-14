@@ -15,12 +15,14 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       // Record that a user read a story
       const { userId, storyId } = req.body;
-      
-      console.log(`[USER STORY READS API] Recording read: User ${userId} read story ${storyId}`);
-      
+
+      console.log(
+        `[USER STORY READS API] Recording read: User ${userId} read story ${storyId}`,
+      );
+
       // In development, we'll just simulate success
       // In production with a real database, this would actually record the read
-      
+
       return res.status(200).json({
         success: true,
         message: "Story read recorded successfully",
@@ -33,12 +35,12 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
       // Get reading history for a user
       const { userId } = req.query;
-      
+
       console.log(`[USER STORY READS API] Getting reads for user ${userId}`);
-      
+
       // In development, return empty array
       // In production, this would query the database
-      
+
       return res.status(200).json({
         success: true,
         reads: [],

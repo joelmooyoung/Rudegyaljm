@@ -21,22 +21,24 @@ export default async function handler(req, res) {
 
   try {
     const { userId, rating } = req.body; // rating: 1-5
-    
+
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
         message: "Rating must be between 1 and 5",
       });
     }
-    
-    console.log(`[STORY RATING API] User ${userId} rated story ${id} with ${rating} stars`);
-    
+
+    console.log(
+      `[STORY RATING API] User ${userId} rated story ${id} with ${rating} stars`,
+    );
+
     // In development, just simulate success
     // In production with database, this would record the rating
-    
+
     const newAverageRating = parseFloat((Math.random() * 2 + 3).toFixed(1)); // 3.0 - 5.0
     const newRatingCount = Math.floor(Math.random() * 20) + 3;
-    
+
     return res.status(200).json({
       success: true,
       message: "Rating submitted successfully",

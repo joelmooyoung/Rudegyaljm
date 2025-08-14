@@ -21,14 +21,14 @@ export default async function handler(req, res) {
 
   try {
     const { userId, action } = req.body; // action: 'like' or 'unlike'
-    
+
     console.log(`[STORY LIKE API] User ${userId} ${action}d story ${id}`);
-    
+
     // In development, just simulate success
     // In production with database, this would record the like/unlike
-    
+
     const newLikeCount = Math.floor(Math.random() * 50) + 5;
-    
+
     return res.status(200).json({
       success: true,
       message: `Story ${action}d successfully`,

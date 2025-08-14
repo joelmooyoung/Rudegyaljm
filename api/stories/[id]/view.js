@@ -21,10 +21,10 @@ export default async function handler(req, res) {
 
   try {
     console.log(`[STORY VIEW API] Recording view for story ${id}`);
-    
+
     // In development, just simulate success
     // In production with database, this would increment view count
-    
+
     return res.status(200).json({
       success: true,
       message: "View recorded successfully",

@@ -21,10 +21,10 @@ export default async function handler(req, res) {
 
   try {
     console.log(`[STORY STATS API] Getting stats for story ${id}`);
-    
+
     // In development, return mock stats
     // In production with database, this would query actual stats
-    
+
     return res.status(200).json({
       success: true,
       stats: {
