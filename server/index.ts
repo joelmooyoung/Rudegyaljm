@@ -441,6 +441,7 @@ export function createServer() {
         rating: 4.9,
         ratingCount: 134,
         image: null,
+        audioUrl: "/uploads/audio/story-audio-1755186589864.mp3", // Added the audio file you just uploaded
       },
       {
         id: "story-reliable-003",
