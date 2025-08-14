@@ -457,12 +457,16 @@ export default function StoryDetail({
     }
 
     // Check file size - different limits for production vs development
-    const isProduction = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('fly.dev');
+    const isProduction =
+      window.location.hostname.includes("vercel.app") ||
+      window.location.hostname.includes("fly.dev");
     const maxSize = isProduction ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB prod, 50MB dev
     const maxSizeMB = Math.floor(maxSize / 1024 / 1024);
 
     if (file.size > maxSize) {
-      alert(`Audio file must be smaller than ${maxSizeMB}MB for ${isProduction ? 'production' : 'development'} uploads.`);
+      alert(
+        `Audio file must be smaller than ${maxSizeMB}MB for ${isProduction ? "production" : "development"} uploads.`,
+      );
       return;
     }
 
@@ -735,7 +739,8 @@ export default function StoryDetail({
                             : "Click to upload audio"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          MP3, WAV, OGG - Max 4MB for production, 50MB for development
+                          MP3, WAV, OGG - Max 4MB for production, 50MB for
+                          development
                         </span>
                       </label>
                     </div>
