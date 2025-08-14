@@ -347,11 +347,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           <Card className="overflow-hidden">
             {/* Story Image */}
             {story.image && (
-              <div className="relative h-64 bg-muted/20">
+              <div className="relative h-80 bg-muted/20">
                 <img
                   src={story.image}
                   alt={story.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
