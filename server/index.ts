@@ -460,6 +460,7 @@ export function createServer() {
         rating: 4.6,
         ratingCount: 67,
         image: null,
+        audioUrl: "/uploads/audio/sample-dancing-dark.mp3", // Sample audio for testing
       },
       {
         id: "story-reliable-004",
@@ -544,7 +545,7 @@ export function createServer() {
     }
 
     // Return reliable fallback stories
-    console.log("📚 [STORIES] ✅ Using reliable fallback stories");
+    console.log("📚 [STORIES] �� Using reliable fallback stories");
     res.json(reliableStories);
   });
 
