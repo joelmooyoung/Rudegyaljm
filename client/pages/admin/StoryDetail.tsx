@@ -152,6 +152,10 @@ export default function StoryDetail({
       if (story.image) {
         setImagePreview(story.image);
       }
+      // Set audio URL if story has audio
+      if (story.audioUrl) {
+        setAudioUrl(story.audioUrl);
+      }
     }
   }, [story]);
 
