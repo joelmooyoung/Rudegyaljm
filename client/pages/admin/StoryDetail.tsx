@@ -692,6 +692,84 @@ export default function StoryDetail({
                 </div>
               </div>
 
+              {/* Audio Upload Section */}
+              <div className="space-y-4">
+                <Label>Story Audio (Optional)</Label>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Upload Audio</Label>
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleAudioUpload(file);
+                        }}
+                        className="hidden"
+                        id="audio-upload"
+                      />
+                      <label
+                        htmlFor="audio-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          {isUploadingAudio
+                            ? "Uploading..."
+                            : "Click to upload audio"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          MP3, WAV, OGG - Max 50MB
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Audio Preview */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Audio Preview</Label>
+                      {audioUrl && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={removeAudio}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    {audioUrl ? (
+                      <div className="border rounded-md p-4 bg-muted/20">
+                        <audio
+                          controls
+                          className="w-full"
+                          preload="metadata"
+                        >
+                          <source src={audioUrl} type="audio/mpeg" />
+                          Your browser does not support the audio element.
+                        </audio>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Audio file ready for listeners
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="border rounded-md bg-muted/20 h-24 flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                          <Upload className="h-8 w-8 mx-auto mb-2" />
+                          <p className="text-sm">No audio file selected</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Premium checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
