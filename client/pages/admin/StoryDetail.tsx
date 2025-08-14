@@ -474,7 +474,9 @@ export default function StoryDetail({
     setAudioFile(file);
 
     try {
-      console.log("Converting audio to base64 on client side for Vercel compatibility...");
+      console.log(
+        "Converting audio to base64 on client side for Vercel compatibility...",
+      );
 
       // Convert audio to base64 on client side (Vercel-compatible approach)
       const base64Audio = await new Promise<string>((resolve, reject) => {
