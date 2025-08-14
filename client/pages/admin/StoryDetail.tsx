@@ -731,7 +731,7 @@ export default function StoryDetail({
                             : "Click to upload audio"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          MP3, WAV, OGG - Max 50MB
+                          MP3, WAV, OGG - Max 4MB for production, 50MB for development
                         </span>
                       </label>
                     </div>
