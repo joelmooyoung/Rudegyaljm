@@ -649,6 +649,22 @@ export function createServer() {
     }
   });
 
+  // Add specific audio upload route with proper error handling
+  app.post("/api/upload-audio", async (req, res) => {
+    console.log("[SERVER] Audio upload request received");
+    try {
+      const { default: handler } = await import("../api/upload-audio.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import audio upload handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Audio upload handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
