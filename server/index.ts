@@ -79,6 +79,7 @@ const storySchema = new mongoose.Schema({
   rating: Number,
   ratingCount: Number,
   image: String,
+  audioUrl: String,
 });
 
 const Story = mongoose.models.Story || mongoose.model("Story", storySchema);
