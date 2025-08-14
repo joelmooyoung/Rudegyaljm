@@ -53,6 +53,7 @@ export interface Story {
   viewCount: number;
   commentCount: number;
   image?: string; // Base64 encoded image data
+  audioUrl?: string; // URL to audio file
   createdAt: Date;
   updatedAt: Date;
 }
