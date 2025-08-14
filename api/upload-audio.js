@@ -56,27 +56,33 @@ export default async function handler(req, res) {
     );
 
     // Check if running on Vercel (production) or local development
-    const isVercel = process.env.VERCEL || process.env.NODE_ENV === "production";
+    const isVercel =
+      process.env.VERCEL || process.env.NODE_ENV === "production";
 
     let audioUrl;
 
     if (isVercel) {
       // Vercel/Production: Convert audio to base64 data URL (like images)
-      console.log("[AUDIO UPLOAD API] Running on Vercel - using base64 encoding");
+      console.log(
+        "[AUDIO UPLOAD API] Running on Vercel - using base64 encoding",
+      );
 
       const audioBuffer = await fs.readFile(audioFile.filepath);
-      const base64Audio = audioBuffer.toString('base64');
-      const mimeType = audioFile.mimetype || 'audio/mpeg';
+      const base64Audio = audioBuffer.toString("base64");
+      const mimeType = audioFile.mimetype || "audio/mpeg";
 
       audioUrl = `data:${mimeType};base64,${base64Audio}`;
-      console.log(`[AUDIO UPLOAD API] ✅ Audio encoded as base64 (${audioBuffer.length} bytes)`);
-
+      console.log(
+        `[AUDIO UPLOAD API] ✅ Audio encoded as base64 (${audioBuffer.length} bytes)`,
+      );
     } else {
       // Development: Save to filesystem
       console.log("[AUDIO UPLOAD API] Running locally - saving to filesystem");
 
       const uploadsDir = path.join(process.cwd(), "public", "uploads", "audio");
-      console.log(`[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`);
+      console.log(
+        `[AUDIO UPLOAD API] Checking uploads directory: ${uploadsDir}`,
+      );
 
       try {
         await fs.access(uploadsDir);
