@@ -450,7 +450,9 @@ export default function StoryDetail({
     const isAudioByExtension = /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name);
 
     if (!isAudioByType && !isAudioByExtension) {
-      alert("Please select a valid audio file (MP3, WAV, OGG, M4A, AAC, FLAC).");
+      alert(
+        "Please select a valid audio file (MP3, WAV, OGG, M4A, AAC, FLAC).",
+      );
       return;
     }
 

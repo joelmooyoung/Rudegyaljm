@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   try {
     if (req.method === "PUT") {
       console.log(`[STORY API] Updating story ${id} with data:`, req.body);
-      
+
       // For reliable stories (development), we'll just return success
       // since they're hardcoded in the server
       if (id.startsWith("story-reliable-")) {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       // Try database update for real stories
       try {
         await connectToDatabase();
-        
+
         const updateData = {
           title: req.body.title,
           content: req.body.content,
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         const updatedStory = await Story.findOneAndUpdate(
           { storyId: id },
           updateData,
-          { new: true, runValidators: true }
+          { new: true, runValidators: true },
         );
 
         if (!updatedStory) {
@@ -115,7 +115,7 @@ export default async function handler(req, res) {
 
     if (req.method === "DELETE") {
       console.log(`[STORY API] Deleting story ${id}`);
-      
+
       // Don't allow deletion of reliable stories
       if (id.startsWith("story-reliable-")) {
         return res.status(400).json({
@@ -126,9 +126,9 @@ export default async function handler(req, res) {
 
       try {
         await connectToDatabase();
-        
+
         const deletedStory = await Story.findOneAndDelete({ storyId: id });
-        
+
         if (!deletedStory) {
           return res.status(404).json({
             success: false,
@@ -142,7 +142,10 @@ export default async function handler(req, res) {
           message: "Story deleted successfully",
         });
       } catch (dbError) {
-        console.error(`[STORY API] Database error deleting ${id}:`, dbError.message);
+        console.error(
+          `[STORY API] Database error deleting ${id}:`,
+          dbError.message,
+        );
         return res.status(500).json({
           success: false,
           message: "Failed to delete story",
@@ -153,12 +156,12 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       console.log(`[STORY API] Getting story ${id}`);
-      
+
       try {
         await connectToDatabase();
-        
+
         const story = await Story.findOne({ storyId: id });
-        
+
         if (!story) {
           return res.status(404).json({
             success: false,
@@ -188,7 +191,10 @@ export default async function handler(req, res) {
           },
         });
       } catch (dbError) {
-        console.error(`[STORY API] Database error getting ${id}:`, dbError.message);
+        console.error(
+          `[STORY API] Database error getting ${id}:`,
+          dbError.message,
+        );
         return res.status(500).json({
           success: false,
           message: "Failed to get story",

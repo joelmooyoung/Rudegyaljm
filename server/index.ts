@@ -669,14 +669,19 @@ export function createServer() {
 
   // Add specific story update route with proper error handling
   app.put("/api/stories/:id", async (req, res) => {
-    console.log(`[SERVER] Story update request received for ID: ${req.params.id}`);
+    console.log(
+      `[SERVER] Story update request received for ID: ${req.params.id}`,
+    );
     try {
       // Set the id in the query object for the handler
       req.query = { id: req.params.id };
       const { default: handler } = await import("../api/stories/[id].js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import story handler for ${req.params.id}:`, error);
+      console.error(
+        `[SERVER] Failed to import story handler for ${req.params.id}:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Story update handler not available",
