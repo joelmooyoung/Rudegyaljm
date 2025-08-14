@@ -32,6 +32,7 @@ const storySchema = new mongoose.Schema(
     category: { type: String, required: true },
     tags: [{ type: String }],
     image: { type: String }, // Base64 encoded image data or image URL
+    audioUrl: { type: String }, // Base64 encoded audio data or audio URL
     excerpt: { type: String }, // Short description/preview text
     accessLevel: { type: String, enum: ["free", "premium"], default: "free" },
     published: { type: Boolean, default: false },
