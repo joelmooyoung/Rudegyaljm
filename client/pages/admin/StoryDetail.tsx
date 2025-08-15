@@ -527,20 +527,22 @@ export default function StoryDetail({
 
       if (response.ok) {
         const result = await response.json();
+        console.log("[ADMIN AUDIO] ✅ Upload successful:", result);
         setAudioUrl(result.audioUrl);
         handleInputChange("audioUrl", result.audioUrl);
-        console.log("Audio uploaded successfully:", result);
+        alert("Audio uploaded successfully!");
       } else {
         const errorData = await response.text();
         console.error(
-          "Failed to upload audio:",
+          "[ADMIN AUDIO] ❌ Upload failed:",
+          response.status,
           response.statusText,
           errorData,
         );
-        alert(`Failed to upload audio: ${response.statusText}`);
+        alert(`Failed to upload audio: ${response.status} ${response.statusText}\n${errorData}`);
       }
     } catch (error) {
-      console.error("Failed to upload audio:", error);
+      console.error("[ADMIN AUDIO] ❌ Upload error:", error);
       alert(
         `Failed to upload audio: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
