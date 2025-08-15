@@ -459,7 +459,8 @@ export default function StoryDetail({
     // Check file size - different limits for production vs development
     const isProduction =
       window.location.hostname.includes("vercel.app") ||
-      window.location.hostname.includes("fly.dev");
+      window.location.hostname.includes("fly.dev") ||
+      window.location.hostname !== "localhost";
     const maxSize = isProduction ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB prod, 50MB dev
     const maxSizeMB = Math.floor(maxSize / 1024 / 1024);
 
