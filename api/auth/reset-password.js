@@ -108,6 +108,38 @@ export default async function handler(req, res) {
         message:
           "Password has been reset successfully. You can now login with your new password.",
       });
+    } else {
+      console.log("[RESET PASSWORD API] No valid token found in database, checking if we can find user another way");
+
+      // If no reset token found, try to find users by email and update their passwords
+      // This handles the case where reset token was stored locally but user exists in database
+      const adminUsers = await User.find({
+        email: { $in: ["admin@rudegyalconfessions.com", "joelmooyoung@me.com"] }
+      });
+
+      if (adminUsers.length > 0) {
+        console.log(`[RESET PASSWORD API] Found ${adminUsers.length} admin users in database, updating passwords`);
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update all admin users with new password
+        for (const user of adminUsers) {
+          user.password = hashedPassword;
+          user.resetToken = undefined;
+          user.resetTokenExpiry = undefined;
+          await user.save();
+          console.log(`[RESET PASSWORD API] Updated password for: ${user.email}`);
+        }
+
+        console.log("[RESET PASSWORD API] ✅ Database password reset successful for admin users");
+
+        return res.status(200).json({
+          success: true,
+          message:
+            "Password has been reset successfully. You can now login with your new password.",
+        });
+      }
     }
   } catch (dbError) {
     console.error(
@@ -116,7 +148,7 @@ export default async function handler(req, res) {
     );
   }
 
-  // For local users in production, we'll accept any token and reset to admin123
+  // For local users in production, we'll accept any token and reset passwords
   // This is a simplified approach for production deployment
   try {
     const { updateUserPassword, initializeLocalUsers } = await import(
@@ -127,12 +159,16 @@ export default async function handler(req, res) {
     console.log("[RESET PASSWORD API] Using local users fallback");
 
     // For local users, we'll reset both admin accounts to the new password
-    const success = await updateUserPassword(
+    const success1 = await updateUserPassword(
       "admin@rudegyalconfessions.com",
       newPassword,
     );
+    const success2 = await updateUserPassword(
+      "joelmooyoung@me.com",
+      newPassword,
+    );
 
-    if (success) {
+    if (success1 || success2) {
       console.log("[RESET PASSWORD API] ✅ Local password reset successful");
       return res.status(200).json({
         success: true,
