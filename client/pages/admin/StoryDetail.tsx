@@ -636,10 +636,20 @@ export default function StoryDetail({
             </div>
             <Button
               onClick={handleSave}
+              disabled={isSaving || isUploadingAudio}
               className="bg-primary hover:bg-primary/90"
             >
-              <Save className="h-4 w-4 mr-2" />
-              {mode === "add" ? "Create Story" : "Save Changes"}
+              {isSaving ? (
+                <>
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {mode === "add" ? "Create Story" : "Save Changes"}
+                </>
+              )}
             </Button>
           </div>
         </div>
