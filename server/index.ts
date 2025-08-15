@@ -779,10 +779,15 @@ export function createServer() {
   app.post("/api/admin/remove-hardcoded-auth", async (req, res) => {
     console.log(`[SERVER] Remove hardcoded auth request`);
     try {
-      const { default: handler } = await import("../api/admin/remove-hardcoded-auth.js");
+      const { default: handler } = await import(
+        "../api/admin/remove-hardcoded-auth.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import remove-hardcoded-auth handler:`, error);
+      console.error(
+        `[SERVER] Failed to import remove-hardcoded-auth handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Remove hardcoded auth handler not available",
@@ -794,10 +799,15 @@ export function createServer() {
   app.post("/api/admin/reset-passwords", async (req, res) => {
     console.log(`[SERVER] Reset passwords request`);
     try {
-      const { default: handler } = await import("../api/admin/reset-passwords.js");
+      const { default: handler } = await import(
+        "../api/admin/reset-passwords.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import reset-passwords handler:`, error);
+      console.error(
+        `[SERVER] Failed to import reset-passwords handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Reset passwords handler not available",
