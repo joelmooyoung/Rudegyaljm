@@ -38,9 +38,20 @@ export default async function handler(req, res) {
     console.log("[LOGIN API] Database connected, trying database auth");
 
     const user = await User.findOne({ email: email.toLowerCase() });
+    console.log(`[LOGIN API] Database user lookup result:`, {
+      found: !!user,
+      email: user?.email,
+      username: user?.username,
+      type: user?.type,
+      active: user?.active,
+      hasPassword: !!user?.password,
+      passwordLength: user?.password?.length || 0
+    });
 
     if (user && user.active) {
+      console.log(`[LOGIN API] Testing password for user: ${user.email}`);
       const isValidPassword = await bcrypt.compare(password, user.password);
+      console.log(`[LOGIN API] Password validation result: ${isValidPassword}`);
 
       if (isValidPassword) {
         console.log("[LOGIN API] ✅ Database login successful");
