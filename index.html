@@ -13,33 +13,7 @@
   <body>
     <div id="root"></div>
 
-    <!-- Fallback message if React doesn't load -->
-    <div
-      id="fallback"
-      style="
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #1e40af;
-        color: white;
-        padding: 30px;
-        border-radius: 10px;
-        text-align: center;
-        font-family: Arial, sans-serif;
-        z-index: 9999;
-        display: none;
-      "
-    >
-      <h2>🔧 Loading App...</h2>
-      <p>If this message persists, there may be a JavaScript loading issue.</p>
-      <p><strong>Try:</strong> Refreshing the page or clearing browser cache</p>
-      <p>
-        <a href="/emergency-test.html" style="color: #60a5fa"
-          >Test Vercel deployment</a
-        >
-      </p>
-    </div>
+    <!-- Fallback message removed - React app is working properly -->
 
     <script type="module" src="/client/main.tsx"></script>
 
