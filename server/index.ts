@@ -300,53 +300,7 @@ export function createServer() {
 
     console.log(`🔐 [LOGIN] Attempting login for: ${email}`);
 
-    // RELIABLE ACCOUNTS THAT ALWAYS WORK - NO DATABASE REQUIRED
-    const reliableAccounts = {
-      "admin@rudegyalconfessions.com": {
-        password: "admin123",
-        user: {
-          id: "admin-reliable-001",
-          email: "admin@rudegyalconfessions.com",
-          username: "admin",
-          role: "admin",
-          isActive: true,
-          isAgeVerified: true,
-          subscriptionStatus: "active",
-          createdAt: new Date("2024-01-01"),
-          lastLogin: new Date(),
-        },
-      },
-      "joelmooyoung@me.com": {
-        password: "password123",
-        user: {
-          id: "joel-reliable-001",
-          email: "joelmooyoung@me.com",
-          username: "joelmooyoung",
-          role: "admin",
-          isActive: true,
-          isAgeVerified: true,
-          subscriptionStatus: "active",
-          createdAt: new Date("2024-01-01"),
-          lastLogin: new Date(),
-        },
-      },
-    };
-
-    // Check reliable accounts first - these ALWAYS work
-    const reliableAccount = reliableAccounts[email.toLowerCase()];
-    if (reliableAccount && reliableAccount.password === password) {
-      console.log("🔐 [LOGIN] ✅ Reliable account login successful");
-      const token = `reliable_token_${reliableAccount.user.id}_${Date.now()}`;
-
-      return res.json({
-        success: true,
-        message: "Login successful",
-        token: token,
-        user: reliableAccount.user,
-      });
-    }
-
-    // Try database authentication as backup only
+    // Database authentication
     try {
       await connectToDatabase();
       console.log("🔐 [LOGIN] Database connected, trying database auth");
