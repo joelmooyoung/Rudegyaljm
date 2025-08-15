@@ -760,6 +760,52 @@ export function createServer() {
     }
   });
 
+  // Add admin routes for user management
+  app.get("/api/admin/list-users", async (req, res) => {
+    console.log(`[SERVER] Admin list users request`);
+    try {
+      const { default: handler } = await import("../api/admin/list-users.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import list-users handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "List users handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  app.post("/api/admin/remove-hardcoded-auth", async (req, res) => {
+    console.log(`[SERVER] Remove hardcoded auth request`);
+    try {
+      const { default: handler } = await import("../api/admin/remove-hardcoded-auth.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import remove-hardcoded-auth handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Remove hardcoded auth handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  app.post("/api/admin/reset-passwords", async (req, res) => {
+    console.log(`[SERVER] Reset passwords request`);
+    try {
+      const { default: handler } = await import("../api/admin/reset-passwords.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import reset-passwords handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Reset passwords handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
