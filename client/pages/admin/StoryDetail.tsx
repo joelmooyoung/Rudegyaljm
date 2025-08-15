@@ -456,17 +456,19 @@ export default function StoryDetail({
       return;
     }
 
-    // Check file size - different limits for production vs development
+    // Check file size - account for base64 expansion (33% larger)
     const isProduction =
       window.location.hostname.includes("vercel.app") ||
       window.location.hostname.includes("fly.dev") ||
       window.location.hostname !== "localhost";
-    const maxSize = isProduction ? 4 * 1024 * 1024 : 50 * 1024 * 1024; // 4MB prod, 50MB dev
-    const maxSizeMB = Math.floor(maxSize / 1024 / 1024);
 
-    if (file.size > maxSize) {
+    // Base64 encoding makes files ~33% larger, so we need to account for that
+    const maxRawSize = isProduction ? 3 * 1024 * 1024 : 50 * 1024 * 1024; // 3MB raw for prod (becomes ~4MB base64)
+    const maxSizeMB = Math.floor(maxRawSize / 1024 / 1024);
+
+    if (file.size > maxRawSize) {
       alert(
-        `Audio file must be smaller than ${maxSizeMB}MB for ${isProduction ? "production" : "development"} uploads.`,
+        `Audio file must be smaller than ${maxSizeMB}MB for ${isProduction ? "production" : "development"} uploads. (Base64 encoding increases size by ~33%)`,
       );
       return;
     }
