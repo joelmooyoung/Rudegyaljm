@@ -330,6 +330,9 @@ export default function ResetPassword({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="pl-11 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    autoComplete="new-password"
                     required
                   />
                 </div>
