@@ -494,10 +494,20 @@ export default function StoryDetail({
         const reader = new FileReader();
         reader.onload = () => {
           const result = reader.result as string;
+          const base64SizeMB = (result.length / 1024 / 1024).toFixed(2);
           console.log(
             "[ADMIN AUDIO] Base64 conversion successful, length:",
             result.length,
+            "size:",
+            base64SizeMB + "MB"
           );
+
+          // Check if base64 is too large for network request
+          if (result.length > 10 * 1024 * 1024) { // 10MB limit
+            reject(new Error(`Base64 audio too large: ${base64SizeMB}MB. Use a smaller file.`));
+            return;
+          }
+
           resolve(result);
         };
         reader.onerror = (error) => {
