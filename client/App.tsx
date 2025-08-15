@@ -586,12 +586,20 @@ const App = () => {
           );
         case "direct-email-test":
           return <DirectEmailTest />;
+        case "register-with-subscription":
+          return (
+            <RegisterWithSubscription
+              onAuthenticated={handleAuthenticated}
+              onNavigateToAuth={handleNavigateToAuth}
+            />
+          );
         case "auth":
         default:
           return (
             <Auth
               onAuthenticated={handleAuthenticated}
               onNavigateToForgotPassword={handleNavigateToForgotPassword}
+              onNavigateToRegister={handleNavigateToRegister}
             />
           );
       }
