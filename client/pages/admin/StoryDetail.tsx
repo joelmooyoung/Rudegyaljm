@@ -144,6 +144,9 @@ export default function StoryDetail({
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [isUploadingAudio, setIsUploadingAudio] = useState(false);
 
+  // Save state
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     if (story) {
       setFormData(story);
