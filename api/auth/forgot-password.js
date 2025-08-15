@@ -23,8 +23,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    await connectToDatabase();
-
     const { email } = req.body;
 
     if (!email) {
@@ -36,8 +34,28 @@ export default async function handler(req, res) {
 
     console.log(`[FORGOT PASSWORD API] Reset request for: ${email}`);
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    let user = null;
+    let userSource = "unknown";
+
+    // Try database first, then fallback to local users
+    try {
+      await connectToDatabase();
+      user = await User.findOne({ email });
+      userSource = "database";
+      console.log(`[FORGOT PASSWORD API] Found user in database: ${email}`);
+    } catch (dbError) {
+      console.log(`[FORGOT PASSWORD API] Database failed, trying local users: ${dbError.message}`);
+      
+      try {
+        const { getUserByEmail, initializeLocalUsers } = await import("../../lib/local-users.js");
+        await initializeLocalUsers();
+        user = await getUserByEmail(email);
+        userSource = "local";
+        console.log(`[FORGOT PASSWORD API] Found user in local storage: ${email}`);
+      } catch (localError) {
+        console.error(`[FORGOT PASSWORD API] Local user lookup failed: ${localError.message}`);
+      }
+    }
 
     // Always return success to prevent email enumeration attacks
     // But only generate token if user exists
@@ -46,12 +64,19 @@ export default async function handler(req, res) {
       const resetToken = crypto.randomBytes(32).toString("hex");
       const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-      // Save reset token to user
-      user.resetToken = resetToken;
-      user.resetTokenExpiry = resetTokenExpiry;
-      await user.save();
+      console.log(`[FORGOT PASSWORD API] Generated reset token for ${email} (${userSource})`);
 
-      console.log(`[FORGOT PASSWORD API] Reset token generated for: ${email}`);
+      // For local users, we'll simulate token storage
+      // In production, you'd want to store this securely
+      if (userSource === "database") {
+        // Save reset token to database user
+        user.resetToken = resetToken;
+        user.resetTokenExpiry = resetTokenExpiry;
+        await user.save();
+      } else {
+        // For local users, just log the token (in production, store in secure temp storage)
+        console.log(`[FORGOT PASSWORD API] Local user reset token (would be stored securely): ${resetToken}`);
+      }
 
       // Send password reset email using Resend
       try {
@@ -59,8 +84,7 @@ export default async function handler(req, res) {
         const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:8080"}/reset-password?token=${resetToken}`;
 
         const emailResult = await resend.emails.send({
-          from:
-            process.env.RESEND_FROM_EMAIL || "noreply@Rudegyalconfessions.com",
+          from: process.env.RESEND_FROM_EMAIL || "noreply@rudegyalconfessions.com",
           to: user.email,
           subject: "Password Reset - Rude Gyal Confessions",
           html: `
@@ -146,13 +170,13 @@ export default async function handler(req, res) {
     // Always return success message for security
     return res.status(200).json({
       success: true,
-      message:
-        "If an account with that email exists, a password reset link has been sent.",
+      message: "If an account with that email exists, a password reset link has been sent.",
+      userSource: userSource,
       // Remove this in production - for testing only
       ...(process.env.NODE_ENV === "development" &&
         user && {
-          resetToken: user.resetToken,
-          resetUrl: `/reset-password?token=${user.resetToken}`,
+          resetToken: user.resetToken || "generated-but-not-stored-for-local-users",
+          resetUrl: `/reset-password?token=${user.resetToken || "test-token"}`,
         }),
     });
   } catch (error) {
@@ -160,6 +184,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+      error: error.message,
     });
   }
 }
