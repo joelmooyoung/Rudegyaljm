@@ -813,6 +813,22 @@ export function createServer() {
     }
   });
 
+  // Add password reset route
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    console.log(`[SERVER] Forgot password request`);
+    try {
+      const { default: handler } = await import("../api/auth/forgot-password.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import forgot-password handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Forgot password handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Import and set up API routes for development
   // In development, we need to manually import the API handlers
   app.use("/api", async (req, res, next) => {
