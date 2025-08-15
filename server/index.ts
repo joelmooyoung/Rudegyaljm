@@ -889,6 +889,22 @@ export function createServer() {
     }
   });
 
+  // Add registration with subscription route
+  app.post("/api/auth/register-with-subscription", async (req, res) => {
+    console.log(`[SERVER] Register with subscription request`);
+    try {
+      const { default: handler } = await import("../api/auth/register-with-subscription.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import register-with-subscription handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Register with subscription handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add password reset route
   app.post("/api/auth/forgot-password", async (req, res) => {
     console.log(`[SERVER] Forgot password request`);
