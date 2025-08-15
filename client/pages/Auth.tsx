@@ -532,6 +532,9 @@ export default function Auth({
                           })
                         }
                         className="pr-10"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        autoComplete="new-password"
                         required
                       />
                       <Button
