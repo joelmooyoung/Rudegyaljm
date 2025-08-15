@@ -94,6 +94,10 @@ export default function ResetPassword({
       const data = await response.json();
 
       if (response.ok) {
+        // Clear reset mode from session storage
+        sessionStorage.removeItem("reset_password_mode");
+        sessionStorage.removeItem("reset_token");
+
         setIsSuccess(true);
         // Redirect to login after 3 seconds
         setTimeout(() => {
