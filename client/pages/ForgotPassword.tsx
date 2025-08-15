@@ -28,6 +28,8 @@ export default function ForgotPassword({
     setIsLoading(true);
     setError("");
 
+    console.log("🔍 [FORGOT PASSWORD] Starting forgot password request for:", email);
+
     try {
       const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
@@ -37,19 +39,27 @@ export default function ForgotPassword({
         body: JSON.stringify({ email }),
       });
 
+      console.log("🔍 [FORGOT PASSWORD] Response status:", response.status);
+      console.log("🔍 [FORGOT PASSWORD] Response headers:", Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
+      console.log("🔍 [FORGOT PASSWORD] Response data:", data);
 
       if (response.ok) {
         setIsSuccess(true);
+        console.log("✅ [FORGOT PASSWORD] Request successful");
+
         // In development, show the reset token for testing
-        if (process.env.NODE_ENV === "development" && data.resetToken) {
-          console.log("Reset token for testing:", data.resetToken);
-          console.log("Reset URL:", data.resetUrl);
+        if (data.resetToken) {
+          console.log("🔑 Reset token for testing:", data.resetToken);
+          console.log("🔗 Reset URL for testing:", data.resetUrl);
         }
       } else {
+        console.error("�� [FORGOT PASSWORD] Request failed:", data.message);
         setError(data.message || "Failed to send reset link");
       }
     } catch (err) {
+      console.error("❌ [FORGOT PASSWORD] Network error:", err);
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
