@@ -33,9 +33,9 @@ export default function ResetPassword({
   onNavigateToAuth,
   onNavigateToForgotPassword,
 }: ResetPasswordProps) {
-  // Get token from URL parameters
+  // Get token from URL parameters or session storage
   const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
+  const token = urlParams.get("token") || sessionStorage.getItem("reset_token");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
