@@ -813,6 +813,22 @@ export function createServer() {
     }
   });
 
+  // Add debug user password route
+  app.all("/api/debug-user-password", async (req, res) => {
+    console.log(`[SERVER] Debug user password request`);
+    try {
+      const { default: handler } = await import("../api/debug-user-password.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-user-password handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add reset password route handler
   app.all("/api/auth/reset-password", async (req, res) => {
     console.log(`[SERVER] Reset password request`);
