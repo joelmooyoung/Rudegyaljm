@@ -88,18 +88,36 @@ const App = () => {
       return;
     }
 
-    // Handle password reset from email link
+    // Handle password reset from email link - multiple detection methods
     const resetPasswordParam = urlParams.get("reset-password");
-    if (
-      resetToken &&
-      (resetPasswordParam === "true" ||
-        window.location.pathname.includes("reset-password"))
-    ) {
+    const hasResetToken = resetToken && resetToken.length > 5; // Basic token validation
+
+    // Check multiple ways the reset might be triggered
+    const isResetPasswordRequest = hasResetToken && (
+      resetPasswordParam === "true" ||
+      window.location.pathname.includes("reset-password") ||
+      window.location.search.includes("reset-password") ||
+      window.location.href.includes("reset-password")
+    );
+
+    if (isResetPasswordRequest) {
       console.log(
         "🔍 [APP] Detected password reset URL, showing reset password form",
       );
+      console.log("🔍 [APP] Reset token found:", resetToken?.substring(0, 8) + "...");
       setCurrentView("reset-password");
       setIsAgeVerified(true); // Allow access to reset password without age verification
+      setIsLoading(false);
+      return;
+    }
+
+    // If we have a token but no reset parameter, still try reset (fallback)
+    if (hasResetToken) {
+      console.log(
+        "🔍 [APP] Found token without reset parameter, assuming password reset",
+      );
+      setCurrentView("reset-password");
+      setIsAgeVerified(true);
       setIsLoading(false);
       return;
     }
