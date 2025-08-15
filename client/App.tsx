@@ -77,7 +77,9 @@ const App = () => {
       return;
     }
 
-    if (resetToken && window.location.pathname.includes("reset-password")) {
+    // Handle password reset from email link
+    const resetPasswordParam = urlParams.get("reset-password");
+    if (resetToken && (resetPasswordParam === "true" || window.location.pathname.includes("reset-password"))) {
       setCurrentView("reset-password");
       setIsAgeVerified(true); // Allow access to reset password without age verification
       setIsLoading(false);
