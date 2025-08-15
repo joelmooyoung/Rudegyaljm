@@ -420,7 +420,9 @@ export default function Auth({
                       onClick={() => {
                         console.log("🔧 Login test button clicked!");
                         console.log("🔧 Current login data:", loginData);
-                        alert("JavaScript is working! Check console for login data.");
+                        alert(
+                          "JavaScript is working! Check console for login data.",
+                        );
                       }}
                       className="text-xs mb-2"
                     >

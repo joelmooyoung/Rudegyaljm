@@ -93,18 +93,21 @@ const App = () => {
     const hasResetToken = resetToken && resetToken.length > 5; // Basic token validation
 
     // Check multiple ways the reset might be triggered
-    const isResetPasswordRequest = hasResetToken && (
-      resetPasswordParam === "true" ||
-      window.location.pathname.includes("reset-password") ||
-      window.location.search.includes("reset-password") ||
-      window.location.href.includes("reset-password")
-    );
+    const isResetPasswordRequest =
+      hasResetToken &&
+      (resetPasswordParam === "true" ||
+        window.location.pathname.includes("reset-password") ||
+        window.location.search.includes("reset-password") ||
+        window.location.href.includes("reset-password"));
 
     if (isResetPasswordRequest) {
       console.log(
         "🔍 [APP] Detected password reset URL, showing reset password form",
       );
-      console.log("🔍 [APP] Reset token found:", resetToken?.substring(0, 8) + "...");
+      console.log(
+        "🔍 [APP] Reset token found:",
+        resetToken?.substring(0, 8) + "...",
+      );
 
       // Store in session so it persists through any navigation
       sessionStorage.setItem("reset_password_mode", "true");

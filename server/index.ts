@@ -817,10 +817,15 @@ export function createServer() {
   app.all("/api/debug-user-password", async (req, res) => {
     console.log(`[SERVER] Debug user password request`);
     try {
-      const { default: handler } = await import("../api/debug-user-password.js");
+      const { default: handler } = await import(
+        "../api/debug-user-password.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-user-password handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-user-password handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug handler not available",

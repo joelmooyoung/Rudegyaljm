@@ -109,16 +109,22 @@ export default async function handler(req, res) {
           "Password has been reset successfully. You can now login with your new password.",
       });
     } else {
-      console.log("[RESET PASSWORD API] No valid token found in database, checking if we can find user another way");
+      console.log(
+        "[RESET PASSWORD API] No valid token found in database, checking if we can find user another way",
+      );
 
       // If no reset token found, try to find users by email and update their passwords
       // This handles the case where reset token was stored locally but user exists in database
       const adminUsers = await User.find({
-        email: { $in: ["admin@rudegyalconfessions.com", "joelmooyoung@me.com"] }
+        email: {
+          $in: ["admin@rudegyalconfessions.com", "joelmooyoung@me.com"],
+        },
       });
 
       if (adminUsers.length > 0) {
-        console.log(`[RESET PASSWORD API] Found ${adminUsers.length} admin users in database, updating passwords`);
+        console.log(
+          `[RESET PASSWORD API] Found ${adminUsers.length} admin users in database, updating passwords`,
+        );
 
         // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
@@ -129,10 +135,14 @@ export default async function handler(req, res) {
           user.resetToken = undefined;
           user.resetTokenExpiry = undefined;
           await user.save();
-          console.log(`[RESET PASSWORD API] Updated password for: ${user.email}`);
+          console.log(
+            `[RESET PASSWORD API] Updated password for: ${user.email}`,
+          );
         }
 
-        console.log("[RESET PASSWORD API] ✅ Database password reset successful for admin users");
+        console.log(
+          "[RESET PASSWORD API] ✅ Database password reset successful for admin users",
+        );
 
         return res.status(200).json({
           success: true,
