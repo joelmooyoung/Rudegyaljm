@@ -820,7 +820,10 @@ export function createServer() {
       const { default: handler } = await import("../api/simple-user-check.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import simple-user-check handler:`, error);
+      console.error(
+        `[SERVER] Failed to import simple-user-check handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Simple user check handler not available",
@@ -893,10 +896,15 @@ export function createServer() {
   app.post("/api/auth/register-with-subscription", async (req, res) => {
     console.log(`[SERVER] Register with subscription request`);
     try {
-      const { default: handler } = await import("../api/auth/register-with-subscription.js");
+      const { default: handler } = await import(
+        "../api/auth/register-with-subscription.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import register-with-subscription handler:`, error);
+      console.error(
+        `[SERVER] Failed to import register-with-subscription handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Register with subscription handler not available",

@@ -88,7 +88,9 @@ export default function SubscriptionPlan({
   onBack,
   userEmail,
 }: SubscriptionPlanProps) {
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
+    null,
+  );
   const [showPayment, setShowPayment] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentData, setPaymentData] = useState({
@@ -109,9 +111,13 @@ export default function SubscriptionPlan({
     }
   };
 
-  const simulateStripePayment = async (): Promise<{ success: boolean; paymentIntentId?: string; error?: string }> => {
+  const simulateStripePayment = async (): Promise<{
+    success: boolean;
+    paymentIntentId?: string;
+    error?: string;
+  }> => {
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Simulate payment validation
     const { cardNumber, expiryDate, cvv, holderName } = paymentData;
@@ -141,7 +147,7 @@ export default function SubscriptionPlan({
     // Success case
     return {
       success: true,
-      paymentIntentId: `pi_simulated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      paymentIntentId: `pi_simulated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
   };
 
@@ -158,8 +164,11 @@ export default function SubscriptionPlan({
       const result = await simulateStripePayment();
 
       if (result.success) {
-        console.log("✅ [STRIPE SIM] Payment successful:", result.paymentIntentId);
-        
+        console.log(
+          "✅ [STRIPE SIM] Payment successful:",
+          result.paymentIntentId,
+        );
+
         // Include payment simulation data
         const paymentMethod = {
           type: "simulated_stripe",
@@ -233,24 +242,34 @@ export default function SubscriptionPlan({
                 Complete Your Purchase
               </CardTitle>
               <CardDescription className="text-base font-serif text-muted-foreground mt-2">
-                {selectedPlan.name} - ${selectedPlan.price}/{selectedPlan.interval}
+                {selectedPlan.name} - ${selectedPlan.price}/
+                {selectedPlan.interval}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
                   <Lock className="h-4 w-4" />
-                  <span className="text-sm font-medium">Stripe Simulation Mode</span>
+                  <span className="text-sm font-medium">
+                    Stripe Simulation Mode
+                  </span>
                 </div>
                 <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-1">
                   This is a test environment. No real charges will be made.
                 </p>
                 <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-1">
-                  <strong>Test cards:</strong> Use 4242424242424242 for success, 4000000000000000 for decline
+                  <strong>Test cards:</strong> Use 4242424242424242 for success,
+                  4000000000000000 for decline
                 </p>
               </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }} className="space-y-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handlePayment();
+                }}
+                className="space-y-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="cardNumber">Card Number</Label>
                   <Input
@@ -328,7 +347,9 @@ export default function SubscriptionPlan({
                   className="w-full bg-primary hover:bg-primary/90"
                   disabled={isProcessing}
                 >
-                  {isProcessing ? "Processing Payment..." : `Pay $${selectedPlan.price}`}
+                  {isProcessing
+                    ? "Processing Payment..."
+                    : `Pay $${selectedPlan.price}`}
                 </Button>
               </form>
             </CardContent>
@@ -362,7 +383,8 @@ export default function SubscriptionPlan({
             Choose Your Experience
           </h1>
           <p className="text-xl font-serif text-muted-foreground max-w-2xl mx-auto">
-            Select the perfect plan to unlock your desires and explore exclusive content
+            Select the perfect plan to unlock your desires and explore exclusive
+            content
           </p>
         </div>
 
@@ -385,14 +407,24 @@ export default function SubscriptionPlan({
               )}
 
               <CardHeader className="text-center pb-6">
-                <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 passionate-glow ${
-                  plan.type === "free" ? "bg-gray-500/20" :
-                  plan.type === "premium" ? "bg-primary/20" :
-                  "bg-yellow-500/20"
-                }`}>
-                  {plan.type === "free" && <Heart className="h-8 w-8 text-gray-500" />}
-                  {plan.type === "premium" && <Crown className="h-8 w-8 text-primary" />}
-                  {plan.type === "vip" && <Flame className="h-8 w-8 text-yellow-500" />}
+                <div
+                  className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 passionate-glow ${
+                    plan.type === "free"
+                      ? "bg-gray-500/20"
+                      : plan.type === "premium"
+                        ? "bg-primary/20"
+                        : "bg-yellow-500/20"
+                  }`}
+                >
+                  {plan.type === "free" && (
+                    <Heart className="h-8 w-8 text-gray-500" />
+                  )}
+                  {plan.type === "premium" && (
+                    <Crown className="h-8 w-8 text-primary" />
+                  )}
+                  {plan.type === "vip" && (
+                    <Flame className="h-8 w-8 text-yellow-500" />
+                  )}
                 </div>
                 <CardTitle className="text-2xl font-display font-bold text-passion-gradient">
                   {plan.name}
@@ -411,18 +443,20 @@ export default function SubscriptionPlan({
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{feature}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
 
                 <Button
                   className={`w-full ${
-                    plan.type === "free" 
+                    plan.type === "free"
                       ? "bg-gray-600 hover:bg-gray-700"
                       : plan.popular
-                      ? "bg-primary hover:bg-primary/90"
-                      : "bg-secondary hover:bg-secondary/90"
+                        ? "bg-primary hover:bg-primary/90"
+                        : "bg-secondary hover:bg-secondary/90"
                   }`}
                   onClick={() => handlePlanSelect(plan)}
                 >

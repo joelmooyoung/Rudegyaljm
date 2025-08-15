@@ -31,7 +31,9 @@ const validatePassword = (password) => {
 const saltRounds = 12;
 
 export default async function handler(req, res) {
-  console.log(`[REGISTER WITH SUBSCRIPTION] ${req.method} /api/auth/register-with-subscription`);
+  console.log(
+    `[REGISTER WITH SUBSCRIPTION] ${req.method} /api/auth/register-with-subscription`,
+  );
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -60,9 +62,15 @@ export default async function handler(req, res) {
       paymentMethod,
     } = req.body;
 
-    console.log(`[REGISTER WITH SUBSCRIPTION] Processing registration for: ${email}`);
-    console.log(`[REGISTER WITH SUBSCRIPTION] Subscription plan: ${subscriptionPlan}`);
-    console.log(`[REGISTER WITH SUBSCRIPTION] Has payment method: ${!!paymentMethod}`);
+    console.log(
+      `[REGISTER WITH SUBSCRIPTION] Processing registration for: ${email}`,
+    );
+    console.log(
+      `[REGISTER WITH SUBSCRIPTION] Subscription plan: ${subscriptionPlan}`,
+    );
+    console.log(
+      `[REGISTER WITH SUBSCRIPTION] Has payment method: ${!!paymentMethod}`,
+    );
 
     // Validate required fields
     if (!email || !username || !password || !dateOfBirth || !subscriptionPlan) {
@@ -88,7 +96,10 @@ export default async function handler(req, res) {
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
 
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
       age--;
     }
 
@@ -106,11 +117,15 @@ export default async function handler(req, res) {
 
       // Check if user already exists
       const existingUser = await User.findOne({
-        $or: [{ email: email.toLowerCase() }, { username: username.toLowerCase() }],
+        $or: [
+          { email: email.toLowerCase() },
+          { username: username.toLowerCase() },
+        ],
       });
 
       if (existingUser) {
-        const field = existingUser.email === email.toLowerCase() ? "email" : "username";
+        const field =
+          existingUser.email === email.toLowerCase() ? "email" : "username";
         return res.status(400).json({
           success: false,
           message: `User with this ${field} already exists`,
@@ -123,7 +138,7 @@ export default async function handler(req, res) {
       // Determine user type based on subscription
       let userType = "free";
       let subscriptionStatus = "none";
-      
+
       if (subscriptionType === "premium") {
         userType = "premium";
         subscriptionStatus = "active";
@@ -145,20 +160,25 @@ export default async function handler(req, res) {
         dateOfBirth: birth,
         subscriptionPlan: subscriptionPlan,
         subscriptionStatus: subscriptionStatus,
-        subscriptionStartDate: subscriptionType !== "free" ? new Date() : undefined,
-        paymentMethod: paymentMethod ? {
-          type: paymentMethod.type,
-          last4: paymentMethod.cardLast4,
-          paymentIntentId: paymentMethod.paymentIntentId,
-          timestamp: paymentMethod.timestamp,
-        } : undefined,
+        subscriptionStartDate:
+          subscriptionType !== "free" ? new Date() : undefined,
+        paymentMethod: paymentMethod
+          ? {
+              type: paymentMethod.type,
+              last4: paymentMethod.cardLast4,
+              paymentIntentId: paymentMethod.paymentIntentId,
+              timestamp: paymentMethod.timestamp,
+            }
+          : undefined,
       };
 
       // Create user in database
       const newUser = new User(userData);
       await newUser.save();
 
-      console.log(`[REGISTER WITH SUBSCRIPTION] ✅ User created in database: ${email}`);
+      console.log(
+        `[REGISTER WITH SUBSCRIPTION] ✅ User created in database: ${email}`,
+      );
 
       // Generate token
       const token = `reg_token_${userData.userId}_${Date.now()}`;
@@ -188,18 +208,16 @@ export default async function handler(req, res) {
           createdAt: userData.createdAt,
         },
       });
-
     } catch (dbError) {
       console.error(
         "[REGISTER WITH SUBSCRIPTION] Database failed, trying local users:",
-        dbError.message
+        dbError.message,
       );
 
       // Fallback to local users
       try {
-        const { createUser, initializeLocalUsers, getUserByEmail } = await import(
-          "../../lib/local-users.js"
-        );
+        const { createUser, initializeLocalUsers, getUserByEmail } =
+          await import("../../lib/local-users.js");
 
         await initializeLocalUsers();
 
@@ -234,7 +252,9 @@ export default async function handler(req, res) {
 
         const createdUser = await createUser(userData);
 
-        console.log(`[REGISTER WITH SUBSCRIPTION] ✅ User created in local storage: ${email}`);
+        console.log(
+          `[REGISTER WITH SUBSCRIPTION] ✅ User created in local storage: ${email}`,
+        );
 
         // Generate token
         const token = `local_reg_token_${createdUser.id}_${Date.now()}`;
@@ -255,16 +275,16 @@ export default async function handler(req, res) {
             createdAt: createdUser.createdAt,
           },
         });
-
       } catch (localError) {
         console.error(
           "[REGISTER WITH SUBSCRIPTION] Local user creation failed:",
-          localError.message
+          localError.message,
         );
-        throw new Error("Registration failed - database and local storage unavailable");
+        throw new Error(
+          "Registration failed - database and local storage unavailable",
+        );
       }
     }
-
   } catch (error) {
     console.error("[REGISTER WITH SUBSCRIPTION] Error:", error);
     return res.status(500).json({

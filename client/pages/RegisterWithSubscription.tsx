@@ -19,7 +19,9 @@ import {
   Heart,
   CheckCircle,
 } from "lucide-react";
-import SubscriptionPlan, { SubscriptionPlan as PlanType } from "./SubscriptionPlan";
+import SubscriptionPlan, {
+  SubscriptionPlan as PlanType,
+} from "./SubscriptionPlan";
 import { validatePassword } from "@/utils/passwordValidation";
 import { User as UserType, RegisterRequest, AuthResponse } from "@shared/api";
 
@@ -114,11 +116,14 @@ export default function RegisterWithSubscription({
     setError("");
 
     try {
-      console.log("🔄 [REGISTRATION] Processing registration with subscription:", {
-        email: registrationData.email,
-        plan: plan.name,
-        hasPayment: !!paymentMethod,
-      });
+      console.log(
+        "🔄 [REGISTRATION] Processing registration with subscription:",
+        {
+          email: registrationData.email,
+          plan: plan.name,
+          hasPayment: !!paymentMethod,
+        },
+      );
 
       // Create the registration payload
       const registrationPayload = {
@@ -145,7 +150,7 @@ export default function RegisterWithSubscription({
       }
 
       const data: AuthResponse = await response.json();
-      
+
       console.log("✅ [REGISTRATION] Registration successful:", {
         userId: data.user.id,
         email: data.user.email,
@@ -160,7 +165,6 @@ export default function RegisterWithSubscription({
       setTimeout(() => {
         onAuthenticated(data.user);
       }, 2000);
-
     } catch (err) {
       console.error("❌ [REGISTRATION] Registration failed:", err);
       setError(err instanceof Error ? err.message : "Registration failed");
@@ -276,7 +280,9 @@ export default function RegisterWithSubscription({
             {registrationData.password && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Password Strength</span>
+                  <span className="text-muted-foreground">
+                    Password Strength
+                  </span>
                   <span
                     className={`font-medium ${
                       passwordValidation.strength === "very-strong"
@@ -288,10 +294,15 @@ export default function RegisterWithSubscription({
                             : "text-red-500"
                     }`}
                   >
-                    {passwordValidation.strength?.replace("_", " ").toUpperCase()}
+                    {passwordValidation.strength
+                      ?.replace("_", " ")
+                      .toUpperCase()}
                   </span>
                 </div>
-                <Progress value={passwordValidation.score * 20} className="h-2" />
+                <Progress
+                  value={passwordValidation.score * 20}
+                  className="h-2"
+                />
 
                 {passwordValidation.errors.length > 0 && (
                   <ul className="text-xs text-destructive space-y-1">
@@ -318,9 +329,12 @@ export default function RegisterWithSubscription({
               required
             />
 
-            {confirmPassword && registrationData.password !== confirmPassword && (
-              <p className="text-xs text-destructive">Passwords do not match</p>
-            )}
+            {confirmPassword &&
+              registrationData.password !== confirmPassword && (
+                <p className="text-xs text-destructive">
+                  Passwords do not match
+                </p>
+              )}
           </div>
 
           {error && (
@@ -332,7 +346,10 @@ export default function RegisterWithSubscription({
           <Button
             type="submit"
             className="w-full bg-primary hover:bg-primary/90"
-            disabled={!passwordValidation.isValid || registrationData.password !== confirmPassword}
+            disabled={
+              !passwordValidation.isValid ||
+              registrationData.password !== confirmPassword
+            }
           >
             Continue to Subscription <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
