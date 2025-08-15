@@ -32,10 +32,10 @@ export default async function handler(req, res) {
         active: true,
         loginCount: 0,
         createdAt: new Date(),
-        lastLogin: null
+        lastLogin: null,
       },
       {
-        userId: "joel-001", 
+        userId: "joel-001",
         username: "joelmooyoung",
         email: "joelmooyoung@me.com",
         password: hashedPassword,
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
         active: true,
         loginCount: 0,
         createdAt: new Date(),
-        lastLogin: null
-      }
+        lastLogin: null,
+      },
     ];
 
     const results = [];
@@ -53,28 +53,34 @@ export default async function handler(req, res) {
       try {
         // Delete existing user if exists
         await User.deleteOne({ email: adminData.email });
-        console.log(`[FORCE CREATE ADMIN] Deleted existing user: ${adminData.email}`);
+        console.log(
+          `[FORCE CREATE ADMIN] Deleted existing user: ${adminData.email}`,
+        );
 
         // Create new user
         const newUser = new User(adminData);
         await newUser.save();
-        
-        console.log(`[FORCE CREATE ADMIN] ✅ Created admin user: ${adminData.email}`);
-        
+
+        console.log(
+          `[FORCE CREATE ADMIN] ✅ Created admin user: ${adminData.email}`,
+        );
+
         results.push({
           email: adminData.email,
           username: adminData.username,
           type: adminData.type,
           active: adminData.active,
-          status: "created"
+          status: "created",
         });
-
       } catch (userError) {
-        console.error(`[FORCE CREATE ADMIN] Failed to create ${adminData.email}:`, userError);
+        console.error(
+          `[FORCE CREATE ADMIN] Failed to create ${adminData.email}:`,
+          userError,
+        );
         results.push({
           email: adminData.email,
           status: "failed",
-          error: userError.message
+          error: userError.message,
         });
       }
     }
@@ -85,19 +91,22 @@ export default async function handler(req, res) {
       try {
         const user = await User.findOne({ email: adminData.email });
         if (user) {
-          const isValidPassword = await bcrypt.compare(adminPassword, user.password);
+          const isValidPassword = await bcrypt.compare(
+            adminPassword,
+            user.password,
+          );
           testResults.push({
             email: adminData.email,
             exists: true,
             passwordValid: isValidPassword,
-            active: user.active
+            active: user.active,
           });
         } else {
           testResults.push({
             email: adminData.email,
             exists: false,
             passwordValid: false,
-            active: false
+            active: false,
           });
         }
       } catch (testError) {
@@ -106,7 +115,7 @@ export default async function handler(req, res) {
           exists: false,
           passwordValid: false,
           active: false,
-          error: testError.message
+          error: testError.message,
         });
       }
     }
@@ -117,16 +126,15 @@ export default async function handler(req, res) {
       adminPassword: adminPassword,
       createdUsers: results,
       testResults: testResults,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[FORCE CREATE ADMIN] ❌ Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to force-create admin users",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }

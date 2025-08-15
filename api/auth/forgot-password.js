@@ -94,7 +94,9 @@ export default async function handler(req, res) {
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
         // Generate proper reset URL based on current environment
-        const baseUrl = process.env.FRONTEND_URL || "https://828ad77a3e9d40c7be6deab3e340d51f-4bd5d56465ea4c69a7b89487f.fly.dev";
+        const baseUrl =
+          process.env.FRONTEND_URL ||
+          "https://828ad77a3e9d40c7be6deab3e340d51f-4bd5d56465ea4c69a7b89487f.fly.dev";
         const resetUrl = `${baseUrl}/?reset-password=true&token=${resetToken}`;
 
         const emailResult = await resend.emails.send({

@@ -28,7 +28,10 @@ export default function ForgotPassword({
     setIsLoading(true);
     setError("");
 
-    console.log("🔍 [FORGOT PASSWORD] Starting forgot password request for:", email);
+    console.log(
+      "🔍 [FORGOT PASSWORD] Starting forgot password request for:",
+      email,
+    );
 
     try {
       const response = await fetch("/api/auth/forgot-password", {
@@ -40,7 +43,10 @@ export default function ForgotPassword({
       });
 
       console.log("🔍 [FORGOT PASSWORD] Response status:", response.status);
-      console.log("🔍 [FORGOT PASSWORD] Response headers:", Object.fromEntries(response.headers.entries()));
+      console.log(
+        "🔍 [FORGOT PASSWORD] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
 
       const data = await response.json();
       console.log("🔍 [FORGOT PASSWORD] Response data:", data);

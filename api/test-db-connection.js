@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   try {
     console.log("[DB TEST] Testing MongoDB connection...");
-    
+
     await connectToDatabase();
     console.log("[DB TEST] ✅ Database connected successfully");
 
@@ -24,15 +24,18 @@ export default async function handler(req, res) {
     console.log(`[DB TEST] Found ${userCount} users in database`);
 
     // Get sample users (without passwords)
-    const sampleUsers = await User.find({}, {
-      email: 1,
-      username: 1,
-      type: 1,
-      active: 1,
-      createdAt: 1,
-      lastLogin: 1,
-      _id: 0
-    }).limit(5);
+    const sampleUsers = await User.find(
+      {},
+      {
+        email: 1,
+        username: 1,
+        type: 1,
+        active: 1,
+        createdAt: 1,
+        lastLogin: 1,
+        _id: 0,
+      },
+    ).limit(5);
 
     console.log("[DB TEST] Sample users retrieved:", sampleUsers.length);
 
@@ -41,16 +44,15 @@ export default async function handler(req, res) {
       message: "Database connection successful",
       userCount: userCount,
       sampleUsers: sampleUsers,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[DB TEST] ❌ Database connection failed:", error);
     return res.status(500).json({
       success: false,
       message: "Database connection failed",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }
