@@ -587,10 +587,33 @@ export default function Auth({
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6 text-center">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <Crown className="h-4 w-4 text-premium" />
-                <span>Premium features available after registration</span>
+            <div className="mt-6 space-y-4">
+              {onNavigateToRegister && (
+                <div className="text-center">
+                  <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20 rounded-lg p-4">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-primary">Premium Registration</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Join with a subscription plan and get immediate access to premium content
+                    </p>
+                    <Button
+                      onClick={onNavigateToRegister}
+                      className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Register with Subscription
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="text-center">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Crown className="h-4 w-4 text-premium" />
+                  <span>All plans include premium features and priority support</span>
+                </div>
               </div>
             </div>
           </CardContent>
