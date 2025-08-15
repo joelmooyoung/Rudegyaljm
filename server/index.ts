@@ -123,7 +123,7 @@ export function createServer() {
 
   // CREATE ADMIN USER ENDPOINT
   app.post("/api/create-admin", async (req, res) => {
-    console.log("����� [CREATE ADMIN] Creating admin user...");
+    console.log("��� [CREATE ADMIN] Creating admin user...");
 
     try {
       await connectToDatabase();
@@ -808,6 +808,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Reset passwords handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add reset password route handler
+  app.all("/api/auth/reset-password", async (req, res) => {
+    console.log(`[SERVER] Reset password request`);
+    try {
+      const { default: handler } = await import("../api/auth/reset-password.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import reset-password handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Reset password handler not available",
         error: error.message,
       });
     }
