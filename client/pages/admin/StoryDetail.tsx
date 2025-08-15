@@ -588,18 +588,28 @@ export default function StoryDetail({
     handleInputChange("audioUrl", "");
   };
 
-  const handleSave = () => {
-    const storyData: Partial<Story> = {
-      ...formData,
-      updatedAt: new Date(),
-    };
+  const handleSave = async () => {
+    setIsSaving(true);
+    console.log("[STORY DETAIL] Starting save process...");
 
-    if (mode === "add") {
-      storyData.id = Date.now().toString();
-      storyData.createdAt = new Date();
+    try {
+      const storyData: Partial<Story> = {
+        ...formData,
+        updatedAt: new Date(),
+      };
+
+      if (mode === "add") {
+        storyData.id = Date.now().toString();
+        storyData.createdAt = new Date();
+      }
+
+      await onSave(storyData);
+      console.log("[STORY DETAIL] Save completed successfully");
+    } catch (error) {
+      console.error("[STORY DETAIL] Save failed:", error);
+    } finally {
+      setIsSaving(false);
     }
-
-    onSave(storyData);
   };
 
   const stripHTML = (html: string): string => {
