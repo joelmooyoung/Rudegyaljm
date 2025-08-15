@@ -485,6 +485,8 @@ export default function StoryDetail({
         size: file.size,
         type: file.type,
         isProduction: isProduction,
+        sizeMB: (file.size / 1024 / 1024).toFixed(2),
+        estimatedBase64MB: ((file.size * 1.33) / 1024 / 1024).toFixed(2),
       });
 
       // Convert audio to base64 on client side (Vercel-compatible approach)
