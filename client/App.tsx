@@ -248,6 +248,19 @@ const App = () => {
   };
 
   const handleSaveStory = async (storyData: Partial<Story>) => {
+    console.log("[STORY SAVE] Saving story:", {
+      ...storyData,
+      audioUrl: storyData.audioUrl ? `${storyData.audioUrl.substring(0, 100)}... (${storyData.audioUrl.length} chars)` : null
+    });
+
+    // Check if audioUrl is too large for HTTP request
+    if (storyData.audioUrl && storyData.audioUrl.length > 50 * 1024 * 1024) {
+      const sizeMB = (storyData.audioUrl.length / 1024 / 1024).toFixed(2);
+      console.error("[STORY SAVE] AudioUrl too large for HTTP request:", sizeMB + "MB");
+      alert(`Story save failed: Audio data is too large (${sizeMB}MB). Please use a smaller audio file.`);
+      return;
+    }
+
     try {
       let response;
       if (storyMode === "add") {
