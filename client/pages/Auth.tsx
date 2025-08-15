@@ -375,6 +375,9 @@ export default function Auth({
                           })
                         }
                         className="pl-11 pr-12 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
+                        autoCapitalize="off"
+                        autoCorrect="off"
+                        autoComplete="current-password"
                         required
                       />
                       <Button
