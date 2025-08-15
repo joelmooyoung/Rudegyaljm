@@ -250,14 +250,21 @@ const App = () => {
   const handleSaveStory = async (storyData: Partial<Story>) => {
     console.log("[STORY SAVE] Saving story:", {
       ...storyData,
-      audioUrl: storyData.audioUrl ? `${storyData.audioUrl.substring(0, 100)}... (${storyData.audioUrl.length} chars)` : null
+      audioUrl: storyData.audioUrl
+        ? `${storyData.audioUrl.substring(0, 100)}... (${storyData.audioUrl.length} chars)`
+        : null,
     });
 
     // Check if audioUrl is too large for HTTP request
     if (storyData.audioUrl && storyData.audioUrl.length > 50 * 1024 * 1024) {
       const sizeMB = (storyData.audioUrl.length / 1024 / 1024).toFixed(2);
-      console.error("[STORY SAVE] AudioUrl too large for HTTP request:", sizeMB + "MB");
-      alert(`Story save failed: Audio data is too large (${sizeMB}MB). Please use a smaller audio file.`);
+      console.error(
+        "[STORY SAVE] AudioUrl too large for HTTP request:",
+        sizeMB + "MB",
+      );
+      alert(
+        `Story save failed: Audio data is too large (${sizeMB}MB). Please use a smaller audio file.`,
+      );
       return;
     }
 
@@ -322,7 +329,10 @@ const App = () => {
       }
 
       console.log("[STORY SAVE] Response status:", response.status);
-      console.log("[STORY SAVE] Response headers:", Object.fromEntries(response.headers.entries()));
+      console.log(
+        "[STORY SAVE] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
 
       if (response.ok) {
         const savedStory = await response.json();
@@ -332,13 +342,20 @@ const App = () => {
         setCurrentView("admin-stories");
       } else {
         const errorData = await response.text();
-        console.error("[STORY SAVE] ❌ Failed to save story:", response.status, response.statusText, errorData);
+        console.error(
+          "[STORY SAVE] ❌ Failed to save story:",
+          response.status,
+          response.statusText,
+          errorData,
+        );
 
         let errorMessage = `Failed to save story: ${response.status} ${response.statusText}`;
         if (response.status === 413) {
-          errorMessage += "\n\nThe story data (including audio) is too large. Please use a smaller audio file.";
+          errorMessage +=
+            "\n\nThe story data (including audio) is too large. Please use a smaller audio file.";
         } else if (response.status === 0) {
-          errorMessage += "\n\nNetwork error - the request may be too large or there's a connection issue.";
+          errorMessage +=
+            "\n\nNetwork error - the request may be too large or there's a connection issue.";
         }
 
         alert(errorMessage);
