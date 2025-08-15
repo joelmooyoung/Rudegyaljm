@@ -123,7 +123,7 @@ export function createServer() {
 
   // CREATE ADMIN USER ENDPOINT
   app.post("/api/create-admin", async (req, res) => {
-    console.log("👑 [CREATE ADMIN] Creating admin user...");
+    console.log("��� [CREATE ADMIN] Creating admin user...");
 
     try {
       await connectToDatabase();
@@ -300,7 +300,7 @@ export function createServer() {
 
     console.log(`🔐 [LOGIN] Attempting login for: ${email}`);
 
-    // Database authentication
+    // Try database authentication first
     try {
       await connectToDatabase();
       console.log("🔐 [LOGIN] Database connected, trying database auth");
@@ -333,7 +333,42 @@ export function createServer() {
         }
       }
     } catch (dbError) {
-      console.error("🔐 [LOGIN] Database failed (expected):", dbError.message);
+      console.error("🔐 [LOGIN] Database failed, trying local users:", dbError.message);
+
+      // Fallback to local users when database is unavailable
+      try {
+        const { authenticateUser, initializeLocalUsers } = await import("../lib/local-users.js");
+
+        // Initialize local users if needed
+        await initializeLocalUsers();
+
+        console.log("🔐 [LOGIN] Trying local authentication");
+        const user = await authenticateUser(email, password);
+
+        if (user) {
+          console.log("🔐 [LOGIN] ✅ Local authentication successful");
+          const token = `local_token_${user.id}_${Date.now()}`;
+
+          return res.json({
+            success: true,
+            message: "Login successful (local)",
+            token: token,
+            user: {
+              id: user.id,
+              email: user.email,
+              username: user.username,
+              role: user.type,
+              isActive: user.active,
+              isAgeVerified: true,
+              subscriptionStatus: user.type === "premium" ? "active" : "none",
+              createdAt: user.createdAt,
+              lastLogin: user.lastLogin,
+            },
+          });
+        }
+      } catch (localError) {
+        console.error("🔐 [LOGIN] Local authentication failed:", localError.message);
+      }
     }
 
     console.log("🔐 [LOGIN] ❌ All authentication methods failed");
