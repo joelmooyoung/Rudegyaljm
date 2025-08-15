@@ -58,6 +58,10 @@ export default function Auth({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔍 [LOGIN] Form submitted, starting login process");
+    console.log("🔍 [LOGIN] Email:", loginData.email);
+    console.log("🔍 [LOGIN] Password length:", loginData.password?.length || 0);
+
     setIsLoading(true);
     setError("");
 
