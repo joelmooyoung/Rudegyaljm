@@ -333,11 +333,16 @@ export function createServer() {
         }
       }
     } catch (dbError) {
-      console.error("🔐 [LOGIN] Database failed, trying local users:", dbError.message);
+      console.error(
+        "🔐 [LOGIN] Database failed, trying local users:",
+        dbError.message,
+      );
 
       // Fallback to local users when database is unavailable
       try {
-        const { authenticateUser, initializeLocalUsers } = await import("../lib/local-users.js");
+        const { authenticateUser, initializeLocalUsers } = await import(
+          "../lib/local-users.js"
+        );
 
         // Initialize local users if needed
         await initializeLocalUsers();
@@ -367,7 +372,10 @@ export function createServer() {
           });
         }
       } catch (localError) {
-        console.error("🔐 [LOGIN] Local authentication failed:", localError.message);
+        console.error(
+          "🔐 [LOGIN] Local authentication failed:",
+          localError.message,
+        );
       }
     }
 

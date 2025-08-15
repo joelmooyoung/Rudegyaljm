@@ -30,7 +30,9 @@ export default async function handler(req, res) {
 
       // Get all users from database
       const users = await User.find({})
-        .select("userId username email type active createdAt lastLogin loginCount")
+        .select(
+          "userId username email type active createdAt lastLogin loginCount",
+        )
         .sort({ createdAt: -1 })
         .lean();
 
@@ -55,13 +57,18 @@ export default async function handler(req, res) {
         message: `Found ${userList.length} database users`,
         users: userList,
         source: "database",
-        hardcodedAccounts: []
+        hardcodedAccounts: [],
       });
     } catch (dbError) {
-      console.error("[LIST USERS API] Database failed, trying local users:", dbError.message);
+      console.error(
+        "[LIST USERS API] Database failed, trying local users:",
+        dbError.message,
+      );
 
       // Fallback to local users
-      const { getAllUsers, initializeLocalUsers } = await import("../../lib/local-users.js");
+      const { getAllUsers, initializeLocalUsers } = await import(
+        "../../lib/local-users.js"
+      );
 
       await initializeLocalUsers();
       const localUsers = await getAllUsers();
@@ -84,7 +91,7 @@ export default async function handler(req, res) {
         message: `Found ${userList.length} local users (database unavailable)`,
         users: userList,
         source: "local",
-        hardcodedAccounts: []
+        hardcodedAccounts: [],
       });
     }
   } catch (error) {

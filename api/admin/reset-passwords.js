@@ -31,7 +31,9 @@ export default async function handler(req, res) {
 
       // Get all users
       const users = await User.find({}).select("userId email type");
-      console.log(`[RESET PASSWORDS API] Found ${users.length} users to update`);
+      console.log(
+        `[RESET PASSWORDS API] Found ${users.length} users to update`,
+      );
 
       const updatedUsers = [];
       const saltRounds = 12;
@@ -42,23 +44,28 @@ export default async function handler(req, res) {
           email: "admin@rudegyalconfessions.com",
           username: "admin",
           type: "admin",
-          password: "admin123"
+          password: "admin123",
         },
         {
           email: "joelmooyoung@me.com",
           username: "joelmooyoung",
           type: "admin",
-          password: "admin123"
-        }
+          password: "admin123",
+        },
       ];
 
       // Add default users if they don't exist
       for (const defaultUser of defaultUsers) {
-        const existingUser = users.find(u => u.email === defaultUser.email);
+        const existingUser = users.find((u) => u.email === defaultUser.email);
         if (!existingUser) {
-          console.log(`[RESET PASSWORDS API] Creating missing user: ${defaultUser.email}`);
+          console.log(
+            `[RESET PASSWORDS API] Creating missing user: ${defaultUser.email}`,
+          );
 
-          const hashedPassword = await bcrypt.hash(defaultUser.password, saltRounds);
+          const hashedPassword = await bcrypt.hash(
+            defaultUser.password,
+            saltRounds,
+          );
           const newUser = new User({
             userId: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             username: defaultUser.username,
@@ -75,7 +82,7 @@ export default async function handler(req, res) {
             email: defaultUser.email,
             newPassword: defaultUser.password,
             accessLevel: defaultUser.type,
-            action: "created"
+            action: "created",
           });
         }
       }
@@ -85,19 +92,21 @@ export default async function handler(req, res) {
         let newPassword;
 
         switch (user.type) {
-          case 'admin':
-            newPassword = 'admin123';
+          case "admin":
+            newPassword = "admin123";
             break;
-          case 'premium':
-            newPassword = 'premium123';
+          case "premium":
+            newPassword = "premium123";
             break;
-          case 'free':
+          case "free":
           default:
-            newPassword = 'free123';
+            newPassword = "free123";
             break;
         }
 
-        console.log(`[RESET PASSWORDS API] Updating password for ${user.email} (${user.type}) to ${newPassword}`);
+        console.log(
+          `[RESET PASSWORDS API] Updating password for ${user.email} (${user.type}) to ${newPassword}`,
+        );
 
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
@@ -106,19 +115,21 @@ export default async function handler(req, res) {
           {
             password: hashedPassword,
             active: true, // Ensure user is active
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         );
 
         updatedUsers.push({
           email: user.email,
           newPassword: newPassword,
-          accessLevel: user.type || 'free',
-          action: "updated"
+          accessLevel: user.type || "free",
+          action: "updated",
         });
       }
 
-      console.log(`[RESET PASSWORDS API] ✅ Successfully updated ${updatedUsers.length} database users`);
+      console.log(
+        `[RESET PASSWORDS API] ✅ Successfully updated ${updatedUsers.length} database users`,
+      );
 
       return res.status(200).json({
         success: true,
@@ -128,19 +139,26 @@ export default async function handler(req, res) {
         passwordRules: {
           admin: "admin123",
           premium: "premium123",
-          free: "free123"
-        }
+          free: "free123",
+        },
       });
     } catch (dbError) {
-      console.error("[RESET PASSWORDS API] Database failed, using local users:", dbError.message);
+      console.error(
+        "[RESET PASSWORDS API] Database failed, using local users:",
+        dbError.message,
+      );
 
       // Fallback to local users
-      const { resetAllPasswords, initializeLocalUsers } = await import("../../lib/local-users.js");
+      const { resetAllPasswords, initializeLocalUsers } = await import(
+        "../../lib/local-users.js"
+      );
 
       await initializeLocalUsers();
       const updatedUsers = await resetAllPasswords();
 
-      console.log(`[RESET PASSWORDS API] ✅ Successfully reset ${updatedUsers.length} local user passwords`);
+      console.log(
+        `[RESET PASSWORDS API] ✅ Successfully reset ${updatedUsers.length} local user passwords`,
+      );
 
       return res.status(200).json({
         success: true,
@@ -150,8 +168,8 @@ export default async function handler(req, res) {
         passwordRules: {
           admin: "admin123",
           premium: "premium123",
-          free: "free123"
-        }
+          free: "free123",
+        },
       });
     }
   } catch (error) {
