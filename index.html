@@ -18,43 +18,9 @@
     <script type="module" src="/client/main.tsx"></script>
 
     <script>
-      // Show fallback message after 5 seconds if React doesn't load properly
-      setTimeout(function () {
-        const root = document.getElementById("root");
-        // Check if React app has actually loaded by looking for React content
-        const hasReactContent = root && (
-          root.innerHTML.includes('data-loc') ||
-          root.children.length > 0 ||
-          root.innerHTML.length > 100
-        );
-
-        if (!hasReactContent) {
-          console.log("🚨 React app failed to load, showing fallback");
-          document.getElementById("fallback").style.display = "block";
-        } else {
-          console.log("✅ React app loaded successfully");
-          document.getElementById("fallback").style.display = "none";
-        }
-      }, 5000);
-
-      // Hide fallback once React loads
-      setTimeout(function () {
-        const root = document.getElementById("root");
-        if (root && root.innerHTML.includes('data-loc')) {
-          document.getElementById("fallback").style.display = "none";
-        }
-      }, 1000);
-
-      // Error handling - but don't auto-show fallback on every error
-      window.addEventListener("error", function (e) {
-        console.error("🚨 JavaScript Error:", e.error);
-        // Only show fallback for critical loading errors
-        if (e.error && e.error.message && e.error.message.includes('module')) {
-          document.getElementById("fallback").style.display = "block";
-        }
-      });
-
+      // Simple logging - fallback overlay removed since React app works properly
       console.log("🔧 Base HTML loaded on:", window.location.hostname);
+      console.log("✅ React app loading...");
     </script>
   </body>
 </html>
