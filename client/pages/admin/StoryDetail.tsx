@@ -482,7 +482,7 @@ export default function StoryDetail({
         name: file.name,
         size: file.size,
         type: file.type,
-        isProduction: isProduction
+        isProduction: isProduction,
       });
 
       // Convert audio to base64 on client side (Vercel-compatible approach)
@@ -490,7 +490,10 @@ export default function StoryDetail({
         const reader = new FileReader();
         reader.onload = () => {
           const result = reader.result as string;
-          console.log("[ADMIN AUDIO] Base64 conversion successful, length:", result.length);
+          console.log(
+            "[ADMIN AUDIO] Base64 conversion successful, length:",
+            result.length,
+          );
           resolve(result);
         };
         reader.onerror = (error) => {
@@ -510,7 +513,7 @@ export default function StoryDetail({
 
       console.log("[ADMIN AUDIO] Request data:", {
         ...requestData,
-        audioData: requestData.audioData.substring(0, 100) + "...(truncated)"
+        audioData: requestData.audioData.substring(0, 100) + "...(truncated)",
       });
 
       // Send base64 data as JSON (much more reliable on Vercel)
@@ -523,7 +526,10 @@ export default function StoryDetail({
       });
 
       console.log("[ADMIN AUDIO] Response status:", response.status);
-      console.log("[ADMIN AUDIO] Response headers:", Object.fromEntries(response.headers.entries()));
+      console.log(
+        "[ADMIN AUDIO] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -539,7 +545,9 @@ export default function StoryDetail({
           response.statusText,
           errorData,
         );
-        alert(`Failed to upload audio: ${response.status} ${response.statusText}\n${errorData}`);
+        alert(
+          `Failed to upload audio: ${response.status} ${response.statusText}\n${errorData}`,
+        );
       }
     } catch (error) {
       console.error("[ADMIN AUDIO] ❌ Upload error:", error);
