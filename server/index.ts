@@ -813,6 +813,22 @@ export function createServer() {
     }
   });
 
+  // Add simple user check route
+  app.all("/api/simple-user-check", async (req, res) => {
+    console.log(`[SERVER] Simple user check request`);
+    try {
+      const { default: handler } = await import("../api/simple-user-check.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import simple-user-check handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Simple user check handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add force update password route
   app.all("/api/force-update-password", async (req, res) => {
     console.log(`[SERVER] Force update password request`);
