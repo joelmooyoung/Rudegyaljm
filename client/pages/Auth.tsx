@@ -31,11 +31,13 @@ import {
 interface AuthProps {
   onAuthenticated: (user: UserType) => void;
   onNavigateToForgotPassword?: () => void;
+  onNavigateToRegister?: () => void;
 }
 
 export default function Auth({
   onAuthenticated,
   onNavigateToForgotPassword,
+  onNavigateToRegister,
 }: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -366,7 +368,7 @@ export default function Auth({
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••���•"
+                        placeholder="••••••����•"
                         value={loginData.password}
                         onChange={(e) =>
                           setLoginData({
