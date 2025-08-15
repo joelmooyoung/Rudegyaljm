@@ -499,12 +499,17 @@ export default function StoryDetail({
             "[ADMIN AUDIO] Base64 conversion successful, length:",
             result.length,
             "size:",
-            base64SizeMB + "MB"
+            base64SizeMB + "MB",
           );
 
           // Check if base64 is too large for network request
-          if (result.length > 10 * 1024 * 1024) { // 10MB limit
-            reject(new Error(`Base64 audio too large: ${base64SizeMB}MB. Use a smaller file.`));
+          if (result.length > 10 * 1024 * 1024) {
+            // 10MB limit
+            reject(
+              new Error(
+                `Base64 audio too large: ${base64SizeMB}MB. Use a smaller file.`,
+              ),
+            );
             return;
           }
 
