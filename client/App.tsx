@@ -65,12 +65,23 @@ const App = () => {
     const resetToken = urlParams.get("token");
     const urlHash = window.location.hash.substring(1); // Remove the #
 
+    // Debug logging for password reset detection
+    console.log("🔍 [APP] URL debugging:", {
+      fullUrl: window.location.href,
+      pathname: window.location.pathname,
+      search: window.location.search,
+      resetToken: resetToken,
+      resetPasswordParam: urlParams.get("reset-password"),
+      allParams: Object.fromEntries(urlParams.entries())
+    });
+
     // Handle direct email test via hash OR parameter
     const emailTest =
       urlParams.get("email-test") === "true" ||
       urlHash === "direct-email-test" ||
       urlParams.get("test") === "email";
     if (emailTest) {
+      console.log("🔍 [APP] Detected email test, showing direct email test");
       setCurrentView("direct-email-test");
       setIsAgeVerified(true); // Allow access without age verification
       setIsLoading(false);
@@ -80,6 +91,7 @@ const App = () => {
     // Handle password reset from email link
     const resetPasswordParam = urlParams.get("reset-password");
     if (resetToken && (resetPasswordParam === "true" || window.location.pathname.includes("reset-password"))) {
+      console.log("🔍 [APP] Detected password reset URL, showing reset password form");
       setCurrentView("reset-password");
       setIsAgeVerified(true); // Allow access to reset password without age verification
       setIsLoading(false);
