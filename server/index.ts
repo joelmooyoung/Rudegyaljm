@@ -817,10 +817,15 @@ export function createServer() {
   app.all("/api/force-update-password", async (req, res) => {
     console.log(`[SERVER] Force update password request`);
     try {
-      const { default: handler } = await import("../api/force-update-password.js");
+      const { default: handler } = await import(
+        "../api/force-update-password.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import force-update-password handler:`, error);
+      console.error(
+        `[SERVER] Failed to import force-update-password handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Force update password handler not available",

@@ -3,7 +3,9 @@ import { connectToDatabase } from "../lib/mongodb.js";
 import { User } from "../models/index.js";
 
 export default async function handler(req, res) {
-  console.log(`[FORCE UPDATE PASSWORD] ${req.method} /api/force-update-password`);
+  console.log(
+    `[FORCE UPDATE PASSWORD] ${req.method} /api/force-update-password`,
+  );
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -59,7 +61,9 @@ export default async function handler(req, res) {
     user.resetTokenExpiry = undefined;
     await user.save();
 
-    console.log(`[FORCE UPDATE PASSWORD] ✅ Password updated successfully for: ${user.email}`);
+    console.log(
+      `[FORCE UPDATE PASSWORD] ✅ Password updated successfully for: ${user.email}`,
+    );
 
     // Test the new password works
     const testResult = await bcrypt.compare(newPassword, user.password);
@@ -73,18 +77,17 @@ export default async function handler(req, res) {
         type: user.type,
         active: user.active,
         lastLogin: user.lastLogin,
-        passwordTestPassed: testResult
+        passwordTestPassed: testResult,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[FORCE UPDATE PASSWORD] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update password",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }

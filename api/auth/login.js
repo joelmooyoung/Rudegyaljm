@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       type: user?.type,
       active: user?.active,
       hasPassword: !!user?.password,
-      passwordLength: user?.password?.length || 0
+      passwordLength: user?.password?.length || 0,
     });
 
     if (user && user.active) {
@@ -128,7 +128,7 @@ export default async function handler(req, res) {
         type: localUser?.type,
         active: localUser?.active,
         hasPassword: !!localUser?.password,
-        passwordLength: localUser?.password?.length || 0
+        passwordLength: localUser?.password?.length || 0,
       });
 
       const user = await authenticateUser(email, password);
