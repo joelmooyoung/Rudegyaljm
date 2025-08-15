@@ -56,7 +56,10 @@ export default async function handler(req, res) {
             logId: `success_${Date.now()}`,
             userId: user.userId,
             username: user.username,
-            ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown",
+            ip:
+              req.headers["x-forwarded-for"] ||
+              req.socket.remoteAddress ||
+              "unknown",
             country: "Unknown",
             userAgent: req.headers["user-agent"] || "Unknown",
             success: true,
@@ -88,11 +91,16 @@ export default async function handler(req, res) {
       }
     }
   } catch (dbError) {
-    console.error("[LOGIN API] Database failed, trying local users:", dbError.message);
+    console.error(
+      "[LOGIN API] Database failed, trying local users:",
+      dbError.message,
+    );
 
     // Fallback to local users when database is unavailable
     try {
-      const { authenticateUser, initializeLocalUsers } = await import("../../lib/local-users.js");
+      const { authenticateUser, initializeLocalUsers } = await import(
+        "../../lib/local-users.js"
+      );
 
       // Initialize local users if needed
       await initializeLocalUsers();
@@ -122,7 +130,10 @@ export default async function handler(req, res) {
         });
       }
     } catch (localError) {
-      console.error("[LOGIN API] Local authentication failed:", localError.message);
+      console.error(
+        "[LOGIN API] Local authentication failed:",
+        localError.message,
+      );
     }
   }
 

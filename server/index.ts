@@ -817,10 +817,15 @@ export function createServer() {
   app.post("/api/auth/forgot-password", async (req, res) => {
     console.log(`[SERVER] Forgot password request`);
     try {
-      const { default: handler } = await import("../api/auth/forgot-password.js");
+      const { default: handler } = await import(
+        "../api/auth/forgot-password.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import forgot-password handler:`, error);
+      console.error(
+        `[SERVER] Failed to import forgot-password handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Forgot password handler not available",
