@@ -22,51 +22,71 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log("[LIST USERS API] Connecting to database...");
-    await connectToDatabase();
-    console.log("[LIST USERS API] Database connected successfully");
+    // Try database first
+    try {
+      console.log("[LIST USERS API] Connecting to database...");
+      await connectToDatabase();
+      console.log("[LIST USERS API] Database connected successfully");
 
-    // Get all users from database
-    const users = await User.find({})
-      .select("userId username email type active createdAt lastLogin loginCount")
-      .sort({ createdAt: -1 })
-      .lean();
+      // Get all users from database
+      const users = await User.find({})
+        .select("userId username email type active createdAt lastLogin loginCount")
+        .sort({ createdAt: -1 })
+        .lean();
 
-    console.log(`[LIST USERS API] Found ${users.length} users in database`);
+      console.log(`[LIST USERS API] Found ${users.length} users in database`);
 
-    // Transform and format user data (excluding passwords for security)
-    const userList = users.map((user) => ({
-      id: user.userId || user._id.toString(),
-      email: user.email,
-      username: user.username,
-      accessLevel: user.type || "free", // admin, premium, free
-      isActive: user.active !== false,
-      createdAt: user.createdAt,
-      lastLogin: user.lastLogin,
-      loginCount: user.loginCount || 0,
-    }));
+      // Transform and format user data (excluding passwords for security)
+      const userList = users.map((user) => ({
+        id: user.userId || user._id.toString(),
+        email: user.email,
+        username: user.username,
+        accessLevel: user.type || "free", // admin, premium, free
+        isActive: user.active !== false,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount || 0,
+      }));
 
-    console.log("[LIST USERS API] ✅ User list retrieved successfully");
+      console.log("[LIST USERS API] ✅ User list retrieved from database");
 
-    return res.status(200).json({
-      success: true,
-      message: `Found ${userList.length} users`,
-      users: userList,
-      hardcodedAccounts: [
-        {
-          email: "admin@rudegyalconfessions.com",
-          accessLevel: "admin",
-          source: "hardcoded",
-          password: "admin123"
-        },
-        {
-          email: "joelmooyoung@me.com", 
-          accessLevel: "admin",
-          source: "hardcoded",
-          password: "password123"
-        }
-      ]
-    });
+      return res.status(200).json({
+        success: true,
+        message: `Found ${userList.length} database users`,
+        users: userList,
+        source: "database",
+        hardcodedAccounts: []
+      });
+    } catch (dbError) {
+      console.error("[LIST USERS API] Database failed, trying local users:", dbError.message);
+
+      // Fallback to local users
+      const { getAllUsers, initializeLocalUsers } = await import("../../lib/local-users.js");
+
+      await initializeLocalUsers();
+      const localUsers = await getAllUsers();
+
+      const userList = localUsers.map((user) => ({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        accessLevel: user.type || "free",
+        isActive: user.active !== false,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        loginCount: user.loginCount || 0,
+      }));
+
+      console.log(`[LIST USERS API] ✅ Found ${userList.length} local users`);
+
+      return res.status(200).json({
+        success: true,
+        message: `Found ${userList.length} local users (database unavailable)`,
+        users: userList,
+        source: "local",
+        hardcodedAccounts: []
+      });
+    }
   } catch (error) {
     console.error("[LIST USERS API] ❌ Error:", error);
     return res.status(500).json({
