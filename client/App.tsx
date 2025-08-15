@@ -307,6 +307,10 @@ const App = () => {
     setCurrentView("auth");
   };
 
+  const handleNavigateToRegister = () => {
+    setCurrentView("register-with-subscription");
+  };
+
   const handleSaveStory = async (storyData: Partial<Story>): Promise<void> => {
     console.log("[STORY SAVE] Saving story:", {
       ...storyData,
