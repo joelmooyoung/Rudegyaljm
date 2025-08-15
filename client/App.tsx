@@ -26,6 +26,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EmailTest from "./pages/admin/EmailTest";
 import DirectEmailTest from "./pages/DirectEmailTest";
+import RegisterWithSubscription from "./pages/RegisterWithSubscription";
 
 import { User, Story } from "@shared/api";
 
