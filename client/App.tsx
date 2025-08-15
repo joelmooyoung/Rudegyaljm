@@ -321,17 +321,27 @@ const App = () => {
         });
       }
 
+      console.log("[STORY SAVE] Response status:", response.status);
+      console.log("[STORY SAVE] Response headers:", Object.fromEntries(response.headers.entries()));
+
       if (response.ok) {
         const savedStory = await response.json();
-        console.log("Story saved successfully:", savedStory);
+        console.log("[STORY SAVE] ✅ Story saved successfully:", savedStory);
+        alert("Story saved successfully!");
         // Navigate back to story maintenance
         setCurrentView("admin-stories");
       } else {
         const errorData = await response.text();
-        console.error("Failed to save story:", response.statusText, errorData);
-        alert(
-          `Failed to save story: ${response.statusText}. Check console for details.`,
-        );
+        console.error("[STORY SAVE] ❌ Failed to save story:", response.status, response.statusText, errorData);
+
+        let errorMessage = `Failed to save story: ${response.status} ${response.statusText}`;
+        if (response.status === 413) {
+          errorMessage += "\n\nThe story data (including audio) is too large. Please use a smaller audio file.";
+        } else if (response.status === 0) {
+          errorMessage += "\n\nNetwork error - the request may be too large or there's a connection issue.";
+        }
+
+        alert(errorMessage);
       }
     } catch (error) {
       console.error("Error saving story:", error);
