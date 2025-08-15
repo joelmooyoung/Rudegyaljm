@@ -813,6 +813,22 @@ export function createServer() {
     }
   });
 
+  // Add force update password route
+  app.all("/api/force-update-password", async (req, res) => {
+    console.log(`[SERVER] Force update password request`);
+    try {
+      const { default: handler } = await import("../api/force-update-password.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import force-update-password handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Force update password handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add debug user password route
   app.all("/api/debug-user-password", async (req, res) => {
     console.log(`[SERVER] Debug user password request`);
