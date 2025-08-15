@@ -247,7 +247,7 @@ const App = () => {
     setCurrentView("auth");
   };
 
-  const handleSaveStory = async (storyData: Partial<Story>) => {
+  const handleSaveStory = async (storyData: Partial<Story>): Promise<void> => {
     console.log("[STORY SAVE] Saving story:", {
       ...storyData,
       audioUrl: storyData.audioUrl
