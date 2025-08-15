@@ -105,8 +105,24 @@ const App = () => {
         "🔍 [APP] Detected password reset URL, showing reset password form",
       );
       console.log("🔍 [APP] Reset token found:", resetToken?.substring(0, 8) + "...");
+
+      // Store in session so it persists through any navigation
+      sessionStorage.setItem("reset_password_mode", "true");
+      sessionStorage.setItem("reset_token", resetToken);
+
       setCurrentView("reset-password");
       setIsAgeVerified(true); // Allow access to reset password without age verification
+      setIsLoading(false);
+      return;
+    }
+
+    // Check session storage for reset mode (in case URL was lost)
+    const sessionResetMode = sessionStorage.getItem("reset_password_mode");
+    const sessionResetToken = sessionStorage.getItem("reset_token");
+    if (sessionResetMode === "true" && sessionResetToken) {
+      console.log("🔍 [APP] Found reset mode in session storage");
+      setCurrentView("reset-password");
+      setIsAgeVerified(true);
       setIsLoading(false);
       return;
     }
@@ -116,6 +132,8 @@ const App = () => {
       console.log(
         "🔍 [APP] Found token without reset parameter, assuming password reset",
       );
+      sessionStorage.setItem("reset_password_mode", "true");
+      sessionStorage.setItem("reset_token", resetToken);
       setCurrentView("reset-password");
       setIsAgeVerified(true);
       setIsLoading(false);
