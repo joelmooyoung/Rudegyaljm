@@ -117,7 +117,22 @@ export default async function handler(req, res) {
       await initializeLocalUsers();
 
       console.log("[LOGIN API] Trying local authentication");
+
+      // First check if user exists in local storage
+      const { getUserByEmail } = await import("../../lib/local-users.js");
+      const localUser = await getUserByEmail(email);
+      console.log(`[LOGIN API] Local user lookup result:`, {
+        found: !!localUser,
+        email: localUser?.email,
+        username: localUser?.username,
+        type: localUser?.type,
+        active: localUser?.active,
+        hasPassword: !!localUser?.password,
+        passwordLength: localUser?.password?.length || 0
+      });
+
       const user = await authenticateUser(email, password);
+      console.log(`[LOGIN API] Local authentication result: ${!!user}`);
 
       if (user) {
         console.log("[LOGIN API] ✅ Local authentication successful");
