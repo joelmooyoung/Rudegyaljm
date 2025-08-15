@@ -558,9 +558,12 @@ export default function Auth({
                     <Input
                       id="confirm-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••���•••"
+                      placeholder="••••����•••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      autoComplete="new-password"
                       required
                     />
                   </div>
