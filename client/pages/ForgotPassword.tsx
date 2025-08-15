@@ -181,6 +181,9 @@ export default function ForgotPassword({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-11 py-3 text-lg font-serif bg-input/80 seductive-border focus:passionate-glow transition-all duration-300"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    autoComplete="email"
                     required
                   />
                 </div>
