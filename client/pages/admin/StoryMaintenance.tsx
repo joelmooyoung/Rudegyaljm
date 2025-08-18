@@ -420,16 +420,18 @@ export default function StoryMaintenance({
                         </p>
 
                         <div className="flex flex-wrap gap-1">
-                          {story.tags.slice(0, 3).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className="text-xs bg-category-tag border-border/50"
-                            >
-                              {tag}
-                            </Badge>
+                          {Array.isArray(story.tags) && story.tags.slice(0, 3).map((tag, index) => (
+                            tag && (
+                              <Badge
+                                key={`${story.id}-tag-${index}`}
+                                variant="outline"
+                                className="text-xs bg-category-tag border-border/50"
+                              >
+                                {tag}
+                              </Badge>
+                            )
                           ))}
-                          {story.tags.length > 3 && (
+                          {Array.isArray(story.tags) && story.tags.length > 3 && (
                             <Badge variant="outline" className="text-xs">
                               +{story.tags.length - 3}
                             </Badge>
