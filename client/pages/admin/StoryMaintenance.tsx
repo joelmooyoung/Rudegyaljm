@@ -29,6 +29,7 @@ import {
   Star,
   Calendar,
   MessageSquare,
+  Heart,
 } from "lucide-react";
 import { Story } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
@@ -54,8 +55,8 @@ export default function StoryMaintenance({
 
   // Fetch stories from server with real stats
   const fetchStories = async () => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const isBuilderPreview = window.location.hostname.includes("builder.my");
       const apiUrl = isBuilderPreview
         ? "https://rudegyaljm-amber.vercel.app/api/stories"
@@ -79,8 +80,9 @@ export default function StoryMaintenance({
         }
 
         // Convert date strings back to Date objects and fetch real stats
+        const validStories = storiesArray.filter(story => story && story.id && story.title);
         const storiesWithDates = await Promise.all(
-          storiesArray.map(async (story: any) => {
+          validStories.map(async (story: any) => {
             const baseStory = {
               ...story,
               title: story.title || "Untitled",
@@ -88,6 +90,11 @@ export default function StoryMaintenance({
               tags: Array.isArray(story.tags) ? story.tags : [],
               createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
               updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
+              viewCount: story.viewCount || 0,
+              likeCount: story.likeCount || 0,
+              rating: story.rating || 0,
+              ratingCount: story.ratingCount || 0,
+              commentCount: story.commentCount || 0,
             };
 
             // Fetch real stats for each story
@@ -96,11 +103,11 @@ export default function StoryMaintenance({
               if (statsResponse.ok) {
                 const statsData = await statsResponse.json();
                 if (statsData.success) {
-                  baseStory.viewCount = statsData.stats.viewCount;
-                  baseStory.likeCount = statsData.stats.likeCount;
-                  baseStory.rating = statsData.stats.rating;
-                  baseStory.ratingCount = statsData.stats.ratingCount;
-                  baseStory.commentCount = statsData.stats.commentCount;
+                  baseStory.viewCount = statsData.stats.viewCount || 0;
+                  baseStory.likeCount = statsData.stats.likeCount || 0;
+                  baseStory.rating = statsData.stats.rating || 0;
+                  baseStory.ratingCount = statsData.stats.ratingCount || 0;
+                  baseStory.commentCount = statsData.stats.commentCount || 0;
                 }
               }
             } catch (statsError) {
@@ -114,9 +121,11 @@ export default function StoryMaintenance({
         setStories(storiesWithDates);
       } else {
         console.error("Failed to fetch stories:", response.statusText);
+        setStories([]);
       }
     } catch (error) {
       console.error("Error fetching stories:", error);
+      setStories([]);
     } finally {
       setIsLoading(false);
     }
@@ -295,12 +304,8 @@ export default function StoryMaintenance({
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredStories
+                .filter((story) => story && story.id && story.title)
                 .map((story) => {
-                  // Safety check to ensure story has all required properties
-                  if (!story || !story.id) {
-                    return null;
-                  }
-
                   return (
                     <Card
                       key={story.id}
