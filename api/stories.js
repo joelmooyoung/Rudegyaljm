@@ -61,27 +61,42 @@ export default async function handler(req, res) {
           .sort({ createdAt: -1 })
           .select("-__v");
 
-        // Transform MongoDB documents to frontend format
-        const transformedStories = stories.map((story) => ({
-          id: story.storyId,
-          title: story.title,
-          author: story.author,
-          excerpt: story.excerpt || story.content.substring(0, 200) + "...",
-          content: story.content,
-          tags: story.tags,
-          category: story.category,
-          accessLevel: story.accessLevel || "free",
-          isPublished: story.published,
-          rating: story.averageRating,
-          ratingCount: story.ratingCount,
-          viewCount: story.views,
-          commentCount: story.commentCount || 0,
-          likeCount: story.likeCount || 0,
-          image: story.image, // Use actual image from database
-          audioUrl: story.audioUrl, // Use actual audio from database
-          createdAt: story.createdAt,
-          updatedAt: story.updatedAt,
-        }));
+        // Get real statistics from story-stats.json
+        const allStats = await getAllStats();
+        console.log(`[STORIES API] Loaded statistics for ${Object.keys(allStats).length} stories`);
+
+        // Transform MongoDB documents to frontend format and merge with real stats
+        const transformedStories = stories.map((story) => {
+          const storyStats = allStats[story.storyId] || {
+            viewCount: 0,
+            likeCount: 0,
+            rating: 0,
+            ratingCount: 0,
+            commentCount: 0,
+          };
+
+          return {
+            id: story.storyId,
+            title: story.title,
+            author: story.author,
+            excerpt: story.excerpt || story.content.substring(0, 200) + "...",
+            content: story.content,
+            tags: story.tags,
+            category: story.category,
+            accessLevel: story.accessLevel || "free",
+            isPublished: story.published,
+            // Use real statistics from story-stats.json instead of MongoDB
+            rating: storyStats.rating || 0,
+            ratingCount: storyStats.ratingCount || 0,
+            viewCount: storyStats.viewCount || 0,
+            commentCount: storyStats.commentCount || 0,
+            likeCount: storyStats.likeCount || 0,
+            image: story.image, // Use actual image from database
+            audioUrl: story.audioUrl, // Use actual audio from database
+            createdAt: story.createdAt,
+            updatedAt: story.updatedAt,
+          };
+        });
 
         console.log(
           `[STORIES API] Found ${transformedStories.length} published stories`,
