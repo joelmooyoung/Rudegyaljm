@@ -1,3 +1,5 @@
+import { getStoryStats, getUserInteractionStatus } from "../../../lib/story-stats.js";
+
 // Story Stats API
 export default async function handler(req, res) {
   const { id } = req.query || {};
@@ -20,21 +22,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(`[STORY STATS API] Getting stats for story ${id}`);
+    console.log(`[STORY STATS API] Getting real stats for story ${id}`);
 
-    // In development, return mock stats
-    // In production with database, this would query actual stats
+    // Get real stats from storage
+    const stats = await getStoryStats(id);
+
+    // Get user interaction status if userId provided
+    const { userId } = req.query;
+    let userInteraction = null;
+
+    if (userId) {
+      userInteraction = await getUserInteractionStatus(id, userId);
+    }
+
+    console.log(`[STORY STATS API] ✅ Stats for story ${id}:`, {
+      views: stats.viewCount,
+      likes: stats.likeCount,
+      rating: stats.rating,
+      comments: stats.commentCount,
+    });
 
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: Math.floor(Math.random() * 1000) + 100,
-        likeCount: Math.floor(Math.random() * 50) + 5,
-        rating: parseFloat((Math.random() * 2 + 3).toFixed(1)), // 3.0 - 5.0
-        ratingCount: Math.floor(Math.random() * 20) + 3,
-        commentCount: Math.floor(Math.random() * 15) + 1,
+        viewCount: stats.viewCount,
+        likeCount: stats.likeCount,
+        rating: stats.rating,
+        ratingCount: stats.ratingCount,
+        commentCount: stats.commentCount,
       },
+      userInteraction,
       storyId: id,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error(`[STORY STATS API] ❌ Error for story ${id}:`, error);
