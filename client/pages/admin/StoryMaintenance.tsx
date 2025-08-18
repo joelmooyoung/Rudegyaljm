@@ -302,6 +302,19 @@ export default function StoryMaintenance({
 
         {/* Stories Grid */}
         <div className="max-h-[70vh] overflow-y-auto">
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+              <p className="text-destructive font-medium">Failed to load initial data: {error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchStories}
+                className="mt-2"
+              >
+                Retry
+              </Button>
+            </div>
+          )}
           {isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
