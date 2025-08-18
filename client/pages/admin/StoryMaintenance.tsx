@@ -58,6 +58,7 @@ export default function StoryMaintenance({
   const fetchStories = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const isBuilderPreview = window.location.hostname.includes("builder.my");
       const apiUrl = isBuilderPreview
         ? "https://rudegyaljm-amber.vercel.app/api/stories"
