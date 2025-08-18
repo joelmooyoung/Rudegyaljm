@@ -146,11 +146,14 @@ export default function StoryMaintenance({
     // Defensive programming - ensure story has required properties
     if (
       !story ||
+      !story.id ||
       !story.title ||
       !story.author ||
       !story.tags ||
-      !Array.isArray(story.tags)
+      !Array.isArray(story.tags) ||
+      !story.category
     ) {
+      console.warn('Skipping invalid story:', story);
       return false;
     }
 
