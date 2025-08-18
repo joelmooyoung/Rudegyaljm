@@ -54,20 +54,40 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     const loadInitialData = async () => {
       try {
         // Increment view count
-        const viewResponse = await fetch(`/api/stories/${story.id}/view`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+        try {
+          const viewResponse = await fetch(`/api/stories/${encodeURIComponent(story.id)}/view`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
 
-        // Update local view count
-        if (viewResponse.ok) {
-          const viewResult = await viewResponse.json();
-          setStoryStats((prev) => ({
-            ...prev,
-            viewCount: viewResult.data?.viewCount || prev.viewCount + 1,
-          }));
-        } else {
-          // Fallback to local increment if API fails
+          // Update local view count
+          if (viewResponse.ok) {
+            const responseText = await viewResponse.text();
+            try {
+              const viewResult = JSON.parse(responseText);
+              setStoryStats((prev) => ({
+                ...prev,
+                viewCount: viewResult.data?.viewCount || prev.viewCount + 1,
+              }));
+            } catch (jsonError) {
+              console.warn("Failed to parse view count JSON response:", responseText);
+              // Fallback to local increment
+              setStoryStats((prev) => ({
+                ...prev,
+                viewCount: prev.viewCount + 1,
+              }));
+            }
+          } else {
+            console.warn(`View count API returned ${viewResponse.status}:`, await viewResponse.text());
+            // Fallback to local increment if API fails
+            setStoryStats((prev) => ({
+              ...prev,
+              viewCount: prev.viewCount + 1,
+            }));
+          }
+        } catch (viewError) {
+          console.error("Error updating view count:", viewError);
+          // Fallback to local increment
           setStoryStats((prev) => ({
             ...prev,
             viewCount: prev.viewCount + 1,
