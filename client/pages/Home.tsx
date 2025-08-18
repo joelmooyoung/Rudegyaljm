@@ -578,7 +578,7 @@ export default function Home({
               <div className="text-center">
                 <div className="text-2xl font-bold text-passion-gradient">
                   {stories
-                    .reduce((sum, story) => sum + story.viewCount, 0)
+                    .reduce((sum, story) => sum + (story.likeCount || 0), 0)
                     .toLocaleString()}
                 </div>
                 <div className="text-muted-foreground">Hearts Racing</div>
