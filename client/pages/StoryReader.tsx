@@ -419,9 +419,15 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {story.createdAt instanceof Date
-                      ? story.createdAt.toLocaleDateString()
-                      : new Date(story.createdAt).toLocaleDateString()}
+                    {(() => {
+                      try {
+                        return story.createdAt instanceof Date
+                          ? story.createdAt.toLocaleDateString()
+                          : new Date(story.createdAt).toLocaleDateString();
+                      } catch {
+                        return "Recent";
+                      }
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
