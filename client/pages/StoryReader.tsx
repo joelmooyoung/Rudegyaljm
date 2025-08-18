@@ -109,10 +109,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             });
 
             if (readResponse.ok) {
-              const readResult = await readResponse.json();
-              console.log(
-                `📚 Story read recorded: User ${user.username} has read ${readResult.data.totalReads} stories total`,
-              );
+              const responseText = await readResponse.text();
+              try {
+                const readResult = JSON.parse(responseText);
+                console.log(
+                  `📚 Story read recorded: User ${user.username} has read ${readResult.data?.totalReads || 'unknown'} stories total`,
+                );
+              } catch (jsonError) {
+                console.warn("Failed to parse read response JSON:", responseText);
+                console.log(`📚 Story read recorded for user ${user.username}`);
+              }
+            } else {
+              console.warn(`User story read API returned ${readResponse.status}:`, await readResponse.text());
             }
           } catch (error) {
             console.error("Failed to record story read:", error);
