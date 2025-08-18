@@ -101,35 +101,71 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         }
 
         // Load comments using working API
-        console.log("Loading comments for story:", story.id);
-        const commentsResponse = await fetch(
-          `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${encodeURIComponent(story.id)}`,
-        );
-        if (commentsResponse.ok) {
-          const commentsResponseData = await commentsResponse.json();
-          const commentsData =
-            commentsResponseData.data || commentsResponseData || [];
-          console.log("Loaded comments for story:", commentsData);
-          setComments(
-            commentsData
-              .filter((comment: any) => comment && comment.id)
-              .map((comment: any) => ({
-                ...comment,
-                id: comment.id || `comment-${Date.now()}-${Math.random()}`,
-                createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
-                updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
-              })),
+        try {
+          console.log("Loading comments for story:", story.id);
+          const commentsResponse = await fetch(
+            `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${encodeURIComponent(story.id)}`,
           );
+          if (commentsResponse.ok) {
+            const responseText = await commentsResponse.text();
+            let commentsResponseData;
+            try {
+              commentsResponseData = JSON.parse(responseText);
+            } catch (jsonError) {
+              console.warn("Failed to parse comments JSON response:", responseText);
+              commentsResponseData = [];
+            }
+
+            const commentsData = Array.isArray(commentsResponseData)
+              ? commentsResponseData
+              : (commentsResponseData?.data || commentsResponseData || []);
+
+            console.log("Loaded comments for story:", commentsData);
+            setComments(
+              commentsData
+                .filter((comment: any) => comment && comment.id)
+                .map((comment: any) => ({
+                  ...comment,
+                  id: comment.id || `comment-${Date.now()}-${Math.random()}`,
+                  createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
+                  updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
+                })),
+            );
+          } else {
+            console.warn(`Comments API returned ${commentsResponse.status}:`, await commentsResponse.text());
+            setComments([]);
+          }
+        } catch (commentsError) {
+          console.error("Error loading comments:", commentsError);
+          setComments([]);
         }
 
         // Load user interaction (rating and like status)
-        const interactionResponse = await fetch(
-          `/api/stories/${story.id}/user-interaction?userId=${user.id}`,
-        );
-        if (interactionResponse.ok) {
-          const interactionData = await interactionResponse.json();
-          setUserRating(interactionData.rating || 0);
-          setIsLiked(interactionData.liked || false);
+        try {
+          const interactionResponse = await fetch(
+            `/api/stories/${story.id}/user-interaction?userId=${encodeURIComponent(user.id)}`,
+          );
+          if (interactionResponse.ok) {
+            const responseText = await interactionResponse.text();
+            let interactionData;
+            try {
+              interactionData = JSON.parse(responseText);
+              setUserRating(interactionData.rating || 0);
+              setIsLiked(interactionData.liked || false);
+            } catch (jsonError) {
+              console.warn("Failed to parse interaction JSON response:", responseText);
+              setUserRating(0);
+              setIsLiked(false);
+            }
+          } else {
+            console.warn(`User interaction API returned ${interactionResponse.status}:`, await interactionResponse.text());
+            setUserRating(0);
+            setIsLiked(false);
+          }
+        } catch (interactionError) {
+          console.error("Error loading user interaction:", interactionError);
+          setUserRating(0);
+          setIsLiked(false);
         }
       } catch (error) {
         console.error("Failed to load initial data:", error);
