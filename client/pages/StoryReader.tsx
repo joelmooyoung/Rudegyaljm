@@ -432,17 +432,17 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  <span>{storyStats.viewCount.toLocaleString()} views</span>
+                  <span>{(storyStats.viewCount || 0).toLocaleString()} views</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-rating-star fill-current" />
                   <span>
-                    {storyStats.rating} ({storyStats.ratingCount} ratings)
+                    {storyStats.rating || 0} ({storyStats.ratingCount || 0} ratings)
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageCircle className="h-4 w-4" />
-                  <span>{storyStats.commentCount} comments</span>
+                  <span>{storyStats.commentCount || 0} comments</span>
                 </div>
                 <Badge variant="outline">{story.category}</Badge>
               </div>
