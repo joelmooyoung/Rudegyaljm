@@ -52,7 +52,7 @@ export default function StoryMaintenance({
 
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
-  // Fetch stories from server
+  // Fetch stories from server with real stats
   const fetchStories = async () => {
     setIsLoading(true);
     try {
@@ -78,15 +78,39 @@ export default function StoryMaintenance({
           storiesArray = [];
         }
 
-        // Convert date strings back to Date objects and ensure data integrity
-        const storiesWithDates = storiesArray.map((story: any) => ({
-          ...story,
-          title: story.title || "Untitled",
-          author: story.author || "Unknown Author",
-          tags: Array.isArray(story.tags) ? story.tags : [],
-          createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
-          updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
-        }));
+        // Convert date strings back to Date objects and fetch real stats
+        const storiesWithDates = await Promise.all(
+          storiesArray.map(async (story: any) => {
+            const baseStory = {
+              ...story,
+              title: story.title || "Untitled",
+              author: story.author || "Unknown Author",
+              tags: Array.isArray(story.tags) ? story.tags : [],
+              createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
+              updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
+            };
+
+            // Fetch real stats for each story
+            try {
+              const statsResponse = await fetch(`/api/stories/${story.id}/stats`);
+              if (statsResponse.ok) {
+                const statsData = await statsResponse.json();
+                if (statsData.success) {
+                  baseStory.viewCount = statsData.stats.viewCount;
+                  baseStory.likeCount = statsData.stats.likeCount;
+                  baseStory.rating = statsData.stats.rating;
+                  baseStory.ratingCount = statsData.stats.ratingCount;
+                  baseStory.commentCount = statsData.stats.commentCount;
+                }
+              }
+            } catch (statsError) {
+              console.warn(`Failed to fetch stats for story ${story.id}:`, statsError);
+            }
+
+            return baseStory;
+          })
+        );
+
         setStories(storiesWithDates);
       } else {
         console.error("Failed to fetch stories:", response.statusText);
