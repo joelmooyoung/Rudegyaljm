@@ -158,25 +158,26 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
   const handleLike = async () => {
     try {
+      const action = isLiked ? 'unlike' : 'like';
       const response = await fetch(`/api/stories/${story.id}/like`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({
+          userId: user.id,
+          action: action
+        }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        setIsLiked(result.liked);
+        setIsLiked(result.action === 'like');
 
         // Update local stats immediately
         setStoryStats((prev) => ({
           ...prev,
-          // likeCount should reflect the actual count from the API response
-          likeCount:
-            result.likeCount ||
-            (result.liked ? prev.likeCount + 1 : prev.likeCount - 1),
+          likeCount: result.newLikeCount || prev.likeCount,
         }));
 
         // Also refresh story stats to sync with server
@@ -201,7 +202,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          score: rating,
+          rating: rating,
           userId: user.id,
         }),
       });
@@ -211,13 +212,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         setUserRating(rating);
 
         // Update local stats immediately with API response data
-        if (result.data) {
-          setStoryStats((prev) => ({
-            ...prev,
-            rating: result.data.averageRating || prev.rating,
-            ratingCount: result.data.ratingCount || prev.ratingCount,
-          }));
-        }
+        setStoryStats((prev) => ({
+          ...prev,
+          rating: result.newAverageRating || prev.rating,
+          ratingCount: result.newRatingCount || prev.ratingCount,
+        }));
 
         // Also refresh story stats to sync with server
         await refreshStoryStats();
