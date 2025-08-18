@@ -813,6 +813,22 @@ export function createServer() {
     }
   });
 
+  // Add refresh stats route
+  app.all("/api/admin/refresh-stats", async (req, res) => {
+    console.log(`[SERVER] Refresh stats request`);
+    try {
+      const { default: handler } = await import("../api/admin/refresh-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import refresh-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Refresh stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add simple user check route
   app.all("/api/simple-user-check", async (req, res) => {
     console.log(`[SERVER] Simple user check request`);
