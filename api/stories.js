@@ -1,6 +1,7 @@
 // Production-ready Stories API with MongoDB integration
 import { connectToDatabase } from "../lib/mongodb.js";
 import { Story } from "../models/index.js";
+import { getAllStats } from "../lib/story-stats.js";
 
 export default async function handler(req, res) {
   console.log(`[STORIES API] ${req.method} /api/stories`);
