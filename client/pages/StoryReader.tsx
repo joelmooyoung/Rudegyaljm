@@ -442,15 +442,17 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {story.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="text-xs bg-category-tag"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+                {Array.isArray(story.tags) && story.tags
+                  .filter((tag) => tag && typeof tag === 'string' && tag.trim())
+                  .map((tag, index) => (
+                    <Badge
+                      key={`${story.id}-tag-${index}-${tag}`}
+                      variant="outline"
+                      className="text-xs bg-category-tag"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
               </div>
 
               {story.excerpt && (
