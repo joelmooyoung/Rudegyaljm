@@ -103,7 +103,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         // Load comments using working API
         console.log("Loading comments for story:", story.id);
         const commentsResponse = await fetch(
-          `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${story.id}`,
+          `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${encodeURIComponent(story.id)}`,
         );
         if (commentsResponse.ok) {
           const commentsResponseData = await commentsResponse.json();
@@ -111,11 +111,14 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             commentsResponseData.data || commentsResponseData || [];
           console.log("Loaded comments for story:", commentsData);
           setComments(
-            commentsData.map((comment: any) => ({
-              ...comment,
-              createdAt: new Date(comment.createdAt),
-              updatedAt: new Date(comment.updatedAt),
-            })),
+            commentsData
+              .filter((comment: any) => comment && comment.id)
+              .map((comment: any) => ({
+                ...comment,
+                id: comment.id || `comment-${Date.now()}-${Math.random()}`,
+                createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
+                updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
+              })),
           );
         }
 
@@ -130,6 +133,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         }
       } catch (error) {
         console.error("Failed to load initial data:", error);
+        // Set default empty states to prevent rendering errors
+        setComments([]);
+        setIsLiked(false);
+        setUserRating(0);
       }
     };
 
@@ -497,7 +504,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             <CardContent>
               <div
                 className="prose prose-lg max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: story.content }}
+                dangerouslySetInnerHTML={{
+                  __html: (story.content || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+                }}
               />
             </CardContent>
           </Card>
@@ -582,10 +591,15 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                             {comment.username}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {comment.createdAt &&
-                            !isNaN(new Date(comment.createdAt).getTime())
-                              ? new Date(comment.createdAt).toLocaleDateString()
-                              : "Recent"}
+                            {(() => {
+                              try {
+                                return comment.createdAt && !isNaN(new Date(comment.createdAt).getTime())
+                                  ? new Date(comment.createdAt).toLocaleDateString()
+                                  : "Recent";
+                              } catch {
+                                return "Recent";
+                              }
+                            })()}
                           </span>
                           {comment.isEdited && (
                             <Badge variant="outline" className="text-xs">
