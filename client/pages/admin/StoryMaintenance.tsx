@@ -122,11 +122,15 @@ export default function StoryMaintenance({
 
         setStories(storiesWithDates);
       } else {
-        console.error("Failed to fetch stories:", response.statusText);
+        const errorMsg = `Failed to fetch stories: ${response.status} ${response.statusText}`;
+        console.error(errorMsg);
+        setError(errorMsg);
         setStories([]);
       }
     } catch (error) {
-      console.error("Error fetching stories:", error);
+      const errorMsg = `Error fetching stories: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      console.error(errorMsg);
+      setError(errorMsg);
       setStories([]);
     } finally {
       setIsLoading(false);
