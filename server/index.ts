@@ -961,6 +961,22 @@ export function createServer() {
     }
   });
 
+  // Add recreate stat fields route
+  app.post("/api/recreate-stat-fields", async (req, res) => {
+    console.log(`[SERVER] Recreate stat fields request`);
+    try {
+      const { default: handler } = await import("../api/recreate-stat-fields.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import recreate-stat-fields handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Recreate stat fields handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
