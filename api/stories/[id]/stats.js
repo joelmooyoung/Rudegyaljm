@@ -25,8 +25,23 @@ export default async function handler(req, res) {
   try {
     console.log(`[STORY STATS API] Getting production stats for story ${id}`);
 
-    // Connect to production database
-    await connectToDatabase();
+    // Connect to production database (with connection checking)
+    try {
+      await connectToDatabase();
+    } catch (connectionError) {
+      console.warn("[STORY STATS API] Database connection failed:", connectionError.message);
+      return res.status(503).json({
+        success: false,
+        message: "Database temporarily unavailable",
+        stats: {
+          viewCount: 0,
+          likeCount: 0,
+          rating: 0,
+          ratingCount: 0,
+          commentCount: 0,
+        },
+      });
+    }
 
     // Get story stats from production MongoDB
     const story = await Story.findOne({ storyId: id });
