@@ -24,65 +24,43 @@ export default async function handler(req, res) {
     await connectToDatabase();
     console.log("[FIX ALL STATS] Connected to database");
 
-    // Update ALL stories that have missing or undefined stat fields
-    console.log("[FIX ALL STATS] Updating all stories with missing stat fields...");
+    // Get all stories first
+    const allStories = await Story.find({});
+    console.log(`[FIX ALL STATS] Found ${allStories.length} total stories`);
 
-    const updateResult = await Story.updateMany(
-      {}, // Match all stories
-      {
-        $set: {
-          views: { $ifNull: ["$views", 0] },
-          likeCount: { $ifNull: ["$likeCount", 0] },
-          averageRating: { $ifNull: ["$averageRating", 0] },
-          commentCount: { $ifNull: ["$commentCount", 0] },
-          ratingCount: { $ifNull: ["$ratingCount", 0] },
-        }
+    let fixedCount = 0;
+    let totalCount = allStories.length;
+
+    // Process each story individually
+    for (const story of allStories) {
+      const needsUpdate = (
+        story.views === undefined || story.views === null ||
+        story.likeCount === undefined || story.likeCount === null ||
+        story.averageRating === undefined || story.averageRating === null ||
+        story.commentCount === undefined || story.commentCount === null ||
+        story.ratingCount === undefined || story.ratingCount === null
+      );
+
+      if (needsUpdate) {
+        const updateFields = {};
+
+        if (story.views === undefined || story.views === null) updateFields.views = 0;
+        if (story.likeCount === undefined || story.likeCount === null) updateFields.likeCount = 0;
+        if (story.averageRating === undefined || story.averageRating === null) updateFields.averageRating = 0;
+        if (story.commentCount === undefined || story.commentCount === null) updateFields.commentCount = 0;
+        if (story.ratingCount === undefined || story.ratingCount === null) updateFields.ratingCount = 0;
+
+        await Story.findOneAndUpdate(
+          { storyId: story.storyId },
+          { $set: updateFields }
+        );
+
+        fixedCount++;
+        console.log(`[FIX ALL STATS] Fixed story ${story.storyId}: ${JSON.stringify(updateFields)}`);
       }
-    );
+    }
 
-    console.log("[FIX ALL STATS] Bulk update result:", {
-      acknowledged: updateResult.acknowledged,
-      modifiedCount: updateResult.modifiedCount,
-      matchedCount: updateResult.matchedCount,
-    });
-
-    // Use a different approach - set fields that are null/undefined to 0
-    const result2 = await Story.updateMany(
-      {
-        $or: [
-          { views: { $exists: false } },
-          { views: null },
-          { views: undefined },
-          { likeCount: { $exists: false } },
-          { likeCount: null },
-          { likeCount: undefined },
-          { averageRating: { $exists: false } },
-          { averageRating: null },
-          { averageRating: undefined },
-          { commentCount: { $exists: false } },
-          { commentCount: null },
-          { commentCount: undefined },
-          { ratingCount: { $exists: false } },
-          { ratingCount: null },
-          { ratingCount: undefined },
-        ]
-      },
-      {
-        $set: {
-          views: 0,
-          likeCount: 0,
-          averageRating: 0,
-          commentCount: 0,
-          ratingCount: 0,
-        }
-      }
-    );
-
-    console.log("[FIX ALL STATS] Second update result:", {
-      acknowledged: result2.acknowledged,
-      modifiedCount: result2.modifiedCount,
-      matchedCount: result2.matchedCount,
-    });
+    console.log(`[FIX ALL STATS] Fixed ${fixedCount} out of ${totalCount} stories`);
 
     // Get a sample story to verify the fix
     const sampleStory = await Story.findOne({ storyId: "1755540821501" });
