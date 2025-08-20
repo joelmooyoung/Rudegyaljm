@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     const story = await Story.findOneAndUpdate(
       { storyId: id },
       {
-        averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+        rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
         ratingCount: ratings.length
       },
       { new: true }
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
 
     // Get the actual values from the raw object to ensure we read correctly
     const storyObj = story?.toObject();
-    const actualAverageRating = storyObj?.averageRating || 0;
+    const actualAverageRating = storyObj?.rating || 0;
     const actualRatingCount = storyObj?.ratingCount || 0;
 
     // Get user interaction status
