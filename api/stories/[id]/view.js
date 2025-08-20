@@ -32,11 +32,22 @@ export default async function handler(req, res) {
     // Find and update the story view count in MongoDB
     console.log(`[STORY VIEW API DEBUG] Looking for story with storyId: ${id}`);
 
-    // First ensure views field exists and is a number
-    await Story.findOneAndUpdate(
-      { storyId: id },
-      { $set: { views: { $ifNull: ["$views", 0] } } }
-    );
+    // First ensure views field exists and is a number - check current story
+    let currentStory = await Story.findOne({ storyId: id });
+    if (!currentStory) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    // Initialize views if it's null/undefined
+    if (currentStory.views === undefined || currentStory.views === null || isNaN(currentStory.views)) {
+      await Story.findOneAndUpdate(
+        { storyId: id },
+        { $set: { views: 0 } }
+      );
+    }
 
     // Now increment the view count
     const story = await Story.findOneAndUpdate(
