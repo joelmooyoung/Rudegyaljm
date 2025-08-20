@@ -56,20 +56,24 @@ export default async function handler(req, res) {
       { new: true, upsert: false }
     );
 
+    // Get the actual view count from the raw object to ensure we read correctly
+    const storyObj = story?.toObject();
+    const actualViews = storyObj?.views || 0;
+
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
-      views: story?.views,
+      views: actualViews,
       storyId: story?.storyId
     });
 
-    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.views}`);
+    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${actualViews}`);
 
     return res.status(200).json({
       success: true,
       message: "View recorded successfully",
       storyId: id,
-      newViewCount: story.views,
-      currentViewCount: story.views,
+      newViewCount: actualViews,
+      currentViewCount: actualViews,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
