@@ -101,10 +101,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                userId: user.id,
-                username: user.username || user.email,
-                storyId: story.id,
-                storyTitle: story.title,
+                userId: user.id || 'unknown',
+                username: user.username || user.email || 'unknown',
+                storyId: story.id || 'unknown',
+                storyTitle: (story.title || 'Unknown Story').substring(0, 200), // Limit title length
               }),
             });
 
