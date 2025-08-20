@@ -58,18 +58,18 @@ export default async function handler(req, res) {
 
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
-      views: story?.views,
+      viewCount: story?.viewCount,
       storyId: story?.storyId
     });
 
-    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.views}`);
+    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.viewCount}`);
 
     return res.status(200).json({
       success: true,
       message: "View recorded successfully",
       storyId: id,
-      newViewCount: story.views,
-      currentViewCount: story.views,
+      newViewCount: story.viewCount,
+      currentViewCount: story.viewCount,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
