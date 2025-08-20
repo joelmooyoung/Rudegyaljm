@@ -1,4 +1,5 @@
-import { getStoryStats, getUserInteractionStatus } from "../../../lib/story-stats.js";
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Story, Like, Rating } from "../../../models/index.js";
 
 // Story Stats API
 export default async function handler(req, res) {
