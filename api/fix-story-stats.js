@@ -46,13 +46,13 @@ export default async function handler(req, res) {
     // Force set all stat fields to proper numbers
     const updateResult = await Story.findOneAndUpdate(
       { storyId },
-      { 
-        $set: { 
-          views: Number(story.views) || 0,
-          likeCount: Number(story.likeCount) || 0,
-          averageRating: Number(story.averageRating) || 0,
-          commentCount: Number(story.commentCount) || 0,
-          ratingCount: Number(story.ratingCount) || 0,
+      {
+        $set: {
+          views: (story.views != null && !isNaN(Number(story.views))) ? Number(story.views) : 0,
+          likeCount: (story.likeCount != null && !isNaN(Number(story.likeCount))) ? Number(story.likeCount) : 0,
+          averageRating: (story.averageRating != null && !isNaN(Number(story.averageRating))) ? Number(story.averageRating) : 0,
+          commentCount: (story.commentCount != null && !isNaN(Number(story.commentCount))) ? Number(story.commentCount) : 0,
+          ratingCount: (story.ratingCount != null && !isNaN(Number(story.ratingCount))) ? Number(story.ratingCount) : 0,
         }
       },
       { new: true }
