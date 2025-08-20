@@ -26,9 +26,18 @@ export default async function handler(req, res) {
 
     const storyId = "1755540821501";
     
-    // Test 1: Get current story
+    // Test 1: Get current story and check both fields
     const currentStory = await Story.findOne({ storyId });
     console.log("[TEST FIELD UPDATE] Current story views:", currentStory?.views);
+    console.log("[TEST FIELD UPDATE] Current story viewCount:", currentStory?.viewCount);
+    console.log("[TEST FIELD UPDATE] Current story toObject():", JSON.stringify({
+      views: currentStory?.views,
+      viewCount: currentStory?.viewCount,
+      likeCount: currentStory?.likeCount,
+      averageRating: currentStory?.averageRating,
+      commentCount: currentStory?.commentCount,
+      ratingCount: currentStory?.ratingCount,
+    }));
 
     // Test 2: Force set views to 100
     console.log("[TEST FIELD UPDATE] Setting views to 100...");
@@ -37,20 +46,23 @@ export default async function handler(req, res) {
       { $set: { views: 100 } },
       { new: true }
     );
-    console.log("[TEST FIELD UPDATE] After setting to 100:", updateResult?.views);
+    console.log("[TEST FIELD UPDATE] After setting views to 100:", updateResult?.views);
+    console.log("[TEST FIELD UPDATE] After setting - viewCount:", updateResult?.viewCount);
 
-    // Test 3: Increment views by 1
-    console.log("[TEST FIELD UPDATE] Incrementing views by 1...");
-    const incResult = await Story.findOneAndUpdate(
+    // Test 3: Try setting viewCount to 200
+    console.log("[TEST FIELD UPDATE] Setting viewCount to 200...");
+    const updateResult2 = await Story.findOneAndUpdate(
       { storyId },
-      { $inc: { views: 1 } },
+      { $set: { viewCount: 200 } },
       { new: true }
     );
-    console.log("[TEST FIELD UPDATE] After increment:", incResult?.views);
+    console.log("[TEST FIELD UPDATE] After setting viewCount to 200:", updateResult2?.viewCount);
+    console.log("[TEST FIELD UPDATE] After setting viewCount - views:", updateResult2?.views);
 
     // Test 4: Read the story again
     const finalStory = await Story.findOne({ storyId });
     console.log("[TEST FIELD UPDATE] Final views:", finalStory?.views);
+    console.log("[TEST FIELD UPDATE] Final viewCount:", finalStory?.viewCount);
 
     return res.status(200).json({
       success: true,
