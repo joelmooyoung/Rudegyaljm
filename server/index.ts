@@ -929,6 +929,22 @@ export function createServer() {
     }
   });
 
+  // Add comprehensive database normalization route
+  app.post("/api/normalize-database-fields", async (req, res) => {
+    console.log(`[SERVER] Normalize database fields request`);
+    try {
+      const { default: handler } = await import("../api/normalize-database-fields.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import normalize-database-fields handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Normalize database fields handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
