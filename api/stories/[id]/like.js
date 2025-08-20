@@ -41,13 +41,42 @@ export default async function handler(req, res) {
 
     console.log(`[STORY LIKE API] User ${userId} ${action}d story ${id}`);
 
-    // Record the like/unlike in persistent storage
-    const updatedStats = await recordLike(id, userId, action);
+    // Connect to production database
+    await connectToDatabase();
 
-    // Get updated user interaction status
-    const userInteraction = await getUserInteractionStatus(id, userId);
+    if (action === 'like') {
+      // Add like record and increment story like count
+      const existingLike = await Like.findOne({ storyId: id, userId });
+      if (!existingLike) {
+        // Create like record
+        const likeId = `like_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await Like.create({ likeId, storyId: id, userId });
 
-    console.log(`[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${updatedStats.likeCount}`);
+        // Increment story like count
+        await Story.findOneAndUpdate(
+          { storyId: id },
+          { $inc: { likeCount: 1 } }
+        );
+      }
+    } else {
+      // Remove like record and decrement story like count
+      const deletedLike = await Like.findOneAndDelete({ storyId: id, userId });
+      if (deletedLike) {
+        // Decrement story like count
+        await Story.findOneAndUpdate(
+          { storyId: id },
+          { $inc: { likeCount: -1 } }
+        );
+      }
+    }
+
+    // Get updated story and user interaction status
+    const [story, userLike] = await Promise.all([
+      Story.findOne({ storyId: id }),
+      Like.findOne({ storyId: id, userId })
+    ]);
+
+    console.log(`[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${story?.likeCount || 0}`);
 
     return res.status(200).json({
       success: true,
@@ -55,8 +84,10 @@ export default async function handler(req, res) {
       storyId: id,
       userId: userId,
       action: action,
-      newLikeCount: updatedStats.likeCount,
-      userInteraction: userInteraction,
+      newLikeCount: story?.likeCount || 0,
+      userInteraction: {
+        liked: !!userLike,
+      },
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
