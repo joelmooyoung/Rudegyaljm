@@ -50,16 +50,16 @@ export default async function handler(req, res) {
     console.log(`[STORY STATS API DEBUG] Story object:`, {
       found: !!story,
       storyId: story?.storyId,
-      views: story?.views,
+      viewCount: story?.viewCount,
       likeCount: story?.likeCount,
-      averageRating: story?.averageRating,
+      rating: story?.rating,
       commentCount: story?.commentCount,
       ratingCount: story?.ratingCount,
       allFields: story ? Object.keys(storyObj) : 'no story',
       rawFieldValues: {
-        views: storyObj.views,
+        viewCount: storyObj.viewCount,
         likeCount: storyObj.likeCount,
-        averageRating: storyObj.averageRating,
+        rating: storyObj.rating,
         commentCount: storyObj.commentCount,
         ratingCount: storyObj.ratingCount,
       }
