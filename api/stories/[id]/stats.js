@@ -89,10 +89,10 @@ export default async function handler(req, res) {
     }
 
     console.log(`[STORY STATS API] ✅ Production stats for story ${id}:`, {
-      views: story.views,
-      likes: story.likeCount,
-      rating: story.averageRating,
-      comments: story.commentCount,
+      viewCount: storyObj.viewCount,
+      likeCount: storyObj.likeCount,
+      rating: storyObj.rating,
+      commentCount: storyObj.commentCount,
     });
 
     return res.status(200).json({
