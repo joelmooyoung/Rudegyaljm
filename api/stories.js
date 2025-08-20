@@ -61,27 +61,30 @@ export default async function handler(req, res) {
           .select("-__v");
 
         // Transform MongoDB documents to frontend format using production data
-        const transformedStories = stories.map((story) => ({
-          id: story.storyId,
-          title: story.title,
-          author: story.author,
-          excerpt: story.excerpt || story.content.substring(0, 200) + "...",
-          content: story.content,
-          tags: story.tags,
-          category: story.category,
-          accessLevel: story.accessLevel || "free",
-          isPublished: story.published,
-          // Use production statistics from MongoDB
-          rating: story.rating || 0,
-          ratingCount: story.ratingCount || 0,
-          viewCount: story.viewCount || 0,
-          commentCount: story.commentCount || 0,
-          likeCount: story.likeCount || 0,
-          image: story.image, // Use actual image from database
-          audioUrl: story.audioUrl, // Use actual audio from database
-          createdAt: story.createdAt,
-          updatedAt: story.updatedAt,
-        }));
+        const transformedStories = stories.map((story) => {
+          const storyObj = story.toObject();
+          return {
+            id: story.storyId,
+            title: story.title,
+            author: story.author,
+            excerpt: story.excerpt || story.content.substring(0, 200) + "...",
+            content: story.content,
+            tags: story.tags,
+            category: story.category,
+            accessLevel: story.accessLevel || "free",
+            isPublished: story.published,
+            // Use production statistics from MongoDB (use raw object to ensure we get actual values)
+            rating: storyObj.rating || 0,
+            ratingCount: storyObj.ratingCount || 0,
+            viewCount: storyObj.viewCount || 0,
+            commentCount: storyObj.commentCount || 0,
+            likeCount: storyObj.likeCount || 0,
+            image: story.image, // Use actual image from database
+            audioUrl: story.audioUrl, // Use actual audio from database
+            createdAt: story.createdAt,
+            updatedAt: story.updatedAt,
+          };
+        });
 
         console.log(
           `[STORIES API] Found ${transformedStories.length} published stories`,
