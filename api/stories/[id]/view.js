@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
-      views: actualViews,
+      viewCount: actualViews,
       storyId: story?.storyId
     });
 
