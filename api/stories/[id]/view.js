@@ -30,11 +30,18 @@ export default async function handler(req, res) {
     await connectToDatabase();
 
     // Find and update the story view count in MongoDB
+    console.log(`[STORY VIEW API DEBUG] Looking for story with storyId: ${id}`);
     const story = await Story.findOneAndUpdate(
       { storyId: id },
       { $inc: { views: 1 } },
       { new: true, upsert: false }
     );
+
+    console.log(`[STORY VIEW API DEBUG] Update result:`, {
+      found: !!story,
+      views: story?.views,
+      storyId: story?.storyId
+    });
 
     if (!story) {
       return res.status(404).json({
