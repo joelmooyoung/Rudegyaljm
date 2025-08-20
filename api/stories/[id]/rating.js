@@ -44,6 +44,19 @@ export default async function handler(req, res) {
     // Connect to production database
     await connectToDatabase();
 
+    // Ensure rating fields exist and are numbers
+    await Story.findOneAndUpdate(
+      { storyId: id, $or: [
+        { averageRating: { $exists: false } },
+        { averageRating: null },
+        { averageRating: undefined },
+        { ratingCount: { $exists: false } },
+        { ratingCount: null },
+        { ratingCount: undefined }
+      ]},
+      { $set: { averageRating: 0, ratingCount: 0 } }
+    );
+
     // Update or create rating record
     const ratingId = `rating_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     await Rating.findOneAndUpdate(
