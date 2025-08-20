@@ -23,34 +23,52 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(`[STORY STATS API] Getting real stats for story ${id}`);
+    console.log(`[STORY STATS API] Getting production stats for story ${id}`);
 
-    // Get real stats from storage
-    const stats = await getStoryStats(id);
+    // Connect to production database
+    await connectToDatabase();
+
+    // Get story stats from production MongoDB
+    const story = await Story.findOne({ storyId: id });
+
+    if (!story) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
 
     // Get user interaction status if userId provided
     const { userId } = req.query;
     let userInteraction = null;
 
     if (userId) {
-      userInteraction = await getUserInteractionStatus(id, userId);
+      const [userLike, userRating] = await Promise.all([
+        Like.findOne({ storyId: id, userId }),
+        Rating.findOne({ storyId: id, userId }),
+      ]);
+
+      userInteraction = {
+        liked: !!userLike,
+        rating: userRating?.rating || 0,
+      };
     }
 
-    console.log(`[STORY STATS API] ✅ Stats for story ${id}:`, {
-      views: stats.viewCount,
-      likes: stats.likeCount,
-      rating: stats.rating,
-      comments: stats.commentCount,
+    console.log(`[STORY STATS API] ✅ Production stats for story ${id}:`, {
+      views: story.views,
+      likes: story.likeCount,
+      rating: story.averageRating,
+      comments: story.commentCount,
     });
 
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: stats.viewCount,
-        likeCount: stats.likeCount,
-        rating: stats.rating,
-        ratingCount: stats.ratingCount,
-        commentCount: stats.commentCount,
+        viewCount: story.views || 0,
+        likeCount: story.likeCount || 0,
+        rating: story.averageRating || 0,
+        ratingCount: story.ratingCount || 0,
+        commentCount: story.commentCount || 0,
       },
       userInteraction,
       storyId: id,
