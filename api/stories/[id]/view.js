@@ -62,13 +62,6 @@ export default async function handler(req, res) {
       storyId: story?.storyId
     });
 
-    if (!story) {
-      return res.status(404).json({
-        success: false,
-        message: "Story not found",
-      });
-    }
-
     console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.views}`);
 
     return res.status(200).json({
