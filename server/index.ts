@@ -1041,6 +1041,22 @@ export function createServer() {
     }
   });
 
+  // Add debug home stats route
+  app.get("/api/debug-home-stats", async (req, res) => {
+    console.log(`[SERVER] Debug home stats request`);
+    try {
+      const { default: handler } = await import("../api/debug-home-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-home-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug home stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
