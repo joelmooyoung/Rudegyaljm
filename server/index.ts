@@ -993,6 +993,22 @@ export function createServer() {
     }
   });
 
+  // Add unified stats route for admin pages
+  app.all("/api/admin/unified-stats", async (req, res) => {
+    console.log(`[SERVER] Unified stats request`);
+    try {
+      const { default: handler } = await import("../api/admin/unified-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import unified-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Unified stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
