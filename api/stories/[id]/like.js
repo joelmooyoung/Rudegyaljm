@@ -44,6 +44,12 @@ export default async function handler(req, res) {
     // Connect to production database
     await connectToDatabase();
 
+    // Ensure likeCount field exists and is a number
+    await Story.findOneAndUpdate(
+      { storyId: id, $or: [{ likeCount: { $exists: false } }, { likeCount: null }, { likeCount: undefined }] },
+      { $set: { likeCount: 0 } }
+    );
+
     if (action === 'like') {
       // Add like record and increment story like count
       const existingLike = await Like.findOne({ storyId: id, userId });
@@ -62,7 +68,7 @@ export default async function handler(req, res) {
       // Remove like record and decrement story like count
       const deletedLike = await Like.findOneAndDelete({ storyId: id, userId });
       if (deletedLike) {
-        // Decrement story like count
+        // Decrement story like count (but don't go below 0)
         await Story.findOneAndUpdate(
           { storyId: id },
           { $inc: { likeCount: -1 } }
