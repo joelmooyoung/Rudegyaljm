@@ -39,7 +39,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      document: story.toObject(),
+      storyId: story.storyId,
+      title: story.title,
       fieldTypes: {
         views: typeof story.views,
         likeCount: typeof story.likeCount,
@@ -53,6 +54,13 @@ export default async function handler(req, res) {
         averageRating: story.averageRating,
         commentCount: story.commentCount,
         ratingCount: story.ratingCount,
+      },
+      rawValues: {
+        views: JSON.stringify(story.views),
+        likeCount: JSON.stringify(story.likeCount),
+        averageRating: JSON.stringify(story.averageRating),
+        commentCount: JSON.stringify(story.commentCount),
+        ratingCount: JSON.stringify(story.ratingCount),
       }
     });
 
