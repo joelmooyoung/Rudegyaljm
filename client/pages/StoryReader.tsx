@@ -139,11 +139,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           }
         }
 
-        // Load comments using working API
+        // Load comments using local API
         try {
           console.log("Loading comments for story:", story.id);
           const commentsResponse = await fetch(
-            `https://rudegyaljm-amber.vercel.app/api/comments?storyId=${encodeURIComponent(story.id)}`,
+            `/api/comments?storyId=${encodeURIComponent(story.id)}`,
           );
           if (commentsResponse.ok) {
             const responseText = await commentsResponse.text();
