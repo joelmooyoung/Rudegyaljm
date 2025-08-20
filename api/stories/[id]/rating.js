@@ -1,4 +1,5 @@
-import { recordRating, getUserInteractionStatus } from "../../../lib/story-stats.js";
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Story, Rating } from "../../../models/index.js";
 
 // Story Rating API
 export default async function handler(req, res) {
