@@ -515,6 +515,17 @@ export function createServer() {
       if (stories && stories.length > 0) {
         console.log(`📚 [STORIES] ✅ Found ${stories.length} database stories`);
 
+        // Debug: Log some actual stats to verify production data
+        const firstStory = stories[0];
+        console.log(`📊 [DEBUG] Sample story stats:`, {
+          title: firstStory.title,
+          views: firstStory.views,
+          averageRating: firstStory.averageRating,
+          likeCount: firstStory.likeCount,
+          commentCount: firstStory.commentCount,
+          ratingCount: firstStory.ratingCount,
+        });
+
         const transformedStories = stories.map((story) => ({
           id: story.storyId || story._id.toString(),
           title: story.title || "Untitled",
@@ -548,7 +559,7 @@ export function createServer() {
     }
 
     // Return reliable fallback stories
-    console.log("📚 [STORIES] ���� Using reliable fallback stories");
+    console.log("📚 [STORIES] �� Using reliable fallback stories");
     res.json(reliableStories);
   });
 
