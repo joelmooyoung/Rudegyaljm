@@ -69,6 +69,7 @@ export default async function handler(req, res) {
       message: "View recorded successfully",
       storyId: id,
       newViewCount: story.views,
+      currentViewCount: story.views,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
