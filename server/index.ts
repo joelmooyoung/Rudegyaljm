@@ -164,7 +164,7 @@ export function createServer() {
 
       await adminUser.save();
 
-      console.log("👑 [CREATE ADMIN] �� Admin user created successfully");
+      console.log("👑 [CREATE ADMIN] ✅ Admin user created successfully");
 
       res.json({
         success: true,
@@ -568,7 +568,7 @@ export function createServer() {
     console.log("🚀 [EMAIL TEST] ==========================================");
     console.log("🚀 [EMAIL TEST] Test email request received!");
     console.log("🚀 [EMAIL TEST] Method:", req.method);
-    console.log("🚀 [EMAIL TEST] Headers:", req.headers);
+    console.log("���� [EMAIL TEST] Headers:", req.headers);
     console.log("🚀 [EMAIL TEST] Body:", req.body);
 
     try {
@@ -767,6 +767,52 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Rating handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add comments routes
+  app.get("/api/comments", async (req, res) => {
+    console.log(`[SERVER] Comments GET request`);
+    try {
+      const { default: handler } = await import("../api/comments.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import comments handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Comments handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  app.post("/api/comments", async (req, res) => {
+    console.log(`[SERVER] Comments POST request`);
+    try {
+      const { default: handler } = await import("../api/comments.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import comments handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Comments handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  app.delete("/api/comments", async (req, res) => {
+    console.log(`[SERVER] Comments DELETE request`);
+    try {
+      const { default: handler } = await import("../api/comments.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import comments handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Comments handler not available",
         error: error.message,
       });
     }
