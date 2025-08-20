@@ -45,17 +45,32 @@ export default async function handler(req, res) {
     await connectToDatabase();
 
     // Ensure rating fields exist and are numbers
-    await Story.findOneAndUpdate(
-      { storyId: id, $or: [
-        { averageRating: { $exists: false } },
-        { averageRating: null },
-        { averageRating: undefined },
-        { ratingCount: { $exists: false } },
-        { ratingCount: null },
-        { ratingCount: undefined }
-      ]},
-      { $set: { averageRating: 0, ratingCount: 0 } }
-    );
+    let currentStory = await Story.findOne({ storyId: id });
+    if (!currentStory) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    let needsUpdate = false;
+    let updateFields = {};
+
+    if (currentStory.averageRating === undefined || currentStory.averageRating === null || isNaN(currentStory.averageRating)) {
+      updateFields.averageRating = 0;
+      needsUpdate = true;
+    }
+    if (currentStory.ratingCount === undefined || currentStory.ratingCount === null || isNaN(currentStory.ratingCount)) {
+      updateFields.ratingCount = 0;
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      await Story.findOneAndUpdate(
+        { storyId: id },
+        { $set: updateFields }
+      );
+    }
 
     // Update or create rating record
     const ratingId = `rating_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
