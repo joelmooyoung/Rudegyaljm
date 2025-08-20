@@ -41,24 +41,24 @@ export default async function handler(req, res) {
       });
     }
 
-    // Initialize views if it's null/undefined
-    if (currentStory.views === undefined || currentStory.views === null || isNaN(currentStory.views)) {
+    // Initialize viewCount if it's null/undefined
+    if (currentStory.viewCount === undefined || currentStory.viewCount === null || isNaN(currentStory.viewCount)) {
       await Story.findOneAndUpdate(
         { storyId: id },
-        { $set: { views: 0 } }
+        { $set: { viewCount: 0 } }
       );
     }
 
     // Now increment the view count
     const story = await Story.findOneAndUpdate(
       { storyId: id },
-      { $inc: { views: 1 } },
+      { $inc: { viewCount: 1 } },
       { new: true, upsert: false }
     );
 
     // Get the actual view count from the raw object to ensure we read correctly
     const storyObj = story?.toObject();
-    const actualViews = storyObj?.views || 0;
+    const actualViews = storyObj?.viewCount || 0;
 
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
