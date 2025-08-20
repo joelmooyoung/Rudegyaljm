@@ -130,9 +130,9 @@ export default async function handler(req, res) {
           accessLevel,
           published,
           featured: false,
-          views: viewCount,
+          viewCount: viewCount,
           likeCount: 0,
-          averageRating: rating,
+          rating: rating,
           ratingCount: ratingCount,
         });
 
