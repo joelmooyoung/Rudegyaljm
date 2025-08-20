@@ -913,6 +913,22 @@ export function createServer() {
     }
   });
 
+  // Add migration route for consolidating duplicate fields
+  app.post("/api/migrate-story-fields", async (req, res) => {
+    console.log(`[SERVER] Migrate story fields request`);
+    try {
+      const { default: handler } = await import("../api/migrate-story-fields.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import migrate-story-fields handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Migrate story fields handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
