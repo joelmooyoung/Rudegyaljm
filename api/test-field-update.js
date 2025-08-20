@@ -68,10 +68,13 @@ export default async function handler(req, res) {
       success: true,
       message: "Field test completed",
       results: {
-        initial: currentStory?.views,
-        afterSet: updateResult?.views,
-        afterIncrement: incResult?.views,
-        final: finalStory?.views,
+        initialViews: currentStory?.views,
+        initialViewCount: currentStory?.viewCount,
+        afterSetViews: updateResult?.views,
+        afterSetViewCount: updateResult?.viewCount,
+        afterSetViewCount2: updateResult2?.viewCount,
+        finalViews: finalStory?.views,
+        finalViewCount: finalStory?.viewCount,
       }
     });
 
