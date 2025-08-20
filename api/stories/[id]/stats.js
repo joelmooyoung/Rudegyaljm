@@ -98,9 +98,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: storyObj.views || 0,
+        viewCount: storyObj.viewCount || 0,
         likeCount: storyObj.likeCount || 0,
-        rating: storyObj.averageRating || 0,
+        rating: storyObj.rating || 0,
         ratingCount: storyObj.ratingCount || 0,
         commentCount: storyObj.commentCount || 0,
       },
