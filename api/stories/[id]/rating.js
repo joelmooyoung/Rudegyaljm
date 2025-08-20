@@ -53,14 +53,15 @@ export default async function handler(req, res) {
       });
     }
 
+    const currentObj = currentStory.toObject();
     let needsUpdate = false;
     let updateFields = {};
 
-    if (currentStory.averageRating === undefined || currentStory.averageRating === null || isNaN(currentStory.averageRating)) {
-      updateFields.averageRating = 0;
+    if (currentObj.rating === undefined || currentObj.rating === null || isNaN(currentObj.rating)) {
+      updateFields.rating = 0.0;
       needsUpdate = true;
     }
-    if (currentStory.ratingCount === undefined || currentStory.ratingCount === null || isNaN(currentStory.ratingCount)) {
+    if (currentObj.ratingCount === undefined || currentObj.ratingCount === null || isNaN(currentObj.ratingCount)) {
       updateFields.ratingCount = 0;
       needsUpdate = true;
     }
