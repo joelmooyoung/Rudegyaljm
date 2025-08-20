@@ -75,10 +75,13 @@ export default async function handler(req, res) {
       await newComment.save();
 
       // Ensure commentCount field exists and is a number, then increment
-      await Story.findOneAndUpdate(
-        { storyId, $or: [{ commentCount: { $exists: false } }, { commentCount: null }, { commentCount: undefined }] },
-        { $set: { commentCount: 0 } }
-      );
+      let currentStory = await Story.findOne({ storyId });
+      if (currentStory && (currentStory.commentCount === undefined || currentStory.commentCount === null || isNaN(currentStory.commentCount))) {
+        await Story.findOneAndUpdate(
+          { storyId },
+          { $set: { commentCount: 0 } }
+        );
+      }
       await Story.findOneAndUpdate({ storyId }, { $inc: { commentCount: 1 } });
 
       console.log(
