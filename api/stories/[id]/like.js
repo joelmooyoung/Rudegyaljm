@@ -53,7 +53,8 @@ export default async function handler(req, res) {
       });
     }
 
-    if (currentStory.likeCount === undefined || currentStory.likeCount === null || isNaN(currentStory.likeCount)) {
+    const currentObj = currentStory.toObject();
+    if (currentObj.likeCount === undefined || currentObj.likeCount === null || isNaN(currentObj.likeCount)) {
       await Story.findOneAndUpdate(
         { storyId: id },
         { $set: { likeCount: 0 } }
