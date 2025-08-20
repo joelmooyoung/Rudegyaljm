@@ -849,6 +849,22 @@ export function createServer() {
     }
   });
 
+  // Add fix story stats route for debugging
+  app.post("/api/fix-story-stats", async (req, res) => {
+    console.log(`[SERVER] Fix story stats request`);
+    try {
+      const { default: handler } = await import("../api/fix-story-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import fix-story-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Fix story stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
