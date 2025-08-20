@@ -1,7 +1,8 @@
-import { getAllStats, updateStoryStats, initializeStatsStorage } from "../../lib/story-stats.js";
+import { connectToDatabase } from "../../lib/mongodb.js";
+import { Story, Like, Rating, Comment } from "../../models/index.js";
 
 export default async function handler(req, res) {
-  console.log(`[REFRESH STATS] ${req.method} /api/admin/refresh-stats`);
+  console.log(`[REFRESH STATS] ${req.method} /api/admin/refresh-stats - REDIRECTING TO UNIFIED STATS`);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -13,19 +14,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Initialize stats storage if needed
-    await initializeStatsStorage();
+    await connectToDatabase();
+    console.log("[REFRESH STATS] Connected to database");
 
     if (req.method === "GET") {
-      // Return current stats
-      const stats = await getAllStats();
-      const storyCount = Object.keys(stats).length;
-      
+      // Return current stats from MongoDB (same as unified-stats)
+      const stories = await Story.find({}).select("storyId title viewCount likeCount rating ratingCount commentCount");
+
+      const stats = {};
+      for (const story of stories) {
+        const storyObj = story.toObject();
+        stats[story.storyId] = {
+          title: story.title,
+          viewCount: storyObj.viewCount || 0,
+          likeCount: storyObj.likeCount || 0,
+          rating: storyObj.rating || 0,
+          ratingCount: storyObj.ratingCount || 0,
+          commentCount: storyObj.commentCount || 0,
+        };
+      }
+
       return res.status(200).json({
         success: true,
-        message: "Stats retrieved successfully",
-        storyCount: storyCount,
+        message: "Stats retrieved successfully (from MongoDB)",
+        storyCount: Object.keys(stats).length,
         stats: stats,
+        source: "MongoDB",
         timestamp: new Date().toISOString(),
       });
     }
