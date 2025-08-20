@@ -162,10 +162,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             console.log("Loaded comments for story:", commentsData);
             setComments(
               commentsData
-                .filter((comment: any) => comment && comment.id)
+                .filter((comment: any) => comment && (comment.id || comment.commentId))
                 .map((comment: any) => ({
                   ...comment,
-                  id: comment.id || `comment-${Date.now()}-${Math.random()}`,
+                  id: comment.id || comment.commentId || `comment-${Date.now()}-${Math.random()}`,
                   createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
                   updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
                 })),
