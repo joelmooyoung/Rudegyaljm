@@ -92,7 +92,11 @@ export default async function handler(req, res) {
       Like.findOne({ storyId: id, userId })
     ]);
 
-    console.log(`[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${story?.likeCount || 0}`);
+    // Get the actual like count from the raw object to ensure we read the correct value
+    const storyObj = story?.toObject();
+    const actualLikeCount = storyObj?.likeCount || 0;
+
+    console.log(`[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${actualLikeCount}`);
 
     return res.status(200).json({
       success: true,
@@ -100,7 +104,7 @@ export default async function handler(req, res) {
       storyId: id,
       userId: userId,
       action: action,
-      newLikeCount: story?.likeCount || 0,
+      newLikeCount: actualLikeCount,
       userInteraction: {
         liked: !!userLike,
       },
