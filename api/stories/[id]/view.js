@@ -26,16 +26,30 @@ export default async function handler(req, res) {
     const { userId, sessionId } = req.body;
     console.log(`[STORY VIEW API] Recording view for story ${id} by user ${userId || sessionId || 'anonymous'}`);
 
-    // Record the view in persistent storage
-    const updatedStats = await recordView(id, userId, sessionId);
+    // Connect to production database
+    await connectToDatabase();
 
-    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${updatedStats.viewCount}`);
+    // Find and update the story view count in MongoDB
+    const story = await Story.findOneAndUpdate(
+      { storyId: id },
+      { $inc: { views: 1 } },
+      { new: true, upsert: false }
+    );
+
+    if (!story) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.views}`);
 
     return res.status(200).json({
       success: true,
       message: "View recorded successfully",
       storyId: id,
-      newViewCount: updatedStats.viewCount,
+      newViewCount: story.views,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
