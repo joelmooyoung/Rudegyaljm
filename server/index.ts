@@ -528,10 +528,14 @@ export function createServer() {
           publishedAt: story.publishedAt || story.createdAt,
           createdAt: story.createdAt || new Date(),
           updatedAt: story.updatedAt || new Date(),
-          viewCount: story.viewCount || 0,
-          rating: story.rating || 0,
+          // Use correct MongoDB field names from production database
+          viewCount: story.views || 0,  // MongoDB field is 'views'
+          rating: story.averageRating || 0,  // MongoDB field is 'averageRating'
           ratingCount: story.ratingCount || 0,
+          likeCount: story.likeCount || 0,
+          commentCount: story.commentCount || 0,
           image: story.image || null,
+          audioUrl: story.audioUrl || null,
         }));
 
         return res.json(transformedStories);
@@ -544,7 +548,7 @@ export function createServer() {
     }
 
     // Return reliable fallback stories
-    console.log("📚 [STORIES] �� Using reliable fallback stories");
+    console.log("📚 [STORIES] ���� Using reliable fallback stories");
     res.json(reliableStories);
   });
 
