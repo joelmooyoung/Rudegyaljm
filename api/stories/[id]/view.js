@@ -1,4 +1,5 @@
-import { recordView, getStoryStats } from "../../../lib/story-stats.js";
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Story } from "../../../models/index.js";
 
 // Story View Tracking API
 export default async function handler(req, res) {
