@@ -325,9 +325,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     setIsSubmittingComment(true);
 
     try {
-      // Use working comments API for both saving and loading
+      // Use local comments API for both saving and loading
       const response = await fetch(
-        "https://rudegyaljm-amber.vercel.app/api/comments",
+        "/api/comments",
         {
           method: "POST",
           headers: {
