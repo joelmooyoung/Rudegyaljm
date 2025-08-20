@@ -34,8 +34,8 @@ export default async function handler(req, res) {
 
     // First ensure views field exists and is a number
     await Story.findOneAndUpdate(
-      { storyId: id, $or: [{ views: { $exists: false } }, { views: null }, { views: undefined }] },
-      { $set: { views: 0 } }
+      { storyId: id },
+      { $set: { views: { $ifNull: ["$views", 0] } } }
     );
 
     // Now increment the view count
