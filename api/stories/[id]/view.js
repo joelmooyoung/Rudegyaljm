@@ -31,6 +31,14 @@ export default async function handler(req, res) {
 
     // Find and update the story view count in MongoDB
     console.log(`[STORY VIEW API DEBUG] Looking for story with storyId: ${id}`);
+
+    // First ensure views field exists and is a number
+    await Story.findOneAndUpdate(
+      { storyId: id, $or: [{ views: { $exists: false } }, { views: null }, { views: undefined }] },
+      { $set: { views: 0 } }
+    );
+
+    // Now increment the view count
     const story = await Story.findOneAndUpdate(
       { storyId: id },
       { $inc: { views: 1 } },
