@@ -48,31 +48,54 @@ export default async function handler(req, res) {
       const { action, storyId, testData } = req.body;
 
       if (action === "refresh-all") {
-        // Refresh all story stats
-        const stats = await getAllStats();
-        const refreshedStats = {};
+        // Refresh all story stats from actual MongoDB data
+        console.log("[REFRESH STATS] Refreshing all story stats from MongoDB...");
 
-        for (const storyId of Object.keys(stats)) {
-          const currentStats = stats[storyId];
-          // Recalculate derived values
-          currentStats.likeCount = currentStats.likes ? currentStats.likes.length : 0;
-          currentStats.ratingCount = currentStats.ratings ? currentStats.ratings.length : 0;
-          currentStats.viewCount = currentStats.views ? currentStats.views.length : 0;
+        const stories = await Story.find({});
+        let refreshedCount = 0;
 
-          // Recalculate average rating
-          if (currentStats.ratings && currentStats.ratings.length > 0) {
-            const totalRating = currentStats.ratings.reduce((sum, r) => sum + r.rating, 0);
-            currentStats.rating = Number((totalRating / currentStats.ratings.length).toFixed(1));
-          }
+        for (const story of stories) {
+          // Get actual counts from related collections
+          const [actualLikes, actualRatings, actualComments] = await Promise.all([
+            Like.find({ storyId: story.storyId }),
+            Rating.find({ storyId: story.storyId }),
+            Comment.find({ storyId: story.storyId })
+          ]);
 
-          refreshedStats[storyId] = await updateStoryStats(storyId, currentStats);
+          // Calculate actual statistics
+          const actualLikeCount = actualLikes.length;
+          const actualRatingCount = actualRatings.length;
+          const actualCommentCount = actualComments.length;
+          const actualAverageRating = actualRatings.length > 0
+            ? actualRatings.reduce((sum, r) => sum + r.rating, 0) / actualRatings.length
+            : 0;
+
+          // Get current story stats
+          const storyObj = story.toObject();
+          const currentViewCount = storyObj.viewCount || 0;
+
+          // Update story with corrected stats
+          await Story.findOneAndUpdate(
+            { storyId: story.storyId },
+            {
+              $set: {
+                likeCount: actualLikeCount,
+                rating: Math.round(actualAverageRating * 10) / 10,
+                ratingCount: actualRatingCount,
+                commentCount: actualCommentCount,
+                viewCount: currentViewCount
+              }
+            }
+          );
+
+          refreshedCount++;
         }
 
         return res.status(200).json({
           success: true,
-          message: "All stats refreshed successfully",
-          refreshedCount: Object.keys(refreshedStats).length,
-          stats: refreshedStats,
+          message: `All stats refreshed successfully from MongoDB (${refreshedCount} stories)`,
+          refreshedCount,
+          source: "MongoDB",
           timestamp: new Date().toISOString(),
         });
       }
