@@ -88,14 +88,8 @@ export default async function handler(req, res) {
       success: true,
       message: "All story stats fixed",
       results: {
-        firstUpdate: {
-          modifiedCount: updateResult.modifiedCount,
-          matchedCount: updateResult.matchedCount,
-        },
-        secondUpdate: {
-          modifiedCount: result2.modifiedCount,
-          matchedCount: result2.matchedCount,
-        },
+        totalStories: totalCount,
+        fixedCount: fixedCount,
         verification: {
           totalStories: totalStoryCount,
           storiesWithProperStats: properStoryCount,
