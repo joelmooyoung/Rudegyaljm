@@ -120,10 +120,21 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 console.log(`📚 Story read recorded for user ${user.username}`);
               }
             } else {
-              console.warn(`User story read API returned ${readResponse.status}:`, await readResponse.text());
+              try {
+                const errorText = await readResponse.text();
+                console.warn(`User story read API returned ${readResponse.status}: ${errorText}`);
+              } catch (textError) {
+                console.warn(`User story read API returned ${readResponse.status}, could not read error response`);
+              }
             }
           } catch (error) {
             console.error("Failed to record story read:", error);
+            console.error("Story read error details:", {
+              userId: user?.id,
+              storyId: story?.id,
+              storyTitle: story?.title,
+              errorMessage: error instanceof Error ? error.message : 'Unknown error'
+            });
             // Don't break the user experience if read tracking fails
           }
         }
