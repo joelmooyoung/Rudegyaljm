@@ -1009,6 +1009,22 @@ export function createServer() {
     }
   });
 
+  // Add statistics consistency test route
+  app.get("/api/test-stats-consistency", async (req, res) => {
+    console.log(`[SERVER] Test stats consistency request`);
+    try {
+      const { default: handler } = await import("../api/test-stats-consistency.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-stats-consistency handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test stats consistency handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
