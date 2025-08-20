@@ -977,6 +977,22 @@ export function createServer() {
     }
   });
 
+  // Add test stories listing route
+  app.get("/api/test-stories-listing", async (req, res) => {
+    console.log(`[SERVER] Test stories listing request`);
+    try {
+      const { default: handler } = await import("../api/test-stories-listing.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-stories-listing handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test stories listing handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
