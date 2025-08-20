@@ -195,7 +195,7 @@ export function createServer() {
 
     try {
       await connectToDatabase();
-      console.log("���� [RESET ADMIN] Database connected");
+      console.log("🔑 [RESET ADMIN] Database connected");
 
       // Find the admin user
       const adminUser = await User.findOne({
@@ -373,7 +373,7 @@ export function createServer() {
         }
       } catch (localError) {
         console.error(
-          "�� [LOGIN] Local authentication failed:",
+          "🔐 [LOGIN] Local authentication failed:",
           localError.message,
         );
       }
@@ -892,6 +892,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Debug story document handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add test field update route for direct testing
+  app.post("/api/test-field-update", async (req, res) => {
+    console.log(`[SERVER] Test field update request`);
+    try {
+      const { default: handler } = await import("../api/test-field-update.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-field-update handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test field update handler not available",
         error: error.message,
       });
     }
