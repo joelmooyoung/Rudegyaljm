@@ -41,35 +41,35 @@ export default async function handler(req, res) {
       });
     }
 
-    // Initialize viewCount if it's null/undefined (use the actual field name in database)
-    if (currentStory.viewCount === undefined || currentStory.viewCount === null || isNaN(currentStory.viewCount)) {
+    // Initialize views if it's null/undefined
+    if (currentStory.views === undefined || currentStory.views === null || isNaN(currentStory.views)) {
       await Story.findOneAndUpdate(
         { storyId: id },
-        { $set: { viewCount: 0 } }
+        { $set: { views: 0 } }
       );
     }
 
-    // Now increment the view count using the correct field name
+    // Now increment the view count
     const story = await Story.findOneAndUpdate(
       { storyId: id },
-      { $inc: { viewCount: 1 } },
+      { $inc: { views: 1 } },
       { new: true, upsert: false }
     );
 
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
-      viewCount: story?.viewCount,
+      views: story?.views,
       storyId: story?.storyId
     });
 
-    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.viewCount}`);
+    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${story.views}`);
 
     return res.status(200).json({
       success: true,
       message: "View recorded successfully",
       storyId: id,
-      newViewCount: story.viewCount,
-      currentViewCount: story.viewCount,
+      newViewCount: story.views,
+      currentViewCount: story.views,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
