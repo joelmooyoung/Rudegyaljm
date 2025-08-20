@@ -1,4 +1,5 @@
-import { recordLike, getUserInteractionStatus } from "../../../lib/story-stats.js";
+import { connectToDatabase } from "../../../lib/mongodb.js";
+import { Story, Like } from "../../../models/index.js";
 
 // Story Like API
 export default async function handler(req, res) {
