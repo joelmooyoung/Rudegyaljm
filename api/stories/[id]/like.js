@@ -45,10 +45,20 @@ export default async function handler(req, res) {
     await connectToDatabase();
 
     // Ensure likeCount field exists and is a number
-    await Story.findOneAndUpdate(
-      { storyId: id, $or: [{ likeCount: { $exists: false } }, { likeCount: null }, { likeCount: undefined }] },
-      { $set: { likeCount: 0 } }
-    );
+    let currentStory = await Story.findOne({ storyId: id });
+    if (!currentStory) {
+      return res.status(404).json({
+        success: false,
+        message: "Story not found",
+      });
+    }
+
+    if (currentStory.likeCount === undefined || currentStory.likeCount === null || isNaN(currentStory.likeCount)) {
+      await Story.findOneAndUpdate(
+        { storyId: id },
+        { $set: { likeCount: 0 } }
+      );
+    }
 
     if (action === 'like') {
       // Add like record and increment story like count
