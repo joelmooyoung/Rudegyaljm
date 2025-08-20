@@ -96,13 +96,18 @@ export default async function handler(req, res) {
       { new: true }
     );
 
+    // Get the actual values from the raw object to ensure we read correctly
+    const storyObj = story?.toObject();
+    const actualAverageRating = storyObj?.averageRating || 0;
+    const actualRatingCount = storyObj?.ratingCount || 0;
+
     // Get user interaction status
     const [userRating, userLike] = await Promise.all([
       Rating.findOne({ storyId: id, userId }),
       null // We'll get this from Like collection if needed
     ]);
 
-    console.log(`[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${story?.averageRating || 0} (${story?.ratingCount || 0} ratings)`);
+    console.log(`[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${actualAverageRating} (${actualRatingCount} ratings)`);
 
     return res.status(200).json({
       success: true,
@@ -110,8 +115,8 @@ export default async function handler(req, res) {
       storyId: id,
       userId: userId,
       rating: rating,
-      newAverageRating: story?.averageRating || 0,
-      newRatingCount: story?.ratingCount || 0,
+      newAverageRating: actualAverageRating,
+      newRatingCount: actualRatingCount,
       userInteraction: {
         rating: userRating?.rating || 0,
       },
