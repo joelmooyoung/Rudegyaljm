@@ -72,9 +72,9 @@ export default async function handler(req, res) {
           accessLevel: story.accessLevel || "free",
           isPublished: story.published,
           // Use production statistics from MongoDB
-          rating: story.averageRating || 0,
+          rating: story.rating || 0,
           ratingCount: story.ratingCount || 0,
-          viewCount: story.views || 0,
+          viewCount: story.viewCount || 0,
           commentCount: story.commentCount || 0,
           likeCount: story.likeCount || 0,
           image: story.image, // Use actual image from database
