@@ -101,64 +101,120 @@ export default async function handler(req, res) {
       }
 
       if (action === "add-test-data" && storyId && testData) {
-        // Add test interactions for a specific story
-        const { views, likes, ratings, comments } = testData;
-        const currentStats = await getAllStats();
-        const storyStats = currentStats[storyId] || {
-          viewCount: 0,
-          likeCount: 0,
-          rating: 0,
-          ratingCount: 0,
-          commentCount: 0,
-          likes: [],
-          ratings: [],
-          views: [],
-        };
+        // Add test data directly to MongoDB
+        console.log(`[REFRESH STATS] Adding test data for story ${storyId}:`, testData);
 
-        // Add test views
-        if (views) {
-          for (let i = 0; i < views; i++) {
-            storyStats.views.push({
-              userId: `test_user_${i}_${Date.now()}`,
-              sessionId: `test_session_${i}_${Date.now()}`,
-              timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-            });
-          }
+        const story = await Story.findOne({ storyId });
+        if (!story) {
+          return res.status(404).json({
+            success: false,
+            message: "Story not found",
+          });
         }
+
+        const { views, likes, ratings, comments } = testData;
 
         // Add test likes
         if (likes) {
           for (let i = 0; i < likes; i++) {
-            const userId = `test_liker_${i}_${Date.now()}`;
-            if (!storyStats.likes.includes(userId)) {
-              storyStats.likes.push(userId);
-            }
+            const testUserId = `test-user-${Date.now()}-${i}`;
+            await Like.findOneAndUpdate(
+              { storyId, userId: testUserId },
+              {
+                likeId: `like_${Date.now()}_${i}`,
+                storyId,
+                userId: testUserId
+              },
+              { upsert: true }
+            );
           }
         }
 
         // Add test ratings
         if (ratings) {
           for (let i = 0; i < ratings; i++) {
-            storyStats.ratings.push({
-              userId: `test_rater_${i}_${Date.now()}`,
-              rating: Math.floor(Math.random() * 5) + 1,
-              timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-            });
+            const testUserId = `test-rater-${Date.now()}-${i}`;
+            const testRating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
+            await Rating.findOneAndUpdate(
+              { storyId, userId: testUserId },
+              {
+                ratingId: `rating_${Date.now()}_${i}`,
+                storyId,
+                userId: testUserId,
+                rating: testRating
+              },
+              { upsert: true }
+            );
           }
         }
 
-        // Add test comments count
+        // Add test comments
         if (comments) {
-          storyStats.commentCount = (storyStats.commentCount || 0) + comments;
+          for (let i = 0; i < comments; i++) {
+            const testUserId = `test-commenter-${Date.now()}-${i}`;
+            await Comment.findOneAndUpdate(
+              { commentId: `comment_${Date.now()}_${i}` },
+              {
+                commentId: `comment_${Date.now()}_${i}`,
+                storyId,
+                userId: testUserId,
+                username: `TestUser${i}`,
+                comment: `Test comment ${i} for story ${storyId}`
+              },
+              { upsert: true }
+            );
+          }
         }
 
-        const updatedStats = await updateStoryStats(storyId, storyStats);
+        // Add test views
+        if (views) {
+          const currentStory = await Story.findOne({ storyId });
+          const currentViews = currentStory.toObject().viewCount || 0;
+
+          await Story.findOneAndUpdate(
+            { storyId },
+            { $set: { viewCount: currentViews + views } }
+          );
+        }
+
+        // Refresh the story's stats after adding test data
+        const [actualLikes, actualRatings, actualComments] = await Promise.all([
+          Like.find({ storyId }),
+          Rating.find({ storyId }),
+          Comment.find({ storyId })
+        ]);
+
+        const actualLikeCount = actualLikes.length;
+        const actualRatingCount = actualRatings.length;
+        const actualCommentCount = actualComments.length;
+        const actualAverageRating = actualRatings.length > 0
+          ? actualRatings.reduce((sum, r) => sum + r.rating, 0) / actualRatings.length
+          : 0;
+
+        await Story.findOneAndUpdate(
+          { storyId },
+          {
+            $set: {
+              likeCount: actualLikeCount,
+              rating: Math.round(actualAverageRating * 10) / 10,
+              ratingCount: actualRatingCount,
+              commentCount: actualCommentCount,
+            }
+          }
+        );
 
         return res.status(200).json({
           success: true,
-          message: "Test data added successfully",
+          message: `Test data added for story ${storyId}`,
           storyId: storyId,
-          updatedStats: updatedStats,
+          testData,
+          updatedStats: {
+            likeCount: actualLikeCount,
+            rating: Math.round(actualAverageRating * 10) / 10,
+            ratingCount: actualRatingCount,
+            commentCount: actualCommentCount,
+          },
+          source: "MongoDB",
           timestamp: new Date().toISOString(),
         });
       }
