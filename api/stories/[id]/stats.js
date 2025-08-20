@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     // Get story stats from production MongoDB
     const story = await Story.findOne({ storyId: id });
 
+    const storyObj = story.toObject();
     console.log(`[STORY STATS API DEBUG] Story object:`, {
       found: !!story,
       storyId: story?.storyId,
@@ -54,7 +55,14 @@ export default async function handler(req, res) {
       averageRating: story?.averageRating,
       commentCount: story?.commentCount,
       ratingCount: story?.ratingCount,
-      allFields: story ? Object.keys(story.toObject()) : 'no story'
+      allFields: story ? Object.keys(storyObj) : 'no story',
+      rawFieldValues: {
+        views: storyObj.views,
+        likeCount: storyObj.likeCount,
+        averageRating: storyObj.averageRating,
+        commentCount: storyObj.commentCount,
+        ratingCount: storyObj.ratingCount,
+      }
     });
 
     if (!story) {
