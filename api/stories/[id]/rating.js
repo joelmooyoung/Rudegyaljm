@@ -41,13 +41,40 @@ export default async function handler(req, res) {
 
     console.log(`[STORY RATING API] User ${userId} rated story ${id} with ${rating} stars`);
 
-    // Record the rating in persistent storage
-    const updatedStats = await recordRating(id, userId, rating);
+    // Connect to production database
+    await connectToDatabase();
 
-    // Get updated user interaction status
-    const userInteraction = await getUserInteractionStatus(id, userId);
+    // Update or create rating record
+    const ratingId = `rating_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await Rating.findOneAndUpdate(
+      { storyId: id, userId },
+      { ratingId, storyId: id, userId, rating },
+      { upsert: true, new: true }
+    );
 
-    console.log(`[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${updatedStats.rating} (${updatedStats.ratingCount} ratings)`);
+    // Recalculate story average rating and count
+    const ratings = await Rating.find({ storyId: id });
+    const averageRating = ratings.length > 0
+      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+      : 0;
+
+    // Update story with new rating stats
+    const story = await Story.findOneAndUpdate(
+      { storyId: id },
+      {
+        averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+        ratingCount: ratings.length
+      },
+      { new: true }
+    );
+
+    // Get user interaction status
+    const [userRating, userLike] = await Promise.all([
+      Rating.findOne({ storyId: id, userId }),
+      null // We'll get this from Like collection if needed
+    ]);
+
+    console.log(`[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${story?.averageRating || 0} (${story?.ratingCount || 0} ratings)`);
 
     return res.status(200).json({
       success: true,
@@ -55,9 +82,11 @@ export default async function handler(req, res) {
       storyId: id,
       userId: userId,
       rating: rating,
-      newAverageRating: updatedStats.rating,
-      newRatingCount: updatedStats.ratingCount,
-      userInteraction: userInteraction,
+      newAverageRating: story?.averageRating || 0,
+      newRatingCount: story?.ratingCount || 0,
+      userInteraction: {
+        rating: userRating?.rating || 0,
+      },
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
