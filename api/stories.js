@@ -195,9 +195,9 @@ export default async function handler(req, res) {
         if (req.body.hasOwnProperty("published"))
           updateFields.published = req.body.published;
         if (req.body.hasOwnProperty("viewCount"))
-          updateFields.views = req.body.viewCount;
+          updateFields.viewCount = req.body.viewCount;
         if (req.body.hasOwnProperty("rating"))
-          updateFields.averageRating = req.body.rating;
+          updateFields.rating = req.body.rating;
         if (req.body.hasOwnProperty("ratingCount"))
           updateFields.ratingCount = req.body.ratingCount;
 
