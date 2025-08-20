@@ -164,7 +164,7 @@ export function createServer() {
 
       await adminUser.save();
 
-      console.log("👑 [CREATE ADMIN] ✅ Admin user created successfully");
+      console.log("👑 [CREATE ADMIN] �� Admin user created successfully");
 
       res.json({
         success: true,
@@ -767,6 +767,37 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Rating handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add user story read tracking route
+  app.post("/api/user-story-reads", async (req, res) => {
+    console.log(`[SERVER] User story read request`);
+    try {
+      const { default: handler } = await import("../api/user-story-reads.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import user-story-reads handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "User story reads handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  app.get("/api/user-story-reads", async (req, res) => {
+    console.log(`[SERVER] User story read history request`);
+    try {
+      const { default: handler } = await import("../api/user-story-reads.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import user-story-reads handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "User story reads handler not available",
         error: error.message,
       });
     }
