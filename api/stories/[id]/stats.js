@@ -98,11 +98,11 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: story.views || 0,
-        likeCount: story.likeCount || 0,
-        rating: story.averageRating || 0,
-        ratingCount: story.ratingCount || 0,
-        commentCount: story.commentCount || 0,
+        viewCount: storyObj.views || 0,
+        likeCount: storyObj.likeCount || 0,
+        rating: storyObj.averageRating || 0,
+        ratingCount: storyObj.ratingCount || 0,
+        commentCount: storyObj.commentCount || 0,
       },
       userInteraction,
       storyId: id,
