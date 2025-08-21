@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use lightweight MongoDB API for real data
+  // STORIES ENDPOINT - Use working test API that returns formatted real data
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using lightweight MongoDB API for real data...");
+    console.log("📚 [STORIES] Using working test API for real MongoDB data...");
     try {
-      const { default: lightStoriesHandler } = await import("../api/stories-light.js");
-      return lightStoriesHandler(req, res);
+      const { default: testHandler } = await import("../api/test-db-simple.js");
+      return testHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import light stories handler:", error);
+      console.error("📚 [STORIES] Failed to import test handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Light stories handler not available",
+        message: "Test handler not available",
         error: error.message
       });
     }
