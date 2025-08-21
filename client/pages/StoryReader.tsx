@@ -179,6 +179,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           setComments([]);
         }
 
+        // Load current story statistics
+        await refreshStoryStats();
+
         // Load user interaction (rating and like status)
         try {
           const interactionResponse = await fetch(
