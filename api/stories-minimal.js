@@ -35,9 +35,15 @@ export default async function handler(req, res) {
     const db = mongoose.connection.db;
     const storiesCollection = db.collection('stories');
     
-    console.log("[STORIES MINIMAL] Getting story titles and basic info only...");
-    
-    // Load only the absolute minimum fields to avoid hanging
+    console.log(`[STORIES MINIMAL] Getting story data for page ${page} (limit: ${limit})...`);
+
+    // Get total count for pagination
+    const totalStories = await storiesCollection.countDocuments({ published: true });
+    const totalPages = Math.ceil(totalStories / limit);
+
+    console.log(`[STORIES MINIMAL] Total: ${totalStories} stories, ${totalPages} pages`);
+
+    // Load stories with basic info and images for home page display
     const stories = await storiesCollection.find(
       { published: true },
       {
@@ -52,12 +58,16 @@ export default async function handler(req, res) {
           averageRating: 1,
           rating: 1,
           createdAt: 1,
-          // Exclude everything else including content, excerpt, tags, etc.
+          image: 1,  // Include images for home page cards
+          audioUrl: 1,  // Include audio info for indicators
+          excerpt: 1,  // Include excerpt for better previews
+          // Still exclude content to keep response size reasonable
         }
       }
     )
     .sort({ createdAt: -1 })
-    // Load all stories since minimal API performs well
+    .skip(skip)
+    .limit(limit)
     .toArray();
     
     console.log(`[STORIES MINIMAL] Retrieved ${stories.length} minimal story records`);
