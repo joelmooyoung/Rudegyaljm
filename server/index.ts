@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { Resend } from "resend";
 import { getCountryFromIP, getCityFromIP } from "./utils/geolocation.js";
+import { User, Story, Comment, LoginLog } from "../models/index.js";
 
 // MongoDB connection with retry logic
 let isConnected = false;
