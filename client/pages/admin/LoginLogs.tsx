@@ -181,6 +181,10 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
                       <Globe className="inline h-4 w-4 mr-1" />
                       Country
                     </TableHead>
+                    <TableHead className="font-serif">
+                      <MapPin className="inline h-4 w-4 mr-1" />
+                      City
+                    </TableHead>
                     <TableHead className="font-serif">User Agent</TableHead>
                     <TableHead className="font-serif">Timestamp</TableHead>
                   </TableRow>
