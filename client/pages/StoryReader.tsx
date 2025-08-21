@@ -58,7 +58,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             ratingCount: stats.ratingCount || prev.ratingCount,
             viewCount: stats.viewCount || prev.viewCount,
             commentCount: stats.commentCount || prev.commentCount,
-            likeCount: stats.likeCount || prev.likeCount,
+            likeCount: stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
           }));
         } catch (jsonError) {
           console.warn("Failed to parse stats JSON response:", responseText);
