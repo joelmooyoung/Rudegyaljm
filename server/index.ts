@@ -415,17 +415,62 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use full stories API for all MongoDB stories
+  // STORIES ENDPOINT - Use updated test API that returns all stories
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using full stories API for all MongoDB data...");
+    console.log("📚 [STORIES] Using updated test API for all MongoDB stories...");
     try {
-      const { default: fullStoriesHandler } = await import("../api/stories-full.js");
-      return fullStoriesHandler(req, res);
+      // Call the updated database test handler that now returns all stories
+      const { default: dbTestHandler } = await import("../api/test-db-simple.js");
+
+      // Create a mock request/response to get the data
+      const mockReq = { method: "GET" };
+      let dbData = null;
+
+      const mockRes = {
+        status: () => mockRes,
+        json: (data) => {
+          dbData = data;
+          return mockRes;
+        }
+      };
+
+      await dbTestHandler(mockReq, mockRes);
+
+      if (dbData && dbData.success && dbData.sampleStories) {
+        // Transform ALL the stories into proper story format
+        const stories = dbData.sampleStories.map((story) => ({
+          id: story.id || story.storyId,
+          title: story.title || "Untitled",
+          content: "Full story content available...", // Simplified content for performance
+          excerpt: story.excerpt || `A captivating story by ${story.author}...`,
+          author: story.author || "Unknown Author",
+          category: story.category || "Romance",
+          tags: Array.isArray(story.tags) ? story.tags : ["romance", "passion"],
+          accessLevel: story.accessLevel || "free",
+          isPublished: true,
+          publishedAt: story.createdAt || new Date(),
+          createdAt: story.createdAt || new Date(),
+          updatedAt: story.updatedAt || new Date(),
+          viewCount: story.views || story.viewCount || 0,
+          rating: story.averageRating || story.rating || 0,
+          ratingCount: story.ratingCount || 0,
+          likeCount: story.likeCount || 0,
+          commentCount: story.commentCount || 0,
+          image: story.image || null,
+          audioUrl: story.audioUrl || null,
+        }));
+
+        console.log(`📚 [STORIES] Returning ${stories.length} MongoDB stories`);
+        return res.json(stories);
+      } else {
+        throw new Error("No data from database test");
+      }
+
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import full stories handler:", error);
+      console.error("📚 [STORIES] Error:", error);
       return res.status(500).json({
         success: false,
-        message: "Full stories handler not available",
+        message: "Failed to fetch stories",
         error: error.message
       });
     }
