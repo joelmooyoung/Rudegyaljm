@@ -23,8 +23,10 @@ export default async function handler(req, res) {
 
   try {
     console.log("[STORIES MINIMAL] Loading minimal story metadata...");
-    
-    // Use existing connection
+
+    // Connect to database
+    await connectToDatabase();
+
     if (mongoose.connection.readyState !== 1) {
       console.log("[STORIES MINIMAL] Database not connected");
       return res.status(500).json({
