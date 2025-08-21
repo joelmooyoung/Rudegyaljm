@@ -86,22 +86,41 @@ export default async function handler(req, res) {
     );
 
     if (stories && stories.length > 0) {
-      // Get real comment counts for all stories in this batch
-      const storyIds = stories.map((story) => story.storyId);
-      const commentCounts = await commentsCollection
-        .aggregate([
-          { $match: { storyId: { $in: storyIds } } },
-          { $group: { _id: "$storyId", count: { $sum: 1 } } },
-        ])
-        .toArray();
+      // Get real comment counts for all stories in this batch with error handling
+      let commentCountMap = {};
 
-      // Create a map of storyId -> real comment count
-      const commentCountMap = {};
-      commentCounts.forEach((item) => {
-        commentCountMap[item._id] = item.count;
-      });
+      try {
+        const storyIds = stories.map((story) => story.storyId).filter(id => id); // Filter out null/undefined
 
-      console.log(`[STORIES MINIMAL] Real comment counts:`, commentCountMap);
+        if (storyIds.length > 0) {
+          console.log(`[STORIES MINIMAL] Getting comment counts for ${storyIds.length} stories...`);
+
+          const commentCounts = await Promise.race([
+            commentsCollection.aggregate([
+              { $match: { storyId: { $in: storyIds } } },
+              { $group: { _id: "$storyId", count: { $sum: 1 } } }
+            ]).toArray(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Comment aggregation timeout')), 5000)
+            )
+          ]);
+
+          // Create a map of storyId -> real comment count
+          commentCounts.forEach((item) => {
+            commentCountMap[item._id] = item.count;
+          });
+
+          console.log(`[STORIES MINIMAL] Real comment counts:`, commentCountMap);
+        }
+      } catch (error) {
+        console.warn(`[STORIES MINIMAL] Failed to get real comment counts, using fallback:`, error.message);
+        // Fallback to story document comment counts
+        stories.forEach((story) => {
+          if (story.storyId) {
+            commentCountMap[story.storyId] = story.commentCount || 0;
+          }
+        });
+      }
 
       const transformedStories = stories.map((story) => ({
         id: story.storyId || story._id.toString(),
