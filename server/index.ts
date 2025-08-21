@@ -349,6 +349,40 @@ export function createServer() {
           console.log("🔐 [LOGIN] ✅ Database login successful");
           const token = `db_token_${user.userId}_${Date.now()}`;
 
+          // Create login log
+          try {
+            // Extract IP address with proper header checking
+            const rawIP = req.headers["x-forwarded-for"] ||
+                         req.headers["x-real-ip"] ||
+                         req.socket.remoteAddress ||
+                         "unknown";
+
+            // Clean IP if it has multiple IPs (take first one)
+            const clientIP = rawIP.includes(',') ? rawIP.split(',')[0].trim() : rawIP;
+
+            // Get country and city from IP using geolocation
+            const country = getCountryFromIP(clientIP);
+            const city = getCityFromIP(clientIP);
+
+            console.log(`🔐 [LOGIN] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}, ${city}`);
+
+            const loginLog = new LoginLog({
+              logId: `success_${Date.now()}`,
+              userId: user.userId,
+              username: user.username,
+              ip: clientIP,
+              country: country,
+              city: city,
+              userAgent: req.headers["user-agent"] || "Unknown",
+              success: true,
+              timestamp: new Date(),
+            });
+            await loginLog.save();
+            console.log("🔐 [LOGIN] ✅ Login log created successfully");
+          } catch (logError) {
+            console.error("🔐 [LOGIN] ❌ Failed to create login log:", logError);
+          }
+
           return res.json({
             success: true,
             message: "Login successful",
