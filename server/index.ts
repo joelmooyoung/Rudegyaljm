@@ -1275,6 +1275,22 @@ export function createServer() {
     }
   });
 
+  // Add migration route for login log countries
+  app.post("/api/migrate-login-countries", async (req, res) => {
+    console.log(`[SERVER] Migrate login countries request`);
+    try {
+      const { default: handler } = await import("../api/migrate-login-countries.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import migrate-login-countries handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Migrate login countries handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add main users API route
   app.all("/api/users", async (req, res) => {
     console.log(`[SERVER] Users API request: ${req.method}`);
