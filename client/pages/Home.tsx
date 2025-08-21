@@ -201,9 +201,9 @@ export default function Home({
     }
   }, [returnToPage]);
 
-  // Refresh stories when returning from story reader (but not during session restoration)
+  // Simple refresh trigger
   useEffect(() => {
-    if (!isRestoringFromSession && refreshTrigger && refreshTrigger > 0) {
+    if (refreshTrigger && refreshTrigger > 0) {
       fetchStories(currentPage);
     }
   }, [refreshTrigger]);
