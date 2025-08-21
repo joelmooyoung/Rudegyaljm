@@ -415,9 +415,22 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use working database connection
+  // Cache for stories to prevent multiple concurrent database calls
+  let storiesCache = null;
+  let lastCacheTime = 0;
+  const CACHE_DURATION = 30000; // 30 seconds
+
+  // STORIES ENDPOINT - Use cached response to prevent hanging
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using working MongoDB connection...");
+    console.log("📚 [STORIES] Checking cache...");
+
+    const now = Date.now();
+    if (storiesCache && (now - lastCacheTime) < CACHE_DURATION) {
+      console.log("📚 [STORIES] Returning cached response");
+      return res.json(storiesCache);
+    }
+
+    console.log("📚 [STORIES] Cache miss, fetching from database...");
     try {
       await connectToDatabase();
       const db = mongoose.connection.db;
@@ -451,19 +464,12 @@ export function createServer() {
         audioUrl: story.audioUrl || null,
       }));
 
-      // Test with minimal response first
-      const minimalResponse = [
-        {
-          id: stories[0]?.storyId,
-          title: stories[0]?.title,
-          author: stories[0]?.author,
-          viewCount: stories[0]?.views || 0,
-          rating: stories[0]?.averageRating || 0
-        }
-      ];
+      // Cache the response
+      storiesCache = transformedStories;
+      lastCacheTime = now;
 
-      console.log(`📚 [STORIES] Returning minimal test response`);
-      return res.json(minimalResponse);
+      console.log(`📚 [STORIES] Returning ${transformedStories.length} MongoDB stories (cached)`);
+      return res.json(transformedStories);
 
     } catch (error) {
       console.error("📚 [STORIES] Error:", error);
