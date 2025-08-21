@@ -194,10 +194,12 @@ export default function Home({
     }
   }, [returnToPage]);
 
-  // Simple refresh trigger
+  // Simple refresh trigger - but use returnToPage if available
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0) {
-      fetchStories(currentPage);
+      const pageToFetch = returnToPage || currentPage;
+      console.log(`🔄 Refresh triggered: using page ${pageToFetch} (returnToPage=${returnToPage}, currentPage=${currentPage})`);
+      fetchStories(pageToFetch);
     }
   }, [refreshTrigger]);
 
