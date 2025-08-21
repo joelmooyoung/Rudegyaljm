@@ -183,6 +183,14 @@ export default function Home({
     }
   }, [currentPage]);
 
+  // Handle returning to specific page when coming back from story detail
+  useEffect(() => {
+    if (returnToPage && returnToPage !== currentPage) {
+      console.log(`📖 Returning to page ${returnToPage} after story detail`);
+      setCurrentPage(returnToPage);
+    }
+  }, [returnToPage]);
+
   // Refresh stories when returning from story reader
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0) {
