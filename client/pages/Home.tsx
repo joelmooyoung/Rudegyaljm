@@ -39,6 +39,8 @@ import {
   Activity,
   AlertTriangle,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Heart,
   RefreshCw,
   Flame,
