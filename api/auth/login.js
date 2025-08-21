@@ -85,6 +85,7 @@ export default async function handler(req, res) {
             username: user.username,
             ip: clientIP,
             country: country,
+            city: city,
             userAgent: req.headers["user-agent"] || "Unknown",
             success: true,
             timestamp: new Date(),
