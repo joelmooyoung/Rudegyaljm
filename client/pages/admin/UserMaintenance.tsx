@@ -84,23 +84,44 @@ export default function UserMaintenance({
       ]);
 
       if (usersResponse.ok && statsResponse.ok) {
-        const usersResponse_data = await usersResponse.json();
-        const statsData = await statsResponse.json();
+        const usersResponseText = await usersResponse.text();
+        const statsResponseText = await statsResponse.text();
+
+        let usersResponse_data, statsData;
+        try {
+          usersResponse_data = JSON.parse(usersResponseText);
+          statsData = JSON.parse(statsResponseText);
+        } catch (jsonError) {
+          console.error("Failed to parse JSON response:", { usersResponseText, statsResponseText });
+          throw new Error(`JSON parsing failed: ${jsonError.message}`);
+        }
 
         // Extract users array from API response
         const usersData = usersResponse_data.success
           ? usersResponse_data.data
           : usersResponse_data;
 
-        // Convert date strings back to Date objects
-        const usersWithDates = (usersData || []).map((user: any) => ({
-          ...user,
-          createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
-          lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
-          subscriptionExpiry: user.subscriptionExpiry
-            ? new Date(user.subscriptionExpiry)
-            : undefined,
-        }));
+        // Convert date strings back to Date objects with error handling
+        const usersWithDates = (usersData || []).map((user: any) => {
+          try {
+            return {
+              ...user,
+              createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
+              lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
+              subscriptionExpiry: user.subscriptionExpiry
+                ? new Date(user.subscriptionExpiry)
+                : undefined,
+            };
+          } catch (dateError) {
+            console.warn("Error parsing dates for user:", user, dateError);
+            return {
+              ...user,
+              createdAt: new Date(),
+              lastLogin: undefined,
+              subscriptionExpiry: undefined,
+            };
+          }
+        });
         setUsers(usersWithDates);
         setStats(statsData);
       } else {
