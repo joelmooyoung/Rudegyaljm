@@ -112,7 +112,7 @@ export function createServer() {
 
   // Email endpoint health check
   app.get("/api/test-email", (req, res) => {
-    console.log("🔍 [EMAIL TEST] GET request to /api/test-email");
+    console.log("�� [EMAIL TEST] GET request to /api/test-email");
     res.json({
       message: "Email test endpoint is available",
       method: "POST required",
@@ -1068,6 +1068,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Debug likes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add fix Amsterdam likes route
+  app.post("/api/fix-amsterdam-likes", async (req, res) => {
+    console.log(`[SERVER] Fix Amsterdam likes request`);
+    try {
+      const { default: handler } = await import("../api/fix-amsterdam-likes.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import fix-amsterdam-likes handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Fix Amsterdam likes handler not available",
         error: error.message,
       });
     }
