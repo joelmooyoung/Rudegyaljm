@@ -233,13 +233,14 @@ export default function Home({
   };
 
   // Reset to page 1 when filters change
-  useEffect(() => {
-    console.log(`🔍 Filter change useEffect triggered: currentPage=${currentPage}, searchTerm="${searchTerm}", selectedCategory="${selectedCategory}", sortBy="${sortBy}"`);
-    if (currentPage !== 1) {
-      console.log(`🔄 Resetting to page 1 due to filter change`);
-      setCurrentPage(1);
-    }
-  }, [searchTerm, selectedCategory, sortBy]);
+  // DISABLED: This was causing race condition with pagination persistence
+  // useEffect(() => {
+  //   console.log(`🔍 Filter change useEffect triggered: currentPage=${currentPage}, searchTerm="${searchTerm}", selectedCategory="${selectedCategory}", sortBy="${sortBy}"`);
+  //   if (currentPage !== 1) {
+  //     console.log(`🔄 Resetting to page 1 due to filter change`);
+  //     setCurrentPage(1);
+  //   }
+  // }, [searchTerm, selectedCategory, sortBy]);
 
   // Pagination handlers
   const handleNextPage = () => {
