@@ -415,70 +415,11 @@ export function createServer() {
     });
   });
 
-  // Cache for stories to prevent multiple concurrent database calls
-  let storiesCache = null;
-  let lastCacheTime = 0;
-  const CACHE_DURATION = 30000; // 30 seconds
-
-  // STORIES ENDPOINT - Use cached response to prevent hanging
-  app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Checking cache...");
-
-    const now = Date.now();
-    if (storiesCache && (now - lastCacheTime) < CACHE_DURATION) {
-      console.log("📚 [STORIES] Returning cached response");
-      return res.json(storiesCache);
-    }
-
-    console.log("📚 [STORIES] Cache miss, fetching from database...");
-    try {
-      await connectToDatabase();
-      const db = mongoose.connection.db;
-      const storiesCollection = db.collection('stories');
-
-      const stories = await storiesCollection.find({ published: true })
-        .sort({ createdAt: -1 })
-        .toArray();
-
-      console.log(`📚 [STORIES] Found ${stories.length} stories`);
-
-      const transformedStories = stories.map((story) => ({
-        id: story.storyId || story._id.toString(),
-        title: story.title || "Untitled",
-        content: story.content || "",
-        excerpt: story.excerpt || "",
-        author: story.author || "Unknown Author",
-        category: story.category || "Romance",
-        tags: Array.isArray(story.tags) ? story.tags : [],
-        accessLevel: story.accessLevel || "free",
-        isPublished: story.published || false,
-        publishedAt: story.publishedAt || story.createdAt,
-        createdAt: story.createdAt || new Date(),
-        updatedAt: story.updatedAt || new Date(),
-        viewCount: story.views || story.viewCount || 0,
-        rating: story.averageRating || story.rating || 0,
-        ratingCount: story.ratingCount || 0,
-        likeCount: story.likeCount || 0,
-        commentCount: story.commentCount || 0,
-        image: story.image || null,
-        audioUrl: story.audioUrl || null,
-      }));
-
-      // Cache the response
-      storiesCache = transformedStories;
-      lastCacheTime = now;
-
-      console.log(`📚 [STORIES] Returning ${transformedStories.length} MongoDB stories (cached)`);
-      return res.json(transformedStories);
-
-    } catch (error) {
-      console.error("📚 [STORIES] Error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to fetch stories",
-        error: error.message
-      });
-    }
+  // STORIES ENDPOINT - Redirect to working API endpoint
+  app.get("/api/stories", (req, res) => {
+    console.log("📚 [STORIES] Redirecting to working test endpoint...");
+    // Temporarily redirect to the working database test which has your real data
+    res.redirect(302, "/api/test-db-simple");
   });
 
   // WORKING EMAIL TEST ENDPOINT
