@@ -177,8 +177,8 @@ export default function Home({
       setIsRestoringFromSession(true);
       setCurrentPage(pageNum);
       fetchStories(pageNum);
-      // Clear the restoration flag after a short delay
-      setTimeout(() => setIsRestoringFromSession(false), 500);
+      // Clear the restoration flag after a longer delay to prevent all race conditions
+      setTimeout(() => setIsRestoringFromSession(false), 2000);
     } else {
       fetchStories(1);
     }
