@@ -207,6 +207,14 @@ export default function LoginLogs({ onBack }: LoginLogsProps) {
                           {log.country}
                         </Badge>
                       </TableCell>
+                      <TableCell className="font-serif">
+                        <Badge
+                          variant="outline"
+                          className="border-primary/30 text-primary font-medium"
+                        >
+                          {log.city || "Unknown City"}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="max-w-48 truncate text-sm text-muted-foreground font-serif">
                         {log.userAgent}
                       </TableCell>
