@@ -100,6 +100,25 @@ const commentSchema = new mongoose.Schema(
 const Comment =
   mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 
+// LoginLog schema
+const loginLogSchema = new mongoose.Schema(
+  {
+    logId: { type: String, required: true, unique: true },
+    userId: { type: String, required: true },
+    username: { type: String, required: true },
+    ip: { type: String },
+    country: { type: String },
+    city: { type: String },
+    userAgent: { type: String },
+    success: { type: Boolean, required: true },
+    timestamp: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+);
+
+const LoginLog =
+  mongoose.models.LoginLog || mongoose.model("LoginLog", loginLogSchema);
+
 export function createServer() {
   const app = express();
 
