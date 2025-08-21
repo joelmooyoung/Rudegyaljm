@@ -323,9 +323,9 @@ export default function Home({
 
   const handleStoryClick = (story: Story) => {
     console.log(`📚 Story clicked: "${story.title}" from page ${currentPage}`);
-    // Store current page in sessionStorage for reliable persistence
-    sessionStorage.setItem('homePageNumber', currentPage.toString());
-    console.log(`💾 Stored page ${currentPage} in sessionStorage`);
+    // Store current page in URL hash for reliable persistence
+    window.location.hash = `page=${currentPage}`;
+    console.log(`💾 Stored page ${currentPage} in URL hash`);
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
