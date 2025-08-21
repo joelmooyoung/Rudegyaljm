@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         ratingCount: 50, // Default value
         likeCount: 0, // Default value
         commentCount: 0, // Default value
-        image: story.image || null,  // Use real image data
+        image: null,  // Temporarily disabled due to DB timeout with large base64 images
         audioUrl: story.audioUrl || null,  // Use real audio data
       }));
 
