@@ -167,8 +167,8 @@ export default function Home({
   };
 
   useEffect(() => {
-    fetchStories();
-  }, []);
+    fetchStories(currentPage);
+  }, [currentPage]);
 
   // Refresh stories when returning from story reader
   useEffect(() => {
