@@ -113,75 +113,42 @@ export default function Home({
 
   // Fetch stories from server
   const fetchStories = async (page = currentPage) => {
+    console.log(`🔄 fetchStories called with page ${page}`);
     setIsLoading(true);
     setError(null);
+
     try {
-      // Route to production API when in preview environment
-      const isBuilderPreview = window.location.hostname.includes("builder.my");
-      const apiUrl = isBuilderPreview
-        ? `https://rudegyaljm-amber.vercel.app/api/stories?page=${page}&limit=12`
-        : `/api/stories?page=${page}&limit=12`;
+      const apiUrl = `/api/stories?page=${page}&limit=12`;
+      console.log(`📞 Calling API: ${apiUrl}`);
+
       const response = await fetch(apiUrl);
+      console.log(`📡 Response status: ${response.status}`);
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Stories API response:", data);
-        console.log("Stories array check:", {
-          isArray: Array.isArray(data),
-          hasStories: data && Array.isArray(data.stories),
-          storiesLength: data?.stories?.length,
-          hasData: data && Array.isArray(data.data)
-        });
+        console.log("✅ Stories API response received:", data);
 
-        // Handle different response formats and ensure data is an array
-        let storiesArray = [];
-        if (Array.isArray(data)) {
-          storiesArray = data;
-        } else if (data && Array.isArray(data.stories)) {
-          storiesArray = data.stories;
-        } else if (data && Array.isArray(data.data)) {
-          storiesArray = data.data;
+        if (data && data.stories && Array.isArray(data.stories)) {
+          console.log(`📚 Processing ${data.stories.length} stories`);
+          setStories(data.stories);
+
+          if (data.pagination) {
+            setPagination(data.pagination);
+            console.log(`📄 Pagination set: Page ${data.pagination.currentPage} of ${data.pagination.totalPages}`);
+          }
         } else {
-          console.warn("Stories API returned unexpected format:", data);
-          storiesArray = [];
-        }
-
-        const storiesWithDates = storiesArray.map((story: any) => ({
-          ...story,
-          title: story.title || "Untitled",
-          author: story.author || "Unknown Author",
-          tags: Array.isArray(story.tags) ? story.tags : [],
-          createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
-          updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
-        }));
-        console.log("Setting stories:", {
-          storiesCount: storiesWithDates.length,
-          firstStory: storiesWithDates[0]?.title
-        });
-        setStories(storiesWithDates);
-
-        // Handle pagination data
-        if (data && data.pagination) {
-          setPagination(data.pagination);
-          console.log(`📚 Pagination: Page ${data.pagination.currentPage} of ${data.pagination.totalPages}`);
-        } else {
-          // Default pagination for legacy format
-          setPagination({
-            totalPages: 1,
-            totalStories: storiesWithDates.length,
-            hasNextPage: false,
-            hasPreviousPage: false,
-            limit: 12
-          });
+          console.error("❌ Invalid response format:", data);
+          setError("Invalid response format from server");
         }
       } else {
-        const errorMsg = `Failed to fetch stories: ${response.status} ${response.statusText}`;
-        setError(errorMsg);
+        console.error(`❌ API error: ${response.status} ${response.statusText}`);
+        setError(`Failed to fetch stories: ${response.status}`);
       }
     } catch (error) {
-      const errorMsg = `Network error: ${error instanceof Error ? error.message : "Unknown error"}`;
-      setError(errorMsg);
+      console.error("❌ Network error:", error);
+      setError(`Network error: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
-      console.log("Setting isLoading to false");
+      console.log("✅ Setting isLoading to false");
       setIsLoading(false);
     }
   };
