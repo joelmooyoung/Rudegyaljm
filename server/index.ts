@@ -334,7 +334,7 @@ export function createServer() {
       }
     } catch (dbError) {
       console.error(
-        "�� [LOGIN] Database failed, trying local users:",
+        "🔐 [LOGIN] Database failed, trying local users:",
         dbError.message,
       );
 
@@ -1100,6 +1100,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Sync story field names handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add debug stats comparison route
+  app.get("/api/debug-stats-comparison", async (req, res) => {
+    console.log(`[SERVER] Debug stats comparison request`);
+    try {
+      const { default: handler } = await import("../api/debug-stats-comparison.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-stats-comparison handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug stats comparison handler not available",
         error: error.message,
       });
     }
