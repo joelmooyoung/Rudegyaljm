@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
     console.log(`[STORIES MINIMAL] Total: ${totalStories} stories, ${totalPages} pages`);
 
-    // Load stories with basic info and images for home page display
+    // Load stories with basic info only - minimal fields to prevent timeout
     const stories = await storiesCollection.find(
       { published: true },
       {
@@ -56,15 +56,8 @@ export default async function handler(req, res) {
           author: 1,
           category: 1,
           accessLevel: 1,
-          views: 1,
-          viewCount: 1,
-          averageRating: 1,
-          rating: 1,
-          createdAt: 1,
-          // image: 1,  // Temporarily disabled - causing DB timeout with large base64 images
-          audioUrl: 1,  // Include audio info for indicators
-          excerpt: 1,  // Include excerpt for better previews
-          // Still exclude content to keep response size reasonable
+          createdAt: 1
+          // Exclude all other fields to prevent timeout
         }
       }
     )
