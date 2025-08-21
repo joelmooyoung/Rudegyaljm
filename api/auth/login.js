@@ -73,10 +73,11 @@ export default async function handler(req, res) {
           // Clean IP if it has multiple IPs (take first one)
           const clientIP = rawIP.includes(',') ? rawIP.split(',')[0].trim() : rawIP;
 
-          // Get country from IP using geolocation
+          // Get country and city from IP using geolocation
           const country = getCountryFromIP(clientIP);
+          const city = getCityFromIP(clientIP);
 
-          console.log(`[LOGIN API] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}`);
+          console.log(`[LOGIN API] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}, ${city}`);
 
           const loginLog = new LoginLog({
             logId: `success_${Date.now()}`,
