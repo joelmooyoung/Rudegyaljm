@@ -173,9 +173,26 @@ export default function Home({
   // Refresh stories when returning from story reader
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0) {
-      fetchStories();
+      fetchStories(currentPage);
     }
   }, [refreshTrigger]);
+
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (pagination.hasNextPage) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (pagination.hasPreviousPage) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageSelect = (page: number) => {
+    setCurrentPage(page);
+  };
 
   // Filter and sort stories
   const filteredStories = stories
