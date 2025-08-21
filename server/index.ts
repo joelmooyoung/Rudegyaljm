@@ -529,37 +529,50 @@ export function createServer() {
           ratingCount: firstStory.ratingCount,
         });
 
-        const transformedStories = await Promise.all(
-          stories.map(async (story) => {
-            // Get real comment count from Comment collection
-            const realCommentCount = await Comment.countDocuments({
-              storyId: story.storyId,
-            });
+        // Optimize: Get all comment counts in a single aggregation query
+        console.log("📚 [STORIES] Getting comment counts for all stories...");
+        const commentCounts = await Comment.aggregate([
+          {
+            $group: {
+              _id: "$storyId",
+              count: { $sum: 1 }
+            }
+          }
+        ]);
 
-            return {
-              id: story.storyId || story._id.toString(),
-              title: story.title || "Untitled",
-              content: story.content || "",
-              excerpt: story.excerpt || "",
-              author: story.author || "Unknown Author",
-              category: story.category || "Romance",
-              tags: Array.isArray(story.tags) ? story.tags : [],
-              accessLevel: story.accessLevel || "free",
-              isPublished: story.published || false,
-              publishedAt: story.publishedAt || story.createdAt,
-              createdAt: story.createdAt || new Date(),
-              updatedAt: story.updatedAt || new Date(),
-              // Use correct MongoDB field names from production database (after sync)
-              viewCount: story.viewCount || 0, // MongoDB field is 'viewCount' after sync
-              rating: story.rating || 0, // MongoDB field is 'rating' after sync
-              ratingCount: story.ratingCount || 0,
-              likeCount: story.likeCount || 0,
-              commentCount: realCommentCount, // Use real comment count from Comment collection
-              image: story.image || null,
-              audioUrl: story.audioUrl || null,
-            };
-          }),
-        );
+        // Create a map for quick lookup
+        const commentCountMap = {};
+        commentCounts.forEach(item => {
+          commentCountMap[item._id] = item.count;
+        });
+
+        console.log("📚 [STORIES] Transforming stories with optimized comment counts...");
+        const transformedStories = stories.map((story) => {
+          const commentCount = commentCountMap[story.storyId] || 0;
+
+          return {
+            id: story.storyId || story._id.toString(),
+            title: story.title || "Untitled",
+            content: story.content || "",
+            excerpt: story.excerpt || "",
+            author: story.author || "Unknown Author",
+            category: story.category || "Romance",
+            tags: Array.isArray(story.tags) ? story.tags : [],
+            accessLevel: story.accessLevel || "free",
+            isPublished: story.published || false,
+            publishedAt: story.publishedAt || story.createdAt,
+            createdAt: story.createdAt || new Date(),
+            updatedAt: story.updatedAt || new Date(),
+            // Use correct MongoDB field names from production database (after sync)
+            viewCount: story.viewCount || 0, // MongoDB field is 'viewCount' after sync
+            rating: story.rating || 0, // MongoDB field is 'rating' after sync
+            ratingCount: story.ratingCount || 0,
+            likeCount: story.likeCount || 0,
+            commentCount: commentCount, // Use optimized comment count
+            image: story.image || null,
+            audioUrl: story.audioUrl || null,
+          };
+        });
 
         return res.json(transformedStories);
       }
