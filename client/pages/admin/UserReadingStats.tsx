@@ -96,10 +96,20 @@ export default function UserReadingStats({ onBack }: UserReadingStatsProps) {
           if (sortBy === "totalReads") return b.totalReads - a.totalReads;
           if (sortBy === "uniqueStories")
             return b.uniqueStoriesCount - a.uniqueStoriesCount;
-          if (sortBy === "lastRead")
-            return (
-              new Date(b.lastRead).getTime() - new Date(a.lastRead).getTime()
-            );
+          if (sortBy === "lastRead") {
+            try {
+              const dateA = new Date(a.lastRead);
+              const dateB = new Date(b.lastRead);
+              if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+                console.warn("Invalid date found in lastRead:", { a: a.lastRead, b: b.lastRead });
+                return 0; // Keep original order if dates are invalid
+              }
+              return dateB.getTime() - dateA.getTime();
+            } catch (error) {
+              console.warn("Error parsing lastRead dates:", error);
+              return 0;
+            }
+          }
           if (sortBy === "username")
             return a.username.localeCompare(b.username);
           return 0;
