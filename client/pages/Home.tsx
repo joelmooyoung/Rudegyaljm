@@ -753,6 +753,55 @@ export default function Home({
             </div>
           )}
 
+          {/* Pagination Controls */}
+          {!isLoading && !error && filteredStories.length > 0 && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-8 pt-8 border-t border-border/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePreviousPage}
+                disabled={!pagination.hasPreviousPage}
+                className="flex items-center gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+
+              <div className="flex items-center gap-2">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <Button
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageSelect(pageNum)}
+                    className="w-10 h-10"
+                  >
+                    {pageNum}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={!pagination.hasNextPage}
+                className="flex items-center gap-2"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {/* Show pagination info */}
+          {!isLoading && !error && filteredStories.length > 0 && (
+            <div className="text-center mt-4 text-sm text-muted-foreground">
+              Showing {filteredStories.length} of {pagination.totalStories} stories
+              (Page {currentPage} of {pagination.totalPages})
+            </div>
+          )}
+
           {!isLoading && !error && filteredStories.length === 0 && (
             <div className="text-center py-12">
               <Flame className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -835,7 +884,7 @@ export default function Home({
                   📧 hello@Rudegyalconfessions.com
                 </div>
                 <div className="break-all">
-                  🛠️ support@Rudegyalconfessions.com
+                  ���️ support@Rudegyalconfessions.com
                 </div>
                 <div className="break-all">🌐 Rudegyalconfessions.com</div>
               </div>
