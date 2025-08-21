@@ -88,6 +88,13 @@ export default function Home({
     hasPreviousPage: false,
     limit: 12
   });
+  const [aggregateStats, setAggregateStats] = useState({
+    totalStories: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalViews: 0,
+    totalRatings: 0
+  });
 
   const categories = [
     "all",
