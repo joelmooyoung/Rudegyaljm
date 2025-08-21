@@ -511,9 +511,13 @@ export function createServer() {
       await connectToDatabase();
       console.log("📚 [STORIES] Database connected, trying database stories");
 
+      console.log("📚 [STORIES] Attempting to query stories from database...");
       const stories = await Story.find({ published: true })
         .sort({ createdAt: -1 })
+        .limit(10) // Limit to 10 stories for debugging
         .lean();
+
+      console.log(`📚 [STORIES] Query completed, found ${stories ? stories.length : 0} stories`);
 
       if (stories && stories.length > 0) {
         console.log(`📚 [STORIES] ✅ Found ${stories.length} database stories`);
@@ -529,27 +533,8 @@ export function createServer() {
           ratingCount: firstStory.ratingCount,
         });
 
-        // Optimize: Get all comment counts in a single aggregation query
-        console.log("📚 [STORIES] Getting comment counts for all stories...");
-        const commentCounts = await Comment.aggregate([
-          {
-            $group: {
-              _id: "$storyId",
-              count: { $sum: 1 }
-            }
-          }
-        ]);
-
-        // Create a map for quick lookup
-        const commentCountMap = {};
-        commentCounts.forEach(item => {
-          commentCountMap[item._id] = item.count;
-        });
-
-        console.log("📚 [STORIES] Transforming stories with optimized comment counts...");
+        console.log("📚 [STORIES] Transforming stories without comment queries...");
         const transformedStories = stories.map((story) => {
-          const commentCount = commentCountMap[story.storyId] || 0;
-
           return {
             id: story.storyId || story._id.toString(),
             title: story.title || "Untitled",
@@ -568,12 +553,13 @@ export function createServer() {
             rating: story.rating || 0, // MongoDB field is 'rating' after sync
             ratingCount: story.ratingCount || 0,
             likeCount: story.likeCount || 0,
-            commentCount: commentCount, // Use optimized comment count
+            commentCount: story.commentCount || 0, // Use story's own commentCount field
             image: story.image || null,
             audioUrl: story.audioUrl || null,
           };
         });
 
+        console.log("📚 [STORIES] Transformation complete, returning response");
         return res.json(transformedStories);
       }
     } catch (dbError) {
