@@ -1140,6 +1140,22 @@ export function createServer() {
     }
   });
 
+  // Add admin user reading stats route
+  app.get("/api/admin/user-reading-stats", async (req, res) => {
+    console.log(`[SERVER] Admin user reading stats request`);
+    try {
+      const { default: handler } = await import("../api/admin/user-reading-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import user-reading-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "User reading stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
