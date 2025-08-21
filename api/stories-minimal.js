@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       }
     )
     .sort({ createdAt: -1 })
-    .limit(15) // Limit to 15 stories for performance
+    .limit(30) // Increase to 30 stories since minimal API works well
     .toArray();
     
     console.log(`[STORIES MINIMAL] Retrieved ${stories.length} minimal story records`);
