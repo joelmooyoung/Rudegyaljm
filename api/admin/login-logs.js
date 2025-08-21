@@ -34,6 +34,7 @@ export default async function handler(req, res) {
           email: log.username, // Use username as email fallback since email isn't stored in LoginLog
           ipAddress: log.ip, // Map ip to ipAddress
           country: log.country,
+          city: log.city, // Add city field
           userAgent: log.userAgent,
           success: log.success,
           createdAt: log.timestamp, // Map timestamp to createdAt
