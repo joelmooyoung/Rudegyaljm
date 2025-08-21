@@ -79,7 +79,14 @@ export default function UserReadingStats({ onBack }: UserReadingStatsProps) {
 
       const response = await fetch(`/api/admin/user-reading-stats?${params}`);
       if (response.ok) {
-        const data = await response.json();
+        const responseText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (jsonError) {
+          console.error("Failed to parse JSON response:", responseText);
+          throw new Error(`JSON parsing failed: ${jsonError.message}`);
+        }
         let filteredUsers = data.data.users || [];
 
         // Client-side search filtering
