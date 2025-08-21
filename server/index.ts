@@ -1156,6 +1156,70 @@ export function createServer() {
     }
   });
 
+  // Add main users API route
+  app.all("/api/users", async (req, res) => {
+    console.log(`[SERVER] Users API request: ${req.method}`);
+    try {
+      const { default: handler } = await import("../api/users.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import users handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Users handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add users stats route
+  app.get("/api/users/stats", async (req, res) => {
+    console.log(`[SERVER] Users stats request`);
+    try {
+      const { default: handler } = await import("../api/users/stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import users stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Users stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add user toggle active route
+  app.patch("/api/users/:id/toggle-active", async (req, res) => {
+    console.log(`[SERVER] User toggle active request for ID: ${req.params.id}`);
+    try {
+      const { default: handler } = await import("../api/users/[id]/toggle-active.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import user toggle-active handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "User toggle-active handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add user delete route
+  app.delete("/api/users/:id", async (req, res) => {
+    console.log(`[SERVER] User delete request for ID: ${req.params.id}`);
+    try {
+      const { default: handler } = await import("../api/users/[id].js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import user delete handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "User delete handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
