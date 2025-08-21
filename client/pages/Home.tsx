@@ -98,6 +98,7 @@ export default function Home({
     totalRatings: 0
   });
   const [isLoadingStories, setIsLoadingStories] = useState(false);
+  const [isRestoringFromSession, setIsRestoringFromSession] = useState(false);
 
   const categories = [
     "all",
