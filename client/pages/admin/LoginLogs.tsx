@@ -28,6 +28,7 @@ import {
   Mail,
   Globe,
   Monitor,
+  MapPin,
 } from "lucide-react";
 import { LoginLog } from "@shared/api";
 
