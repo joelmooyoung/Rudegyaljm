@@ -167,29 +167,32 @@ export default function Home({
     }
   };
 
-  // Simple initial load - just load page 1, handle restoration separately
+  // Simple initial load - check hash first, then load appropriate page
   useEffect(() => {
-    console.log("🚀 Component mounted - loading initial data");
-    fetchStories(1);
-    fetchAggregateStats();
+    console.log("🚀 Component mounted - checking for page restoration");
 
-    // Handle restoration in a separate, delayed call to avoid race conditions
-    setTimeout(() => {
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const pageFromHash = hashParams.get('page');
-      if (pageFromHash) {
-        const pageNum = parseInt(pageFromHash);
-        console.log(`🔄 Restoring page ${pageNum} from URL hash`);
-        window.location.hash = '';
-        setCurrentPage(pageNum);
-        fetchStories(pageNum);
-      }
-    }, 100);
+    // Check hash first for page restoration
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const pageFromHash = hashParams.get('page');
+
+    if (pageFromHash) {
+      const pageNum = parseInt(pageFromHash);
+      console.log(`🔄 Restoring page ${pageNum} from URL hash`);
+      // Don't clear hash immediately - let user see they're on correct page
+      setCurrentPage(pageNum);
+      fetchStories(pageNum);
+    } else {
+      console.log("📖 No page in hash, loading page 1");
+      fetchStories(1);
+    }
+
+    fetchAggregateStats();
   }, []); // Only run on mount
 
-  // Simple page changes
+  // Handle page changes (but skip initial mount)
   useEffect(() => {
-    if (currentPage > 1) {
+    // Skip the initial mount to avoid double loading
+    if (currentPage !== 1 || stories.length > 0) {
       console.log(`📄 Page changed to ${currentPage}`);
       fetchStories(currentPage);
     }
@@ -326,7 +329,7 @@ export default function Home({
     console.log(`📚 Story clicked: "${story.title}" from page ${currentPage}`);
     // Store current page in URL hash for reliable persistence
     window.location.hash = `page=${currentPage}`;
-    console.log(`💾 Stored page ${currentPage} in URL hash`);
+    console.log(`💾 Stored page ${currentPage} in URL hash: ${window.location.hash}`);
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
