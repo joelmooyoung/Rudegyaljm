@@ -174,8 +174,11 @@ export default function Home({
       const pageNum = parseInt(storedPage);
       console.log(`🔄 Restoring page ${pageNum} from sessionStorage`);
       sessionStorage.removeItem('homePageNumber'); // Clear after use
+      setIsRestoringFromSession(true);
       setCurrentPage(pageNum);
       fetchStories(pageNum);
+      // Clear the restoration flag after a short delay
+      setTimeout(() => setIsRestoringFromSession(false), 500);
     } else {
       fetchStories(1);
     }
@@ -951,7 +954,7 @@ export default function Home({
                   📧 hello@Rudegyalconfessions.com
                 </div>
                 <div className="break-all">
-                  ���️ support@Rudegyalconfessions.com
+                  ����️ support@Rudegyalconfessions.com
                 </div>
                 <div className="break-all">🌐 Rudegyalconfessions.com</div>
               </div>
