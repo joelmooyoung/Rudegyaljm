@@ -46,11 +46,11 @@ export default async function handler(req, res) {
     console.log(`[STORIES SAFE] Found ${storyIds.length} story IDs to process`);
     
     // Process stories one by one to identify problematic ones
-    for (let i = 0; i < Math.min(storyIds.length, 15); i++) { // Limit to 15 for testing
+    for (let i = 0; i < Math.min(storyIds.length, 30); i++) { // Increase to 30 stories
       const storyRef = storyIds[i];
-      
+
       try {
-        console.log(`[STORIES SAFE] Loading story ${i + 1}/${Math.min(storyIds.length, 15)}: ${storyRef.title}`);
+        console.log(`[STORIES SAFE] Loading story ${i + 1}/${Math.min(storyIds.length, 30)}: ${storyRef.title}`);
         
         const story = await storiesCollection.findOne(
           { _id: storyRef._id },
