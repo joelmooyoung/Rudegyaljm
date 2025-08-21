@@ -87,6 +87,7 @@ const loginLogSchema = new mongoose.Schema(
     username: { type: String, required: true },
     ip: { type: String },
     country: { type: String },
+    city: { type: String }, // New field for city detection
     userAgent: { type: String },
     success: { type: Boolean, required: true },
     timestamp: { type: Date, default: Date.now },
