@@ -90,19 +90,28 @@ export default async function handler(req, res) {
       let commentCountMap = {};
 
       try {
-        const storyIds = stories.map((story) => story.storyId).filter(id => id); // Filter out null/undefined
+        const storyIds = stories
+          .map((story) => story.storyId)
+          .filter((id) => id); // Filter out null/undefined
 
         if (storyIds.length > 0) {
-          console.log(`[STORIES MINIMAL] Getting comment counts for ${storyIds.length} stories...`);
+          console.log(
+            `[STORIES MINIMAL] Getting comment counts for ${storyIds.length} stories...`,
+          );
 
           const commentCounts = await Promise.race([
-            commentsCollection.aggregate([
-              { $match: { storyId: { $in: storyIds } } },
-              { $group: { _id: "$storyId", count: { $sum: 1 } } }
-            ]).toArray(),
+            commentsCollection
+              .aggregate([
+                { $match: { storyId: { $in: storyIds } } },
+                { $group: { _id: "$storyId", count: { $sum: 1 } } },
+              ])
+              .toArray(),
             new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Comment aggregation timeout')), 5000)
-            )
+              setTimeout(
+                () => reject(new Error("Comment aggregation timeout")),
+                5000,
+              ),
+            ),
           ]);
 
           // Create a map of storyId -> real comment count
@@ -110,10 +119,16 @@ export default async function handler(req, res) {
             commentCountMap[item._id] = item.count;
           });
 
-          console.log(`[STORIES MINIMAL] Real comment counts:`, commentCountMap);
+          console.log(
+            `[STORIES MINIMAL] Real comment counts:`,
+            commentCountMap,
+          );
         }
       } catch (error) {
-        console.warn(`[STORIES MINIMAL] Failed to get real comment counts, using fallback:`, error.message);
+        console.warn(
+          `[STORIES MINIMAL] Failed to get real comment counts, using fallback:`,
+          error.message,
+        );
         // Fallback to story document comment counts
         stories.forEach((story) => {
           if (story.storyId) {
