@@ -23,10 +23,10 @@ export default async function handler(req, res) {
     const count = await storiesCollection.countDocuments({ published: true });
     console.log(`[TEST DB] Found ${count} published stories`);
     
-    console.log("[TEST DB] Attempting to find first 3 stories...");
+    console.log("[TEST DB] Attempting to find first 10 stories...");
     const stories = await storiesCollection.find({ published: true })
       .sort({ createdAt: -1 })
-      .limit(3)
+      .limit(10)
       .toArray();
     
     console.log(`[TEST DB] Retrieved ${stories.length} stories successfully`);
