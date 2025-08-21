@@ -181,16 +181,22 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               : (commentsResponseData?.data || commentsResponseData || []);
 
             console.log("Loaded comments for story:", commentsData);
-            setComments(
-              commentsData
-                .filter((comment: any) => comment && (comment.id || comment.commentId))
-                .map((comment: any) => ({
-                  ...comment,
-                  id: comment.id || comment.commentId || `comment-${Date.now()}-${Math.random()}`,
-                  createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
-                  updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
-                })),
-            );
+            const filteredComments = commentsData
+              .filter((comment: any) => comment && (comment.id || comment.commentId))
+              .map((comment: any) => ({
+                ...comment,
+                id: comment.id || comment.commentId || `comment-${Date.now()}-${Math.random()}`,
+                createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
+                updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
+              }));
+
+            setComments(filteredComments);
+
+            // Update header stats with actual comment count
+            setStoryStats((prev) => ({
+              ...prev,
+              commentCount: filteredComments.length,
+            }));
           } else {
             console.warn(`Comments API returned ${commentsResponse.status}:`, await commentsResponse.text());
             setComments([]);
