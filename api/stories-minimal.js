@@ -63,8 +63,8 @@ export default async function handler(req, res) {
           commentCount: 1,
           rating: 1,
           averageRating: 1,
-          ratingCount: 1
-          // Still exclude large fields like content and image
+          ratingCount: 1,
+          image: 1  // Re-enable images - monitor for timeouts
         }
       }
     )
