@@ -99,6 +99,7 @@ export default function Home({
   });
   const [isLoadingStories, setIsLoadingStories] = useState(false);
   const [isRestoringFromSession, setIsRestoringFromSession] = useState(false);
+  const [isRestoringFromReturn, setIsRestoringFromReturn] = useState(false);
 
   const categories = [
     "all",
@@ -174,19 +175,28 @@ export default function Home({
     fetchAggregateStats();
   }, []); // Only run on mount
 
-  // Handle page changes (but skip initial mount)
+  // Handle page changes (but skip initial mount and restoration scenarios)
   useEffect(() => {
+    // Skip if we're restoring from return page to avoid conflicts
+    if (isRestoringFromReturn) {
+      console.log(`���️ Skipping currentPage useEffect - restoring from return page`);
+      return;
+    }
+
     // Skip the initial mount to avoid double loading
     if (currentPage !== 1 || stories.length > 0) {
       console.log(`📄 Page changed to ${currentPage}`);
       fetchStories(currentPage);
     }
-  }, [currentPage]);
+  }, [currentPage, isRestoringFromReturn]);
 
   // Handle returning to specific page when coming back from story detail
   useEffect(() => {
     console.log(`🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`);
     if (returnToPage && returnToPage > 0) {
+      console.log(`📖 Starting page restoration to ${returnToPage}`);
+      setIsRestoringFromReturn(true);
+
       if (returnToPage !== currentPage) {
         console.log(`📖 Returning to page ${returnToPage} after story detail (was on page ${currentPage})`);
         setCurrentPage(returnToPage);
@@ -197,17 +207,28 @@ export default function Home({
         console.log(`ℹ️ returnToPage=${returnToPage} matches currentPage=${currentPage} - just refresh this page`);
         fetchStories(currentPage);
       }
+
+      // Clear restoration flag after a delay
+      setTimeout(() => {
+        console.log(`✅ Page restoration complete, clearing flag`);
+        setIsRestoringFromReturn(false);
+      }, 500);
     }
   }, [returnToPage]);
 
-  // Simple refresh trigger - but use returnToPage if available
+  // Simple refresh trigger - but skip if we're in page restoration
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0) {
-      const pageToFetch = returnToPage || currentPage;
-      console.log(`🔄 Refresh triggered: using page ${pageToFetch} (returnToPage=${returnToPage}, currentPage=${currentPage})`);
-      fetchStories(pageToFetch);
+      // Skip refresh if we're restoring from return page
+      if (isRestoringFromReturn || returnToPage) {
+        console.log(`⏸️ Skipping refresh trigger - page restoration in progress`);
+        return;
+      }
+
+      console.log(`🔄 Refresh triggered: fetching page ${currentPage}`);
+      fetchStories(currentPage);
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, isRestoringFromReturn, returnToPage]);
 
   // Fetch aggregate stats for header display
   const fetchAggregateStats = async () => {
