@@ -92,25 +92,19 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             const responseText = await viewResponse.text();
             try {
               const viewResult = JSON.parse(responseText);
-              setStoryStats((prev) => ({
-                ...prev,
-                viewCount: viewResult.data?.viewCount || prev.viewCount + 1,
-              }));
+              // Use the actual view count from API response
+              const newViewCount = viewResult.newViewCount || viewResult.currentViewCount || viewResult.data?.viewCount;
+              if (newViewCount !== undefined) {
+                setStoryStats((prev) => ({
+                  ...prev,
+                  viewCount: newViewCount,
+                }));
+              }
             } catch (jsonError) {
               console.warn("Failed to parse view count JSON response:", responseText);
-              // Fallback to local increment
-              setStoryStats((prev) => ({
-                ...prev,
-                viewCount: prev.viewCount + 1,
-              }));
             }
           } else {
             console.warn(`View count API returned ${viewResponse.status}:`, await viewResponse.text());
-            // Fallback to local increment if API fails
-            setStoryStats((prev) => ({
-              ...prev,
-              viewCount: prev.viewCount + 1,
-            }));
           }
         } catch (viewError) {
           console.error("Error updating view count:", viewError);
