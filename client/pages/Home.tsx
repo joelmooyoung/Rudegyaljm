@@ -185,11 +185,11 @@ export default function Home({
 
   // Handle returning to specific page when coming back from story detail
   useEffect(() => {
-    if (returnToPage && returnToPage !== currentPage) {
+    if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
       console.log(`📖 Returning to page ${returnToPage} after story detail`);
       setCurrentPage(returnToPage);
     }
-  }, [returnToPage]);
+  }, [returnToPage, currentPage]);
 
   // Refresh stories when returning from story reader
   useEffect(() => {
