@@ -1243,6 +1243,22 @@ export function createServer() {
     }
   });
 
+  // Add admin login logs route
+  app.all("/api/admin/login-logs", async (req, res) => {
+    console.log(`[SERVER] Admin login logs request: ${req.method}`);
+    try {
+      const { default: handler } = await import("../api/admin/login-logs.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import login-logs handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Login logs handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add main users API route
   app.all("/api/users", async (req, res) => {
     console.log(`[SERVER] Users API request: ${req.method}`);
