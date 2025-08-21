@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   // Get pagination parameters
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 12; // Default to 12 stories per page
+  const limit = parseInt(req.query.limit) || 8; // Reduced to 8 stories per page for better performance
   const skip = (page - 1) * limit;
 
   try {
