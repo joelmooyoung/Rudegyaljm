@@ -186,11 +186,17 @@ export default function Home({
   // Handle returning to specific page when coming back from story detail
   useEffect(() => {
     console.log(`🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`);
-    if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
-      console.log(`📖 Returning to page ${returnToPage} after story detail (was on page ${currentPage})`);
-      setCurrentPage(returnToPage);
-    } else if (returnToPage) {
-      console.log(`ℹ️ returnToPage=${returnToPage} but currentPage=${currentPage} (no change needed)`);
+    if (returnToPage && returnToPage > 0) {
+      if (returnToPage !== currentPage) {
+        console.log(`📖 Returning to page ${returnToPage} after story detail (was on page ${currentPage})`);
+        setCurrentPage(returnToPage);
+        // Fetch stories for the return page immediately
+        console.log(`🚀 Fetching stories for return page ${returnToPage}`);
+        fetchStories(returnToPage);
+      } else {
+        console.log(`ℹ️ returnToPage=${returnToPage} matches currentPage=${currentPage} - just refresh this page`);
+        fetchStories(currentPage);
+      }
     }
   }, [returnToPage]);
 
