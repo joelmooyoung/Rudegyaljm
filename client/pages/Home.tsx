@@ -307,6 +307,7 @@ export default function Home({
     });
 
   const handleStoryClick = (story: Story) => {
+    console.log(`📚 Story clicked: "${story.title}" from page ${currentPage}`);
     if (onReadStory) {
       // Pass the current page so we can return to it later
       onReadStory(story, currentPage);
