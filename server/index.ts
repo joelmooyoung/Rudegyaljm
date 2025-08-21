@@ -1057,6 +1057,22 @@ export function createServer() {
     }
   });
 
+  // Add debug likes route
+  app.get("/api/debug-likes", async (req, res) => {
+    console.log(`[SERVER] Debug likes request`);
+    try {
+      const { default: handler } = await import("../api/debug-likes.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-likes handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug likes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add admin routes for user management
   app.get("/api/admin/list-users", async (req, res) => {
     console.log(`[SERVER] Admin list users request`);
