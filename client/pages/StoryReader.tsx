@@ -37,6 +37,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   const [newComment, setNewComment] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const [fullStory, setFullStory] = useState<Story>(story);
+  const [isLoadingStory, setIsLoadingStory] = useState(false);
   const [storyStats, setStoryStats] = useState({
     rating: story.rating,
     ratingCount: story.ratingCount,
