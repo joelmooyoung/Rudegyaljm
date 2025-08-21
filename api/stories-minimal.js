@@ -37,7 +37,8 @@ export default async function handler(req, res) {
     
     const db = mongoose.connection.db;
     const storiesCollection = db.collection('stories');
-    
+    const commentsCollection = db.collection('comments');
+
     console.log(`[STORIES MINIMAL] Getting story data for page ${page} (limit: ${limit})...`);
 
     // Get total count for pagination
