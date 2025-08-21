@@ -334,7 +334,7 @@ export function createServer() {
       }
     } catch (dbError) {
       console.error(
-        "🔐 [LOGIN] Database failed, trying local users:",
+        "�� [LOGIN] Database failed, trying local users:",
         dbError.message,
       );
 
@@ -1084,6 +1084,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Fix Amsterdam likes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add sync story field names route
+  app.post("/api/sync-story-field-names", async (req, res) => {
+    console.log(`[SERVER] Sync story field names request`);
+    try {
+      const { default: handler } = await import("../api/sync-story-field-names.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import sync-story-field-names handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Sync story field names handler not available",
         error: error.message,
       });
     }
