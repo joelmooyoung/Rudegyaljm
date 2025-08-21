@@ -30,40 +30,54 @@ export default async function handler(req, res) {
 
     console.log("[STORIES AGGREGATE STATS] Calculating aggregate statistics...");
 
-    // Get total published stories count
-    const totalStories = await storiesCollection.countDocuments({ published: true });
+    // Use Promise.race to add timeout protection
+    const timeoutMs = 10000; // 10 seconds timeout
 
-    // Get aggregate stats from published stories
-    const storyStats = await storiesCollection.aggregate([
-      { $match: { published: true } },
-      {
-        $group: {
-          _id: null,
-          totalLikes: { $sum: { $ifNull: ["$likeCount", 0] } },
-          totalViews: { $sum: { $ifNull: ["$viewCount", 0] } },
-          totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } }
-        }
-      }
-    ]).toArray();
+    const aggregatePromise = Promise.all([
+      // Get total published stories count
+      storiesCollection.countDocuments({ published: true }),
 
-    // Get total comments across all published stories
-    const commentStats = await commentsCollection.aggregate([
-      {
-        $lookup: {
-          from: 'stories',
-          localField: 'storyId',
-          foreignField: 'storyId',
-          as: 'story'
+      // Get aggregate stats from published stories
+      storiesCollection.aggregate([
+        { $match: { published: true } },
+        {
+          $group: {
+            _id: null,
+            totalLikes: { $sum: { $ifNull: ["$likeCount", 0] } },
+            totalViews: { $sum: { $ifNull: ["$viewCount", 0] } },
+            totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } }
+          }
         }
-      },
-      { $match: { 'story.published': true } },
-      {
-        $group: {
-          _id: null,
-          totalComments: { $sum: 1 }
+      ]).toArray(),
+
+      // Get total comments across all published stories
+      commentsCollection.aggregate([
+        {
+          $lookup: {
+            from: 'stories',
+            localField: 'storyId',
+            foreignField: 'storyId',
+            as: 'story'
+          }
+        },
+        { $match: { 'story.published': true } },
+        {
+          $group: {
+            _id: null,
+            totalComments: { $sum: 1 }
+          }
         }
-      }
-    ]).toArray();
+      ]).toArray()
+    ]);
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Aggregate stats timeout')), timeoutMs)
+    );
+
+    const [totalStories, storyStats, commentStats] = await Promise.race([
+      aggregatePromise,
+      timeoutPromise
+    ]);
 
     const aggregateStats = {
       totalStories: totalStories,
