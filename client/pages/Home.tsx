@@ -55,12 +55,13 @@ interface HomeProps {
   user?: UserType;
   onLogout?: () => void;
   onNavigateToAdmin?: (section: string) => void;
-  onReadStory?: (story: Story) => void;
+  onReadStory?: (story: Story, returnPage?: number) => void;
   onNavigateToAbout?: () => void;
   onNavigateToContact?: () => void;
   onNavigateToHelp?: () => void;
   onNavigateToProfile?: (section: string) => void;
   refreshTrigger?: number;
+  returnToPage?: number; // Page to return to when coming back from story detail
 }
 
 export default function Home({
