@@ -415,18 +415,51 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use working raw MongoDB API
+  // STORIES ENDPOINT - Use working database connection
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using raw MongoDB API...");
+    console.log("📚 [STORIES] Using working MongoDB connection...");
     try {
-      const { default: handler } = await import("../api/stories-raw.js");
-      return handler(req, res);
+      await connectToDatabase();
+      const db = mongoose.connection.db;
+      const storiesCollection = db.collection('stories');
+
+      const stories = await storiesCollection.find({ published: true })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      console.log(`📚 [STORIES] Found ${stories.length} stories`);
+
+      const transformedStories = stories.map((story) => ({
+        id: story.storyId || story._id.toString(),
+        title: story.title || "Untitled",
+        content: story.content || "",
+        excerpt: story.excerpt || "",
+        author: story.author || "Unknown Author",
+        category: story.category || "Romance",
+        tags: Array.isArray(story.tags) ? story.tags : [],
+        accessLevel: story.accessLevel || "free",
+        isPublished: story.published || false,
+        publishedAt: story.publishedAt || story.createdAt,
+        createdAt: story.createdAt || new Date(),
+        updatedAt: story.updatedAt || new Date(),
+        viewCount: story.views || story.viewCount || 0,
+        rating: story.averageRating || story.rating || 0,
+        ratingCount: story.ratingCount || 0,
+        likeCount: story.likeCount || 0,
+        commentCount: story.commentCount || 0,
+        image: story.image || null,
+        audioUrl: story.audioUrl || null,
+      }));
+
+      console.log(`📚 [STORIES] Returning ${transformedStories.length} MongoDB stories`);
+      return res.json(transformedStories);
+
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import stories-raw handler:", error);
+      console.error("📚 [STORIES] Error:", error);
       return res.status(500).json({
         success: false,
-        message: "Stories raw handler not available",
-        error: error.message,
+        message: "Failed to fetch stories",
+        error: error.message
       });
     }
   });
