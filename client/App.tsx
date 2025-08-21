@@ -278,6 +278,8 @@ const App = () => {
     setCurrentView("home");
     // Set a flag to trigger stories refresh in Home component
     setRefreshStories(Date.now());
+    console.log(`📖 Returning from story detail to page ${returnPage}`);
+    // Note: returnPage will be passed to Home component, cleared after use
   };
 
   const handleNavigateToAbout = () => {
