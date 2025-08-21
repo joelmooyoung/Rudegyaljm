@@ -836,6 +836,22 @@ export function createServer() {
     }
   });
 
+  // Add stories aggregate stats route
+  app.get("/api/stories-aggregate-stats", async (req, res) => {
+    console.log(`[SERVER] Stories aggregate stats request`);
+    try {
+      const { default: handler } = await import("../api/stories-aggregate-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import stories-aggregate-stats handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Stories aggregate stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test field update route for direct testing
   app.post("/api/test-field-update", async (req, res) => {
     console.log(`[SERVER] Test field update request`);
