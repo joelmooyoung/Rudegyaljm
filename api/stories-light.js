@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         return {
           id: story.storyId || story._id.toString(),
           title: story.title || "Untitled",
-          content: "Story content available - click to read", // Placeholder since we excluded content
+          content: story.content || "Story content available - click to read",
           excerpt: story.excerpt || `A story by ${story.author}`,
           author: story.author || "Unknown Author",
           category: story.category || "Romance",
