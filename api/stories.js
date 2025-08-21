@@ -61,34 +61,38 @@ export default async function handler(req, res) {
           .select("-__v");
 
         // Transform MongoDB documents to frontend format using production data
-        const transformedStories = await Promise.all(stories.map(async (story) => {
-          const storyObj = story.toObject();
+        const transformedStories = await Promise.all(
+          stories.map(async (story) => {
+            const storyObj = story.toObject();
 
-          // Get real comment count from Comment collection
-          const commentCount = await Comment.countDocuments({ storyId: story.storyId });
+            // Get real comment count from Comment collection
+            const commentCount = await Comment.countDocuments({
+              storyId: story.storyId,
+            });
 
-          return {
-            id: story.storyId,
-            title: story.title,
-            author: story.author,
-            excerpt: story.excerpt || story.content.substring(0, 200) + "...",
-            content: story.content,
-            tags: story.tags,
-            category: story.category,
-            accessLevel: story.accessLevel || "free",
-            isPublished: story.published,
-            // Use production statistics from MongoDB (use raw object to ensure we get actual values)
-            rating: storyObj.rating || 0,
-            ratingCount: storyObj.ratingCount || 0,
-            viewCount: storyObj.viewCount || 0,
-            commentCount: commentCount, // Use real comment count from Comment collection
-            likeCount: storyObj.likeCount || 0,
-            image: story.image, // Use actual image from database
-            audioUrl: story.audioUrl, // Use actual audio from database
-            createdAt: story.createdAt,
-            updatedAt: story.updatedAt,
-          };
-        }));
+            return {
+              id: story.storyId,
+              title: story.title,
+              author: story.author,
+              excerpt: story.excerpt || story.content.substring(0, 200) + "...",
+              content: story.content,
+              tags: story.tags,
+              category: story.category,
+              accessLevel: story.accessLevel || "free",
+              isPublished: story.published,
+              // Use production statistics from MongoDB (use raw object to ensure we get actual values)
+              rating: storyObj.rating || 0,
+              ratingCount: storyObj.ratingCount || 0,
+              viewCount: storyObj.viewCount || 0,
+              commentCount: commentCount, // Use real comment count from Comment collection
+              likeCount: storyObj.likeCount || 0,
+              image: story.image, // Use actual image from database
+              audioUrl: story.audioUrl, // Use actual audio from database
+              createdAt: story.createdAt,
+              updatedAt: story.updatedAt,
+            };
+          }),
+        );
 
         console.log(
           `[STORIES API] Found ${transformedStories.length} published stories`,

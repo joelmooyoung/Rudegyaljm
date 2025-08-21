@@ -32,14 +32,16 @@ export default async function handler(req, res) {
       });
     }
 
-    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
         message: "Rating must be a number between 1 and 5",
       });
     }
 
-    console.log(`[STORY RATING API] User ${userId} rated story ${id} with ${rating} stars`);
+    console.log(
+      `[STORY RATING API] User ${userId} rated story ${id} with ${rating} stars`,
+    );
 
     // Connect to production database
     await connectToDatabase();
@@ -57,20 +59,25 @@ export default async function handler(req, res) {
     let needsUpdate = false;
     let updateFields = {};
 
-    if (currentObj.rating === undefined || currentObj.rating === null || isNaN(currentObj.rating)) {
+    if (
+      currentObj.rating === undefined ||
+      currentObj.rating === null ||
+      isNaN(currentObj.rating)
+    ) {
       updateFields.rating = 0.0;
       needsUpdate = true;
     }
-    if (currentObj.ratingCount === undefined || currentObj.ratingCount === null || isNaN(currentObj.ratingCount)) {
+    if (
+      currentObj.ratingCount === undefined ||
+      currentObj.ratingCount === null ||
+      isNaN(currentObj.ratingCount)
+    ) {
       updateFields.ratingCount = 0;
       needsUpdate = true;
     }
 
     if (needsUpdate) {
-      await Story.findOneAndUpdate(
-        { storyId: id },
-        { $set: updateFields }
-      );
+      await Story.findOneAndUpdate({ storyId: id }, { $set: updateFields });
     }
 
     // Update or create rating record
@@ -78,23 +85,24 @@ export default async function handler(req, res) {
     await Rating.findOneAndUpdate(
       { storyId: id, userId },
       { ratingId, storyId: id, userId, rating },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     // Recalculate story average rating and count
     const ratings = await Rating.find({ storyId: id });
-    const averageRating = ratings.length > 0
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
-      : 0;
+    const averageRating =
+      ratings.length > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+        : 0;
 
     // Update story with new rating stats
     const story = await Story.findOneAndUpdate(
       { storyId: id },
       {
         rating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
-        ratingCount: ratings.length
+        ratingCount: ratings.length,
       },
-      { new: true }
+      { new: true },
     );
 
     // Get the actual values from the raw object to ensure we read correctly
@@ -105,10 +113,12 @@ export default async function handler(req, res) {
     // Get user interaction status
     const [userRating, userLike] = await Promise.all([
       Rating.findOne({ storyId: id, userId }),
-      null // We'll get this from Like collection if needed
+      null, // We'll get this from Like collection if needed
     ]);
 
-    console.log(`[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${actualAverageRating} (${actualRatingCount} ratings)`);
+    console.log(
+      `[STORY RATING API] ✅ Rating recorded for story ${id}. New average: ${actualAverageRating} (${actualRatingCount} ratings)`,
+    );
 
     return res.status(200).json({
       success: true,

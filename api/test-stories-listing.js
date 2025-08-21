@@ -56,18 +56,19 @@ export default async function handler(req, res) {
           viewCount: story.viewCount,
           commentCount: story.commentCount,
           likeCount: story.likeCount,
-        }
+        },
       };
     });
 
-    console.log(`[TEST STORIES LIST] Processed ${transformedStories.length} stories`);
+    console.log(
+      `[TEST STORIES LIST] Processed ${transformedStories.length} stories`,
+    );
 
     return res.status(200).json({
       success: true,
       count: transformedStories.length,
-      stories: transformedStories
+      stories: transformedStories,
     });
-
   } catch (error) {
     console.error("[TEST STORIES LIST] Error:", error);
     return res.status(500).json({

@@ -96,7 +96,8 @@ const commentSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
+const Comment =
+  mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 
 export function createServer() {
   const app = express();
@@ -540,33 +541,37 @@ export function createServer() {
           ratingCount: firstStory.ratingCount,
         });
 
-        const transformedStories = await Promise.all(stories.map(async (story) => {
-          // Get real comment count from Comment collection
-          const realCommentCount = await Comment.countDocuments({ storyId: story.storyId });
+        const transformedStories = await Promise.all(
+          stories.map(async (story) => {
+            // Get real comment count from Comment collection
+            const realCommentCount = await Comment.countDocuments({
+              storyId: story.storyId,
+            });
 
-          return {
-            id: story.storyId || story._id.toString(),
-            title: story.title || "Untitled",
-            content: story.content || "",
-            excerpt: story.excerpt || "",
-            author: story.author || "Unknown Author",
-            category: story.category || "Romance",
-            tags: Array.isArray(story.tags) ? story.tags : [],
-            accessLevel: story.accessLevel || "free",
-            isPublished: story.published || false,
-            publishedAt: story.publishedAt || story.createdAt,
-            createdAt: story.createdAt || new Date(),
-            updatedAt: story.updatedAt || new Date(),
-            // Use correct MongoDB field names from production database (after sync)
-            viewCount: story.viewCount || 0,  // MongoDB field is 'viewCount' after sync
-            rating: story.rating || 0,  // MongoDB field is 'rating' after sync
-            ratingCount: story.ratingCount || 0,
-            likeCount: story.likeCount || 0,
-            commentCount: realCommentCount, // Use real comment count from Comment collection
-            image: story.image || null,
-            audioUrl: story.audioUrl || null,
-          };
-        }));
+            return {
+              id: story.storyId || story._id.toString(),
+              title: story.title || "Untitled",
+              content: story.content || "",
+              excerpt: story.excerpt || "",
+              author: story.author || "Unknown Author",
+              category: story.category || "Romance",
+              tags: Array.isArray(story.tags) ? story.tags : [],
+              accessLevel: story.accessLevel || "free",
+              isPublished: story.published || false,
+              publishedAt: story.publishedAt || story.createdAt,
+              createdAt: story.createdAt || new Date(),
+              updatedAt: story.updatedAt || new Date(),
+              // Use correct MongoDB field names from production database (after sync)
+              viewCount: story.viewCount || 0, // MongoDB field is 'viewCount' after sync
+              rating: story.rating || 0, // MongoDB field is 'rating' after sync
+              ratingCount: story.ratingCount || 0,
+              likeCount: story.likeCount || 0,
+              commentCount: realCommentCount, // Use real comment count from Comment collection
+              image: story.image || null,
+              audioUrl: story.audioUrl || null,
+            };
+          }),
+        );
 
         return res.json(transformedStories);
       }
@@ -844,7 +849,10 @@ export function createServer() {
       const { default: handler } = await import("../api/user-story-reads.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import user-story-reads handler:`, error);
+      console.error(
+        `[SERVER] Failed to import user-story-reads handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "User story reads handler not available",
@@ -859,7 +867,10 @@ export function createServer() {
       const { default: handler } = await import("../api/user-story-reads.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import user-story-reads handler:`, error);
+      console.error(
+        `[SERVER] Failed to import user-story-reads handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "User story reads handler not available",
@@ -875,7 +886,10 @@ export function createServer() {
       const { default: handler } = await import("../api/fix-story-stats.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import fix-story-stats handler:`, error);
+      console.error(
+        `[SERVER] Failed to import fix-story-stats handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Fix story stats handler not available",
@@ -888,10 +902,15 @@ export function createServer() {
   app.post("/api/fix-all-story-stats", async (req, res) => {
     console.log(`[SERVER] Fix all story stats request`);
     try {
-      const { default: handler } = await import("../api/fix-all-story-stats.js");
+      const { default: handler } = await import(
+        "../api/fix-all-story-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import fix-all-story-stats handler:`, error);
+      console.error(
+        `[SERVER] Failed to import fix-all-story-stats handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Fix all story stats handler not available",
@@ -904,10 +923,15 @@ export function createServer() {
   app.get("/api/debug-story-document", async (req, res) => {
     console.log(`[SERVER] Debug story document request`);
     try {
-      const { default: handler } = await import("../api/debug-story-document.js");
+      const { default: handler } = await import(
+        "../api/debug-story-document.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-story-document handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-story-document handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug story document handler not available",
@@ -923,7 +947,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-field-update.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-field-update handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-field-update handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test field update handler not available",
@@ -936,10 +963,15 @@ export function createServer() {
   app.post("/api/migrate-story-fields", async (req, res) => {
     console.log(`[SERVER] Migrate story fields request`);
     try {
-      const { default: handler } = await import("../api/migrate-story-fields.js");
+      const { default: handler } = await import(
+        "../api/migrate-story-fields.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import migrate-story-fields handler:`, error);
+      console.error(
+        `[SERVER] Failed to import migrate-story-fields handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Migrate story fields handler not available",
@@ -952,10 +984,15 @@ export function createServer() {
   app.post("/api/normalize-database-fields", async (req, res) => {
     console.log(`[SERVER] Normalize database fields request`);
     try {
-      const { default: handler } = await import("../api/normalize-database-fields.js");
+      const { default: handler } = await import(
+        "../api/normalize-database-fields.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import normalize-database-fields handler:`, error);
+      console.error(
+        `[SERVER] Failed to import normalize-database-fields handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Normalize database fields handler not available",
@@ -968,10 +1005,15 @@ export function createServer() {
   app.post("/api/test-database-operations", async (req, res) => {
     console.log(`[SERVER] Test database operations request`);
     try {
-      const { default: handler } = await import("../api/test-database-operations.js");
+      const { default: handler } = await import(
+        "../api/test-database-operations.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-database-operations handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-database-operations handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test database operations handler not available",
@@ -984,10 +1026,15 @@ export function createServer() {
   app.post("/api/recreate-stat-fields", async (req, res) => {
     console.log(`[SERVER] Recreate stat fields request`);
     try {
-      const { default: handler } = await import("../api/recreate-stat-fields.js");
+      const { default: handler } = await import(
+        "../api/recreate-stat-fields.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import recreate-stat-fields handler:`, error);
+      console.error(
+        `[SERVER] Failed to import recreate-stat-fields handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Recreate stat fields handler not available",
@@ -1000,10 +1047,15 @@ export function createServer() {
   app.get("/api/test-stories-listing", async (req, res) => {
     console.log(`[SERVER] Test stories listing request`);
     try {
-      const { default: handler } = await import("../api/test-stories-listing.js");
+      const { default: handler } = await import(
+        "../api/test-stories-listing.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-stories-listing handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-stories-listing handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test stories listing handler not available",
@@ -1016,7 +1068,9 @@ export function createServer() {
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
     try {
-      const { default: handler } = await import("../api/admin/unified-stats.js");
+      const { default: handler } = await import(
+        "../api/admin/unified-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
       console.error(`[SERVER] Failed to import unified-stats handler:`, error);
@@ -1032,10 +1086,15 @@ export function createServer() {
   app.get("/api/test-stats-consistency", async (req, res) => {
     console.log(`[SERVER] Test stats consistency request`);
     try {
-      const { default: handler } = await import("../api/test-stats-consistency.js");
+      const { default: handler } = await import(
+        "../api/test-stats-consistency.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-stats-consistency handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-stats-consistency handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test stats consistency handler not available",
@@ -1048,10 +1107,15 @@ export function createServer() {
   app.get("/api/test-home-page-data", async (req, res) => {
     console.log(`[SERVER] Test home page data request`);
     try {
-      const { default: handler } = await import("../api/test-home-page-data.js");
+      const { default: handler } = await import(
+        "../api/test-home-page-data.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-home-page-data handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-home-page-data handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test home page data handler not available",
@@ -1067,7 +1131,10 @@ export function createServer() {
       const { default: handler } = await import("../api/debug-home-stats.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-home-stats handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-home-stats handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug home stats handler not available",
@@ -1096,10 +1163,15 @@ export function createServer() {
   app.post("/api/fix-amsterdam-likes", async (req, res) => {
     console.log(`[SERVER] Fix Amsterdam likes request`);
     try {
-      const { default: handler } = await import("../api/fix-amsterdam-likes.js");
+      const { default: handler } = await import(
+        "../api/fix-amsterdam-likes.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import fix-amsterdam-likes handler:`, error);
+      console.error(
+        `[SERVER] Failed to import fix-amsterdam-likes handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Fix Amsterdam likes handler not available",
@@ -1112,10 +1184,15 @@ export function createServer() {
   app.post("/api/sync-story-field-names", async (req, res) => {
     console.log(`[SERVER] Sync story field names request`);
     try {
-      const { default: handler } = await import("../api/sync-story-field-names.js");
+      const { default: handler } = await import(
+        "../api/sync-story-field-names.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import sync-story-field-names handler:`, error);
+      console.error(
+        `[SERVER] Failed to import sync-story-field-names handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Sync story field names handler not available",
@@ -1128,10 +1205,15 @@ export function createServer() {
   app.get("/api/debug-stats-comparison", async (req, res) => {
     console.log(`[SERVER] Debug stats comparison request`);
     try {
-      const { default: handler } = await import("../api/debug-stats-comparison.js");
+      const { default: handler } = await import(
+        "../api/debug-stats-comparison.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-stats-comparison handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-stats-comparison handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug stats comparison handler not available",
@@ -1144,10 +1226,15 @@ export function createServer() {
   app.get("/api/admin/user-reading-stats", async (req, res) => {
     console.log(`[SERVER] Admin user reading stats request`);
     try {
-      const { default: handler } = await import("../api/admin/user-reading-stats.js");
+      const { default: handler } = await import(
+        "../api/admin/user-reading-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import user-reading-stats handler:`, error);
+      console.error(
+        `[SERVER] Failed to import user-reading-stats handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "User reading stats handler not available",
@@ -1192,10 +1279,15 @@ export function createServer() {
   app.patch("/api/users/:id/toggle-active", async (req, res) => {
     console.log(`[SERVER] User toggle active request for ID: ${req.params.id}`);
     try {
-      const { default: handler } = await import("../api/users/[id]/toggle-active.js");
+      const { default: handler } = await import(
+        "../api/users/[id]/toggle-active.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import user toggle-active handler:`, error);
+      console.error(
+        `[SERVER] Failed to import user toggle-active handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "User toggle-active handler not available",
@@ -1280,7 +1372,9 @@ export function createServer() {
   app.all("/api/admin/refresh-stats", async (req, res) => {
     console.log(`[SERVER] Refresh stats request`);
     try {
-      const { default: handler } = await import("../api/admin/refresh-stats.js");
+      const { default: handler } = await import(
+        "../api/admin/refresh-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
       console.error(`[SERVER] Failed to import refresh-stats handler:`, error);

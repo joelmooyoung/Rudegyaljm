@@ -4,9 +4,9 @@ import { Story } from "../models/index.js";
 export default async function handler(req, res) {
   try {
     await connectToDatabase();
-    
+
     const stories = await Story.find({ published: true }).limit(3);
-    
+
     const debugData = stories.map((story) => {
       const storyObj = story.toObject();
       return {
@@ -23,15 +23,14 @@ export default async function handler(req, res) {
           ratingCount: storyObj.ratingCount,
           viewCount: storyObj.viewCount,
           commentCount: storyObj.commentCount,
-        }
+        },
       };
     });
 
     return res.status(200).json({
       success: true,
-      debugData: debugData
+      debugData: debugData,
     });
-
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
   }

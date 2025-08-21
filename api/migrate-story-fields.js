@@ -26,7 +26,9 @@ export default async function handler(req, res) {
 
     // Get all stories to examine and migrate
     const allStories = await Story.find({});
-    console.log(`[MIGRATE FIELDS] Found ${allStories.length} stories to migrate`);
+    console.log(
+      `[MIGRATE FIELDS] Found ${allStories.length} stories to migrate`,
+    );
 
     let migratedCount = 0;
     const migrationLog = [];
@@ -42,13 +44,15 @@ export default async function handler(req, res) {
         const oldViews = storyData.views || 0;
         const legacyViewCount = storyData.viewCount || 0;
         const finalViews = Math.max(oldViews, legacyViewCount);
-        
+
         if (finalViews !== oldViews) {
           updates.views = finalViews;
           needsUpdate = true;
-          changes.push(`views: ${oldViews} → ${finalViews} (merged from viewCount: ${legacyViewCount})`);
+          changes.push(
+            `views: ${oldViews} → ${finalViews} (merged from viewCount: ${legacyViewCount})`,
+          );
         }
-        
+
         // Remove the old field
         updates.$unset = updates.$unset || {};
         updates.$unset.viewCount = "";
@@ -61,13 +65,15 @@ export default async function handler(req, res) {
         const oldRating = storyData.averageRating || 0;
         const legacyRating = storyData.rating || 0;
         const finalRating = Math.max(oldRating, legacyRating);
-        
+
         if (finalRating !== oldRating) {
           updates.averageRating = finalRating;
           needsUpdate = true;
-          changes.push(`averageRating: ${oldRating} → ${finalRating} (merged from rating: ${legacyRating})`);
+          changes.push(
+            `averageRating: ${oldRating} → ${finalRating} (merged from rating: ${legacyRating})`,
+          );
         }
-        
+
         // Remove the old field
         updates.$unset = updates.$unset || {};
         updates.$unset.rating = "";
@@ -76,10 +82,20 @@ export default async function handler(req, res) {
       }
 
       // Migration Rule 3: Ensure all stat fields exist and are numbers
-      const statFields = ['views', 'likeCount', 'averageRating', 'commentCount', 'ratingCount'];
-      
+      const statFields = [
+        "views",
+        "likeCount",
+        "averageRating",
+        "commentCount",
+        "ratingCount",
+      ];
+
       for (const field of statFields) {
-        if (storyData[field] === undefined || storyData[field] === null || typeof storyData[field] !== 'number') {
+        if (
+          storyData[field] === undefined ||
+          storyData[field] === null ||
+          typeof storyData[field] !== "number"
+        ) {
           updates[field] = 0;
           needsUpdate = true;
           changes.push(`initialized ${field} to 0`);
@@ -89,31 +105,33 @@ export default async function handler(req, res) {
       // Apply updates if needed
       if (needsUpdate) {
         const updateOperation = {};
-        
+
         // Separate $set and $unset operations
         if (updates.$unset) {
           updateOperation.$unset = updates.$unset;
           delete updates.$unset;
         }
-        
+
         if (Object.keys(updates).length > 0) {
           updateOperation.$set = updates;
         }
 
         await Story.findOneAndUpdate(
           { storyId: story.storyId },
-          updateOperation
+          updateOperation,
         );
 
         migratedCount++;
         const logEntry = {
           storyId: story.storyId,
           title: story.title,
-          changes: changes
+          changes: changes,
         };
         migrationLog.push(logEntry);
-        
-        console.log(`[MIGRATE FIELDS] Migrated story ${story.storyId}: ${changes.join(', ')}`);
+
+        console.log(
+          `[MIGRATE FIELDS] Migrated story ${story.storyId}: ${changes.join(", ")}`,
+        );
       }
     }
 
@@ -131,7 +149,9 @@ export default async function handler(req, res) {
       hasOldRating: sampleStory?.rating !== undefined,
     };
 
-    console.log(`[MIGRATE FIELDS] Migration completed. Migrated ${migratedCount} stories.`);
+    console.log(
+      `[MIGRATE FIELDS] Migration completed. Migrated ${migratedCount} stories.`,
+    );
 
     return res.status(200).json({
       success: true,
@@ -141,10 +161,9 @@ export default async function handler(req, res) {
         migratedCount: migratedCount,
         verification: verification,
         migrationLog: migrationLog.slice(0, 5), // Show first 5 for brevity
-        allMigrations: migrationLog.length
-      }
+        allMigrations: migrationLog.length,
+      },
     });
-
   } catch (error) {
     console.error("[MIGRATE FIELDS] Error:", error);
     return res.status(500).json({

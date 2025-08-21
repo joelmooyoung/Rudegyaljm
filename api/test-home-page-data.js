@@ -5,19 +5,21 @@ export default async function handler(req, res) {
   console.log(`[TEST HOME DATA] ${req.method} /api/test-home-page-data`);
 
   if (req.method !== "GET") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
   }
 
   try {
     await connectToDatabase();
-    
+
     // Get first few stories the same way the main API does
     const stories = await Story.find({ published: true })
       .sort({ createdAt: -1 })
       .limit(3)
       .select("-__v");
 
-    // Transform exactly like main stories API 
+    // Transform exactly like main stories API
     const transformedStories = stories.map((story) => {
       const storyObj = story.toObject();
       return {
@@ -47,18 +49,17 @@ export default async function handler(req, res) {
       message: "Home page data test",
       stories: transformedStories,
       // Show raw values too for debugging
-      debugInfo: transformedStories.map(story => ({
+      debugInfo: transformedStories.map((story) => ({
         id: story.id,
         title: story.title,
         homePageFields: {
           rating: story.rating,
-          ratingCount: story.ratingCount, 
+          ratingCount: story.ratingCount,
           viewCount: story.viewCount,
-          commentCount: story.commentCount
-        }
-      }))
+          commentCount: story.commentCount,
+        },
+      })),
     });
-
   } catch (error) {
     console.error("[TEST HOME DATA] Error:", error);
     return res.status(500).json({

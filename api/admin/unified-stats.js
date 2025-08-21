@@ -19,8 +19,10 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       // Return current stats from MongoDB
-      const stories = await Story.find({}).select("storyId title viewCount likeCount rating ratingCount commentCount");
-      
+      const stories = await Story.find({}).select(
+        "storyId title viewCount likeCount rating ratingCount commentCount",
+      );
+
       const stats = {};
       for (const story of stories) {
         const storyObj = story.toObject();
@@ -33,7 +35,7 @@ export default async function handler(req, res) {
           commentCount: storyObj.commentCount || 0,
         };
       }
-      
+
       return res.status(200).json({
         success: true,
         message: "Unified stats retrieved successfully",
@@ -49,26 +51,31 @@ export default async function handler(req, res) {
 
       if (action === "refresh-all") {
         // Refresh all story stats by recalculating from actual data
-        console.log("[UNIFIED STATS] Refreshing all story stats from actual data...");
-        
+        console.log(
+          "[UNIFIED STATS] Refreshing all story stats from actual data...",
+        );
+
         const stories = await Story.find({});
         let refreshedCount = 0;
 
         for (const story of stories) {
           // Get actual counts from related collections
-          const [actualLikes, actualRatings, actualComments] = await Promise.all([
-            Like.find({ storyId: story.storyId }),
-            Rating.find({ storyId: story.storyId }),
-            Comment.find({ storyId: story.storyId })
-          ]);
+          const [actualLikes, actualRatings, actualComments] =
+            await Promise.all([
+              Like.find({ storyId: story.storyId }),
+              Rating.find({ storyId: story.storyId }),
+              Comment.find({ storyId: story.storyId }),
+            ]);
 
           // Calculate actual statistics
           const actualLikeCount = actualLikes.length;
           const actualRatingCount = actualRatings.length;
           const actualCommentCount = actualComments.length;
-          const actualAverageRating = actualRatings.length > 0 
-            ? actualRatings.reduce((sum, r) => sum + r.rating, 0) / actualRatings.length 
-            : 0;
+          const actualAverageRating =
+            actualRatings.length > 0
+              ? actualRatings.reduce((sum, r) => sum + r.rating, 0) /
+                actualRatings.length
+              : 0;
 
           // Get current story stats
           const storyObj = story.toObject();
@@ -84,13 +91,15 @@ export default async function handler(req, res) {
                 ratingCount: actualRatingCount,
                 commentCount: actualCommentCount,
                 // Keep existing viewCount as it's tracked differently
-                viewCount: currentViewCount
-              }
-            }
+                viewCount: currentViewCount,
+              },
+            },
           );
 
           refreshedCount++;
-          console.log(`[UNIFIED STATS] Refreshed ${story.storyId}: likes=${actualLikeCount}, ratings=${actualRatingCount}, comments=${actualCommentCount}, avgRating=${actualAverageRating.toFixed(1)}`);
+          console.log(
+            `[UNIFIED STATS] Refreshed ${story.storyId}: likes=${actualLikeCount}, ratings=${actualRatingCount}, comments=${actualCommentCount}, avgRating=${actualAverageRating.toFixed(1)}`,
+          );
         }
 
         return res.status(200).json({
@@ -104,8 +113,11 @@ export default async function handler(req, res) {
 
       if (action === "add-test-data" && testData && storyId) {
         // Add test data directly to MongoDB
-        console.log(`[UNIFIED STATS] Adding test data for story ${storyId}:`, testData);
-        
+        console.log(
+          `[UNIFIED STATS] Adding test data for story ${storyId}:`,
+          testData,
+        );
+
         const story = await Story.findOne({ storyId });
         if (!story) {
           return res.status(404).json({
@@ -120,12 +132,12 @@ export default async function handler(req, res) {
             const testUserId = `test-user-${Date.now()}-${i}`;
             await Like.findOneAndUpdate(
               { storyId, userId: testUserId },
-              { 
+              {
                 likeId: `like_${Date.now()}_${i}`,
-                storyId, 
-                userId: testUserId 
+                storyId,
+                userId: testUserId,
               },
-              { upsert: true }
+              { upsert: true },
             );
           }
         }
@@ -137,13 +149,13 @@ export default async function handler(req, res) {
             const testRating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
             await Rating.findOneAndUpdate(
               { storyId, userId: testUserId },
-              { 
+              {
                 ratingId: `rating_${Date.now()}_${i}`,
-                storyId, 
+                storyId,
                 userId: testUserId,
-                rating: testRating
+                rating: testRating,
               },
-              { upsert: true }
+              { upsert: true },
             );
           }
         }
@@ -154,14 +166,14 @@ export default async function handler(req, res) {
             const testUserId = `test-commenter-${Date.now()}-${i}`;
             await Comment.findOneAndUpdate(
               { commentId: `comment_${Date.now()}_${i}` },
-              { 
+              {
                 commentId: `comment_${Date.now()}_${i}`,
-                storyId, 
+                storyId,
                 userId: testUserId,
                 username: `TestUser${i}`,
-                comment: `Test comment ${i} for story ${storyId}`
+                comment: `Test comment ${i} for story ${storyId}`,
               },
-              { upsert: true }
+              { upsert: true },
             );
           }
         }
@@ -170,10 +182,10 @@ export default async function handler(req, res) {
         if (testData.views) {
           const currentStory = await Story.findOne({ storyId });
           const currentViews = currentStory.toObject().viewCount || 0;
-          
+
           await Story.findOneAndUpdate(
             { storyId },
-            { $set: { viewCount: currentViews + testData.views } }
+            { $set: { viewCount: currentViews + testData.views } },
           );
         }
 
@@ -181,15 +193,17 @@ export default async function handler(req, res) {
         const [actualLikes, actualRatings, actualComments] = await Promise.all([
           Like.find({ storyId }),
           Rating.find({ storyId }),
-          Comment.find({ storyId })
+          Comment.find({ storyId }),
         ]);
 
         const actualLikeCount = actualLikes.length;
         const actualRatingCount = actualRatings.length;
         const actualCommentCount = actualComments.length;
-        const actualAverageRating = actualRatings.length > 0 
-          ? actualRatings.reduce((sum, r) => sum + r.rating, 0) / actualRatings.length 
-          : 0;
+        const actualAverageRating =
+          actualRatings.length > 0
+            ? actualRatings.reduce((sum, r) => sum + r.rating, 0) /
+              actualRatings.length
+            : 0;
 
         await Story.findOneAndUpdate(
           { storyId },
@@ -199,8 +213,8 @@ export default async function handler(req, res) {
               rating: Math.round(actualAverageRating * 10) / 10,
               ratingCount: actualRatingCount,
               commentCount: actualCommentCount,
-            }
-          }
+            },
+          },
         );
 
         return res.status(200).json({
@@ -228,7 +242,6 @@ export default async function handler(req, res) {
       success: false,
       message: "Method not allowed",
     });
-
   } catch (error) {
     console.error("[UNIFIED STATS] Error:", error);
     return res.status(500).json({

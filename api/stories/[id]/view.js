@@ -24,7 +24,9 @@ export default async function handler(req, res) {
 
   try {
     const { userId, sessionId } = req.body;
-    console.log(`[STORY VIEW API] Recording view for story ${id} by user ${userId || sessionId || 'anonymous'}`);
+    console.log(
+      `[STORY VIEW API] Recording view for story ${id} by user ${userId || sessionId || "anonymous"}`,
+    );
 
     // Connect to production database
     await connectToDatabase();
@@ -42,18 +44,19 @@ export default async function handler(req, res) {
     }
 
     // Initialize viewCount if it's null/undefined
-    if (currentStory.viewCount === undefined || currentStory.viewCount === null || isNaN(currentStory.viewCount)) {
-      await Story.findOneAndUpdate(
-        { storyId: id },
-        { $set: { viewCount: 0 } }
-      );
+    if (
+      currentStory.viewCount === undefined ||
+      currentStory.viewCount === null ||
+      isNaN(currentStory.viewCount)
+    ) {
+      await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
     }
 
     // Now increment the view count
     const story = await Story.findOneAndUpdate(
       { storyId: id },
       { $inc: { viewCount: 1 } },
-      { new: true, upsert: false }
+      { new: true, upsert: false },
     );
 
     // Get the actual view count from the raw object to ensure we read correctly
@@ -63,10 +66,12 @@ export default async function handler(req, res) {
     console.log(`[STORY VIEW API DEBUG] Update result:`, {
       found: !!story,
       viewCount: actualViews,
-      storyId: story?.storyId
+      storyId: story?.storyId,
     });
 
-    console.log(`[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${actualViews}`);
+    console.log(
+      `[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${actualViews}`,
+    );
 
     return res.status(200).json({
       success: true,

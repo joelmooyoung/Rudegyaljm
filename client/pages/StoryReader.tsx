@@ -47,7 +47,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   // Function to refresh story stats
   const refreshStoryStats = async () => {
     try {
-      const statsResponse = await fetch(`/api/stories/${encodeURIComponent(story.id)}/stats`);
+      const statsResponse = await fetch(
+        `/api/stories/${encodeURIComponent(story.id)}/stats`,
+      );
       if (statsResponse.ok) {
         const responseText = await statsResponse.text();
         try {
@@ -58,13 +60,17 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             ratingCount: stats.ratingCount || prev.ratingCount,
             viewCount: stats.viewCount || prev.viewCount,
             commentCount: stats.commentCount || prev.commentCount,
-            likeCount: stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
+            likeCount:
+              stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
           }));
         } catch (jsonError) {
           console.warn("Failed to parse stats JSON response:", responseText);
         }
       } else {
-        console.warn(`Stats API returned ${statsResponse.status}:`, await statsResponse.text());
+        console.warn(
+          `Stats API returned ${statsResponse.status}:`,
+          await statsResponse.text(),
+        );
       }
     } catch (error) {
       console.error("Failed to refresh story stats:", error);
@@ -82,10 +88,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       try {
         // Increment view count
         try {
-          const viewResponse = await fetch(`/api/stories/${encodeURIComponent(story.id)}/view`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          });
+          const viewResponse = await fetch(
+            `/api/stories/${encodeURIComponent(story.id)}/view`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            },
+          );
 
           // Update local view count
           if (viewResponse.ok) {
@@ -93,7 +102,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             try {
               const viewResult = JSON.parse(responseText);
               // Use the actual view count from API response
-              const newViewCount = viewResult.newViewCount || viewResult.currentViewCount || viewResult.data?.viewCount;
+              const newViewCount =
+                viewResult.newViewCount ||
+                viewResult.currentViewCount ||
+                viewResult.data?.viewCount;
               if (newViewCount !== undefined) {
                 setStoryStats((prev) => ({
                   ...prev,
@@ -101,10 +113,16 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 }));
               }
             } catch (jsonError) {
-              console.warn("Failed to parse view count JSON response:", responseText);
+              console.warn(
+                "Failed to parse view count JSON response:",
+                responseText,
+              );
             }
           } else {
-            console.warn(`View count API returned ${viewResponse.status}:`, await viewResponse.text());
+            console.warn(
+              `View count API returned ${viewResponse.status}:`,
+              await viewResponse.text(),
+            );
           }
         } catch (viewError) {
           console.error("Error updating view count:", viewError);
@@ -122,10 +140,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                userId: user.id || 'unknown',
-                username: user.username || user.email || 'unknown',
-                storyId: story.id || 'unknown',
-                storyTitle: (story.title || 'Unknown Story').substring(0, 200), // Limit title length
+                userId: user.id || "unknown",
+                username: user.username || user.email || "unknown",
+                storyId: story.id || "unknown",
+                storyTitle: (story.title || "Unknown Story").substring(0, 200), // Limit title length
               }),
             });
 
@@ -134,18 +152,25 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               try {
                 const readResult = JSON.parse(responseText);
                 console.log(
-                  `📚 Story read recorded: User ${user.username} has read ${readResult.data?.totalReads || 'unknown'} stories total`,
+                  `📚 Story read recorded: User ${user.username} has read ${readResult.data?.totalReads || "unknown"} stories total`,
                 );
               } catch (jsonError) {
-                console.warn("Failed to parse read response JSON:", responseText);
+                console.warn(
+                  "Failed to parse read response JSON:",
+                  responseText,
+                );
                 console.log(`📚 Story read recorded for user ${user.username}`);
               }
             } else {
               try {
                 const errorText = await readResponse.text();
-                console.warn(`User story read API returned ${readResponse.status}: ${errorText}`);
+                console.warn(
+                  `User story read API returned ${readResponse.status}: ${errorText}`,
+                );
               } catch (textError) {
-                console.warn(`User story read API returned ${readResponse.status}, could not read error response`);
+                console.warn(
+                  `User story read API returned ${readResponse.status}, could not read error response`,
+                );
               }
             }
           } catch (error) {
@@ -154,7 +179,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               userId: user?.id,
               storyId: story?.id,
               storyTitle: story?.title,
-              errorMessage: error instanceof Error ? error.message : 'Unknown error'
+              errorMessage:
+                error instanceof Error ? error.message : "Unknown error",
             });
             // Don't break the user experience if read tracking fails
           }
@@ -172,22 +198,34 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             try {
               commentsResponseData = JSON.parse(responseText);
             } catch (jsonError) {
-              console.warn("Failed to parse comments JSON response:", responseText);
+              console.warn(
+                "Failed to parse comments JSON response:",
+                responseText,
+              );
               commentsResponseData = [];
             }
 
             const commentsData = Array.isArray(commentsResponseData)
               ? commentsResponseData
-              : (commentsResponseData?.data || commentsResponseData || []);
+              : commentsResponseData?.data || commentsResponseData || [];
 
             console.log("Loaded comments for story:", commentsData);
             const filteredComments = commentsData
-              .filter((comment: any) => comment && (comment.id || comment.commentId))
+              .filter(
+                (comment: any) => comment && (comment.id || comment.commentId),
+              )
               .map((comment: any) => ({
                 ...comment,
-                id: comment.id || comment.commentId || `comment-${Date.now()}-${Math.random()}`,
-                createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
-                updatedAt: comment.updatedAt ? new Date(comment.updatedAt) : new Date(),
+                id:
+                  comment.id ||
+                  comment.commentId ||
+                  `comment-${Date.now()}-${Math.random()}`,
+                createdAt: comment.createdAt
+                  ? new Date(comment.createdAt)
+                  : new Date(),
+                updatedAt: comment.updatedAt
+                  ? new Date(comment.updatedAt)
+                  : new Date(),
               }));
 
             setComments(filteredComments);
@@ -198,7 +236,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               commentCount: filteredComments.length,
             }));
           } else {
-            console.warn(`Comments API returned ${commentsResponse.status}:`, await commentsResponse.text());
+            console.warn(
+              `Comments API returned ${commentsResponse.status}:`,
+              await commentsResponse.text(),
+            );
             setComments([]);
           }
         } catch (commentsError) {
@@ -222,12 +263,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               setUserRating(interactionData.rating || 0);
               setIsLiked(interactionData.liked || false);
             } catch (jsonError) {
-              console.warn("Failed to parse interaction JSON response:", responseText);
+              console.warn(
+                "Failed to parse interaction JSON response:",
+                responseText,
+              );
               setUserRating(0);
               setIsLiked(false);
             }
           } else {
-            console.warn(`User interaction API returned ${interactionResponse.status}:`, await interactionResponse.text());
+            console.warn(
+              `User interaction API returned ${interactionResponse.status}:`,
+              await interactionResponse.text(),
+            );
             setUserRating(0);
             setIsLiked(false);
           }
@@ -250,7 +297,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
   const handleLike = async () => {
     try {
-      const action = isLiked ? 'unlike' : 'like';
+      const action = isLiked ? "unlike" : "like";
       const response = await fetch(`/api/stories/${story.id}/like`, {
         method: "POST",
         headers: {
@@ -258,13 +305,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         },
         body: JSON.stringify({
           userId: user.id,
-          action: action
+          action: action,
         }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        setIsLiked(result.action === 'like');
+        setIsLiked(result.action === "like");
 
         // Update local stats immediately
         setStoryStats((prev) => ({
@@ -329,21 +376,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
     try {
       // Use local comments API for both saving and loading
-      const response = await fetch(
-        "/api/comments",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            storyId: story.id,
-            content: newComment.trim(),
-            userId: user.id,
-            username: user.username,
-          }),
+      const response = await fetch("/api/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          storyId: story.id,
+          content: newComment.trim(),
+          userId: user.id,
+          username: user.username,
+        }),
+      });
 
       if (response.ok) {
         const responseData = await response.json();
@@ -517,12 +561,15 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  <span>{(storyStats.viewCount || 0).toLocaleString()} views</span>
+                  <span>
+                    {(storyStats.viewCount || 0).toLocaleString()} views
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-rating-star fill-current" />
                   <span>
-                    {storyStats.rating || 0} ({storyStats.ratingCount || 0} ratings)
+                    {storyStats.rating || 0} ({storyStats.ratingCount || 0}{" "}
+                    ratings)
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -533,17 +580,20 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {Array.isArray(story.tags) && story.tags
-                  .filter((tag) => tag && typeof tag === 'string' && tag.trim())
-                  .map((tag, index) => (
-                    <Badge
-                      key={`${story.id}-tag-${index}-${tag}`}
-                      variant="outline"
-                      className="text-xs bg-category-tag"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
+                {Array.isArray(story.tags) &&
+                  story.tags
+                    .filter(
+                      (tag) => tag && typeof tag === "string" && tag.trim(),
+                    )
+                    .map((tag, index) => (
+                      <Badge
+                        key={`${story.id}-tag-${index}-${tag}`}
+                        variant="outline"
+                        className="text-xs bg-category-tag"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
               </div>
 
               {story.excerpt && (
@@ -598,7 +648,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               <div
                 className="prose prose-lg max-w-none dark:prose-invert"
                 dangerouslySetInnerHTML={{
-                  __html: (story.content || '').replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+                  __html: (story.content || "").replace(
+                    /[\u0000-\u001F\u007F-\u009F]/g,
+                    "",
+                  ),
                 }}
               />
             </CardContent>
@@ -686,8 +739,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                           <span className="text-xs text-muted-foreground">
                             {(() => {
                               try {
-                                return comment.createdAt && !isNaN(new Date(comment.createdAt).getTime())
-                                  ? new Date(comment.createdAt).toLocaleDateString()
+                                return comment.createdAt &&
+                                  !isNaN(new Date(comment.createdAt).getTime())
+                                  ? new Date(
+                                      comment.createdAt,
+                                    ).toLocaleDateString()
                                   : "Recent";
                               } catch {
                                 return "Recent";

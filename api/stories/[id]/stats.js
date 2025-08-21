@@ -29,7 +29,10 @@ export default async function handler(req, res) {
     try {
       await connectToDatabase();
     } catch (connectionError) {
-      console.warn("[STORY STATS API] Database connection failed:", connectionError.message);
+      console.warn(
+        "[STORY STATS API] Database connection failed:",
+        connectionError.message,
+      );
       return res.status(503).json({
         success: false,
         message: "Database temporarily unavailable",
@@ -60,14 +63,14 @@ export default async function handler(req, res) {
       commentCount: story?.commentCount,
       realCommentCount: realCommentCount,
       ratingCount: story?.ratingCount,
-      allFields: story ? Object.keys(storyObj) : 'no story',
+      allFields: story ? Object.keys(storyObj) : "no story",
       rawFieldValues: {
         viewCount: storyObj.viewCount,
         likeCount: storyObj.likeCount,
         rating: storyObj.rating,
         commentCount: storyObj.commentCount,
         ratingCount: storyObj.ratingCount,
-      }
+      },
     });
 
     if (!story) {

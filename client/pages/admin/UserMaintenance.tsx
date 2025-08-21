@@ -92,7 +92,10 @@ export default function UserMaintenance({
           usersResponse_data = JSON.parse(usersResponseText);
           statsData = JSON.parse(statsResponseText);
         } catch (jsonError) {
-          console.error("Failed to parse JSON response:", { usersResponseText, statsResponseText });
+          console.error("Failed to parse JSON response:", {
+            usersResponseText,
+            statsResponseText,
+          });
           throw new Error(`JSON parsing failed: ${jsonError.message}`);
         }
 

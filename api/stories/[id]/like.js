@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!action || !['like', 'unlike'].includes(action)) {
+    if (!action || !["like", "unlike"].includes(action)) {
       return res.status(400).json({
         success: false,
         message: "Action must be 'like' or 'unlike'",
@@ -54,14 +54,15 @@ export default async function handler(req, res) {
     }
 
     const currentObj = currentStory.toObject();
-    if (currentObj.likeCount === undefined || currentObj.likeCount === null || isNaN(currentObj.likeCount)) {
-      await Story.findOneAndUpdate(
-        { storyId: id },
-        { $set: { likeCount: 0 } }
-      );
+    if (
+      currentObj.likeCount === undefined ||
+      currentObj.likeCount === null ||
+      isNaN(currentObj.likeCount)
+    ) {
+      await Story.findOneAndUpdate({ storyId: id }, { $set: { likeCount: 0 } });
     }
 
-    if (action === 'like') {
+    if (action === "like") {
       // Add like record and increment story like count
       const existingLike = await Like.findOne({ storyId: id, userId });
       if (!existingLike) {
@@ -72,7 +73,7 @@ export default async function handler(req, res) {
         // Increment story like count
         await Story.findOneAndUpdate(
           { storyId: id },
-          { $inc: { likeCount: 1 } }
+          { $inc: { likeCount: 1 } },
         );
       }
     } else {
@@ -82,7 +83,7 @@ export default async function handler(req, res) {
         // Decrement story like count (but don't go below 0)
         await Story.findOneAndUpdate(
           { storyId: id },
-          { $inc: { likeCount: -1 } }
+          { $inc: { likeCount: -1 } },
         );
       }
     }
@@ -90,14 +91,16 @@ export default async function handler(req, res) {
     // Get updated story and user interaction status
     const [story, userLike] = await Promise.all([
       Story.findOne({ storyId: id }),
-      Like.findOne({ storyId: id, userId })
+      Like.findOne({ storyId: id, userId }),
     ]);
 
     // Get the actual like count from the raw object to ensure we read the correct value
     const storyObj = story?.toObject();
     const actualLikeCount = storyObj?.likeCount || 0;
 
-    console.log(`[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${actualLikeCount}`);
+    console.log(
+      `[STORY LIKE API] ✅ ${action} recorded for story ${id}. New like count: ${actualLikeCount}`,
+    );
 
     return res.status(200).json({
       success: true,

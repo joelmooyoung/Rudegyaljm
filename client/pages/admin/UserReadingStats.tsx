@@ -108,7 +108,10 @@ export default function UserReadingStats({ onBack }: UserReadingStatsProps) {
               const dateA = new Date(a.lastRead);
               const dateB = new Date(b.lastRead);
               if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
-                console.warn("Invalid date found in lastRead:", { a: a.lastRead, b: b.lastRead });
+                console.warn("Invalid date found in lastRead:", {
+                  a: a.lastRead,
+                  b: b.lastRead,
+                });
                 return 0; // Keep original order if dates are invalid
               }
               return dateB.getTime() - dateA.getTime();
