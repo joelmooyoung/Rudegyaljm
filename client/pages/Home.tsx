@@ -234,9 +234,9 @@ export default function Home({
     }
   };
 
-  // Reset to page 1 when filters change (but not during session restoration)
+  // Simple filter reset - just reset to page 1 when filters change
   useEffect(() => {
-    if (!isRestoringFromSession && currentPage !== 1) {
+    if (currentPage !== 1) {
       console.log(`🔄 Resetting to page 1 due to filter change`);
       setCurrentPage(1);
     }
