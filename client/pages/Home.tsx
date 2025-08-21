@@ -164,34 +164,29 @@ export default function Home({
     }
   };
 
-  // Initial load
+  // Simple initial load - just load page 1, handle restoration separately
   useEffect(() => {
     console.log("🚀 Component mounted - loading initial data");
-
-    // Check if we should restore a specific page from URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const pageFromHash = hashParams.get('page');
-
-    if (pageFromHash) {
-      const pageNum = parseInt(pageFromHash);
-      console.log(`🔄 Restoring page ${pageNum} from URL hash`);
-      // Clear the hash after use
-      window.location.hash = '';
-      setIsRestoringFromSession(true);
-      setCurrentPage(pageNum);
-      fetchStories(pageNum);
-      // Clear the restoration flag after a longer delay to prevent all race conditions
-      setTimeout(() => setIsRestoringFromSession(false), 2000);
-    } else {
-      fetchStories(1);
-    }
-
+    fetchStories(1);
     fetchAggregateStats();
+
+    // Handle restoration in a separate, delayed call to avoid race conditions
+    setTimeout(() => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const pageFromHash = hashParams.get('page');
+      if (pageFromHash) {
+        const pageNum = parseInt(pageFromHash);
+        console.log(`🔄 Restoring page ${pageNum} from URL hash`);
+        window.location.hash = '';
+        setCurrentPage(pageNum);
+        fetchStories(pageNum);
+      }
+    }, 100);
   }, []); // Only run on mount
 
-  // Handle page changes (but not during session restoration)
+  // Simple page changes
   useEffect(() => {
-    if (!isRestoringFromSession && currentPage > 1) {
+    if (currentPage > 1) {
       console.log(`📄 Page changed to ${currentPage}`);
       fetchStories(currentPage);
     }
