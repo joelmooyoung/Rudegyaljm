@@ -519,8 +519,8 @@ export function createServer() {
         const firstStory = stories[0];
         console.log(`📊 [DEBUG] Sample story stats:`, {
           title: firstStory.title,
-          views: firstStory.views,
-          averageRating: firstStory.averageRating,
+          viewCount: firstStory.viewCount,
+          rating: firstStory.rating,
           likeCount: firstStory.likeCount,
           commentCount: firstStory.commentCount,
           ratingCount: firstStory.ratingCount,
@@ -539,9 +539,9 @@ export function createServer() {
           publishedAt: story.publishedAt || story.createdAt,
           createdAt: story.createdAt || new Date(),
           updatedAt: story.updatedAt || new Date(),
-          // Use correct MongoDB field names from production database
-          viewCount: story.views || 0,  // MongoDB field is 'views'
-          rating: story.averageRating || 0,  // MongoDB field is 'averageRating'
+          // Use correct MongoDB field names from production database (after sync)
+          viewCount: story.viewCount || 0,  // MongoDB field is 'viewCount' after sync
+          rating: story.rating || 0,  // MongoDB field is 'rating' after sync
           ratingCount: story.ratingCount || 0,
           likeCount: story.likeCount || 0,
           commentCount: story.commentCount || 0,
