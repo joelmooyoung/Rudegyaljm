@@ -109,7 +109,17 @@ export default async function handler(req, res) {
       });
     } else {
       console.log("[STORIES MINIMAL] No stories found");
-      return res.json([]);
+      return res.json({
+        stories: [],
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalStories: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          limit: limit
+        }
+      });
     }
 
   } catch (error) {
