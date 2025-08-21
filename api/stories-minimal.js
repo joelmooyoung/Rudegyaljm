@@ -56,8 +56,15 @@ export default async function handler(req, res) {
           author: 1,
           category: 1,
           accessLevel: 1,
-          createdAt: 1
-          // Exclude all other fields to prevent timeout
+          createdAt: 1,
+          viewCount: 1,
+          views: 1,
+          likeCount: 1,
+          commentCount: 1,
+          rating: 1,
+          averageRating: 1,
+          ratingCount: 1
+          // Still exclude large fields like content and image
         }
       }
     )
