@@ -166,7 +166,19 @@ export default function Home({
   // Initial load
   useEffect(() => {
     console.log("🚀 Component mounted - loading initial data");
-    fetchStories(1);
+
+    // Check if we should restore a specific page from sessionStorage
+    const storedPage = sessionStorage.getItem('homePageNumber');
+    if (storedPage) {
+      const pageNum = parseInt(storedPage);
+      console.log(`🔄 Restoring page ${pageNum} from sessionStorage`);
+      sessionStorage.removeItem('homePageNumber'); // Clear after use
+      setCurrentPage(pageNum);
+      fetchStories(pageNum);
+    } else {
+      fetchStories(1);
+    }
+
     fetchAggregateStats();
   }, []); // Only run on mount
 
