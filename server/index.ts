@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Route to separate API file
+  // STORIES ENDPOINT - Use working raw MongoDB API
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Routing to separate API file...");
+    console.log("📚 [STORIES] Using raw MongoDB API...");
     try {
-      const { default: handler } = await import("../api/stories.js");
+      const { default: handler } = await import("../api/stories-raw.js");
       return handler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import stories handler:", error);
+      console.error("📚 [STORIES] Failed to import stories-raw handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Stories handler not available",
+        message: "Stories raw handler not available",
         error: error.message,
       });
     }
