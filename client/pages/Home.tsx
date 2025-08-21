@@ -125,6 +125,12 @@ export default function Home({
       if (response.ok) {
         const data = await response.json();
         console.log("Stories API response:", data);
+        console.log("Stories array check:", {
+          isArray: Array.isArray(data),
+          hasStories: data && Array.isArray(data.stories),
+          storiesLength: data?.stories?.length,
+          hasData: data && Array.isArray(data.data)
+        });
 
         // Handle different response formats and ensure data is an array
         let storiesArray = [];
