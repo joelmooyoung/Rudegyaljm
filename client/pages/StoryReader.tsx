@@ -44,6 +44,33 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     commentCount: story.commentCount || 0,
   });
 
+  // Function to refresh story stats
+  const refreshStoryStats = async () => {
+    try {
+      const statsResponse = await fetch(`/api/stories/${encodeURIComponent(story.id)}/stats`);
+      if (statsResponse.ok) {
+        const responseText = await statsResponse.text();
+        try {
+          const response = JSON.parse(responseText);
+          const stats = response.data || response.stats || response;
+          setStoryStats((prev) => ({
+            rating: stats.averageRating || stats.rating || prev.rating,
+            ratingCount: stats.ratingCount || prev.ratingCount,
+            viewCount: stats.viewCount || prev.viewCount,
+            commentCount: stats.commentCount || prev.commentCount,
+            likeCount: stats.likeCount || prev.likeCount,
+          }));
+        } catch (jsonError) {
+          console.warn("Failed to parse stats JSON response:", responseText);
+        }
+      } else {
+        console.warn(`Stats API returned ${statsResponse.status}:`, await statsResponse.text());
+      }
+    } catch (error) {
+      console.error("Failed to refresh story stats:", error);
+    }
+  };
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
