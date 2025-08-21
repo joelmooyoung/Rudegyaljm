@@ -29,28 +29,8 @@ export default async function handler(req, res) {
       { published: true },
       {
         projection: {
-          // Exclude the heavy content field that might be causing hanging
-          content: 0,
-          // Include all other fields
-          storyId: 1,
-          title: 1,
-          author: 1,
-          excerpt: 1,
-          category: 1,
-          tags: 1,
-          accessLevel: 1,
-          published: 1,
-          views: 1,
-          viewCount: 1,
-          averageRating: 1,
-          rating: 1,
-          ratingCount: 1,
-          likeCount: 1,
-          commentCount: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          image: 1,
-          audioUrl: 1
+          // Only exclude the heavy content field - let all others come through
+          content: 0
         }
       }
     )
