@@ -108,7 +108,7 @@ export default async function handler(req, res) {
         likeCount: storyObj.likeCount || 0,
         rating: storyObj.rating || 0,
         ratingCount: storyObj.ratingCount || 0,
-        commentCount: storyObj.commentCount || 0,
+        commentCount: realCommentCount, // Use real comment count
       },
       userInteraction,
       storyId: id,
