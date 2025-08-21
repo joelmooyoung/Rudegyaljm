@@ -24,18 +24,11 @@ export default async function handler(req, res) {
     const db = mongoose.connection.db;
     const storiesCollection = db.collection('stories');
     
-    console.log("[STORIES LIGHT API] Querying stories WITHOUT content field...");
-    const stories = await storiesCollection.find(
-      { published: true },
-      {
-        projection: {
-          // Only exclude the heavy content field - let all others come through
-          content: 0
-        }
-      }
-    )
-    .sort({ createdAt: -1 })
-    .toArray();
+    console.log("[STORIES LIGHT API] Querying first 15 stories for performance...");
+    const stories = await storiesCollection.find({ published: true })
+      .sort({ createdAt: -1 })
+      .limit(15)
+      .toArray();
     
     console.log(`[STORIES LIGHT API] Found ${stories.length} real MongoDB stories`);
 
