@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use working test API that returns formatted real data
+  // STORIES ENDPOINT - Use optimized MongoDB API for all stories
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using working test API for real MongoDB data...");
+    console.log("📚 [STORIES] Using optimized MongoDB API for all stories...");
     try {
-      const { default: testHandler } = await import("../api/test-db-simple.js");
-      return testHandler(req, res);
+      const { default: optimizedHandler } = await import("../api/stories-optimized.js");
+      return optimizedHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import test handler:", error);
+      console.error("📚 [STORIES] Failed to import optimized handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Test handler not available",
+        message: "Optimized handler not available",
         error: error.message
       });
     }
@@ -510,7 +510,7 @@ export function createServer() {
       });
 
       console.log(
-        `[EMAIL TEST] ✅ Email sent successfully! ID: ${emailResult.data?.id}`,
+        `[EMAIL TEST] �� Email sent successfully! ID: ${emailResult.data?.id}`,
       );
 
       res.json({
