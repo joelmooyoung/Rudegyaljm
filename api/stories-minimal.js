@@ -70,14 +70,14 @@ export default async function handler(req, res) {
     .limit(limit)
     .toArray();
     
-    console.log(`[STORIES MINIMAL] Retrieved ${stories.length} minimal story records`);
+    console.log(`[STORIES MINIMAL] Retrieved ${stories.length} story records for page ${page}`);
 
     if (stories && stories.length > 0) {
       const transformedStories = stories.map((story) => ({
         id: story.storyId || story._id.toString(),
         title: story.title || "Untitled",
         content: "Click to read this captivating story...", // Simple placeholder
-        excerpt: `A ${story.category || 'passionate'} story by ${story.author}`, // Generated excerpt
+        excerpt: story.excerpt || `A ${story.category || 'passionate'} story by ${story.author}`, // Use real or generated excerpt
         author: story.author || "Unknown Author",
         category: story.category || "Romance",
         tags: ["passion", "romance"], // Simple default tags
@@ -91,12 +91,22 @@ export default async function handler(req, res) {
         ratingCount: 50, // Default value
         likeCount: 0, // Default value
         commentCount: 0, // Default value
-        image: null,
-        audioUrl: null,
+        image: story.image || null,  // Use real image data
+        audioUrl: story.audioUrl || null,  // Use real audio data
       }));
 
-      console.log(`[STORIES MINIMAL] Returning ${transformedStories.length} minimal MongoDB stories`);
-      return res.json(transformedStories);
+      console.log(`[STORIES MINIMAL] Returning ${transformedStories.length} stories with images for page ${page}`);
+      return res.json({
+        stories: transformedStories,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalStories: totalStories,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+          limit: limit
+        }
+      });
     } else {
       console.log("[STORIES MINIMAL] No stories found");
       return res.json([]);
