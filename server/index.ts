@@ -532,8 +532,68 @@ export function createServer() {
       },
     ];
 
-    // Temporarily skip database to resolve hanging issue
-    console.log("📚 [STORIES] Temporarily using fallback stories to fix hanging issue");
+    // Try database first with corrected schema
+    try {
+      await connectToDatabase();
+      console.log("📚 [STORIES] Database connected, trying database stories");
+
+      console.log("📚 [STORIES] Querying stories with correct schema...");
+      const stories = await Story.find({ published: true })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      console.log(`📚 [STORIES] Query completed, found ${stories ? stories.length : 0} stories`);
+
+      if (stories && stories.length > 0) {
+        console.log(`📚 [STORIES] ✅ Found ${stories.length} database stories`);
+
+        // Debug: Log first story to check field names
+        const firstStory = stories[0];
+        console.log(`📊 [DEBUG] Sample story fields:`, Object.keys(firstStory));
+        console.log(`📊 [DEBUG] Sample story stats:`, {
+          title: firstStory.title,
+          views: firstStory.views,
+          averageRating: firstStory.averageRating,
+          likeCount: firstStory.likeCount,
+          commentCount: firstStory.commentCount,
+          ratingCount: firstStory.ratingCount,
+        });
+
+        console.log("📚 [STORIES] Transforming stories with correct field names...");
+        const transformedStories = stories.map((story) => {
+          return {
+            id: story.storyId || story._id.toString(),
+            title: story.title || "Untitled",
+            content: story.content || "",
+            excerpt: story.excerpt || "",
+            author: story.author || "Unknown Author",
+            category: story.category || "Romance",
+            tags: Array.isArray(story.tags) ? story.tags : [],
+            accessLevel: story.accessLevel || "free",
+            isPublished: story.published || false,
+            publishedAt: story.publishedAt || story.createdAt,
+            createdAt: story.createdAt || new Date(),
+            updatedAt: story.updatedAt || new Date(),
+            // Use correct MongoDB field names from schema
+            viewCount: story.views || 0, // MongoDB field is 'views' in schema
+            rating: story.averageRating || 0, // MongoDB field is 'averageRating' in schema
+            ratingCount: story.ratingCount || 0,
+            likeCount: story.likeCount || 0,
+            commentCount: story.commentCount || 0,
+            image: story.image || null,
+            audioUrl: story.audioUrl || null,
+          };
+        });
+
+        console.log("📚 [STORIES] Transformation complete, returning MongoDB data");
+        return res.json(transformedStories);
+      }
+    } catch (dbError) {
+      console.error(
+        "📚 [STORIES] Database failed:",
+        dbError.message,
+      );
+    }
 
     // Return reliable fallback stories
     console.log("📚 [STORIES] �� Using reliable fallback stories");
