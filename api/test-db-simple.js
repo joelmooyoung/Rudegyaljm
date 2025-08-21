@@ -23,9 +23,30 @@ export default async function handler(req, res) {
     const count = await storiesCollection.countDocuments({ published: true });
     console.log(`[TEST DB] Found ${count} published stories`);
     
-    console.log("[TEST DB] Attempting to find first 3 stories...");
+    console.log("[TEST DB] Attempting to find all stories (limited data)...");
     const stories = await storiesCollection.find({ published: true })
-      .limit(3)
+      .project({
+        storyId: 1,
+        title: 1,
+        author: 1,
+        excerpt: 1,
+        category: 1,
+        tags: 1,
+        accessLevel: 1,
+        published: 1,
+        views: 1,
+        viewCount: 1,
+        averageRating: 1,
+        rating: 1,
+        ratingCount: 1,
+        likeCount: 1,
+        commentCount: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        image: 1,
+        audioUrl: 1
+      })
+      .sort({ createdAt: -1 })
       .toArray();
     
     console.log(`[TEST DB] Retrieved ${stories.length} stories successfully`);
