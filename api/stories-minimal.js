@@ -89,11 +89,11 @@ export default async function handler(req, res) {
         publishedAt: story.createdAt || new Date(),
         createdAt: story.createdAt || new Date(),
         updatedAt: story.createdAt || new Date(),
-        viewCount: 0, // Default value - too slow to query
-        rating: 4.5, // Default value - too slow to query
-        ratingCount: 50, // Default value
-        likeCount: 0, // Default value
-        commentCount: 0, // Default value
+        viewCount: story.viewCount || story.views || 0,
+        rating: story.rating || story.averageRating || 0,
+        ratingCount: story.ratingCount || 0,
+        likeCount: story.likeCount || 0,
+        commentCount: story.commentCount || 0,
         image: null,  // Disabled due to DB timeout
         audioUrl: null,  // Disabled due to DB timeout
       }));
