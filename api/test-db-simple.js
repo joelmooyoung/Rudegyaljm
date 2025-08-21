@@ -1,30 +1,55 @@
 import { connectToDatabase } from "../lib/mongodb.js";
+import mongoose from "mongoose";
 
 export default async function handler(req, res) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ 
+      success: false, 
+      message: "Method not allowed" 
+    });
+  }
+
   try {
-    console.log("🧪 Testing MongoDB connection...");
-    console.log("Environment check:", {
-      hasMongoUri: !!process.env.MONGODB_URI,
-      nodeEnv: process.env.NODE_ENV,
-    });
-
-    // Test connection only
+    console.log("[TEST DB] Testing database connection without models...");
     await connectToDatabase();
+    
+    console.log("[TEST DB] Connection successful, testing raw collection access...");
+    
+    // Access collection directly without models
+    const db = mongoose.connection.db;
+    const storiesCollection = db.collection('stories');
+    
+    console.log("[TEST DB] Attempting to count stories...");
+    const count = await storiesCollection.countDocuments({ published: true });
+    console.log(`[TEST DB] Found ${count} published stories`);
+    
+    console.log("[TEST DB] Attempting to find first 3 stories...");
+    const stories = await storiesCollection.find({ published: true })
+      .limit(3)
+      .toArray();
+    
+    console.log(`[TEST DB] Retrieved ${stories.length} stories successfully`);
 
-    console.log("✅ MongoDB connection successful");
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "MongoDB connection test successful",
-      timestamp: new Date().toISOString(),
+      message: "Database test successful",
+      storyCount: count,
+      sampleStories: stories.map(s => ({
+        id: s.storyId,
+        title: s.title,
+        author: s.author,
+        views: s.views,
+        viewCount: s.viewCount,
+        hasFields: Object.keys(s)
+      }))
     });
+
   } catch (error) {
-    console.error("❌ MongoDB connection failed:", error);
-    res.status(500).json({
+    console.error("[TEST DB] Error:", error);
+    return res.status(500).json({
       success: false,
-      message: "MongoDB connection failed",
-      error: error.message,
-      stack: error.stack,
+      message: "Database test failed",
+      error: error.message
     });
   }
 }
