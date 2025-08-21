@@ -415,189 +415,20 @@ export function createServer() {
     });
   });
 
-  // RELIABLE STORIES ENDPOINT WITH FALLBACK
+  // STORIES ENDPOINT - Route to separate API file
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Fetching stories...");
-
-    // RELIABLE FALLBACK STORIES THAT ALWAYS WORK
-    const reliableStories = [
-      {
-        id: "story-reliable-001",
-        title: "Midnight Whispers",
-        content:
-          "<h1>Chapter One: The Encounter</h1><p>In the sultry heat of a Caribbean night, Maria found herself drawn to the mysterious stranger who had been watching her from across the resort pool...</p><p>His dark eyes held secrets she desperately wanted to uncover, and when he finally approached, his voice was like velvet against her skin.</p><p>'I've been waiting for you,' he whispered, his accent thick with promise. 'All evening, all my life.'</p><h2>The Dance:</h2><p>The music from the resort bar drifted across the water, a slow reggae rhythm that seemed to pulse with the heat of the night. Maria felt her heart racing as the stranger extended his hand.</p><p>'Dance with me,' he said, and she knew there was no refusing such a request.</p>",
-        excerpt:
-          "A chance encounter at a Caribbean resort leads to an unforgettable night of passion and mystery.",
-        author: "Jasmine Rose",
-        category: "Romance",
-        tags: ["passionate", "romance", "vacation", "mystery", "caribbean"],
-        accessLevel: "free",
-        isPublished: true,
-        publishedAt: new Date("2024-01-15"),
-        createdAt: new Date("2024-01-15"),
-        updatedAt: new Date("2024-01-15"),
-        viewCount: 1247,
-        rating: 4.8,
-        ratingCount: 89,
-        image: null,
-        audioUrl: "/uploads/audio/sample-midnight-whispers.mp3", // Sample audio for testing
-      },
-      {
-        id: "story-reliable-002",
-        title: "The Professor's Secret",
-        content:
-          "<h1>After Hours</h1><p>Elena had always been the best student in Professor Martinez's literature class, but tonight's private study session was about to become something much more intimate...</p><p>As rain pattered against the library windows, she found herself alone with the man who had been the subject of her secret fantasies for months.</p><p>'You understand the poetry better than any student I've ever taught,' he said, moving closer. 'But I wonder if you understand the passion behind the words.'</p><h2>The Lesson:</h2><p>The leather-bound book of sonnets lay forgotten on the mahogany desk as Professor Martinez traced a line from Neruda with his finger, his eyes never leaving Elena's face.</p><p>'Poetry is about desire,' he whispered. 'About the space between what we say and what we mean.'</p>",
-        excerpt:
-          "A brilliant student discovers that some lessons can only be learned after hours.",
-        author: "Carmen Silva",
-        category: "Forbidden",
-        tags: [
-          "forbidden",
-          "academic",
-          "intellectual",
-          "tension",
-          "literature",
-        ],
-        accessLevel: "premium",
-        isPublished: true,
-        publishedAt: new Date("2024-01-20"),
-        createdAt: new Date("2024-01-20"),
-        updatedAt: new Date("2024-01-20"),
-        viewCount: 2156,
-        rating: 4.9,
-        ratingCount: 134,
-        image: null,
-        audioUrl: "/uploads/audio/story-audio-1755186589864.mp3", // Added the audio file you just uploaded
-      },
-      {
-        id: "story-reliable-003",
-        title: "Dancing in the Dark",
-        content:
-          "<h1>The Rhythm of Desire</h1><p>The salsa club was crowded, but Sophia only had eyes for one man. His hips moved to the rhythm like liquid fire, and when he extended his hand to her, she knew her quiet life was about to change forever...</p><p>'Baila conmigo,' he murmured, pulling her close enough that she could feel his heartbeat against her chest. The music pulsed through them both, a primal rhythm that spoke of desire older than words.</p><h2>The Transformation:</h2><p>For twenty-six years, Sophia had lived the life of a dutiful librarian. Quiet, reserved, predictable. But tonight, as the stranger's hands guided her hips to the music, she felt something wild awakening within her.</p><p>'Let the music move through you,' he whispered in her ear. 'Don't think, just feel.'</p>",
-        excerpt:
-          "A shy librarian discovers her wild side on the dance floor with a captivating stranger.",
-        author: "Isabella Morales",
-        category: "Seductive",
-        tags: ["dance", "transformation", "passionate", "music", "salsa"],
-        accessLevel: "free",
-        isPublished: true,
-        publishedAt: new Date("2024-01-25"),
-        createdAt: new Date("2024-01-25"),
-        updatedAt: new Date("2024-01-25"),
-        viewCount: 892,
-        rating: 4.6,
-        ratingCount: 67,
-        image: null,
-        audioUrl: "/uploads/audio/sample-dancing-dark.mp3", // Sample audio for testing
-      },
-      {
-        id: "story-reliable-004",
-        title: "Summer Storm",
-        content:
-          "<h1>When Lightning Strikes</h1><p>When the power went out during the thunderstorm, Amelia thought she was alone in the beach house. But then she heard footsteps on the deck, and realized her mysterious neighbor had come to check on her...</p><p>By candlelight, with rain lashing the windows, they talked until dawn. But it wasn't just conversation that kept them awake all night.</p><h2>Shelter from the Storm:</h2><p>'I brought candles,' he said, setting down a bag by the door. 'And wine. Figured we might as well make the best of it.'</p><p>Amelia watched him move through her kitchen with confident familiarity, as if he belonged there. As if this moment had always been inevitable.</p>",
-        excerpt:
-          "A power outage brings two lonely hearts together during a wild summer storm.",
-        author: "Maya Rodriguez",
-        category: "Romance",
-        tags: ["storm", "neighbors", "candlelight", "intimate", "wine"],
-        accessLevel: "premium",
-        isPublished: true,
-        publishedAt: new Date("2024-01-30"),
-        createdAt: new Date("2024-01-30"),
-        updatedAt: new Date("2024-01-30"),
-        viewCount: 1634,
-        rating: 4.7,
-        ratingCount: 102,
-        image: null,
-      },
-      {
-        id: "story-reliable-005",
-        title: "Art of Desire",
-        content:
-          "<h1>The Perfect Model</h1><p>Painting the male figure had always been academic for Rosa, until the day Marcus walked into her art studio. His sculpted physique was perfection, but it was the intensity in his eyes that made her hand tremble as she tried to capture his essence on canvas...</p><p>'Am I making you nervous?' he asked during their third session, noticing how she couldn't quite meet his gaze. 'Perhaps we should take a break from the formal poses.'</p><h2>Beyond the Canvas:</h2><p>Rosa set down her brush, her hands shaking slightly. In ten years of figure drawing, she had never felt this way about a model. Marcus stepped down from the platform, moving toward her with the same fluid grace she had been trying to capture in paint.</p><p>'You see me,' he said softly. 'Really see me. I can tell by the way you paint.'</p>",
-        excerpt:
-          "An artist finds inspiration and passion when the perfect model walks into her studio.",
-        author: "Valentina Cruz",
-        category: "Fantasy",
-        tags: ["art", "model", "studio", "creative", "painting"],
-        accessLevel: "free",
-        isPublished: true,
-        publishedAt: new Date("2024-02-05"),
-        createdAt: new Date("2024-02-05"),
-        updatedAt: new Date("2024-02-05"),
-        viewCount: 976,
-        rating: 4.5,
-        ratingCount: 78,
-        image: null,
-      },
-    ];
-
-    // Try database first with corrected schema
+    console.log("📚 [STORIES] Routing to separate API file...");
     try {
-      await connectToDatabase();
-      console.log("📚 [STORIES] Database connected, trying database stories");
-
-      console.log("📚 [STORIES] Querying stories with correct schema...");
-      const stories = await Story.find({ published: true })
-        .sort({ createdAt: -1 })
-        .lean();
-
-      console.log(`📚 [STORIES] Query completed, found ${stories ? stories.length : 0} stories`);
-
-      if (stories && stories.length > 0) {
-        console.log(`📚 [STORIES] ✅ Found ${stories.length} database stories`);
-
-        // Debug: Log first story to check field names
-        const firstStory = stories[0];
-        console.log(`📊 [DEBUG] Sample story fields:`, Object.keys(firstStory));
-        console.log(`📊 [DEBUG] Sample story stats:`, {
-          title: firstStory.title,
-          views: firstStory.views,
-          averageRating: firstStory.averageRating,
-          likeCount: firstStory.likeCount,
-          commentCount: firstStory.commentCount,
-          ratingCount: firstStory.ratingCount,
-        });
-
-        console.log("📚 [STORIES] Transforming stories with correct field names...");
-        const transformedStories = stories.map((story) => {
-          return {
-            id: story.storyId || story._id.toString(),
-            title: story.title || "Untitled",
-            content: story.content || "",
-            excerpt: story.excerpt || "",
-            author: story.author || "Unknown Author",
-            category: story.category || "Romance",
-            tags: Array.isArray(story.tags) ? story.tags : [],
-            accessLevel: story.accessLevel || "free",
-            isPublished: story.published || false,
-            publishedAt: story.publishedAt || story.createdAt,
-            createdAt: story.createdAt || new Date(),
-            updatedAt: story.updatedAt || new Date(),
-            // Use correct MongoDB field names from schema
-            viewCount: story.views || 0, // MongoDB field is 'views' in schema
-            rating: story.averageRating || 0, // MongoDB field is 'averageRating' in schema
-            ratingCount: story.ratingCount || 0,
-            likeCount: story.likeCount || 0,
-            commentCount: story.commentCount || 0,
-            image: story.image || null,
-            audioUrl: story.audioUrl || null,
-          };
-        });
-
-        console.log("📚 [STORIES] Transformation complete, returning MongoDB data");
-        return res.json(transformedStories);
-      }
-    } catch (dbError) {
-      console.error(
-        "📚 [STORIES] Database failed:",
-        dbError.message,
-      );
+      const { default: handler } = await import("../api/stories.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("📚 [STORIES] Failed to import stories handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Stories handler not available",
+        error: error.message,
+      });
     }
-
-    // Return reliable fallback stories
-    console.log("📚 [STORIES] �� Using reliable fallback stories");
-    res.json(reliableStories);
   });
 
   // WORKING EMAIL TEST ENDPOINT
