@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use safe loading API with limited stories for reliable response
+  // STORIES ENDPOINT - Use minimal API for fast reliable response
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using safe loading API with limited stories...");
+    console.log("📚 [STORIES] Using minimal API for fast reliable response...");
     try {
-      const { default: safeHandler } = await import("../api/stories-safe.js");
-      return safeHandler(req, res);
+      const { default: minimalHandler } = await import("../api/stories-minimal.js");
+      return minimalHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import safe handler:", error);
+      console.error("📚 [STORIES] Failed to import minimal handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Safe handler not available",
+        message: "Minimal handler not available",
         error: error.message
       });
     }
