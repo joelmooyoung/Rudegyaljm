@@ -1,5 +1,5 @@
 import { connectToDatabase } from "../../../lib/mongodb.js";
-import { Story, Like, Rating } from "../../../models/index.js";
+import { Story, Like, Rating, Comment } from "../../../models/index.js";
 
 // Story Stats API
 export default async function handler(req, res) {
