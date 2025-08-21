@@ -97,6 +97,7 @@ export default function Home({
     totalViews: 0,
     totalRatings: 0
   });
+  const [isLoadingStories, setIsLoadingStories] = useState(false);
 
   const categories = [
     "all",
