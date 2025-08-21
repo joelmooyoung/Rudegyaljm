@@ -84,6 +84,20 @@ const storySchema = new mongoose.Schema({
 
 const Story = mongoose.models.Story || mongoose.model("Story", storySchema);
 
+// Comment schema
+const commentSchema = new mongoose.Schema(
+  {
+    commentId: { type: String, required: true, unique: true },
+    storyId: { type: String, required: true },
+    userId: { type: String, required: true },
+    username: { type: String, required: true },
+    comment: { type: String, required: true },
+  },
+  { timestamps: true },
+);
+
+const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
+
 export function createServer() {
   const app = express();
 
