@@ -159,6 +159,7 @@ export default function Home({
     } finally {
       console.log("✅ Setting isLoading to false");
       setIsLoading(false);
+      setIsLoadingStories(false);
     }
   };
 
