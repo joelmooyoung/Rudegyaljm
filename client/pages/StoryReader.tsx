@@ -255,7 +255,17 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               ? commentsResponseData
               : commentsResponseData?.data || commentsResponseData || [];
 
-            console.log("Loaded comments for story:", commentsData);
+            console.log("📝 Loaded comments for story:", commentsData);
+            console.log(`📝 Total comments from API: ${commentsData.length}`);
+
+            // Check which comments are being filtered out
+            const invalidComments = commentsData.filter(
+              (comment: any) => !comment || (!comment.id && !comment.commentId)
+            );
+            if (invalidComments.length > 0) {
+              console.warn(`📝 Filtering out ${invalidComments.length} invalid comments:`, invalidComments);
+            }
+
             const filteredComments = commentsData
               .filter(
                 (comment: any) => comment && (comment.id || comment.commentId),
@@ -274,6 +284,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                   : new Date(),
               }));
 
+            console.log(`📝 Filtered comments: ${filteredComments.length} (showing these)`);
             setComments(filteredComments);
 
             // Update header stats with actual comment count
