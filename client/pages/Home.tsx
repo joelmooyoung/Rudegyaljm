@@ -84,7 +84,7 @@ export default function Home({
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(() => {
     // Try to restore page from sessionStorage on initial load
-    const savedPage = sessionStorage.getItem('home-current-page');
+    const savedPage = sessionStorage.getItem("home-current-page");
     return savedPage ? parseInt(savedPage) : 1;
   });
   const [pagination, setPagination] = useState({
@@ -92,14 +92,14 @@ export default function Home({
     totalStories: 0,
     hasNextPage: false,
     hasPreviousPage: false,
-    limit: 12
+    limit: 12,
   });
   const [aggregateStats, setAggregateStats] = useState({
     totalStories: 0,
     totalLikes: 0,
     totalComments: 0,
     totalViews: 0,
-    totalRatings: 0
+    totalRatings: 0,
   });
   const [isLoadingStories, setIsLoadingStories] = useState(false);
   const [isRestoringFromSession, setIsRestoringFromSession] = useState(false);
@@ -150,7 +150,9 @@ export default function Home({
           if (data.pagination) {
             setPagination(data.pagination);
             console.log(`📄 Pagination set:`, data.pagination);
-            console.log(`📄 Total pages: ${data.pagination.totalPages}, Current page: ${data.pagination.currentPage}`);
+            console.log(
+              `📄 Total pages: ${data.pagination.totalPages}, Current page: ${data.pagination.currentPage}`,
+            );
           } else {
             console.log("❌ No pagination data in response");
           }
@@ -159,12 +161,16 @@ export default function Home({
           setError("Invalid response format from server");
         }
       } else {
-        console.error(`❌ API error: ${response.status} ${response.statusText}`);
+        console.error(
+          `❌ API error: ${response.status} ${response.statusText}`,
+        );
         setError(`Failed to fetch stories: ${response.status}`);
       }
     } catch (error) {
       console.error("❌ Network error:", error);
-      setError(`Network error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setError(
+        `Network error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       console.log("✅ Setting isLoading to false");
       setIsLoading(false);
@@ -174,7 +180,9 @@ export default function Home({
 
   // Simple initial load - load the current page (which may be restored from sessionStorage)
   useEffect(() => {
-    console.log(`🚀 Component mounted - loading page ${currentPage} (from sessionStorage)`);
+    console.log(
+      `🚀 Component mounted - loading page ${currentPage} (from sessionStorage)`,
+    );
     fetchStories(currentPage);
     fetchAggregateStats();
   }, []); // Only run on mount
@@ -183,12 +191,14 @@ export default function Home({
   useEffect(() => {
     // Skip if we're restoring from return page to avoid conflicts
     if (isRestoringFromReturn) {
-      console.log(`⏸️ Skipping currentPage useEffect - restoring from return page`);
+      console.log(
+        `⏸️ Skipping currentPage useEffect - restoring from return page`,
+      );
       return;
     }
 
     // Save current page to sessionStorage
-    sessionStorage.setItem('home-current-page', currentPage.toString());
+    sessionStorage.setItem("home-current-page", currentPage.toString());
     console.log(`💾 Saved page ${currentPage} to sessionStorage`);
 
     // Skip the initial mount to avoid double loading
@@ -200,7 +210,9 @@ export default function Home({
 
   // Handle returning to specific page when coming back from story detail
   useEffect(() => {
-    console.log(`🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`);
+    console.log(
+      `🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`,
+    );
     if (returnToPage && returnToPage > 0) {
       console.log(`📖 Starting page restoration to ${returnToPage}`);
       setIsRestoringFromReturn(true);
@@ -208,7 +220,7 @@ export default function Home({
       // Always set the page and save to sessionStorage
       console.log(`📖 Returning to page ${returnToPage} after story detail`);
       setCurrentPage(returnToPage);
-      sessionStorage.setItem('home-current-page', returnToPage.toString());
+      sessionStorage.setItem("home-current-page", returnToPage.toString());
       console.log(`💾 Saved return page ${returnToPage} to sessionStorage`);
 
       // Fetch stories for the return page immediately
@@ -228,7 +240,9 @@ export default function Home({
     if (refreshTrigger && refreshTrigger > 0) {
       // Skip refresh if we're restoring from return page
       if (isRestoringFromReturn || returnToPage) {
-        console.log(`⏸️ Skipping refresh trigger - page restoration in progress`);
+        console.log(
+          `⏸️ Skipping refresh trigger - page restoration in progress`,
+        );
         return;
       }
 
@@ -274,13 +288,13 @@ export default function Home({
   // Pagination handlers
   const handleNextPage = () => {
     if (pagination.hasNextPage) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (pagination.hasPreviousPage) {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev) => prev - 1);
     }
   };
 
@@ -352,8 +366,10 @@ export default function Home({
     console.log(`📚 Story clicked: "${story.title}" from page ${currentPage}`);
 
     // Save current page to sessionStorage before navigating
-    sessionStorage.setItem('home-current-page', currentPage.toString());
-    console.log(`💾 Saved page ${currentPage} to sessionStorage before story navigation`);
+    sessionStorage.setItem("home-current-page", currentPage.toString());
+    console.log(
+      `💾 Saved page ${currentPage} to sessionStorage before story navigation`,
+    );
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
@@ -715,7 +731,9 @@ export default function Home({
             <div className="flex justify-center gap-8 mb-8 text-sm font-serif">
               <div className="text-center">
                 <div className="text-2xl font-bold text-passion-gradient">
-                  {aggregateStats.totalStories || pagination.totalStories || stories.length}
+                  {aggregateStats.totalStories ||
+                    pagination.totalStories ||
+                    stories.length}
                 </div>
                 <div className="text-muted-foreground">Seductive Tales</div>
               </div>
@@ -866,7 +884,10 @@ export default function Home({
               </Button>
 
               <div className="flex items-center gap-2">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                {Array.from(
+                  { length: pagination.totalPages },
+                  (_, i) => i + 1,
+                ).map((pageNum) => (
                   <Button
                     key={pageNum}
                     variant={currentPage === pageNum ? "default" : "outline"}
@@ -895,8 +916,8 @@ export default function Home({
           {/* Show pagination info */}
           {!isLoading && !error && filteredStories.length > 0 && (
             <div className="text-center mt-4 text-sm text-muted-foreground">
-              Showing {filteredStories.length} of {pagination.totalStories} stories
-              (Page {currentPage} of {pagination.totalPages})
+              Showing {filteredStories.length} of {pagination.totalStories}{" "}
+              stories (Page {currentPage} of {pagination.totalPages})
             </div>
           )}
 

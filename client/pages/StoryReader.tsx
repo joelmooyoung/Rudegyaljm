@@ -69,7 +69,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             console.log("Full story data loaded:", storyResult.story);
             setFullStory(storyResult.story);
           } else {
-            console.warn("Story API returned unsuccessful result:", storyResult);
+            console.warn(
+              "Story API returned unsuccessful result:",
+              storyResult,
+            );
           }
         } catch (jsonError) {
           console.warn("Failed to parse story JSON response:", responseText);
@@ -99,7 +102,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           const response = JSON.parse(responseText);
           const stats = response.data || response.stats || response;
           console.log(`📊 Initial stats from API:`, stats);
-          console.log(`📊 Setting initial commentCount to: ${stats.commentCount}`);
+          console.log(
+            `📊 Setting initial commentCount to: ${stats.commentCount}`,
+          );
           setStoryStats((prev) => ({
             rating: stats.averageRating || stats.rating || prev.rating,
             ratingCount: stats.ratingCount || prev.ratingCount,
@@ -262,10 +267,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
             // Check which comments are being filtered out
             const invalidComments = commentsData.filter(
-              (comment: any) => !comment || (!comment.id && !comment.commentId)
+              (comment: any) => !comment || (!comment.id && !comment.commentId),
             );
             if (invalidComments.length > 0) {
-              console.warn(`📝 Filtering out ${invalidComments.length} invalid comments:`, invalidComments);
+              console.warn(
+                `📝 Filtering out ${invalidComments.length} invalid comments:`,
+                invalidComments,
+              );
             }
 
             const filteredComments = commentsData
@@ -286,11 +294,15 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                   : new Date(),
               }));
 
-            console.log(`📝 Filtered comments: ${filteredComments.length} (showing these)`);
+            console.log(
+              `📝 Filtered comments: ${filteredComments.length} (showing these)`,
+            );
             setComments(filteredComments);
 
             // Update header stats with actual comment count
-            console.log(`📊 Updating storyStats.commentCount from ${storyStats.commentCount} to ${filteredComments.length}`);
+            console.log(
+              `📊 Updating storyStats.commentCount from ${storyStats.commentCount} to ${filteredComments.length}`,
+            );
             setStoryStats((prev) => ({
               ...prev,
               commentCount: filteredComments.length,
@@ -707,7 +719,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             <CardContent>
               {isLoadingStory ? (
                 <div className="text-center py-8">
-                  <div className="text-muted-foreground">Loading story content...</div>
+                  <div className="text-muted-foreground">
+                    Loading story content...
+                  </div>
                 </div>
               ) : (
                 <div

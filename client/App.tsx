@@ -270,7 +270,9 @@ const App = () => {
     setReadingStory(story);
     setReturnPage(returnPageNum || 1); // Default to page 1 if not specified
     setCurrentView("story-reader");
-    console.log(`📖 Reading story "${story.title}", will return to page ${returnPageNum || 1}`);
+    console.log(
+      `📖 Reading story "${story.title}", will return to page ${returnPageNum || 1}`,
+    );
   };
 
   const handleBackFromReader = () => {
@@ -283,7 +285,9 @@ const App = () => {
       console.log(`🔄 No return page, triggering general refresh`);
       setRefreshStories(Date.now());
     } else {
-      console.log(`🔄 Return page ${returnPage} set, skipping refresh trigger (returnToPage will handle it)`);
+      console.log(
+        `🔄 Return page ${returnPage} set, skipping refresh trigger (returnToPage will handle it)`,
+      );
     }
 
     // Clear returnPage after a longer delay to ensure Home component processes it

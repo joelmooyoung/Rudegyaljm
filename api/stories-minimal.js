@@ -31,62 +31,73 @@ export default async function handler(req, res) {
       console.log("[STORIES MINIMAL] Database not connected");
       return res.status(500).json({
         success: false,
-        message: "Database connection not available"
+        message: "Database connection not available",
       });
     }
-    
-    const db = mongoose.connection.db;
-    const storiesCollection = db.collection('stories');
-    const commentsCollection = db.collection('comments');
 
-    console.log(`[STORIES MINIMAL] Getting story data for page ${page} (limit: ${limit})...`);
+    const db = mongoose.connection.db;
+    const storiesCollection = db.collection("stories");
+    const commentsCollection = db.collection("comments");
+
+    console.log(
+      `[STORIES MINIMAL] Getting story data for page ${page} (limit: ${limit})...`,
+    );
 
     // Get total count for pagination
-    const totalStories = await storiesCollection.countDocuments({ published: true });
+    const totalStories = await storiesCollection.countDocuments({
+      published: true,
+    });
     const totalPages = Math.ceil(totalStories / limit);
 
-    console.log(`[STORIES MINIMAL] Total: ${totalStories} stories, ${totalPages} pages`);
+    console.log(
+      `[STORIES MINIMAL] Total: ${totalStories} stories, ${totalPages} pages`,
+    );
 
     // Load stories with basic info only - minimal fields to prevent timeout
-    const stories = await storiesCollection.find(
-      { published: true },
-      {
-        projection: {
-          storyId: 1,
-          title: 1,
-          author: 1,
-          category: 1,
-          accessLevel: 1,
-          createdAt: 1,
-          viewCount: 1,
-          views: 1,
-          likeCount: 1,
-          commentCount: 1,
-          rating: 1,
-          averageRating: 1,
-          ratingCount: 1,
-          image: 1  // Re-enable images - monitor for timeouts
-        }
-      }
-    )
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .toArray();
-    
-    console.log(`[STORIES MINIMAL] Retrieved ${stories.length} story records for page ${page}`);
+    const stories = await storiesCollection
+      .find(
+        { published: true },
+        {
+          projection: {
+            storyId: 1,
+            title: 1,
+            author: 1,
+            category: 1,
+            accessLevel: 1,
+            createdAt: 1,
+            viewCount: 1,
+            views: 1,
+            likeCount: 1,
+            commentCount: 1,
+            rating: 1,
+            averageRating: 1,
+            ratingCount: 1,
+            image: 1, // Re-enable images - monitor for timeouts
+          },
+        },
+      )
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    console.log(
+      `[STORIES MINIMAL] Retrieved ${stories.length} story records for page ${page}`,
+    );
 
     if (stories && stories.length > 0) {
       // Get real comment counts for all stories in this batch
-      const storyIds = stories.map(story => story.storyId);
-      const commentCounts = await commentsCollection.aggregate([
-        { $match: { storyId: { $in: storyIds } } },
-        { $group: { _id: "$storyId", count: { $sum: 1 } } }
-      ]).toArray();
+      const storyIds = stories.map((story) => story.storyId);
+      const commentCounts = await commentsCollection
+        .aggregate([
+          { $match: { storyId: { $in: storyIds } } },
+          { $group: { _id: "$storyId", count: { $sum: 1 } } },
+        ])
+        .toArray();
 
       // Create a map of storyId -> real comment count
       const commentCountMap = {};
-      commentCounts.forEach(item => {
+      commentCounts.forEach((item) => {
         commentCountMap[item._id] = item.count;
       });
 
@@ -96,7 +107,7 @@ export default async function handler(req, res) {
         id: story.storyId || story._id.toString(),
         title: story.title || "Untitled",
         content: "Click to read this captivating story...", // Simple placeholder
-        excerpt: `A ${story.category || 'passionate'} story by ${story.author}`, // Generated excerpt
+        excerpt: `A ${story.category || "passionate"} story by ${story.author}`, // Generated excerpt
         author: story.author || "Unknown Author",
         category: story.category || "Romance",
         tags: ["passion", "romance"], // Simple default tags
@@ -110,11 +121,13 @@ export default async function handler(req, res) {
         ratingCount: story.ratingCount || 0,
         likeCount: story.likeCount || 0,
         commentCount: commentCountMap[story.storyId] || 0, // Use real comment count
-        image: story.image || null,  // Use real image data
-        audioUrl: null,  // Disabled due to DB timeout
+        image: story.image || null, // Use real image data
+        audioUrl: null, // Disabled due to DB timeout
       }));
 
-      console.log(`[STORIES MINIMAL] Returning ${transformedStories.length} stories with images for page ${page}`);
+      console.log(
+        `[STORIES MINIMAL] Returning ${transformedStories.length} stories with images for page ${page}`,
+      );
       return res.json({
         stories: transformedStories,
         pagination: {
@@ -123,8 +136,8 @@ export default async function handler(req, res) {
           totalStories: totalStories,
           hasNextPage: page < totalPages,
           hasPreviousPage: page > 1,
-          limit: limit
-        }
+          limit: limit,
+        },
       });
     } else {
       console.log("[STORIES MINIMAL] No stories found");
@@ -136,17 +149,16 @@ export default async function handler(req, res) {
           totalStories: 0,
           hasNextPage: false,
           hasPreviousPage: false,
-          limit: limit
-        }
+          limit: limit,
+        },
       });
     }
-
   } catch (error) {
     console.error("[STORIES MINIMAL] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to load minimal stories",
-      error: error.message
+      error: error.message,
     });
   }
 }
