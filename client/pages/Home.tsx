@@ -186,9 +186,9 @@ export default function Home({
     fetchAggregateStats();
   }, []); // Only run on mount
 
-  // Handle page changes
+  // Handle page changes (but not during session restoration)
   useEffect(() => {
-    if (currentPage > 1) {
+    if (!isRestoringFromSession && currentPage > 1) {
       console.log(`📄 Page changed to ${currentPage}`);
       fetchStories(currentPage);
     }
