@@ -415,102 +415,20 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Temporary expanded list based on your MongoDB data
-  app.get("/api/stories", (req, res) => {
-    console.log("📚 [STORIES] Returning expanded story list based on your MongoDB data...");
-
-    // Temporary expanded list representing your 43 MongoDB stories
-    // Based on the successful queries we know you have "Midnight Desires" by Luna Starweaver, etc.
-    const stories = [
-      {
-        id: "story1",
-        title: "Midnight Desires",
-        content: "In the sultry heat of a Caribbean night, Maria found herself drawn to the mysterious stranger...",
-        excerpt: "A chance encounter at a Caribbean resort leads to an unforgettable night of passion and mystery.",
-        author: "Luna Starweaver",
-        category: "Romance",
-        tags: ["passionate", "romance", "vacation", "mystery", "caribbean"],
-        accessLevel: "free",
-        isPublished: true,
-        publishedAt: new Date("2024-01-15"),
-        createdAt: new Date("2024-01-15"),
-        updatedAt: new Date("2024-01-15"),
-        viewCount: 2343,
-        rating: 4.8,
-        ratingCount: 189,
-        likeCount: 45,
-        commentCount: 23,
-        image: null,
-        audioUrl: null,
-      },
-      {
-        id: "story2",
-        title: "The Executive's Secret",
-        content: "Elena had always been the best employee, but tonight's private meeting was about to become something much more intimate...",
-        excerpt: "A brilliant employee discovers that some meetings can only be held after hours.",
-        author: "Scarlett Blackthorne",
-        category: "Forbidden",
-        tags: ["forbidden", "office", "executive", "tension", "corporate"],
-        accessLevel: "premium",
-        isPublished: true,
-        publishedAt: new Date("2024-01-20"),
-        createdAt: new Date("2024-01-20"),
-        updatedAt: new Date("2024-01-20"),
-        viewCount: 1586,
-        rating: 4.9,
-        ratingCount: 134,
-        likeCount: 78,
-        commentCount: 45,
-        image: null,
-        audioUrl: null,
-      },
-      {
-        id: "story3",
-        title: "Summer Heat",
-        content: "The salsa club was crowded, but Sophia only had eyes for one man...",
-        excerpt: "A shy librarian discovers her wild side on the dance floor with a captivating stranger.",
-        author: "Marina Solace",
-        category: "Seductive",
-        tags: ["dance", "transformation", "passionate", "music", "salsa"],
-        accessLevel: "free",
-        isPublished: true,
-        publishedAt: new Date("2024-01-25"),
-        createdAt: new Date("2024-01-25"),
-        updatedAt: new Date("2024-01-25"),
-        viewCount: 2894,
-        rating: 4.6,
-        ratingCount: 167,
-        likeCount: 89,
-        commentCount: 34,
-        image: null,
-        audioUrl: null,
-      },
-      // Add more stories to represent your 43 total
-      ...Array.from({ length: 40 }, (_, i) => ({
-        id: `story${i + 4}`,
-        title: `Passionate Tale ${i + 4}`,
-        content: `Another captivating story from your MongoDB collection...`,
-        excerpt: `One of your 43 published stories with real MongoDB data...`,
-        author: `Author ${i + 4}`,
-        category: ["Romance", "Forbidden", "Seductive", "Fantasy"][i % 4],
-        tags: ["passion", "romance", "desire"],
-        accessLevel: i % 3 === 0 ? "premium" : "free",
-        isPublished: true,
-        publishedAt: new Date(2024, 0, 15 + i),
-        createdAt: new Date(2024, 0, 15 + i),
-        updatedAt: new Date(2024, 0, 15 + i),
-        viewCount: Math.floor(Math.random() * 3000) + 100,
-        rating: 4.0 + Math.random() * 1.0,
-        ratingCount: Math.floor(Math.random() * 200) + 50,
-        likeCount: Math.floor(Math.random() * 100),
-        commentCount: Math.floor(Math.random() * 50),
-        image: null,
-        audioUrl: null,
-      }))
-    ];
-
-    console.log(`📚 [STORIES] Returning ${stories.length} stories (MongoDB representation)`);
-    return res.json(stories);
+  // STORIES ENDPOINT - Use lightweight MongoDB API for real data
+  app.get("/api/stories", async (req, res) => {
+    console.log("📚 [STORIES] Using lightweight MongoDB API for real data...");
+    try {
+      const { default: lightStoriesHandler } = await import("../api/stories-light.js");
+      return lightStoriesHandler(req, res);
+    } catch (error) {
+      console.error("📚 [STORIES] Failed to import light stories handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Light stories handler not available",
+        error: error.message
+      });
+    }
   });
 
   // WORKING EMAIL TEST ENDPOINT
