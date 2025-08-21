@@ -3,7 +3,6 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { Resend } from "resend";
-import { Comment } from "../models/index.js";
 
 // MongoDB connection with retry logic
 let isConnected = false;
