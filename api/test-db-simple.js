@@ -31,19 +31,31 @@ export default async function handler(req, res) {
     
     console.log(`[TEST DB] Retrieved ${stories.length} stories successfully`);
 
-    return res.status(200).json({
-      success: true,
-      message: "Database test successful",
-      storyCount: count,
-      sampleStories: stories.map(s => ({
-        id: s.storyId,
-        title: s.title,
-        author: s.author,
-        views: s.views,
-        viewCount: s.viewCount,
-        hasFields: Object.keys(s)
-      }))
-    });
+    // Format as proper story objects for the frontend
+    const formattedStories = stories.map(s => ({
+      id: s.storyId || s._id.toString(),
+      title: s.title || "Untitled",
+      content: s.content || "Story content available...",
+      excerpt: s.excerpt || `A captivating story by ${s.author}`,
+      author: s.author || "Unknown Author",
+      category: s.category || "Romance",
+      tags: Array.isArray(s.tags) ? s.tags : [],
+      accessLevel: s.accessLevel || "free",
+      isPublished: s.published || false,
+      publishedAt: s.publishedAt || s.createdAt,
+      createdAt: s.createdAt || new Date(),
+      updatedAt: s.updatedAt || new Date(),
+      viewCount: s.views || s.viewCount || 0,
+      rating: s.averageRating || s.rating || 0,
+      ratingCount: s.ratingCount || 0,
+      likeCount: s.likeCount || 0,
+      commentCount: s.commentCount || 0,
+      image: s.image || null,
+      audioUrl: s.audioUrl || null,
+    }));
+
+    console.log(`[TEST DB] Returning ${formattedStories.length} formatted MongoDB stories`);
+    return res.status(200).json(formattedStories);
 
   } catch (error) {
     console.error("[TEST DB] Error:", error);
