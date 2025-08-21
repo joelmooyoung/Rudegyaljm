@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         ratingCount: story.ratingCount || 0,
         likeCount: story.likeCount || 0,
         commentCount: story.commentCount || 0,
-        image: null,  // Disabled due to DB timeout
+        image: story.image || null,  // Use real image data
         audioUrl: null,  // Disabled due to DB timeout
       }));
 
