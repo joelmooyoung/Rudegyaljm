@@ -62,8 +62,21 @@ export default async function handler(req, res) {
         };
       });
 
-      console.log(`[STORIES RAW API] Returning ${transformedStories.length} stories`);
-      return res.json(transformedStories);
+      // Test with simplified response first
+      const simplifiedStories = transformedStories.slice(0, 5).map(story => ({
+        id: story.id,
+        title: story.title,
+        author: story.author,
+        excerpt: story.excerpt?.substring(0, 100) + "...", // Truncate content
+        viewCount: story.viewCount,
+        rating: story.rating,
+        ratingCount: story.ratingCount,
+        likeCount: story.likeCount,
+        commentCount: story.commentCount
+      }));
+
+      console.log(`[STORIES RAW API] Returning ${simplifiedStories.length} simplified stories`);
+      return res.json(simplifiedStories);
     } else {
       console.log("[STORIES RAW API] No stories found");
       return res.json([]);
