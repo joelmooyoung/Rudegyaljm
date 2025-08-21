@@ -1259,6 +1259,22 @@ export function createServer() {
     }
   });
 
+  // Add test geolocation route
+  app.get("/api/test-geolocation", async (req, res) => {
+    console.log(`[SERVER] Test geolocation request`);
+    try {
+      const { default: handler } = await import("../api/test-geolocation.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-geolocation handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test geolocation handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add main users API route
   app.all("/api/users", async (req, res) => {
     console.log(`[SERVER] Users API request: ${req.method}`);
