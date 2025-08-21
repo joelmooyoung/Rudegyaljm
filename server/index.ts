@@ -4,7 +4,33 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { Resend } from "resend";
 import { getCountryFromIP, getCityFromIP } from "./utils/geolocation.js";
-import { User, Story, Comment, LoginLog } from "../models/index.js";
+import { User, Comment, LoginLog } from "../models/index.js";
+
+// Define Story schema directly in server to avoid import conflicts
+const storySchema = new mongoose.Schema(
+  {
+    storyId: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    author: { type: String, required: true },
+    category: { type: String, required: true },
+    tags: [{ type: String }],
+    image: { type: String },
+    audioUrl: { type: String },
+    excerpt: { type: String },
+    accessLevel: { type: String, enum: ["free", "premium"], default: "free" },
+    published: { type: Boolean, default: false },
+    featured: { type: Boolean, default: false },
+    views: { type: Number, default: 0 },
+    likeCount: { type: Number, default: 0 },
+    commentCount: { type: Number, default: 0 },
+    averageRating: { type: Number, default: 0 },
+    ratingCount: { type: Number, default: 0 },
+  },
+  { timestamps: true },
+);
+
+const Story = mongoose.models.Story || mongoose.model("Story", storySchema);
 
 // MongoDB connection with retry logic
 let isConnected = false;
