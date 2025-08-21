@@ -669,10 +669,7 @@ export default function Home({
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-passion-gradient">
-                  {stories.reduce(
-                    (sum, story) => sum + (story.commentCount || 0),
-                    0,
-                  )}
+                  {aggregateStats.totalComments.toLocaleString()}
                 </div>
                 <div className="text-muted-foreground">Whispered Secrets</div>
               </div>
