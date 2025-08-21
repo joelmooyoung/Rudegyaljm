@@ -302,7 +302,8 @@ export default function Home({
 
   const handleStoryClick = (story: Story) => {
     if (onReadStory) {
-      onReadStory(story);
+      // Pass the current page so we can return to it later
+      onReadStory(story, currentPage);
     }
   };
 
