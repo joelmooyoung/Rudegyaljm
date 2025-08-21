@@ -103,15 +103,15 @@ export default function Home({
   ];
 
   // Fetch stories from server
-  const fetchStories = async () => {
+  const fetchStories = async (page = currentPage) => {
     setIsLoading(true);
     setError(null);
     try {
       // Route to production API when in preview environment
       const isBuilderPreview = window.location.hostname.includes("builder.my");
       const apiUrl = isBuilderPreview
-        ? "https://rudegyaljm-amber.vercel.app/api/stories"
-        : "/api/stories";
+        ? `https://rudegyaljm-amber.vercel.app/api/stories-minimal?page=${page}&limit=12`
+        : `/api/stories-minimal?page=${page}&limit=12`;
       const response = await fetch(apiUrl);
       if (response.ok) {
         const data = await response.json();
