@@ -168,12 +168,15 @@ export default function Home({
   useEffect(() => {
     console.log("🚀 Component mounted - loading initial data");
 
-    // Check if we should restore a specific page from sessionStorage
-    const storedPage = sessionStorage.getItem('homePageNumber');
-    if (storedPage) {
-      const pageNum = parseInt(storedPage);
-      console.log(`🔄 Restoring page ${pageNum} from sessionStorage`);
-      sessionStorage.removeItem('homePageNumber'); // Clear after use
+    // Check if we should restore a specific page from URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const pageFromHash = hashParams.get('page');
+
+    if (pageFromHash) {
+      const pageNum = parseInt(pageFromHash);
+      console.log(`🔄 Restoring page ${pageNum} from URL hash`);
+      // Clear the hash after use
+      window.location.hash = '';
       setIsRestoringFromSession(true);
       setCurrentPage(pageNum);
       fetchStories(pageNum);
