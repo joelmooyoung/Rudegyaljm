@@ -1307,6 +1307,22 @@ export function createServer() {
     }
   });
 
+  // Add check login city data route
+  app.get("/api/check-login-city-data", async (req, res) => {
+    console.log(`[SERVER] Check login city data request`);
+    try {
+      const { default: handler } = await import("../api/check-login-city-data.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import check-login-city-data handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Check login city data handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add migration route for login log countries
   app.post("/api/migrate-login-countries", async (req, res) => {
     console.log(`[SERVER] Migrate login countries request`);
