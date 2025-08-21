@@ -266,9 +266,11 @@ const App = () => {
     setCurrentView("admin-comments");
   };
 
-  const handleReadStory = (story: Story) => {
+  const handleReadStory = (story: Story, returnPageNum?: number) => {
     setReadingStory(story);
+    setReturnPage(returnPageNum || 1); // Default to page 1 if not specified
     setCurrentView("story-reader");
+    console.log(`📖 Reading story "${story.title}", will return to page ${returnPageNum || 1}`);
   };
 
   const handleBackFromReader = () => {
