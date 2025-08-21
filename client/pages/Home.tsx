@@ -144,7 +144,10 @@ export default function Home({
 
           if (data.pagination) {
             setPagination(data.pagination);
-            console.log(`📄 Pagination set: Page ${data.pagination.currentPage} of ${data.pagination.totalPages}`);
+            console.log(`📄 Pagination set:`, data.pagination);
+            console.log(`📄 Total pages: ${data.pagination.totalPages}, Current page: ${data.pagination.currentPage}`);
+          } else {
+            console.log("❌ No pagination data in response");
           }
         } else {
           console.error("❌ Invalid response format:", data);
