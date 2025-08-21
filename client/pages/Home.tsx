@@ -153,6 +153,10 @@ export default function Home({
           createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
           updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
         }));
+        console.log("Setting stories:", {
+          storiesCount: storiesWithDates.length,
+          firstStory: storiesWithDates[0]?.title
+        });
         setStories(storiesWithDates);
 
         // Handle pagination data
