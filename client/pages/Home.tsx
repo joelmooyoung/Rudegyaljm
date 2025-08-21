@@ -80,6 +80,14 @@ export default function Home({
   const [sortBy, setSortBy] = useState("newest");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalPages: 0,
+    totalStories: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+    limit: 12
+  });
 
   const categories = [
     "all",
