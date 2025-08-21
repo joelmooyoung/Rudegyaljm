@@ -734,6 +734,8 @@ const App = () => {
             onNavigateToContact={handleNavigateToContact}
             onNavigateToHelp={handleNavigateToHelp}
             onNavigateToProfile={handleNavigateToProfile}
+            refreshTrigger={refreshStories}
+            returnToPage={returnPage}
           />
         );
     }
