@@ -181,6 +181,7 @@ export default function Home({
       const errorMsg = `Network error: ${error instanceof Error ? error.message : "Unknown error"}`;
       setError(errorMsg);
     } finally {
+      console.log("Setting isLoading to false");
       setIsLoading(false);
     }
   };
