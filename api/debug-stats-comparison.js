@@ -29,18 +29,12 @@ export default async function handler(req, res) {
         likeCount: storyObj.likeCount || 0,
       };
       
-      // Raw MongoDB fields for debugging
+      // Raw MongoDB fields for debugging (simplified)
       const mongodbFields = {
-        storyId: story.storyId,
         rating: storyObj.rating,
-        averageRating: storyObj.averageRating,
-        ratingCount: storyObj.ratingCount,
         viewCount: storyObj.viewCount,
-        views: storyObj.views,
         commentCount: storyObj.commentCount,
-        realCommentCount: realCommentCount,
         likeCount: storyObj.likeCount,
-        allFields: Object.keys(storyObj).filter(key => key.includes('rating') || key.includes('view') || key.includes('comment') || key.includes('like'))
       };
       
       comparisons.push({
