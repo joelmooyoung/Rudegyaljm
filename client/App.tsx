@@ -279,7 +279,10 @@ const App = () => {
     // Set a flag to trigger stories refresh in Home component
     setRefreshStories(Date.now());
     console.log(`📖 Returning from story detail to page ${returnPage}`);
-    // Note: returnPage will be passed to Home component, cleared after use
+    // Clear returnPage after a short delay to allow Home component to use it
+    setTimeout(() => {
+      setReturnPage(undefined);
+    }, 100);
   };
 
   const handleNavigateToAbout = () => {
