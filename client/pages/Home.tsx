@@ -184,12 +184,13 @@ export default function Home({
   }, [currentPage]);
 
   // Handle returning to specific page when coming back from story detail
-  useEffect(() => {
-    if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
-      console.log(`📖 Returning to page ${returnToPage} after story detail`);
-      setCurrentPage(returnToPage);
-    }
-  }, [returnToPage, currentPage]);
+  // TEMPORARILY DISABLED TO FIX LOADING ISSUE
+  // useEffect(() => {
+  //   if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
+  //     console.log(`📖 Returning to page ${returnToPage} after story detail`);
+  //     setCurrentPage(returnToPage);
+  //   }
+  // }, [returnToPage, currentPage]);
 
   // Refresh stories when returning from story reader
   useEffect(() => {
