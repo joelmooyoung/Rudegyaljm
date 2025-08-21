@@ -98,6 +98,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         try {
           const response = JSON.parse(responseText);
           const stats = response.data || response.stats || response;
+          console.log(`📊 Initial stats from API:`, stats);
+          console.log(`📊 Setting initial commentCount to: ${stats.commentCount}`);
           setStoryStats((prev) => ({
             rating: stats.averageRating || stats.rating || prev.rating,
             ratingCount: stats.ratingCount || prev.ratingCount,
