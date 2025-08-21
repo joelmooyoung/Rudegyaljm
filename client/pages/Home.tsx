@@ -115,6 +115,14 @@ export default function Home({
   // Fetch stories from server
   const fetchStories = async (page = currentPage) => {
     console.log(`🔄 fetchStories called with page ${page}`);
+
+    // Prevent multiple simultaneous requests
+    if (isLoadingStories) {
+      console.log("⚠️ Already loading stories, skipping request");
+      return;
+    }
+
+    setIsLoadingStories(true);
     setIsLoading(true);
     setError(null);
 
