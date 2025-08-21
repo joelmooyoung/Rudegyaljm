@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "../../lib/mongodb.js";
 import { User, LoginLog } from "../../models/index.js";
-import { getCountryFromIP } from "../../server/utils/geolocation.js";
+import { getCountryFromIP, getCityFromIP } from "../../server/utils/geolocation.js";
 
 export default async function handler(req, res) {
   console.log(`[LOGIN API] ${req.method} /api/auth/login`);
