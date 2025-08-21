@@ -175,6 +175,10 @@ export default function Home({
 
   useEffect(() => {
     fetchStories(currentPage);
+    // Only fetch aggregate stats on initial load
+    if (currentPage === 1) {
+      fetchAggregateStats();
+    }
   }, [currentPage]);
 
   // Refresh stories when returning from story reader
