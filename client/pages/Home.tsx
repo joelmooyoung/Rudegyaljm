@@ -187,8 +187,10 @@ export default function Home({
   useEffect(() => {
     console.log(`🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`);
     if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
-      console.log(`📖 Returning to page ${returnToPage} after story detail`);
+      console.log(`📖 Returning to page ${returnToPage} after story detail (was on page ${currentPage})`);
       setCurrentPage(returnToPage);
+    } else if (returnToPage) {
+      console.log(`ℹ️ returnToPage=${returnToPage} but currentPage=${currentPage} (no change needed)`);
     }
   }, [returnToPage]);
 
