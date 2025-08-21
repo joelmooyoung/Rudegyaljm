@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { connectToDatabase } from "../lib/mongodb.js";
 
 export default async function handler(req, res) {
   console.log(`[STORIES MINIMAL] ${req.method} /api/stories-minimal`);
