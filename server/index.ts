@@ -1199,6 +1199,22 @@ export function createServer() {
     }
   });
 
+  // Add simple database test route
+  app.get("/api/test-db-simple", async (req, res) => {
+    console.log(`[SERVER] Simple database test request`);
+    try {
+      const { default: handler } = await import("../api/test-db-simple.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-db-simple handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Simple database test handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test login route
   app.get("/api/test-login", async (req, res) => {
     console.log(`[SERVER] Test login request`);
