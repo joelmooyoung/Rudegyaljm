@@ -98,6 +98,7 @@ export default async function handler(req, res) {
       likeCount: storyObj.likeCount,
       rating: storyObj.rating,
       commentCount: storyObj.commentCount,
+      realCommentCount: realCommentCount,
     });
 
     return res.status(200).json({
