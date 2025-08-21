@@ -820,6 +820,22 @@ export function createServer() {
     }
   });
 
+  // Add test image sizes route
+  app.get("/api/test-image-sizes", async (req, res) => {
+    console.log(`[SERVER] Test image sizes request`);
+    try {
+      const { default: handler } = await import("../api/test-image-sizes.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-image-sizes handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test image sizes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test field update route for direct testing
   app.post("/api/test-field-update", async (req, res) => {
     console.log(`[SERVER] Test field update request`);
