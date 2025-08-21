@@ -180,6 +180,7 @@ export default function Home({
 
   // Handle returning to specific page when coming back from story detail
   useEffect(() => {
+    console.log(`🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`);
     if (returnToPage && returnToPage > 0 && returnToPage !== currentPage) {
       console.log(`📖 Returning to page ${returnToPage} after story detail`);
       setCurrentPage(returnToPage);
