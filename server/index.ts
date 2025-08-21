@@ -451,8 +451,19 @@ export function createServer() {
         audioUrl: story.audioUrl || null,
       }));
 
-      console.log(`📚 [STORIES] Returning ${transformedStories.length} MongoDB stories`);
-      return res.json(transformedStories);
+      // Test with minimal response first
+      const minimalResponse = [
+        {
+          id: stories[0]?.storyId,
+          title: stories[0]?.title,
+          author: stories[0]?.author,
+          viewCount: stories[0]?.views || 0,
+          rating: stories[0]?.averageRating || 0
+        }
+      ];
+
+      console.log(`📚 [STORIES] Returning minimal test response`);
+      return res.json(minimalResponse);
 
     } catch (error) {
       console.error("📚 [STORIES] Error:", error);
