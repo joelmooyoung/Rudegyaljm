@@ -1225,6 +1225,22 @@ export function createServer() {
     });
   });
 
+  // Add debug story sizes route
+  app.get("/api/debug-story-sizes", async (req, res) => {
+    console.log(`[SERVER] Debug story sizes request`);
+    try {
+      const { default: handler } = await import("../api/debug-story-sizes.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-story-sizes handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug story sizes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test login route
   app.get("/api/test-login", async (req, res) => {
     console.log(`[SERVER] Test login request`);
