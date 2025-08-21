@@ -1291,6 +1291,22 @@ export function createServer() {
     }
   });
 
+  // Add debug login logs route
+  app.get("/api/debug-login-logs", async (req, res) => {
+    console.log(`[SERVER] Debug login logs request`);
+    try {
+      const { default: handler } = await import("../api/debug-login-logs.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-login-logs handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug login logs handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add migration route for login log countries
   app.post("/api/migrate-login-countries", async (req, res) => {
     console.log(`[SERVER] Migrate login countries request`);
