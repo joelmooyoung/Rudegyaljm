@@ -48,77 +48,10 @@ async function connectToDatabase() {
   return connectionPromise;
 }
 
-// User schema
-const userSchema = new mongoose.Schema({
-  userId: String,
-  username: String,
-  email: String,
-  password: String,
-  type: String,
-  active: Boolean,
-  loginCount: Number,
-  lastLogin: Date,
-  createdAt: Date,
-});
+// Schemas imported from models/index.js
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-// Story schema
-const storySchema = new mongoose.Schema({
-  storyId: String,
-  title: String,
-  content: String,
-  excerpt: String,
-  author: String,
-  category: String,
-  tags: [String],
-  accessLevel: String,
-  published: Boolean,
-  publishedAt: Date,
-  createdAt: Date,
-  updatedAt: Date,
-  viewCount: Number,
-  rating: Number,
-  ratingCount: Number,
-  image: String,
-  audioUrl: String,
-});
 
-const Story = mongoose.models.Story || mongoose.model("Story", storySchema);
-
-// Comment schema
-const commentSchema = new mongoose.Schema(
-  {
-    commentId: { type: String, required: true, unique: true },
-    storyId: { type: String, required: true },
-    userId: { type: String, required: true },
-    username: { type: String, required: true },
-    comment: { type: String, required: true },
-  },
-  { timestamps: true },
-);
-
-const Comment =
-  mongoose.models.Comment || mongoose.model("Comment", commentSchema);
-
-// LoginLog schema
-const loginLogSchema = new mongoose.Schema(
-  {
-    logId: { type: String, required: true, unique: true },
-    userId: { type: String, required: true },
-    username: { type: String, required: true },
-    ip: { type: String },
-    country: { type: String },
-    city: { type: String },
-    userAgent: { type: String },
-    success: { type: Boolean, required: true },
-    timestamp: { type: Date, default: Date.now },
-  },
-  { timestamps: true },
-);
-
-const LoginLog =
-  mongoose.models.LoginLog || mongoose.model("LoginLog", loginLogSchema);
 
 export function createServer() {
   const app = express();
