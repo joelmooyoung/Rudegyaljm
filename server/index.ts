@@ -415,62 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use working database test internally
+  // STORIES ENDPOINT - Use full stories API for all MongoDB stories
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using working database connection internally...");
+    console.log("📚 [STORIES] Using full stories API for all MongoDB data...");
     try {
-      // Call the working database test handler internally
-      const { default: dbTestHandler } = await import("../api/test-db-simple.js");
-
-      // Create a mock request/response to get the data
-      const mockReq = { method: "GET" };
-      let dbData = null;
-
-      const mockRes = {
-        status: () => mockRes,
-        json: (data) => {
-          dbData = data;
-          return mockRes;
-        }
-      };
-
-      await dbTestHandler(mockReq, mockRes);
-
-      if (dbData && dbData.success && dbData.sampleStories) {
-        // Transform the sample data into proper story format
-        const stories = dbData.sampleStories.map((story, index) => ({
-          id: story.id || `story-${index}`,
-          title: story.title || "Untitled",
-          content: "Your MongoDB story content here...", // Simplified for now
-          excerpt: `A captivating story by ${story.author}...`,
-          author: story.author || "Unknown Author",
-          category: "Romance",
-          tags: ["romance", "passion"],
-          accessLevel: "free",
-          isPublished: true,
-          publishedAt: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          viewCount: story.views || story.viewCount || 0,
-          rating: 4.5, // Default rating
-          ratingCount: 100,
-          likeCount: 0,
-          commentCount: 0,
-          image: null,
-          audioUrl: null,
-        }));
-
-        console.log(`📚 [STORIES] Returning ${stories.length} transformed MongoDB stories`);
-        return res.json(stories);
-      } else {
-        throw new Error("No data from database test");
-      }
-
+      const { default: fullStoriesHandler } = await import("../api/stories-full.js");
+      return fullStoriesHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Error:", error);
+      console.error("📚 [STORIES] Failed to import full stories handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Failed to fetch stories",
+        message: "Full stories handler not available",
         error: error.message
       });
     }
