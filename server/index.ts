@@ -1327,6 +1327,22 @@ export function createServer() {
     }
   });
 
+  // Add test MongoDB city route
+  app.get("/api/test-mongodb-city", async (req, res) => {
+    console.log(`[SERVER] Test MongoDB city request`);
+    try {
+      const { default: handler } = await import("../api/test-mongodb-city.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-mongodb-city handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test MongoDB city handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test login route
   app.get("/api/test-login", async (req, res) => {
     console.log(`[SERVER] Test login request`);
