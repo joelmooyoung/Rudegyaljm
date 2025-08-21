@@ -506,68 +506,8 @@ export function createServer() {
       },
     ];
 
-    // Try database first as backup
-    try {
-      await connectToDatabase();
-      console.log("📚 [STORIES] Database connected, trying database stories");
-
-      console.log("📚 [STORIES] Attempting to query stories from database...");
-      const stories = await Story.find({ published: true })
-        .sort({ createdAt: -1 })
-        .limit(10) // Limit to 10 stories for debugging
-        .lean();
-
-      console.log(`📚 [STORIES] Query completed, found ${stories ? stories.length : 0} stories`);
-
-      if (stories && stories.length > 0) {
-        console.log(`📚 [STORIES] ✅ Found ${stories.length} database stories`);
-
-        // Debug: Log some actual stats to verify production data
-        const firstStory = stories[0];
-        console.log(`📊 [DEBUG] Sample story stats:`, {
-          title: firstStory.title,
-          viewCount: firstStory.viewCount,
-          rating: firstStory.rating,
-          likeCount: firstStory.likeCount,
-          commentCount: firstStory.commentCount,
-          ratingCount: firstStory.ratingCount,
-        });
-
-        console.log("📚 [STORIES] Transforming stories without comment queries...");
-        const transformedStories = stories.map((story) => {
-          return {
-            id: story.storyId || story._id.toString(),
-            title: story.title || "Untitled",
-            content: story.content || "",
-            excerpt: story.excerpt || "",
-            author: story.author || "Unknown Author",
-            category: story.category || "Romance",
-            tags: Array.isArray(story.tags) ? story.tags : [],
-            accessLevel: story.accessLevel || "free",
-            isPublished: story.published || false,
-            publishedAt: story.publishedAt || story.createdAt,
-            createdAt: story.createdAt || new Date(),
-            updatedAt: story.updatedAt || new Date(),
-            // Use correct MongoDB field names from production database (after sync)
-            viewCount: story.viewCount || 0, // MongoDB field is 'viewCount' after sync
-            rating: story.rating || 0, // MongoDB field is 'rating' after sync
-            ratingCount: story.ratingCount || 0,
-            likeCount: story.likeCount || 0,
-            commentCount: story.commentCount || 0, // Use story's own commentCount field
-            image: story.image || null,
-            audioUrl: story.audioUrl || null,
-          };
-        });
-
-        console.log("📚 [STORIES] Transformation complete, returning response");
-        return res.json(transformedStories);
-      }
-    } catch (dbError) {
-      console.error(
-        "📚 [STORIES] Database failed (expected):",
-        dbError.message,
-      );
-    }
+    // Temporarily skip database to resolve hanging issue
+    console.log("📚 [STORIES] Temporarily using fallback stories to fix hanging issue");
 
     // Return reliable fallback stories
     console.log("📚 [STORIES] �� Using reliable fallback stories");
