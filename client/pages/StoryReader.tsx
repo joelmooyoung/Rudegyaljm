@@ -288,6 +288,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             setComments(filteredComments);
 
             // Update header stats with actual comment count
+            console.log(`📊 Updating storyStats.commentCount from ${storyStats.commentCount} to ${filteredComments.length}`);
             setStoryStats((prev) => ({
               ...prev,
               commentCount: filteredComments.length,
