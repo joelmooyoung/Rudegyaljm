@@ -139,6 +139,21 @@ export default function Home({
           updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
         }));
         setStories(storiesWithDates);
+
+        // Handle pagination data
+        if (data && data.pagination) {
+          setPagination(data.pagination);
+          console.log(`📚 Pagination: Page ${data.pagination.currentPage} of ${data.pagination.totalPages}`);
+        } else {
+          // Default pagination for legacy format
+          setPagination({
+            totalPages: 1,
+            totalStories: storiesWithDates.length,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            limit: 12
+          });
+        }
       } else {
         const errorMsg = `Failed to fetch stories: ${response.status} ${response.statusText}`;
         setError(errorMsg);
