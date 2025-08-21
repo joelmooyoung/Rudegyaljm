@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
-    "Access-Control-Allow-Methods", 
+    "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS",
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -14,6 +14,11 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
+
+  // Get pagination parameters
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 12; // Default to 12 stories per page
+  const skip = (page - 1) * limit;
 
   try {
     console.log("[STORIES MINIMAL] Loading minimal story metadata...");
