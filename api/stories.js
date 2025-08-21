@@ -1,6 +1,6 @@
 // Production-ready Stories API with MongoDB integration
 import { connectToDatabase } from "../lib/mongodb.js";
-import { Story } from "../models/index.js";
+import { Story, Comment } from "../models/index.js";
 
 export default async function handler(req, res) {
   console.log(`[STORIES API] ${req.method} /api/stories`);
@@ -61,8 +61,12 @@ export default async function handler(req, res) {
           .select("-__v");
 
         // Transform MongoDB documents to frontend format using production data
-        const transformedStories = stories.map((story) => {
+        const transformedStories = await Promise.all(stories.map(async (story) => {
           const storyObj = story.toObject();
+
+          // Get real comment count from Comment collection
+          const commentCount = await Comment.countDocuments({ storyId: story.storyId });
+
           return {
             id: story.storyId,
             title: story.title,
@@ -77,14 +81,14 @@ export default async function handler(req, res) {
             rating: storyObj.rating || 0,
             ratingCount: storyObj.ratingCount || 0,
             viewCount: storyObj.viewCount || 0,
-            commentCount: storyObj.commentCount || 0,
+            commentCount: commentCount, // Use real comment count from Comment collection
             likeCount: storyObj.likeCount || 0,
             image: story.image, // Use actual image from database
             audioUrl: story.audioUrl, // Use actual audio from database
             createdAt: story.createdAt,
             updatedAt: story.updatedAt,
           };
-        });
+        }));
 
         console.log(
           `[STORIES API] Found ${transformedStories.length} published stories`,
