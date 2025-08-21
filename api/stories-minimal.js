@@ -77,6 +77,21 @@ export default async function handler(req, res) {
     console.log(`[STORIES MINIMAL] Retrieved ${stories.length} story records for page ${page}`);
 
     if (stories && stories.length > 0) {
+      // Get real comment counts for all stories in this batch
+      const storyIds = stories.map(story => story.storyId);
+      const commentCounts = await commentsCollection.aggregate([
+        { $match: { storyId: { $in: storyIds } } },
+        { $group: { _id: "$storyId", count: { $sum: 1 } } }
+      ]).toArray();
+
+      // Create a map of storyId -> real comment count
+      const commentCountMap = {};
+      commentCounts.forEach(item => {
+        commentCountMap[item._id] = item.count;
+      });
+
+      console.log(`[STORIES MINIMAL] Real comment counts:`, commentCountMap);
+
       const transformedStories = stories.map((story) => ({
         id: story.storyId || story._id.toString(),
         title: story.title || "Untitled",
@@ -94,7 +109,7 @@ export default async function handler(req, res) {
         rating: story.rating || story.averageRating || 0,
         ratingCount: story.ratingCount || 0,
         likeCount: story.likeCount || 0,
-        commentCount: story.commentCount || 0,
+        commentCount: commentCountMap[story.storyId] || 0, // Use real comment count
         image: story.image || null,  // Use real image data
         audioUrl: null,  // Disabled due to DB timeout
       }));
