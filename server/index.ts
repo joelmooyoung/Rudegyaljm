@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use batch loading API for all stories
+  // STORIES ENDPOINT - Use safe loading API for reliable story access
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using batch loading API for all stories...");
+    console.log("📚 [STORIES] Using safe loading API for reliable story access...");
     try {
-      const { default: batchHandler } = await import("../api/stories-batch.js");
-      return batchHandler(req, res);
+      const { default: safeHandler } = await import("../api/stories-safe.js");
+      return safeHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import batch handler:", error);
+      console.error("📚 [STORIES] Failed to import safe handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Batch handler not available",
+        message: "Safe handler not available",
         error: error.message
       });
     }
