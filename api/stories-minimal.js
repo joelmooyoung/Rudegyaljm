@@ -61,7 +61,7 @@ export default async function handler(req, res) {
           averageRating: 1,
           rating: 1,
           createdAt: 1,
-          image: 1,  // Include images for home page cards
+          // image: 1,  // Temporarily disabled - causing DB timeout with large base64 images
           audioUrl: 1,  // Include audio info for indicators
           excerpt: 1,  // Include excerpt for better previews
           // Still exclude content to keep response size reasonable
