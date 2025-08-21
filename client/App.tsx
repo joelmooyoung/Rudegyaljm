@@ -276,14 +276,21 @@ const App = () => {
   const handleBackFromReader = () => {
     setReadingStory(null);
     setCurrentView("home");
-    // Set a flag to trigger stories refresh in Home component
-    setRefreshStories(Date.now());
     console.log(`📖 Returning from story detail to page ${returnPage}`);
+
+    // Only trigger refresh if there's no return page to restore
+    if (!returnPage) {
+      console.log(`🔄 No return page, triggering general refresh`);
+      setRefreshStories(Date.now());
+    } else {
+      console.log(`🔄 Return page ${returnPage} set, skipping refresh trigger (returnToPage will handle it)`);
+    }
+
     // Clear returnPage after a longer delay to ensure Home component processes it
     setTimeout(() => {
       console.log(`🧹 Clearing returnPage after timeout`);
       setReturnPage(undefined);
-    }, 1000);
+    }, 1500);
   };
 
   const handleNavigateToAbout = () => {
