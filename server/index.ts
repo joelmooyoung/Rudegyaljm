@@ -526,27 +526,32 @@ export function createServer() {
           ratingCount: firstStory.ratingCount,
         });
 
-        const transformedStories = stories.map((story) => ({
-          id: story.storyId || story._id.toString(),
-          title: story.title || "Untitled",
-          content: story.content || "",
-          excerpt: story.excerpt || "",
-          author: story.author || "Unknown Author",
-          category: story.category || "Romance",
-          tags: Array.isArray(story.tags) ? story.tags : [],
-          accessLevel: story.accessLevel || "free",
-          isPublished: story.published || false,
-          publishedAt: story.publishedAt || story.createdAt,
-          createdAt: story.createdAt || new Date(),
-          updatedAt: story.updatedAt || new Date(),
-          // Use correct MongoDB field names from production database (after sync)
-          viewCount: story.viewCount || 0,  // MongoDB field is 'viewCount' after sync
-          rating: story.rating || 0,  // MongoDB field is 'rating' after sync
-          ratingCount: story.ratingCount || 0,
-          likeCount: story.likeCount || 0,
-          commentCount: story.commentCount || 0,
-          image: story.image || null,
-          audioUrl: story.audioUrl || null,
+        const transformedStories = await Promise.all(stories.map(async (story) => {
+          // Get real comment count from Comment collection
+          const realCommentCount = await Comment.countDocuments({ storyId: story.storyId });
+
+          return {
+            id: story.storyId || story._id.toString(),
+            title: story.title || "Untitled",
+            content: story.content || "",
+            excerpt: story.excerpt || "",
+            author: story.author || "Unknown Author",
+            category: story.category || "Romance",
+            tags: Array.isArray(story.tags) ? story.tags : [],
+            accessLevel: story.accessLevel || "free",
+            isPublished: story.published || false,
+            publishedAt: story.publishedAt || story.createdAt,
+            createdAt: story.createdAt || new Date(),
+            updatedAt: story.updatedAt || new Date(),
+            // Use correct MongoDB field names from production database (after sync)
+            viewCount: story.viewCount || 0,  // MongoDB field is 'viewCount' after sync
+            rating: story.rating || 0,  // MongoDB field is 'rating' after sync
+            ratingCount: story.ratingCount || 0,
+            likeCount: story.likeCount || 0,
+            commentCount: realCommentCount, // Use real comment count from Comment collection
+            image: story.image || null,
+            audioUrl: story.audioUrl || null,
+          };
         }));
 
         return res.json(transformedStories);
