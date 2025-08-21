@@ -187,7 +187,13 @@ export const getCountryFromIP = (ip: string): string => {
     cleanIP.startsWith("12.") ||
     cleanIP.startsWith("207.") ||
     cleanIP.startsWith("167.") ||
-    cleanIP.startsWith("159.")
+    cleanIP.startsWith("159.") ||
+    cleanIP.startsWith("172.58.") || // AT&T/Verizon US range
+    cleanIP.startsWith("172.59.") || // AT&T/Verizon US range
+    cleanIP.startsWith("172.60.") || // US ISP ranges
+    cleanIP.startsWith("172.61.") || // US ISP ranges
+    cleanIP.startsWith("172.62.") || // US ISP ranges
+    cleanIP.startsWith("172.63.")    // US ISP ranges
   ) {
     console.log(`[GEO] United States detected: ${cleanIP}`);
     return "🇺🇸 United States";
