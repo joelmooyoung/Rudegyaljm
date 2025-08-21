@@ -691,15 +691,21 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               <CardTitle>Story</CardTitle>
             </CardHeader>
             <CardContent>
-              <div
-                className="prose prose-lg max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{
-                  __html: (story.content || "").replace(
-                    /[\u0000-\u001F\u007F-\u009F]/g,
-                    "",
-                  ),
-                }}
-              />
+              {isLoadingStory ? (
+                <div className="text-center py-8">
+                  <div className="text-muted-foreground">Loading story content...</div>
+                </div>
+              ) : (
+                <div
+                  className="prose prose-lg max-w-none dark:prose-invert"
+                  dangerouslySetInnerHTML={{
+                    __html: (fullStory.content || "").replace(
+                      /[\u0000-\u001F\u007F-\u009F]/g,
+                      "",
+                    ),
+                  }}
+                />
+              )}
             </CardContent>
           </Card>
 
