@@ -820,6 +820,7 @@ export default function Home({
           )}
 
           {/* Pagination Controls */}
+          {/* Debug: isLoading={isLoading}, error={error}, filteredStories.length={filteredStories.length}, pagination.totalPages={pagination.totalPages} */}
           {!isLoading && !error && filteredStories.length > 0 && pagination.totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 mt-8 pt-8 border-t border-border/50">
               <Button
