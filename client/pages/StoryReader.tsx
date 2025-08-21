@@ -129,6 +129,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        // Load full story data first
+        await loadFullStoryData();
+
         // Increment view count
         try {
           const viewResponse = await fetch(
