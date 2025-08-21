@@ -784,6 +784,22 @@ export function createServer() {
     }
   });
 
+  // Add test story data route
+  app.get("/api/test-story-data", async (req, res) => {
+    console.log(`[SERVER] Test story data request`);
+    try {
+      const { default: handler } = await import("../api/test-story-data.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-story-data handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test story data handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add test field update route for direct testing
   app.post("/api/test-field-update", async (req, res) => {
     console.log(`[SERVER] Test field update request`);
