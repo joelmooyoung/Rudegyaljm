@@ -163,11 +163,18 @@ export default function Home({
     }
   };
 
+  // Initial load
   useEffect(() => {
-    fetchStories(currentPage);
-    // Only fetch aggregate stats on initial load
-    if (currentPage === 1) {
-      fetchAggregateStats();
+    console.log("🚀 Component mounted - loading initial data");
+    fetchStories(1);
+    fetchAggregateStats();
+  }, []); // Only run on mount
+
+  // Handle page changes
+  useEffect(() => {
+    if (currentPage > 1) {
+      console.log(`📄 Page changed to ${currentPage}`);
+      fetchStories(currentPage);
     }
   }, [currentPage]);
 
