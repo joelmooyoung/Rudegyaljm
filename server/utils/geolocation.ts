@@ -506,3 +506,196 @@ export const getCountryFromIP = (ip: string): string => {
 
   return "🌐 Unknown Region";
 };
+
+// City detection function based on IP address
+export const getCityFromIP = (ip: string): string => {
+  // Clean up IP address
+  if (!ip || ip === "unknown" || ip === "undefined" || ip === "null") {
+    return "Unknown City";
+  }
+
+  let cleanIP = ip.trim();
+  if (cleanIP.startsWith("::ffff:")) {
+    cleanIP = cleanIP.substring(7);
+  }
+
+  // Handle port removal
+  if (cleanIP.includes("]:")) {
+    cleanIP = cleanIP.substring(1, cleanIP.indexOf("]:"));
+  } else if (
+    cleanIP.includes(":") &&
+    !cleanIP.includes("::") &&
+    cleanIP.split(":").length === 2
+  ) {
+    const parts = cleanIP.split(":");
+    if (parts.length === 2 && !isNaN(parseInt(parts[1]))) {
+      cleanIP = parts[0];
+    }
+  }
+
+  console.log(`[GEO CITY] Detecting city for IP: "${ip}" -> cleaned: "${cleanIP}"`);
+
+  // Localhost
+  if (cleanIP === "127.0.0.1" || cleanIP === "::1" || cleanIP === "localhost") {
+    return "Localhost";
+  }
+
+  // Private networks
+  if (
+    cleanIP.startsWith("192.168.") ||
+    cleanIP.startsWith("10.") ||
+    cleanIP.startsWith("172.16.") ||
+    cleanIP.startsWith("172.17.") ||
+    cleanIP.startsWith("172.18.") ||
+    cleanIP.startsWith("172.19.") ||
+    cleanIP.startsWith("172.20.") ||
+    cleanIP.startsWith("172.21.") ||
+    cleanIP.startsWith("172.22.") ||
+    cleanIP.startsWith("172.23.") ||
+    cleanIP.startsWith("172.24.") ||
+    cleanIP.startsWith("172.25.") ||
+    cleanIP.startsWith("172.26.") ||
+    cleanIP.startsWith("172.27.") ||
+    cleanIP.startsWith("172.28.") ||
+    cleanIP.startsWith("172.29.") ||
+    cleanIP.startsWith("172.30.") ||
+    cleanIP.startsWith("172.31.")
+  ) {
+    return "Private Network";
+  }
+
+  // Major US cities based on ISP IP ranges
+  // Google/Mountain View
+  if (cleanIP.startsWith("8.8.8.") || cleanIP.startsWith("8.8.4.")) {
+    return "Mountain View, CA";
+  }
+
+  // Cloudflare (multiple locations, default to San Francisco)
+  if (cleanIP.startsWith("1.1.1.") || cleanIP.startsWith("1.0.0.")) {
+    return "San Francisco, CA";
+  }
+
+  // AWS regions (approximate)
+  if (cleanIP.startsWith("52.") || cleanIP.startsWith("54.") || cleanIP.startsWith("3.")) {
+    if (cleanIP.startsWith("52.0.") || cleanIP.startsWith("54.80.")) {
+      return "Ashburn, VA"; // US-East-1
+    } else if (cleanIP.startsWith("52.8.") || cleanIP.startsWith("54.176.")) {
+      return "San Francisco, CA"; // US-West-1
+    } else if (cleanIP.startsWith("52.24.") || cleanIP.startsWith("54.200.")) {
+      return "Portland, OR"; // US-West-2
+    } else {
+      return "Cloud Service";
+    }
+  }
+
+  // Common US ISP ranges with city approximations
+  // AT&T/Verizon ranges
+  if (cleanIP.startsWith("172.58.") || cleanIP.startsWith("172.59.")) {
+    return "Dallas, TX"; // Major AT&T hub
+  }
+
+  if (cleanIP.startsWith("76.28.")) {
+    return "New York, NY"; // Verizon FiOS
+  }
+
+  if (cleanIP.startsWith("98.") || cleanIP.startsWith("67.")) {
+    return "Chicago, IL"; // Comcast major hub
+  }
+
+  if (cleanIP.startsWith("24.") || cleanIP.startsWith("99.")) {
+    return "Toronto, ON"; // Canadian ISPs
+  }
+
+  // UK major cities
+  if (cleanIP.startsWith("81.") || cleanIP.startsWith("86.")) {
+    return "London, UK";
+  }
+
+  // Germany
+  if (cleanIP.startsWith("46.") || cleanIP.startsWith("78.")) {
+    return "Berlin, Germany";
+  }
+
+  // France
+  if (cleanIP.startsWith("80.") || cleanIP.startsWith("82.")) {
+    return "Paris, France";
+  }
+
+  // Japan
+  if (cleanIP.startsWith("27.") || cleanIP.startsWith("110.")) {
+    return "Tokyo, Japan";
+  }
+
+  // Australia
+  if (cleanIP.startsWith("203.") || cleanIP.startsWith("101.")) {
+    return "Sydney, Australia";
+  }
+
+  // China
+  if (cleanIP.startsWith("36.") || cleanIP.startsWith("58.")) {
+    return "Beijing, China";
+  }
+
+  // India
+  if (cleanIP.startsWith("49.") || cleanIP.startsWith("117.")) {
+    return "Mumbai, India";
+  }
+
+  // Brazil
+  if (cleanIP.startsWith("177.") || cleanIP.startsWith("189.")) {
+    return "São Paulo, Brazil";
+  }
+
+  // General US regions based on IP ranges
+  if (
+    cleanIP.startsWith("104.") ||
+    cleanIP.startsWith("107.") ||
+    cleanIP.startsWith("173.") ||
+    cleanIP.startsWith("184.")
+  ) {
+    return "Los Angeles, CA";
+  }
+
+  if (
+    cleanIP.startsWith("76.") ||
+    cleanIP.startsWith("75.") ||
+    cleanIP.startsWith("96.")
+  ) {
+    return "New York, NY";
+  }
+
+  if (
+    cleanIP.startsWith("74.") ||
+    cleanIP.startsWith("71.") ||
+    cleanIP.startsWith("67.")
+  ) {
+    return "Chicago, IL";
+  }
+
+  // Default based on country detection
+  const country = getCountryFromIP(cleanIP);
+  if (country.includes("United States")) {
+    return "United States";
+  } else if (country.includes("Canada")) {
+    return "Canada";
+  } else if (country.includes("United Kingdom")) {
+    return "United Kingdom";
+  } else if (country.includes("Germany")) {
+    return "Germany";
+  } else if (country.includes("France")) {
+    return "France";
+  } else if (country.includes("Japan")) {
+    return "Japan";
+  } else if (country.includes("Australia")) {
+    return "Australia";
+  } else if (country.includes("China")) {
+    return "China";
+  } else if (country.includes("India")) {
+    return "India";
+  } else if (country.includes("Brazil")) {
+    return "Brazil";
+  }
+
+  console.log(`[GEO CITY] No specific city found for IP: "${cleanIP}"`);
+  return "Unknown City";
+};
