@@ -46,6 +46,47 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     commentCount: story.commentCount || 0,
   });
 
+  // Function to load full story data including content, images, and audio
+  const loadFullStoryData = async () => {
+    if (isLoadingStory) return;
+
+    setIsLoadingStory(true);
+    try {
+      console.log(`Loading full story data for: ${story.id}`);
+      const storyResponse = await fetch(
+        `/api/stories/${encodeURIComponent(story.id)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
+      if (storyResponse.ok) {
+        const responseText = await storyResponse.text();
+        try {
+          const storyResult = JSON.parse(responseText);
+          if (storyResult.success && storyResult.story) {
+            console.log("Full story data loaded:", storyResult.story);
+            setFullStory(storyResult.story);
+          } else {
+            console.warn("Story API returned unsuccessful result:", storyResult);
+          }
+        } catch (jsonError) {
+          console.warn("Failed to parse story JSON response:", responseText);
+        }
+      } else {
+        console.warn(
+          `Story API returned ${storyResponse.status}:`,
+          await storyResponse.text(),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load full story data:", error);
+    } finally {
+      setIsLoadingStory(false);
+    }
+  };
+
   // Function to refresh story stats
   const refreshStoryStats = async () => {
     try {
