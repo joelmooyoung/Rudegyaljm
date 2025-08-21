@@ -1215,6 +1215,16 @@ export function createServer() {
     }
   });
 
+  // Add direct test route to check routing
+  app.get("/api/test-direct", (req, res) => {
+    console.log(`[SERVER] Direct test route called`);
+    res.json({
+      success: true,
+      message: "Direct route working",
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Add test login route
   app.get("/api/test-login", async (req, res) => {
     console.log(`[SERVER] Test login request`);
