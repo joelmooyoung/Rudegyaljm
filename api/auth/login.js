@@ -64,15 +64,26 @@ export default async function handler(req, res) {
 
         // Create successful login log
         try {
+          // Extract IP address with proper header checking
+          const rawIP = req.headers["x-forwarded-for"] ||
+                       req.headers["x-real-ip"] ||
+                       req.socket.remoteAddress ||
+                       "unknown";
+
+          // Clean IP if it has multiple IPs (take first one)
+          const clientIP = rawIP.includes(',') ? rawIP.split(',')[0].trim() : rawIP;
+
+          // Get country from IP using geolocation
+          const country = getCountryFromIP(clientIP);
+
+          console.log(`[LOGIN API] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}`);
+
           const loginLog = new LoginLog({
             logId: `success_${Date.now()}`,
             userId: user.userId,
             username: user.username,
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.socket.remoteAddress ||
-              "unknown",
-            country: "Unknown",
+            ip: clientIP,
+            country: country,
             userAgent: req.headers["user-agent"] || "Unknown",
             success: true,
             timestamp: new Date(),
