@@ -1,5 +1,4 @@
 import { connectToDatabase } from "../../lib/mongodb.js";
-import { connectToDatabase } from "../../lib/mongodb.js";
 import { User } from "../../models/index.js";
 import bcrypt from "bcryptjs";
 
