@@ -415,17 +415,17 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use optimized MongoDB API for all stories
+  // STORIES ENDPOINT - Use batch loading API for all stories
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using optimized MongoDB API for all stories...");
+    console.log("📚 [STORIES] Using batch loading API for all stories...");
     try {
-      const { default: optimizedHandler } = await import("../api/stories-optimized.js");
-      return optimizedHandler(req, res);
+      const { default: batchHandler } = await import("../api/stories-batch.js");
+      return batchHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import optimized handler:", error);
+      console.error("📚 [STORIES] Failed to import batch handler:", error);
       return res.status(500).json({
         success: false,
-        message: "Optimized handler not available",
+        message: "Batch handler not available",
         error: error.message
       });
     }
@@ -510,7 +510,7 @@ export function createServer() {
       });
 
       console.log(
-        `[EMAIL TEST] �� Email sent successfully! ID: ${emailResult.data?.id}`,
+        `[EMAIL TEST] ✅ Email sent successfully! ID: ${emailResult.data?.id}`,
       );
 
       res.json({
