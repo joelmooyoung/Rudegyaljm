@@ -564,6 +564,76 @@ export const getCityFromIP = (ip: string): string => {
     return "Private Network";
   }
 
+  // IPv6 address detection for cities
+  if (cleanIP.includes(":")) {
+    console.log(`[GEO CITY] IPv6 address detected: ${cleanIP}`);
+
+    // IPv6 localhost
+    if (cleanIP === "::1") {
+      return "Localhost";
+    }
+
+    // Major US IPv6 ranges with city detection
+    // Comcast/Xfinity IPv6 ranges
+    if (cleanIP.startsWith("2607:fb90:")) {
+      return "Philadelphia, PA"; // Comcast HQ region
+    }
+    if (cleanIP.startsWith("2607:f8b0:")) {
+      return "Chicago, IL"; // Google IPv6 Chicago
+    }
+    if (cleanIP.startsWith("2001:4860:")) {
+      return "Mountain View, CA"; // Google IPv6
+    }
+
+    // General US IPv6 ranges by region
+    if (cleanIP.startsWith("2600:") || cleanIP.startsWith("2601:")) {
+      return "Denver, CO"; // Major US ISP hub
+    }
+    if (cleanIP.startsWith("2602:") || cleanIP.startsWith("2603:")) {
+      return "Atlanta, GA"; // Southeastern US hub
+    }
+    if (cleanIP.startsWith("2604:") || cleanIP.startsWith("2605:")) {
+      return "Dallas, TX"; // Central US hub
+    }
+    if (cleanIP.startsWith("2606:") || cleanIP.startsWith("2607:")) {
+      return "New York, NY"; // Northeastern US hub
+    }
+    if (cleanIP.startsWith("2620:")) {
+      return "San Francisco, CA"; // West Coast organizations
+    }
+
+    // Canadian IPv6 ranges
+    if (cleanIP.startsWith("2001:56a:")) {
+      return "Toronto, ON";
+    }
+    if (cleanIP.startsWith("2607:5300:")) {
+      return "Montreal, QC";
+    }
+
+    // European IPv6 ranges
+    if (cleanIP.startsWith("2a00:") || cleanIP.startsWith("2a01:")) {
+      return "London, UK";
+    }
+    if (cleanIP.startsWith("2a02:") || cleanIP.startsWith("2a03:")) {
+      return "Amsterdam, Netherlands";
+    }
+    if (cleanIP.startsWith("2a04:") || cleanIP.startsWith("2a05:")) {
+      return "Frankfurt, Germany";
+    }
+
+    // If it's IPv6 but no specific match, return based on country
+    const country = getCountryFromIP(cleanIP);
+    if (country.includes("United States")) {
+      return "United States";
+    } else if (country.includes("Canada")) {
+      return "Canada";
+    } else if (country.includes("Europe") || country.includes("United Kingdom")) {
+      return "Europe";
+    }
+
+    return "Unknown City (IPv6)";
+  }
+
   // Major US cities based on ISP IP ranges
   // Google/Mountain View
   if (cleanIP.startsWith("8.8.8.") || cleanIP.startsWith("8.8.4.")) {
