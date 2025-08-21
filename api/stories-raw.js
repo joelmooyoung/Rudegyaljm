@@ -33,26 +33,10 @@ export default async function handler(req, res) {
     console.log(`[STORIES RAW API] Found ${stories.length} published stories`);
 
     if (stories && stories.length > 0) {
-      // Get comment counts for all stories in one query
-      console.log("[STORIES RAW API] Getting comment counts...");
-      const commentCounts = await commentsCollection.aggregate([
-        {
-          $group: {
-            _id: "$storyId",
-            count: { $sum: 1 }
-          }
-        }
-      ]).toArray();
-
-      // Create comment count map
-      const commentCountMap = {};
-      commentCounts.forEach(item => {
-        commentCountMap[item._id] = item.count;
-      });
-
-      console.log("[STORIES RAW API] Transforming stories...");
+      console.log("[STORIES RAW API] Transforming stories without comment aggregation...");
       const transformedStories = stories.map((story) => {
-        const commentCount = commentCountMap[story.storyId] || 0;
+        // Use the commentCount field from the story document itself
+        const commentCount = story.commentCount || 0;
 
         return {
           id: story.storyId || story._id.toString(),
