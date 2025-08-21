@@ -62,21 +62,18 @@ export default async function handler(req, res) {
         };
       });
 
-      // Test with simplified response first
-      const simplifiedStories = transformedStories.slice(0, 5).map(story => ({
-        id: story.id,
-        title: story.title,
-        author: story.author,
-        excerpt: story.excerpt?.substring(0, 100) + "...", // Truncate content
-        viewCount: story.viewCount,
-        rating: story.rating,
-        ratingCount: story.ratingCount,
-        likeCount: story.likeCount,
-        commentCount: story.commentCount
-      }));
-
-      console.log(`[STORIES RAW API] Returning ${simplifiedStories.length} simplified stories`);
-      return res.json(simplifiedStories);
+      console.log(`[STORIES RAW API] Returning test response`);
+      return res.json({
+        success: true,
+        message: "MongoDB stories loaded successfully",
+        count: transformedStories.length,
+        sample: {
+          title: transformedStories[0]?.title,
+          author: transformedStories[0]?.author,
+          viewCount: transformedStories[0]?.viewCount,
+          rating: transformedStories[0]?.rating
+        }
+      });
     } else {
       console.log("[STORIES RAW API] No stories found");
       return res.json([]);
