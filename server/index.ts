@@ -199,7 +199,7 @@ export function createServer() {
 
       await adminUser.save();
 
-      console.log("👑 [CREATE ADMIN] ✅ Admin user created successfully");
+      console.log("���� [CREATE ADMIN] ✅ Admin user created successfully");
 
       res.json({
         success: true,
@@ -1208,6 +1208,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Debug likes handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add debug login logs route
+  app.get("/api/debug-login-logs", async (req, res) => {
+    console.log(`[SERVER] Debug login logs request`);
+    try {
+      const { default: handler } = await import("../api/debug-login-logs.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-login-logs handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug login logs handler not available",
         error: error.message,
       });
     }
