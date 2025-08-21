@@ -657,7 +657,7 @@ export default function Home({
             <div className="flex justify-center gap-8 mb-8 text-sm font-serif">
               <div className="text-center">
                 <div className="text-2xl font-bold text-passion-gradient">
-                  {pagination.totalStories || stories.length}
+                  {aggregateStats.totalStories || pagination.totalStories || stories.length}
                 </div>
                 <div className="text-muted-foreground">Seductive Tales</div>
               </div>
