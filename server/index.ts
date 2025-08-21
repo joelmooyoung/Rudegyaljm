@@ -1377,6 +1377,22 @@ export function createServer() {
     }
   });
 
+  // Add test login route
+  app.get("/api/test-login", async (req, res) => {
+    console.log(`[SERVER] Test login request`);
+    try {
+      const { default: handler } = await import("../api/test-login.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-login handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test login handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add migration route for login log countries
   app.post("/api/migrate-login-countries", async (req, res) => {
     console.log(`[SERVER] Migrate login countries request`);
