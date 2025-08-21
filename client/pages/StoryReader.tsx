@@ -527,11 +527,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           {/* Story Header */}
           <Card className="overflow-hidden">
             {/* Story Image */}
-            {story.image && (
+            {fullStory.image && (
               <div className="relative h-80 bg-muted/20">
                 <img
-                  src={story.image}
-                  alt={story.title}
+                  src={fullStory.image}
+                  alt={fullStory.title}
                   className="w-full h-full object-contain"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -562,7 +562,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             )}
 
             <CardHeader>
-              {!story.image && (
+              {!fullStory.image && (
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-3xl mb-2">
@@ -647,7 +647,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               )}
 
               {/* Audio Player */}
-              {story.audioUrl && (
+              {fullStory.audioUrl && (
                 <div className="mt-6 p-4 bg-muted/20 rounded-lg border">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center gap-2 text-sm font-medium">
@@ -671,9 +671,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                     preload="metadata"
                     controlsList="nodownload"
                   >
-                    <source src={story.audioUrl} type="audio/mpeg" />
-                    <source src={story.audioUrl} type="audio/wav" />
-                    <source src={story.audioUrl} type="audio/ogg" />
+                    <source src={fullStory.audioUrl} type="audio/mpeg" />
+                    <source src={fullStory.audioUrl} type="audio/wav" />
+                    <source src={fullStory.audioUrl} type="audio/ogg" />
                     Your browser does not support the audio element.
                   </audio>
                   <p className="text-xs text-muted-foreground mt-2">
