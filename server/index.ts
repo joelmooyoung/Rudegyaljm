@@ -1275,6 +1275,22 @@ export function createServer() {
     }
   });
 
+  // Add test city detection route
+  app.get("/api/test-city-detection", async (req, res) => {
+    console.log(`[SERVER] Test city detection request`);
+    try {
+      const { default: handler } = await import("../api/test-city-detection.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-city-detection handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test city detection handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add migration route for login log countries
   app.post("/api/migrate-login-countries", async (req, res) => {
     console.log(`[SERVER] Migrate login countries request`);
