@@ -167,25 +167,10 @@ export default function Home({
     }
   };
 
-  // Simple initial load - check hash first, then load appropriate page
+  // Simple initial load - just load page 1 on mount
   useEffect(() => {
-    console.log("🚀 Component mounted - checking for page restoration");
-
-    // Check hash first for page restoration
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const pageFromHash = hashParams.get('page');
-
-    if (pageFromHash) {
-      const pageNum = parseInt(pageFromHash);
-      console.log(`🔄 Restoring page ${pageNum} from URL hash`);
-      // Don't clear hash immediately - let user see they're on correct page
-      setCurrentPage(pageNum);
-      fetchStories(pageNum);
-    } else {
-      console.log("📖 No page in hash, loading page 1");
-      fetchStories(1);
-    }
-
+    console.log("🚀 Component mounted - loading initial data");
+    fetchStories(1);
     fetchAggregateStats();
   }, []); // Only run on mount
 
@@ -327,12 +312,10 @@ export default function Home({
 
   const handleStoryClick = (story: Story) => {
     console.log(`📚 Story clicked: "${story.title}" from page ${currentPage}`);
-    // Store current page in URL hash for reliable persistence
-    window.location.hash = `page=${currentPage}`;
-    console.log(`💾 Stored page ${currentPage} in URL hash: ${window.location.hash}`);
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
+      console.log(`💾 Passing currentPage ${currentPage} to onReadStory`);
       onReadStory(story, currentPage);
     }
   };
