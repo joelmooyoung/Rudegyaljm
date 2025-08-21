@@ -702,7 +702,7 @@ export function createServer() {
               </div>
 
               <ul style="color: #6b7280; font-size: 14px; margin: 20px 0;">
-                <li>✅ Resend API connection established</li>
+                <li>��� Resend API connection established</li>
                 <li>✅ Email delivery confirmed</li>
                 <li>✅ Template rendering correctly</li>
                 <li>✅ Ready for production use</li>
@@ -1452,6 +1452,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Migrate login cities v2 handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add IPv6 city update route
+  app.post("/api/update-ipv6-cities", async (req, res) => {
+    console.log(`[SERVER] Update IPv6 cities request`);
+    try {
+      const { default: handler } = await import("../api/update-ipv6-cities.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import update-ipv6-cities handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Update IPv6 cities handler not available",
         error: error.message,
       });
     }
