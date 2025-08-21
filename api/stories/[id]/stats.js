@@ -58,6 +58,7 @@ export default async function handler(req, res) {
       likeCount: story?.likeCount,
       rating: story?.rating,
       commentCount: story?.commentCount,
+      realCommentCount: realCommentCount,
       ratingCount: story?.ratingCount,
       allFields: story ? Object.keys(storyObj) : 'no story',
       rawFieldValues: {
