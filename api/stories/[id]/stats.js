@@ -47,6 +47,10 @@ export default async function handler(req, res) {
     const story = await Story.findOne({ storyId: id });
 
     const storyObj = story.toObject();
+
+    // Get real comment count from Comment collection
+    const realCommentCount = await Comment.countDocuments({ storyId: id });
+
     console.log(`[STORY STATS API DEBUG] Story object:`, {
       found: !!story,
       storyId: story?.storyId,
