@@ -59,19 +59,18 @@ export default async function handler(req, res) {
 
       // Get the actual viewCount from raw object (handles Mongoose property access issues)
       const storyObj = currentStory.toObject();
-      const actualViewCount = storyObj.viewCount || storyObj.views || 0;
+      const actualViewCount = storyObj.viewCount || storyObj.views;
 
       console.log(`[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`);
       console.log(`[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`);
+      console.log(`[STORY VIEW API DEBUG] All story fields:`, Object.keys(storyObj));
 
-      // Initialize viewCount if it's null/undefined
-      if (
-        actualViewCount === undefined ||
-        actualViewCount === null ||
-        isNaN(actualViewCount)
-      ) {
-        console.log(`[STORY VIEW API DEBUG] Initializing viewCount to 0`);
+      // Only initialize if the field truly doesn't exist - don't overwrite existing values
+      if (actualViewCount === undefined || actualViewCount === null) {
+        console.log(`[STORY VIEW API DEBUG] Field doesn't exist, initializing viewCount to 0`);
         await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
+      } else {
+        console.log(`[STORY VIEW API DEBUG] ViewCount exists (${actualViewCount}), proceeding with increment`);
       }
 
       // Now increment the view count
