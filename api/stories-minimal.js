@@ -4,13 +4,16 @@ import { connectToDatabase } from "../lib/mongodb.js";
 export default async function handler(req, res) {
   console.log(`[STORIES MINIMAL] ${req.method} /api/stories-minimal`);
 
-  // Enable CORS
+  // Enable CORS and disable caching for fresh data
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS",
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
