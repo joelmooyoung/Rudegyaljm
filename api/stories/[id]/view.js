@@ -49,9 +49,9 @@ export default async function handler(req, res) {
     // Record this view attempt
     recentViews.set(viewKey, now);
 
-    // Clean up old entries periodically
-    if (recentViews.size > 1000) {
-      const cutoff = now - (RATE_LIMIT_MS * 2);
+    // Clean up old entries more aggressively
+    if (recentViews.size > 100) {
+      const cutoff = now - (RATE_LIMIT_MS * 5);
       for (const [key, time] of recentViews.entries()) {
         if (time < cutoff) {
           recentViews.delete(key);
