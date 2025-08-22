@@ -81,10 +81,21 @@ export default async function handler(req, res) {
       setTimeout(() => reject(new Error('Database operation timeout')), timeoutMs)
     );
 
-    const { stories, cachedStats, totalStories } = await Promise.race([
-      dbOperations(),
-      timeoutPromise
-    ]);
+    let stories, cachedStats, totalStories;
+
+    try {
+      const result = await Promise.race([
+        dbOperations(),
+        timeoutPromise
+      ]);
+      stories = result.stories;
+      cachedStats = result.cachedStats;
+      totalStories = result.totalStories;
+    } catch (timeoutError) {
+      console.warn("[STORIES CACHED] Database operations timed out, falling back to minimal API");
+      const { default: minimalHandler } = await import("./stories-minimal.js");
+      return minimalHandler(req, res);
+    }
 
     // Create a map for fast lookup
     const statsMap = new Map();
