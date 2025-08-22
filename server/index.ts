@@ -1238,6 +1238,22 @@ export function createServer() {
     }
   });
 
+  // Add admin route for stats cache status
+  app.get("/api/admin/stats-cache-status", async (req, res) => {
+    console.log("[SERVER] Admin stats cache status request");
+    try {
+      const { default: handler } = await import("../api/admin/stats-cache-status.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import stats cache status handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Stats cache status handler not available",
+        error: error.message
+      });
+    }
+  });
+
   // Add admin user reading stats route
   app.get("/api/admin/user-reading-stats", async (req, res) => {
     console.log(`[SERVER] Admin user reading stats request`);
