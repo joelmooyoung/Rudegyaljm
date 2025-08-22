@@ -870,6 +870,22 @@ export function createServer() {
     }
   });
 
+  // Add test view increment route for debugging
+  app.all("/api/test-view-increment", async (req, res) => {
+    console.log("[SERVER] Test view increment request");
+    try {
+      const { default: handler } = await import("../api/test-view-increment.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import test view increment handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Test view increment handler not available",
+        error: error.message
+      });
+    }
+  });
+
   // Add performance test route for debugging
   app.get("/api/performance-test", async (req, res) => {
     console.log("[SERVER] Performance test request");
