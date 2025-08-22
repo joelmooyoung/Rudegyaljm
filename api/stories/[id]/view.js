@@ -114,11 +114,14 @@ export default async function handler(req, res) {
       // Now increment the view count - ensure we use the right field
       console.log(`[STORY VIEW API DEBUG] About to increment viewCount from ${actualViewCount}...`);
 
-      // First, let's try a direct increment operation and check the result
+      // Increment both viewCount and views fields for consistency
       const updateResult = await Story.updateOne(
         { storyId: id },
         {
-          $inc: { viewCount: 1 },
+          $inc: {
+            viewCount: 1,
+            views: 1  // Also increment views field to prevent conflicts
+          },
           $set: { updatedAt: new Date() }
         }
       );
