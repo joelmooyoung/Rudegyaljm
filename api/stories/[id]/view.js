@@ -1,9 +1,9 @@
 import { connectToDatabase } from "../../../lib/mongodb.js";
 import { Story } from "../../../models/index.js";
 
-// Simple rate limiting to prevent duplicate increments
+// Minimal rate limiting to prevent rapid double-clicks only
 const recentViews = new Map();
-const RATE_LIMIT_MS = 1000; // 1 second cooldown per story per session
+const RATE_LIMIT_MS = 100; // 100ms cooldown - only prevents rapid double-clicks
 
 // Story View Tracking API
 export default async function handler(req, res) {
