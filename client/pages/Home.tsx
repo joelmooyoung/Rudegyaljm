@@ -82,11 +82,7 @@ export default function Home({
   const [sortBy, setSortBy] = useState("newest");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(() => {
-    // Try to restore page from sessionStorage on initial load
-    const savedPage = sessionStorage.getItem("home-current-page");
-    return savedPage ? parseInt(savedPage) : 1;
-  });
+  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     totalPages: 0,
     totalStories: 0,
@@ -102,8 +98,7 @@ export default function Home({
     totalRatings: 0,
   });
   const [isLoadingStories, setIsLoadingStories] = useState(false);
-  const [isRestoringFromSession, setIsRestoringFromSession] = useState(false);
-  const [isRestoringFromReturn, setIsRestoringFromReturn] = useState(false);
+  const [isRestoringPage, setIsRestoringPage] = useState(false);
 
   const categories = [
     "all",
@@ -178,22 +173,41 @@ export default function Home({
     }
   };
 
-  // Simple initial load - load the current page (which may be restored from sessionStorage)
+  // Initial load - restore page from sessionStorage or return page
   useEffect(() => {
-    console.log(
-      `🚀 Component mounted - loading page ${currentPage} (from sessionStorage)`,
-    );
-    fetchStories(currentPage);
+    let pageToLoad = 1;
+
+    // Check if we have a return page first (highest priority)
+    if (returnToPage && returnToPage > 0) {
+      console.log(`🔙 Returning to page ${returnToPage} from story detail`);
+      pageToLoad = returnToPage;
+      setCurrentPage(returnToPage);
+      setIsRestoringPage(true);
+    } else {
+      // Try to restore from sessionStorage
+      const savedPage = sessionStorage.getItem("home-current-page");
+      if (savedPage) {
+        pageToLoad = parseInt(savedPage);
+        console.log(`💾 Restored page ${pageToLoad} from sessionStorage`);
+        setCurrentPage(pageToLoad);
+      }
+    }
+
+    console.log(`🚀 Component mounted - loading page ${pageToLoad}`);
+    fetchStories(pageToLoad);
     fetchAggregateStats();
-  }, []); // Only run on mount
+
+    // Clear restoration flag after load
+    if (isRestoringPage) {
+      setTimeout(() => setIsRestoringPage(false), 500);
+    }
+  }, [returnToPage]); // Re-run when returnToPage changes
 
   // Handle page changes and save to sessionStorage
   useEffect(() => {
-    // Skip if we're restoring from return page to avoid conflicts
-    if (isRestoringFromReturn) {
-      console.log(
-        `⏸️ Skipping currentPage useEffect - restoring from return page`,
-      );
+    // Skip if we're restoring to avoid conflicts
+    if (isRestoringPage) {
+      console.log(`⏸️ Skipping page change - currently restoring`);
       return;
     }
 
@@ -201,55 +215,18 @@ export default function Home({
     sessionStorage.setItem("home-current-page", currentPage.toString());
     console.log(`💾 Saved page ${currentPage} to sessionStorage`);
 
-    // Skip the initial mount to avoid double loading
-    if (currentPage !== 1 || stories.length > 0) {
-      console.log(`📄 Page changed to ${currentPage}`);
-      fetchStories(currentPage);
-    }
-  }, [currentPage, isRestoringFromReturn]);
+    // Fetch stories for new page
+    console.log(`📄 Page changed to ${currentPage}`);
+    fetchStories(currentPage);
+  }, [currentPage]);
 
-  // Handle returning to specific page when coming back from story detail
+  // Handle refresh trigger
   useEffect(() => {
-    console.log(
-      `🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`,
-    );
-    if (returnToPage && returnToPage > 0) {
-      console.log(`📖 Starting page restoration to ${returnToPage}`);
-      setIsRestoringFromReturn(true);
-
-      // Always set the page and save to sessionStorage
-      console.log(`📖 Returning to page ${returnToPage} after story detail`);
-      setCurrentPage(returnToPage);
-      sessionStorage.setItem("home-current-page", returnToPage.toString());
-      console.log(`💾 Saved return page ${returnToPage} to sessionStorage`);
-
-      // Fetch stories for the return page immediately
-      console.log(`🚀 Fetching stories for return page ${returnToPage}`);
-      fetchStories(returnToPage);
-
-      // Clear restoration flag after a delay
-      setTimeout(() => {
-        console.log(`✅ Page restoration complete, clearing flag`);
-        setIsRestoringFromReturn(false);
-      }, 500);
-    }
-  }, [returnToPage]);
-
-  // Simple refresh trigger - but skip if we're in page restoration
-  useEffect(() => {
-    if (refreshTrigger && refreshTrigger > 0) {
-      // Skip refresh if we're restoring from return page
-      if (isRestoringFromReturn || returnToPage) {
-        console.log(
-          `⏸️ Skipping refresh trigger - page restoration in progress`,
-        );
-        return;
-      }
-
+    if (refreshTrigger && refreshTrigger > 0 && !isRestoringPage) {
       console.log(`🔄 Refresh triggered: fetching page ${currentPage}`);
       fetchStories(currentPage);
     }
-  }, [refreshTrigger, isRestoringFromReturn, returnToPage]);
+  }, [refreshTrigger]);
 
   // Fetch aggregate stats for header display
   const fetchAggregateStats = async () => {
@@ -277,9 +254,9 @@ export default function Home({
     }
   };
 
-  // Simple filter reset - just reset to page 1 when filters change
+  // Reset to page 1 when filters change
   useEffect(() => {
-    if (currentPage !== 1) {
+    if (currentPage !== 1 && !isRestoringPage) {
       console.log(`🔄 Resetting to page 1 due to filter change`);
       setCurrentPage(1);
     }
@@ -299,6 +276,7 @@ export default function Home({
   };
 
   const handlePageSelect = (page: number) => {
+    console.log(`📄 Page selected: ${page}`);
     setCurrentPage(page);
   };
 
@@ -367,13 +345,11 @@ export default function Home({
 
     // Save current page to sessionStorage before navigating
     sessionStorage.setItem("home-current-page", currentPage.toString());
-    console.log(
-      `💾 Saved page ${currentPage} to sessionStorage before story navigation`,
-    );
+    console.log(`💾 Saved page ${currentPage} to sessionStorage before story navigation`);
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
-      console.log(`💾 Passing currentPage ${currentPage} to onReadStory`);
+      console.log(`🔄 Passing page ${currentPage} to story reader`);
       onReadStory(story, currentPage);
     }
   };
