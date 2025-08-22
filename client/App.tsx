@@ -281,21 +281,11 @@ const App = () => {
     setCurrentView("home");
     console.log(`📖 Returning from story detail to page ${returnPage}`);
 
-    // Only trigger refresh if there's no return page to restore
-    if (!returnPage) {
-      console.log(`🔄 No return page, triggering general refresh`);
-      setRefreshStories(Date.now());
-    } else {
-      console.log(
-        `🔄 Return page ${returnPage} set, skipping refresh trigger (returnToPage will handle it)`,
-      );
-    }
-
-    // Clear returnPage after a longer delay to ensure Home component processes it
+    // Clear returnPage after Home component has processed it
     setTimeout(() => {
-      console.log(`🧹 Clearing returnPage after timeout`);
+      console.log(`🧹 Clearing returnPage`);
       setReturnPage(undefined);
-    }, 1500);
+    }, 1000);
   };
 
   const handleNavigateToAbout = () => {
