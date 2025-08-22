@@ -133,7 +133,7 @@ export default function Home({
     setError(null);
 
     try {
-      const apiUrl = `/api/stories?page=${page}&limit=8`;
+      const apiUrl = `/api/stories?page=${page}&limit=8&includeRealCommentCounts=true`;
       console.log(`📞 Calling API: ${apiUrl}`);
 
       const response = await fetch(apiUrl);
