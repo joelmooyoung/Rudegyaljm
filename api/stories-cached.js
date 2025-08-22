@@ -47,11 +47,17 @@ export default async function handler(req, res) {
     const storyIds = stories.map(story => story.storyId);
 
     // Get cached stats for these stories
+    console.log(`[STORIES CACHED] Looking up cached stats for story IDs:`, storyIds.slice(0, 3));
+
     const cachedStats = await StoryStatsCache.find({
       storyId: { $in: storyIds }
     }).lean();
 
     console.log(`[STORIES CACHED] Found ${cachedStats.length} cached stats entries`);
+
+    if (cachedStats.length > 0) {
+      console.log(`[STORIES CACHED] Sample cached stat:`, cachedStats[0]);
+    }
 
     // Create a map for fast lookup
     const statsMap = new Map();
