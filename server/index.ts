@@ -159,7 +159,7 @@ export function createServer() {
 
       await adminUser.save();
 
-      console.log("���� [CREATE ADMIN] ✅ Admin user created successfully");
+      console.log("����� [CREATE ADMIN] ✅ Admin user created successfully");
 
       res.json({
         success: true,
@@ -832,6 +832,22 @@ export function createServer() {
         success: false,
         message: "Test image sizes handler not available",
         error: error.message,
+      });
+    }
+  });
+
+  // Add performance test route for debugging
+  app.get("/api/performance-test", async (req, res) => {
+    console.log("[SERVER] Performance test request");
+    try {
+      const { default: handler } = await import("../api/performance-test.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import performance test handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Performance test handler not available",
+        error: error.message
       });
     }
   });
