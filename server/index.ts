@@ -267,7 +267,7 @@ export function createServer() {
         })),
       });
     } catch (error) {
-      console.error("👥 [CHECK USERS] ❌ Error:", error);
+      console.error("���� [CHECK USERS] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to check users",
@@ -1077,6 +1077,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Test fix viewcount handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add debug story3 fields route
+  app.get("/api/debug-story3-fields", async (req, res) => {
+    console.log(`[SERVER] Debug story3 fields request`);
+    try {
+      const { default: handler } = await import("../api/debug-story3-fields.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import debug story3 fields handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug story3 fields handler not available",
         error: error.message,
       });
     }
