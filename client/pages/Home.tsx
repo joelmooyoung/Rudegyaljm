@@ -658,6 +658,12 @@ export default function Home({
                       <BookOpen className="h-4 w-4 mr-2" />
                       Reading Statistics
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onNavigateToAdmin("stats-management")}
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Stats Management
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onNavigateToAdmin("login-logs")}
