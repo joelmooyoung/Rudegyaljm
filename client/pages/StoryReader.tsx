@@ -22,6 +22,7 @@ import {
   Send,
 } from "lucide-react";
 import { Story, User as UserType, Comment } from "@shared/api";
+import { requestCache } from "@/utils/request-cache";
 
 interface StoryReaderProps {
   story: Story;
