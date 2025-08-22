@@ -132,8 +132,10 @@ export default function Home({
     setError(null);
 
     try {
-      const apiUrl = `/api/stories?page=${page}&limit=8`;
-      console.log(`📞 Calling cached stats API: ${apiUrl}`);
+      // Add timestamp to bust any cache and ensure fresh data
+      const timestamp = Date.now();
+      const apiUrl = `/api/stories?page=${page}&limit=8&t=${timestamp}`;
+      console.log(`📞 Calling fresh stats API: ${apiUrl}`);
 
       const response = await fetch(apiUrl);
       console.log(`📡 Response status: ${response.status}`);
