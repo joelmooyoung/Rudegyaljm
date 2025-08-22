@@ -28,8 +28,39 @@ export default async function handler(req, res) {
 
   try {
     const { userId, sessionId } = req.body;
+    const userKey = userId || sessionId || req.ip || "anonymous";
+    const viewKey = `${id}-${userKey}`;
+
+    // Check rate limiting
+    const lastView = recentViews.get(viewKey);
+    const now = Date.now();
+
+    if (lastView && (now - lastView) < RATE_LIMIT_MS) {
+      console.log(`[STORY VIEW API] Rate limited: Recent view detected for ${viewKey}`);
+      return res.status(200).json({
+        success: true,
+        message: "View already recorded recently",
+        rateLimited: true,
+        storyId: id,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    // Record this view attempt
+    recentViews.set(viewKey, now);
+
+    // Clean up old entries periodically
+    if (recentViews.size > 1000) {
+      const cutoff = now - (RATE_LIMIT_MS * 2);
+      for (const [key, time] of recentViews.entries()) {
+        if (time < cutoff) {
+          recentViews.delete(key);
+        }
+      }
+    }
+
     console.log(
-      `[STORY VIEW API] Recording view for story ${id} by user ${userId || sessionId || "anonymous"}`,
+      `[STORY VIEW API] Recording view for story ${id} by user ${userKey}`,
     );
 
     // Connect to production database with timeout protection
