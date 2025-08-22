@@ -33,8 +33,9 @@ export default async function handler(req, res) {
     try {
       await connectToDatabase();
     } catch (dbError) {
-      console.error("[STORIES CACHED] Database connection failed, falling back to minimal API");
-      // Fallback to minimal API when database has issues
+      console.error("[STORIES CACHED] Database connection failed, falling back to minimal API with real comment counts");
+      // Fallback to minimal API when database has issues, but ensure we get real comment counts
+      req.query.includeRealCommentCounts = 'true';
       const { default: minimalHandler } = await import("./stories-minimal.js");
       return minimalHandler(req, res);
     }
