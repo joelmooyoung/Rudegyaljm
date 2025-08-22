@@ -173,41 +173,22 @@ export default function Home({
     }
   };
 
-  // Initial load - restore page from sessionStorage or return page
+  // Simple initial load - load the current page (which may be restored from sessionStorage)
   useEffect(() => {
-    let pageToLoad = 1;
-
-    // Check if we have a return page first (highest priority)
-    if (returnToPage && returnToPage > 0) {
-      console.log(`🔙 Returning to page ${returnToPage} from story detail`);
-      pageToLoad = returnToPage;
-      setCurrentPage(returnToPage);
-      setIsRestoringPage(true);
-    } else {
-      // Try to restore from sessionStorage
-      const savedPage = sessionStorage.getItem("home-current-page");
-      if (savedPage) {
-        pageToLoad = parseInt(savedPage);
-        console.log(`💾 Restored page ${pageToLoad} from sessionStorage`);
-        setCurrentPage(pageToLoad);
-      }
-    }
-
-    console.log(`🚀 Component mounted - loading page ${pageToLoad}`);
-    fetchStories(pageToLoad);
+    console.log(
+      `🚀 Component mounted - loading page ${currentPage} (from sessionStorage)`,
+    );
+    fetchStories(currentPage);
     fetchAggregateStats();
-
-    // Clear restoration flag after load
-    if (isRestoringPage) {
-      setTimeout(() => setIsRestoringPage(false), 500);
-    }
-  }, [returnToPage]); // Re-run when returnToPage changes
+  }, []); // Only run on mount
 
   // Handle page changes and save to sessionStorage
   useEffect(() => {
-    // Skip if we're restoring to avoid conflicts
+    // Skip if we're restoring from return page to avoid conflicts
     if (isRestoringPage) {
-      console.log(`⏸️ Skipping page change - currently restoring`);
+      console.log(
+        `⏸️ Skipping currentPage useEffect - restoring from return page`,
+      );
       return;
     }
 
@@ -215,18 +196,55 @@ export default function Home({
     sessionStorage.setItem("home-current-page", currentPage.toString());
     console.log(`💾 Saved page ${currentPage} to sessionStorage`);
 
-    // Fetch stories for new page
-    console.log(`📄 Page changed to ${currentPage}`);
-    fetchStories(currentPage);
-  }, [currentPage]);
+    // Skip the initial mount to avoid double loading
+    if (currentPage !== 1 || stories.length > 0) {
+      console.log(`📄 Page changed to ${currentPage}`);
+      fetchStories(currentPage);
+    }
+  }, [currentPage, isRestoringPage]);
 
-  // Handle refresh trigger
+  // Handle returning to specific page when coming back from story detail
   useEffect(() => {
-    if (refreshTrigger && refreshTrigger > 0 && !isRestoringPage) {
+    console.log(
+      `🔍 returnToPage useEffect triggered: returnToPage=${returnToPage}, currentPage=${currentPage}`,
+    );
+    if (returnToPage && returnToPage > 0) {
+      console.log(`📖 Starting page restoration to ${returnToPage}`);
+      setIsRestoringPage(true);
+
+      // Always set the page and save to sessionStorage
+      console.log(`📖 Returning to page ${returnToPage} after story detail`);
+      setCurrentPage(returnToPage);
+      sessionStorage.setItem("home-current-page", returnToPage.toString());
+      console.log(`💾 Saved return page ${returnToPage} to sessionStorage`);
+
+      // Fetch stories for the return page immediately to get updated stats
+      console.log(`🚀 Fetching stories for return page ${returnToPage} with fresh stats`);
+      fetchStories(returnToPage);
+
+      // Clear restoration flag after a delay
+      setTimeout(() => {
+        console.log(`✅ Page restoration complete, clearing flag`);
+        setIsRestoringPage(false);
+      }, 500);
+    }
+  }, [returnToPage]);
+
+  // Simple refresh trigger - but skip if we're in page restoration
+  useEffect(() => {
+    if (refreshTrigger && refreshTrigger > 0) {
+      // Skip refresh if we're restoring from return page
+      if (isRestoringPage || returnToPage) {
+        console.log(
+          `⏸️ Skipping refresh trigger - page restoration in progress`,
+        );
+        return;
+      }
+
       console.log(`🔄 Refresh triggered: fetching page ${currentPage}`);
       fetchStories(currentPage);
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, isRestoringPage, returnToPage]);
 
   // Fetch aggregate stats for header display
   const fetchAggregateStats = async () => {
