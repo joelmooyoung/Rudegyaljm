@@ -63,30 +63,34 @@ export default async function handler(req, res) {
     const totalStories = await Story.countDocuments({ published: true });
     const totalPages = Math.ceil(totalStories / limit);
 
-    // Transform to expected format
-    const transformedStories = stories.map(story => ({
-      id: story.storyId,
-      title: story.title || "Untitled",
-      author: story.author || "Unknown Author",
-      excerpt: story.excerpt || `A ${story.category || 'passionate'} story by ${story.author}`,
-      content: "Click to read this captivating story...", // Placeholder - actual content loaded separately
-      tags: Array.isArray(story.tags) ? story.tags : ["passion", "romance"],
-      category: story.category || "Romance",
-      accessLevel: story.accessLevel || "free",
-      isPublished: true,
-      createdAt: story.createdAt || new Date(),
-      updatedAt: story.updatedAt || new Date(),
-      // Cached stats (no database calculation needed!)
-      viewCount: story.viewCount || 0,
-      likeCount: story.likeCount || 0, 
-      commentCount: story.commentCount || 0,
-      rating: story.rating || 0,
-      ratingCount: story.ratingCount || 0,
-      image: story.image || null,
-      audioUrl: story.audioUrl || null,
-      // Metadata
-      lastStatsUpdate: story.lastStatsUpdate
-    }));
+    // Transform to expected format using cached stats
+    const transformedStories = stories.map(story => {
+      const cachedStat = statsMap.get(story.storyId);
+
+      return {
+        id: story.storyId,
+        title: story.title || "Untitled",
+        author: story.author || "Unknown Author",
+        excerpt: story.excerpt || `A ${story.category || 'passionate'} story by ${story.author}`,
+        content: "Click to read this captivating story...", // Placeholder - actual content loaded separately
+        tags: Array.isArray(story.tags) ? story.tags : ["passion", "romance"],
+        category: story.category || "Romance",
+        accessLevel: story.accessLevel || "free",
+        isPublished: true,
+        createdAt: story.createdAt || new Date(),
+        updatedAt: story.updatedAt || new Date(),
+        // Use cached stats if available, fallback to 0
+        viewCount: cachedStat?.viewCount || 0,
+        likeCount: cachedStat?.likeCount || 0,
+        commentCount: cachedStat?.commentCount || 0,
+        rating: cachedStat?.rating || 0,
+        ratingCount: cachedStat?.ratingCount || 0,
+        image: story.image || null,
+        audioUrl: story.audioUrl || null,
+        // Metadata
+        lastStatsUpdate: cachedStat?.lastCalculated || null
+      };
+    });
 
     const queryTime = Date.now() - startTime;
 
