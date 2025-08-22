@@ -1222,6 +1222,22 @@ export function createServer() {
     }
   });
 
+  // Add admin route for stats calculation
+  app.post("/api/admin/calculate-all-stats", async (req, res) => {
+    console.log("[SERVER] Admin stats calculation request");
+    try {
+      const { default: handler } = await import("../api/admin/calculate-all-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import stats calculation handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Stats calculation handler not available",
+        error: error.message
+      });
+    }
+  });
+
   // Add admin user reading stats route
   app.get("/api/admin/user-reading-stats", async (req, res) => {
     console.log(`[SERVER] Admin user reading stats request`);
