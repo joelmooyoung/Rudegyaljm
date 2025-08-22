@@ -57,13 +57,18 @@ export default async function handler(req, res) {
         throw new Error("Story not found");
       }
 
-      console.log(`[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount}`);
+      // Get the actual viewCount from raw object (handles Mongoose property access issues)
+      const storyObj = currentStory.toObject();
+      const actualViewCount = storyObj.viewCount || storyObj.views || 0;
+
+      console.log(`[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`);
+      console.log(`[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`);
 
       // Initialize viewCount if it's null/undefined
       if (
-        currentStory.viewCount === undefined ||
-        currentStory.viewCount === null ||
-        isNaN(currentStory.viewCount)
+        actualViewCount === undefined ||
+        actualViewCount === null ||
+        isNaN(actualViewCount)
       ) {
         console.log(`[STORY VIEW API DEBUG] Initializing viewCount to 0`);
         await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
