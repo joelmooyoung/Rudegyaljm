@@ -94,37 +94,25 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   // Function to refresh story stats
   const refreshStoryStats = async () => {
     try {
-      const statsResponse = await requestCache.fetch(
+      const response = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
         {},
         10000 // 10 second cache TTL for stats
       );
-      if (statsResponse.ok) {
-        const responseText = await statsResponse.text();
-        try {
-          const response = JSON.parse(responseText);
-          const stats = response.data || response.stats || response;
-          console.log(`📊 Initial stats from API:`, stats);
-          console.log(
-            `📊 Setting initial commentCount to: ${stats.commentCount}`,
-          );
-          setStoryStats((prev) => ({
-            rating: stats.averageRating || stats.rating || prev.rating,
-            ratingCount: stats.ratingCount || prev.ratingCount,
-            viewCount: stats.viewCount || prev.viewCount,
-            commentCount: stats.commentCount || prev.commentCount,
-            likeCount:
-              stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
-          }));
-        } catch (jsonError) {
-          console.warn("Failed to parse stats JSON response:", responseText);
-        }
-      } else {
-        console.warn(
-          `Stats API returned ${statsResponse.status}:`,
-          await statsResponse.text(),
-        );
-      }
+
+      const stats = response.data || response.stats || response;
+      console.log(`📊 Initial stats from API (cached):`, stats);
+      console.log(
+        `📊 Setting initial commentCount to: ${stats.commentCount}`,
+      );
+      setStoryStats((prev) => ({
+        rating: stats.averageRating || stats.rating || prev.rating,
+        ratingCount: stats.ratingCount || prev.ratingCount,
+        viewCount: stats.viewCount || prev.viewCount,
+        commentCount: stats.commentCount || prev.commentCount,
+        likeCount:
+          stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
+      }));
     } catch (error) {
       console.error("Failed to refresh story stats:", error);
     }
