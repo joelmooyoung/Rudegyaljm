@@ -267,7 +267,7 @@ export function createServer() {
         })),
       });
     } catch (error) {
-      console.error("���� [CHECK USERS] ❌ Error:", error);
+      console.error("👥 [CHECK USERS] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to check users",
@@ -1093,6 +1093,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Debug story3 fields handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add fix Amsterdam viewcount route
+  app.get("/api/fix-amsterdam-viewcount", async (req, res) => {
+    console.log(`[SERVER] Fix Amsterdam viewcount request`);
+    try {
+      const { default: handler } = await import("../api/fix-amsterdam-viewcount.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import fix Amsterdam viewcount handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Fix Amsterdam viewcount handler not available",
         error: error.message,
       });
     }
