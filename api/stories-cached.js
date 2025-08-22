@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   try {
     const startTime = Date.now();
-    
+
     // Get pagination parameters
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 8;
@@ -30,7 +30,14 @@ export default async function handler(req, res) {
 
     console.log(`[STORIES CACHED] Fetching page ${page} (limit: ${limit}) using cached stats...`);
 
-    await connectToDatabase();
+    try {
+      await connectToDatabase();
+    } catch (dbError) {
+      console.error("[STORIES CACHED] Database connection failed, falling back to minimal API");
+      // Fallback to minimal API when database has issues
+      const { default: minimalHandler } = await import("./stories-minimal.js");
+      return minimalHandler(req, res);
+    }
 
     // Simple approach: Get stories first, then get their cached stats
     console.log("[STORIES CACHED] Getting stories...");
