@@ -35,9 +35,11 @@ export default async function handler(req, res) {
     const lastView = recentViews.get(viewKey);
     const now = Date.now();
 
-    if (lastView && (now - lastView) < RATE_LIMIT_MS) {
+    if (lastView && now - lastView < RATE_LIMIT_MS) {
       const timeSinceLastView = now - lastView;
-      console.log(`[STORY VIEW API] Rate limited: ${timeSinceLastView}ms since last view for ${viewKey} (limit: ${RATE_LIMIT_MS}ms)`);
+      console.log(
+        `[STORY VIEW API] Rate limited: ${timeSinceLastView}ms since last view for ${viewKey} (limit: ${RATE_LIMIT_MS}ms)`,
+      );
       return res.status(200).json({
         success: true,
         message: "View already recorded recently",
@@ -54,7 +56,7 @@ export default async function handler(req, res) {
 
     // Clean up old entries more aggressively
     if (recentViews.size > 100) {
-      const cutoff = now - (RATE_LIMIT_MS * 5);
+      const cutoff = now - RATE_LIMIT_MS * 5;
       for (const [key, time] of recentViews.entries()) {
         if (time < cutoff) {
           recentViews.delete(key);
@@ -69,16 +71,19 @@ export default async function handler(req, res) {
     // Connect to production database with timeout protection
     const connectPromise = connectToDatabase();
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Database connection timeout')), 3000)
+      setTimeout(() => reject(new Error("Database connection timeout")), 3000),
     );
 
     try {
       await Promise.race([connectPromise, timeoutPromise]);
     } catch (dbError) {
-      console.warn(`[STORY VIEW API] Database connection failed: ${dbError.message}`);
+      console.warn(
+        `[STORY VIEW API] Database connection failed: ${dbError.message}`,
+      );
       return res.status(200).json({
         success: false,
-        message: "View recording temporarily unavailable due to database issues",
+        message:
+          "View recording temporarily unavailable due to database issues",
         fallback: true,
         storyId: id,
         timestamp: new Date().toISOString(),
@@ -99,20 +104,36 @@ export default async function handler(req, res) {
       const storyObj = currentStory.toObject();
       const actualViewCount = storyObj.viewCount || storyObj.views;
 
-      console.log(`[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`);
-      console.log(`[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`);
-      console.log(`[STORY VIEW API DEBUG] All story fields:`, Object.keys(storyObj));
+      console.log(
+        `[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`,
+      );
+      console.log(
+        `[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`,
+      );
+      console.log(
+        `[STORY VIEW API DEBUG] All story fields:`,
+        Object.keys(storyObj),
+      );
 
       // Only initialize if the field truly doesn't exist - don't overwrite existing values
       if (actualViewCount === undefined || actualViewCount === null) {
-        console.log(`[STORY VIEW API DEBUG] Field doesn't exist, initializing viewCount to 0`);
-        await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
+        console.log(
+          `[STORY VIEW API DEBUG] Field doesn't exist, initializing viewCount to 0`,
+        );
+        await Story.findOneAndUpdate(
+          { storyId: id },
+          { $set: { viewCount: 0 } },
+        );
       } else {
-        console.log(`[STORY VIEW API DEBUG] ViewCount exists (${actualViewCount}), proceeding with increment`);
+        console.log(
+          `[STORY VIEW API DEBUG] ViewCount exists (${actualViewCount}), proceeding with increment`,
+        );
       }
 
       // Now increment the view count - ensure we use the right field
-      console.log(`[STORY VIEW API DEBUG] About to increment viewCount from ${actualViewCount}...`);
+      console.log(
+        `[STORY VIEW API DEBUG] About to increment viewCount from ${actualViewCount}...`,
+      );
 
       // Increment both viewCount and views fields for consistency
       const updateResult = await Story.updateOne(
@@ -120,32 +141,39 @@ export default async function handler(req, res) {
         {
           $inc: {
             viewCount: 1,
-            views: 1  // Also increment views field to prevent conflicts
+            views: 1, // Also increment views field to prevent conflicts
           },
-          $set: { updatedAt: new Date() }
-        }
+          $set: { updatedAt: new Date() },
+        },
       );
 
-      console.log(`[STORY VIEW API DEBUG] MongoDB updateOne result:`, updateResult);
+      console.log(
+        `[STORY VIEW API DEBUG] MongoDB updateOne result:`,
+        updateResult,
+      );
 
       // Then get the updated document
       const story = await Story.findOne({ storyId: id });
 
-      console.log(`[STORY VIEW API DEBUG] Retrieved updated story after increment`);
+      console.log(
+        `[STORY VIEW API DEBUG] Retrieved updated story after increment`,
+      );
 
       return story;
     };
 
     // Execute with timeout protection
     const dbTimeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Database operation timeout')), 5000)
+      setTimeout(() => reject(new Error("Database operation timeout")), 5000),
     );
 
     let story;
     try {
       story = await Promise.race([dbOperations(), dbTimeoutPromise]);
     } catch (dbOpError) {
-      console.error(`[STORY VIEW API] Database operation failed: ${dbOpError.message}`);
+      console.error(
+        `[STORY VIEW API] Database operation failed: ${dbOpError.message}`,
+      );
       return res.status(200).json({
         success: false,
         message: "View increment failed due to database timeout",

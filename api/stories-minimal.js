@@ -118,11 +118,11 @@ export default async function handler(req, res) {
                 ])
                 .toArray(),
               new Promise((_, reject) =>
-              setTimeout(
-                () => reject(new Error("Comment aggregation timeout")),
-                1500, // Very short timeout - fallback quickly to static data
+                setTimeout(
+                  () => reject(new Error("Comment aggregation timeout")),
+                  1500, // Very short timeout - fallback quickly to static data
+                ),
               ),
-            ),
             ]);
 
             // Create a map of storyId -> real comment count
@@ -136,29 +136,48 @@ export default async function handler(req, res) {
             );
           }
         } catch (error) {
-        console.warn(
-          `[STORIES MINIMAL] Failed to get real comment counts, using static fallback:`,
-          error.message,
-        );
+          console.warn(
+            `[STORIES MINIMAL] Failed to get real comment counts, using static fallback:`,
+            error.message,
+          );
 
-        // Use static fallback data for critical stories when database is unstable
-        try {
-          const fs = await import('fs');
-          const path = await import('path');
-          const fallbackPath = path.join(process.cwd(), 'data/comment-counts-fallback.json');
+          // Use static fallback data for critical stories when database is unstable
+          try {
+            const fs = await import("fs");
+            const path = await import("path");
+            const fallbackPath = path.join(
+              process.cwd(),
+              "data/comment-counts-fallback.json",
+            );
 
-          if (fs.existsSync(fallbackPath)) {
-            const fallbackData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
-            console.log(`[STORIES MINIMAL] Using static comment count fallback for accurate counts`);
+            if (fs.existsSync(fallbackPath)) {
+              const fallbackData = JSON.parse(
+                fs.readFileSync(fallbackPath, "utf8"),
+              );
+              console.log(
+                `[STORIES MINIMAL] Using static comment count fallback for accurate counts`,
+              );
 
-            stories.forEach((story) => {
-              if (story.storyId && fallbackData[story.storyId]) {
-                commentCountMap[story.storyId] = fallbackData[story.storyId];
-              } else {
-                commentCountMap[story.storyId] = story.commentCount || 0;
-              }
-            });
-          } else {
+              stories.forEach((story) => {
+                if (story.storyId && fallbackData[story.storyId]) {
+                  commentCountMap[story.storyId] = fallbackData[story.storyId];
+                } else {
+                  commentCountMap[story.storyId] = story.commentCount || 0;
+                }
+              });
+            } else {
+              // Final fallback to story document comment counts
+              stories.forEach((story) => {
+                if (story.storyId) {
+                  commentCountMap[story.storyId] = story.commentCount || 0;
+                }
+              });
+            }
+          } catch (fallbackError) {
+            console.warn(
+              `[STORIES MINIMAL] Static fallback failed:`,
+              fallbackError.message,
+            );
             // Final fallback to story document comment counts
             stories.forEach((story) => {
               if (story.storyId) {
@@ -166,16 +185,7 @@ export default async function handler(req, res) {
               }
             });
           }
-        } catch (fallbackError) {
-          console.warn(`[STORIES MINIMAL] Static fallback failed:`, fallbackError.message);
-          // Final fallback to story document comment counts
-          stories.forEach((story) => {
-            if (story.storyId) {
-              commentCountMap[story.storyId] = story.commentCount || 0;
-            }
-          });
         }
-      }
       } else {
         console.log(
           `[STORIES MINIMAL] Using cached comment counts for better performance`,

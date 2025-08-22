@@ -422,14 +422,18 @@ export function createServer() {
 
   // STORIES ENDPOINT - Use minimal API with real comment counts for reliability
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using minimal API with real comment counts for reliability...");
+    console.log(
+      "📚 [STORIES] Using minimal API with real comment counts for reliability...",
+    );
 
     // Temporarily use minimal API directly while database connectivity is unstable
     // This ensures fast, reliable loading with accurate comment counts
-    req.query.includeRealCommentCounts = 'true';
+    req.query.includeRealCommentCounts = "true";
 
     try {
-      const { default: minimalHandler } = await import("../api/stories-minimal.js");
+      const { default: minimalHandler } = await import(
+        "../api/stories-minimal.js"
+      );
       return minimalHandler(req, res);
     } catch (error) {
       console.error("📚 [STORIES] Minimal API failed:", error);
@@ -450,7 +454,10 @@ export function createServer() {
       );
       return minimalHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES MINIMAL] Failed to import minimal handler:", error);
+      console.error(
+        "📚 [STORIES MINIMAL] Failed to import minimal handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Minimal handler not available",
@@ -874,14 +881,19 @@ export function createServer() {
   app.all("/api/test-view-increment", async (req, res) => {
     console.log("[SERVER] Test view increment request");
     try {
-      const { default: handler } = await import("../api/test-view-increment.js");
+      const { default: handler } = await import(
+        "../api/test-view-increment.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import test view increment handler:", error);
+      console.error(
+        "[SERVER] Failed to import test view increment handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test view increment handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -1073,7 +1085,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-fix-viewcount.js");
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import test fix viewcount handler:", error);
+      console.error(
+        "[SERVER] Failed to import test fix viewcount handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test fix viewcount handler not available",
@@ -1086,10 +1101,15 @@ export function createServer() {
   app.get("/api/debug-story3-fields", async (req, res) => {
     console.log(`[SERVER] Debug story3 fields request`);
     try {
-      const { default: handler } = await import("../api/debug-story3-fields.js");
+      const { default: handler } = await import(
+        "../api/debug-story3-fields.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import debug story3 fields handler:", error);
+      console.error(
+        "[SERVER] Failed to import debug story3 fields handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug story3 fields handler not available",
@@ -1102,10 +1122,15 @@ export function createServer() {
   app.get("/api/fix-amsterdam-viewcount", async (req, res) => {
     console.log(`[SERVER] Fix Amsterdam viewcount request`);
     try {
-      const { default: handler } = await import("../api/fix-amsterdam-viewcount.js");
+      const { default: handler } = await import(
+        "../api/fix-amsterdam-viewcount.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import fix Amsterdam viewcount handler:", error);
+      console.error(
+        "[SERVER] Failed to import fix Amsterdam viewcount handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Fix Amsterdam viewcount handler not available",
@@ -1118,10 +1143,15 @@ export function createServer() {
   app.get("/api/check-amsterdam-state", async (req, res) => {
     console.log(`[SERVER] Check Amsterdam state request`);
     try {
-      const { default: handler } = await import("../api/check-amsterdam-state.js");
+      const { default: handler } = await import(
+        "../api/check-amsterdam-state.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import check Amsterdam state handler:", error);
+      console.error(
+        "[SERVER] Failed to import check Amsterdam state handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Check Amsterdam state handler not available",
@@ -1311,14 +1341,19 @@ export function createServer() {
   app.post("/api/admin/calculate-all-stats", async (req, res) => {
     console.log("[SERVER] Admin stats calculation request");
     try {
-      const { default: handler } = await import("../api/admin/calculate-all-stats.js");
+      const { default: handler } = await import(
+        "../api/admin/calculate-all-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import stats calculation handler:", error);
+      console.error(
+        "[SERVER] Failed to import stats calculation handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Stats calculation handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -1327,14 +1362,19 @@ export function createServer() {
   app.get("/api/admin/stats-cache-status", async (req, res) => {
     console.log("[SERVER] Admin stats cache status request");
     try {
-      const { default: handler } = await import("../api/admin/stats-cache-status.js");
+      const { default: handler } = await import(
+        "../api/admin/stats-cache-status.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import stats cache status handler:", error);
+      console.error(
+        "[SERVER] Failed to import stats cache status handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Stats cache status handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
