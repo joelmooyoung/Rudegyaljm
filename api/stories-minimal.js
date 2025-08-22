@@ -115,11 +115,11 @@ export default async function handler(req, res) {
                 ])
                 .toArray(),
               new Promise((_, reject) =>
-                setTimeout(
-                  () => reject(new Error("Comment aggregation timeout")),
-                  3000, // Reduced timeout for better performance
-                ),
+              setTimeout(
+                () => reject(new Error("Comment aggregation timeout")),
+                1500, // Very short timeout - fallback quickly to static data
               ),
+            ),
             ]);
 
             // Create a map of storyId -> real comment count
