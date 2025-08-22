@@ -22,8 +22,11 @@ export default async function handler(req, res) {
   const skip = (page - 1) * limit;
 
   // Option to skip expensive comment count aggregation for better performance
-  const includeRealCommentCounts = req.query.includeRealCommentCounts === 'true';
-  console.log(`[STORIES MINIMAL] includeRealCommentCounts param: ${req.query.includeRealCommentCounts} -> ${includeRealCommentCounts}`);
+  const includeRealCommentCounts =
+    req.query.includeRealCommentCounts === "true";
+  console.log(
+    `[STORIES MINIMAL] includeRealCommentCounts param: ${req.query.includeRealCommentCounts} -> ${includeRealCommentCounts}`,
+  );
 
   try {
     console.log("[STORIES MINIMAL] Loading minimal story metadata...");
@@ -142,7 +145,9 @@ export default async function handler(req, res) {
           });
         }
       } else {
-        console.log(`[STORIES MINIMAL] Using cached comment counts for better performance`);
+        console.log(
+          `[STORIES MINIMAL] Using cached comment counts for better performance`,
+        );
         // Use existing comment counts from story documents
         stories.forEach((story) => {
           if (story.storyId) {

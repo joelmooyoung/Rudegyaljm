@@ -1,12 +1,13 @@
 // Request deduplication utility to prevent multiple concurrent calls to the same API
 class RequestCache {
   private pendingRequests: Map<string, Promise<any>> = new Map();
-  private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
+  private cache: Map<string, { data: any; timestamp: number; ttl: number }> =
+    new Map();
 
   async fetch<T>(
-    url: string, 
-    options: RequestInit = {}, 
-    ttlMs: number = 30000 // 30 seconds default TTL
+    url: string,
+    options: RequestInit = {},
+    ttlMs: number = 30000, // 30 seconds default TTL
   ): Promise<T> {
     const cacheKey = this.createCacheKey(url, options);
 
@@ -26,7 +27,7 @@ class RequestCache {
     // Create new request
     console.log(`🔄 Making new request for ${url}`);
     const requestPromise = this.makeRequest<T>(url, options, ttlMs, cacheKey);
-    
+
     // Store the pending request
     this.pendingRequests.set(cacheKey, requestPromise);
 
@@ -40,13 +41,13 @@ class RequestCache {
   }
 
   private async makeRequest<T>(
-    url: string, 
-    options: RequestInit, 
-    ttlMs: number, 
-    cacheKey: string
+    url: string,
+    options: RequestInit,
+    ttlMs: number,
+    cacheKey: string,
   ): Promise<T> {
     const response = await fetch(url, options);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -57,7 +58,7 @@ class RequestCache {
     this.cache.set(cacheKey, {
       data,
       timestamp: Date.now(),
-      ttl: ttlMs
+      ttl: ttlMs,
     });
 
     return data;
@@ -65,8 +66,8 @@ class RequestCache {
 
   private createCacheKey(url: string, options: RequestInit): string {
     // Create a cache key from URL and relevant options
-    const method = options.method || 'GET';
-    const body = options.body ? JSON.stringify(options.body) : '';
+    const method = options.method || "GET";
+    const body = options.body ? JSON.stringify(options.body) : "";
     return `${method}:${url}:${body}`;
   }
 
@@ -90,7 +91,7 @@ class RequestCache {
   getStats(): { cacheSize: number; pendingRequests: number } {
     return {
       cacheSize: this.cache.size,
-      pendingRequests: this.pendingRequests.size
+      pendingRequests: this.pendingRequests.size,
     };
   }
 }
@@ -99,6 +100,9 @@ class RequestCache {
 export const requestCache = new RequestCache();
 
 // Auto-cleanup expired entries every 5 minutes
-setInterval(() => {
-  requestCache.clearExpired();
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    requestCache.clearExpired();
+  },
+  5 * 60 * 1000,
+);

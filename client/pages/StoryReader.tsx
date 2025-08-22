@@ -97,14 +97,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       const response = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
         {},
-        10000 // 10 second cache TTL for stats
+        10000, // 10 second cache TTL for stats
       );
 
       const stats = response.data || response.stats || response;
       console.log(`📊 Initial stats from API (cached):`, stats);
-      console.log(
-        `📊 Setting initial commentCount to: ${stats.commentCount}`,
-      );
+      console.log(`📊 Setting initial commentCount to: ${stats.commentCount}`);
       setStoryStats((prev) => ({
         rating: stats.averageRating || stats.rating || prev.rating,
         ratingCount: stats.ratingCount || prev.ratingCount,

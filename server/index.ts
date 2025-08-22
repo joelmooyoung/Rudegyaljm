@@ -76,9 +76,6 @@ async function connectToDatabase() {
 
 // Schemas imported from models/index.js
 
-
-
-
 export function createServer() {
   const app = express();
 
@@ -312,19 +309,24 @@ export function createServer() {
           // Create login log
           try {
             // Extract IP address with proper header checking
-            const rawIP = req.headers["x-forwarded-for"] ||
-                         req.headers["x-real-ip"] ||
-                         req.socket.remoteAddress ||
-                         "unknown";
+            const rawIP =
+              req.headers["x-forwarded-for"] ||
+              req.headers["x-real-ip"] ||
+              req.socket.remoteAddress ||
+              "unknown";
 
             // Clean IP if it has multiple IPs (take first one)
-            const clientIP = rawIP.includes(',') ? rawIP.split(',')[0].trim() : rawIP;
+            const clientIP = rawIP.includes(",")
+              ? rawIP.split(",")[0].trim()
+              : rawIP;
 
             // Get country and city from IP using geolocation
             const country = getCountryFromIP(clientIP);
             const city = getCityFromIP(clientIP);
 
-            console.log(`🔐 [LOGIN] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}, ${city}`);
+            console.log(
+              `🔐 [LOGIN] IP geolocation: ${rawIP} -> ${clientIP} -> ${country}, ${city}`,
+            );
 
             const loginLog = new LoginLog({
               logId: `success_${Date.now()}`,
@@ -340,7 +342,10 @@ export function createServer() {
             await loginLog.save();
             console.log("🔐 [LOGIN] ✅ Login log created successfully");
           } catch (logError) {
-            console.error("🔐 [LOGIN] ❌ Failed to create login log:", logError);
+            console.error(
+              "🔐 [LOGIN] ❌ Failed to create login log:",
+              logError,
+            );
           }
 
           return res.json({
@@ -419,14 +424,16 @@ export function createServer() {
   app.get("/api/stories", async (req, res) => {
     console.log("📚 [STORIES] Using minimal API for fast reliable response...");
     try {
-      const { default: minimalHandler } = await import("../api/stories-minimal.js");
+      const { default: minimalHandler } = await import(
+        "../api/stories-minimal.js"
+      );
       return minimalHandler(req, res);
     } catch (error) {
       console.error("📚 [STORIES] Failed to import minimal handler:", error);
       return res.status(500).json({
         success: false,
         message: "Minimal handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -811,7 +818,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-story-data.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-story-data handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-story-data handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test story data handler not available",
@@ -827,7 +837,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-image-sizes.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-image-sizes handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-image-sizes handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test image sizes handler not available",
@@ -843,11 +856,14 @@ export function createServer() {
       const { default: handler } = await import("../api/performance-test.js");
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import performance test handler:", error);
+      console.error(
+        "[SERVER] Failed to import performance test handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Performance test handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -863,7 +879,7 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Bulk stats handler not available",
-        error: error.message
+        error: error.message,
       });
     }
   });
@@ -872,10 +888,15 @@ export function createServer() {
   app.get("/api/stories-aggregate-stats", async (req, res) => {
     console.log(`[SERVER] Stories aggregate stats request`);
     try {
-      const { default: handler } = await import("../api/stories-aggregate-stats.js");
+      const { default: handler } = await import(
+        "../api/stories-aggregate-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import stories-aggregate-stats handler:`, error);
+      console.error(
+        `[SERVER] Failed to import stories-aggregate-stats handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Stories aggregate stats handler not available",
@@ -1110,7 +1131,10 @@ export function createServer() {
       const { default: handler } = await import("../api/debug-login-logs.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-login-logs handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-login-logs handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug login logs handler not available",
@@ -1226,7 +1250,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-geolocation.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-geolocation handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-geolocation handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test geolocation handler not available",
@@ -1239,10 +1266,15 @@ export function createServer() {
   app.get("/api/test-city-detection", async (req, res) => {
     console.log(`[SERVER] Test city detection request`);
     try {
-      const { default: handler } = await import("../api/test-city-detection.js");
+      const { default: handler } = await import(
+        "../api/test-city-detection.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-city-detection handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-city-detection handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test city detection handler not available",
@@ -1258,7 +1290,10 @@ export function createServer() {
       const { default: handler } = await import("../api/debug-login-logs.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-login-logs handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-login-logs handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug login logs handler not available",
@@ -1271,10 +1306,15 @@ export function createServer() {
   app.get("/api/check-login-city-data", async (req, res) => {
     console.log(`[SERVER] Check login city data request`);
     try {
-      const { default: handler } = await import("../api/check-login-city-data.js");
+      const { default: handler } = await import(
+        "../api/check-login-city-data.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import check-login-city-data handler:`, error);
+      console.error(
+        `[SERVER] Failed to import check-login-city-data handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Check login city data handler not available",
@@ -1290,7 +1330,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-mongodb-city.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-mongodb-city handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-mongodb-city handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test MongoDB city handler not available",
@@ -1321,7 +1364,7 @@ export function createServer() {
     res.json({
       success: true,
       message: "Direct route working",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
@@ -1332,7 +1375,10 @@ export function createServer() {
       const { default: handler } = await import("../api/debug-story-sizes.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-story-sizes handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-story-sizes handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug story sizes handler not available",
@@ -1377,10 +1423,15 @@ export function createServer() {
   app.post("/api/migrate-login-countries", async (req, res) => {
     console.log(`[SERVER] Migrate login countries request`);
     try {
-      const { default: handler } = await import("../api/migrate-login-countries.js");
+      const { default: handler } = await import(
+        "../api/migrate-login-countries.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import migrate-login-countries handler:`, error);
+      console.error(
+        `[SERVER] Failed to import migrate-login-countries handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Migrate login countries handler not available",
@@ -1393,10 +1444,15 @@ export function createServer() {
   app.post("/api/migrate-login-cities", async (req, res) => {
     console.log(`[SERVER] Migrate login cities request`);
     try {
-      const { default: handler } = await import("../api/migrate-login-cities.js");
+      const { default: handler } = await import(
+        "../api/migrate-login-cities.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import migrate-login-cities handler:`, error);
+      console.error(
+        `[SERVER] Failed to import migrate-login-cities handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Migrate login cities handler not available",
@@ -1409,10 +1465,15 @@ export function createServer() {
   app.post("/api/migrate-login-cities-v2", async (req, res) => {
     console.log(`[SERVER] Migrate login cities v2 request`);
     try {
-      const { default: handler } = await import("../api/migrate-login-cities-v2.js");
+      const { default: handler } = await import(
+        "../api/migrate-login-cities-v2.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import migrate-login-cities-v2 handler:`, error);
+      console.error(
+        `[SERVER] Failed to import migrate-login-cities-v2 handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Migrate login cities v2 handler not available",
@@ -1428,7 +1489,10 @@ export function createServer() {
       const { default: handler } = await import("../api/update-ipv6-cities.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import update-ipv6-cities handler:`, error);
+      console.error(
+        `[SERVER] Failed to import update-ipv6-cities handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Update IPv6 cities handler not available",

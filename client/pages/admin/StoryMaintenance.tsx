@@ -82,7 +82,9 @@ export default function StoryMaintenance({
         }
 
         // Convert date strings back to Date objects and fetch real stats in bulk
-        const validStories = storiesArray.filter(story => story && story.id && story.title);
+        const validStories = storiesArray.filter(
+          (story) => story && story.id && story.title,
+        );
 
         // Prepare base stories with default values
         const storiesWithDates = validStories.map((story: any) => ({
@@ -102,10 +104,14 @@ export default function StoryMaintenance({
         // Fetch real stats for ALL stories in one API call
         if (validStories.length > 0) {
           try {
-            const storyIds = validStories.map(story => story.id).join(',');
-            console.log(`📊 Fetching bulk stats for ${validStories.length} stories...`);
+            const storyIds = validStories.map((story) => story.id).join(",");
+            console.log(
+              `📊 Fetching bulk stats for ${validStories.length} stories...`,
+            );
 
-            const statsResponse = await fetch(`/api/stories-bulk-stats?storyIds=${encodeURIComponent(storyIds)}`);
+            const statsResponse = await fetch(
+              `/api/stories-bulk-stats?storyIds=${encodeURIComponent(storyIds)}`,
+            );
             if (statsResponse.ok) {
               const bulkStatsData = await statsResponse.json();
               if (bulkStatsData.success) {
@@ -120,7 +126,9 @@ export default function StoryMaintenance({
                     story.commentCount = stats.commentCount || 0;
                   }
                 });
-                console.log(`📊 ✅ Updated ${validStories.length} stories with real stats`);
+                console.log(
+                  `📊 ✅ Updated ${validStories.length} stories with real stats`,
+                );
               }
             }
           } catch (statsError) {
@@ -136,7 +144,7 @@ export default function StoryMaintenance({
         setStories([]);
       }
     } catch (error) {
-      const errorMsg = `Error fetching stories: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      const errorMsg = `Error fetching stories: ${error instanceof Error ? error.message : "Unknown error"}`;
       console.error(errorMsg);
       setError(errorMsg);
       setStories([]);
@@ -161,7 +169,7 @@ export default function StoryMaintenance({
       !Array.isArray(story.tags) ||
       !story.category
     ) {
-      console.warn('Skipping invalid story:', story);
+      console.warn("Skipping invalid story:", story);
       return false;
     }
 
@@ -315,7 +323,9 @@ export default function StoryMaintenance({
         <div className="max-h-[70vh] overflow-y-auto">
           {error && (
             <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
-              <p className="text-destructive font-medium">Failed to load initial data: {error}</p>
+              <p className="text-destructive font-medium">
+                Failed to load initial data: {error}
+              </p>
               <Button
                 variant="outline"
                 size="sm"
@@ -428,22 +438,25 @@ export default function StoryMaintenance({
                         </p>
 
                         <div className="flex flex-wrap gap-1">
-                          {Array.isArray(story.tags) && story.tags.slice(0, 3).map((tag, index) => (
-                            tag && (
-                              <Badge
-                                key={`${story.id}-tag-${index}`}
-                                variant="outline"
-                                className="text-xs bg-category-tag border-border/50"
-                              >
-                                {tag}
+                          {Array.isArray(story.tags) &&
+                            story.tags.slice(0, 3).map(
+                              (tag, index) =>
+                                tag && (
+                                  <Badge
+                                    key={`${story.id}-tag-${index}`}
+                                    variant="outline"
+                                    className="text-xs bg-category-tag border-border/50"
+                                  >
+                                    {tag}
+                                  </Badge>
+                                ),
+                            )}
+                          {Array.isArray(story.tags) &&
+                            story.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{story.tags.length - 3}
                               </Badge>
-                            )
-                          ))}
-                          {Array.isArray(story.tags) && story.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{story.tags.length - 3}
-                            </Badge>
-                          )}
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -453,7 +466,9 @@ export default function StoryMaintenance({
                               <div className="flex items-center gap-1">
                                 <Star className="h-3 w-3 text-rating-star fill-current" />
                                 <span>{story.rating || 0}</span>
-                                <span className="text-gray-400">({story.ratingCount || 0})</span>
+                                <span className="text-gray-400">
+                                  ({story.ratingCount || 0})
+                                </span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
@@ -483,7 +498,9 @@ export default function StoryMaintenance({
                               <span>{story.commentCount || 0} comments</span>
                             </div>
                             {story.isPublished && (
-                              <div className="text-green-600 font-medium">Published</div>
+                              <div className="text-green-600 font-medium">
+                                Published
+                              </div>
                             )}
                           </div>
                         </div>
