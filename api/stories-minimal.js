@@ -133,17 +133,46 @@ export default async function handler(req, res) {
             );
           }
         } catch (error) {
-          console.warn(
-            `[STORIES MINIMAL] Failed to get real comment counts, using fallback:`,
-            error.message,
-          );
-          // Fallback to story document comment counts
+        console.warn(
+          `[STORIES MINIMAL] Failed to get real comment counts, using static fallback:`,
+          error.message,
+        );
+
+        // Use static fallback data for critical stories when database is unstable
+        try {
+          const fs = await import('fs');
+          const path = await import('path');
+          const fallbackPath = path.join(process.cwd(), 'data/comment-counts-fallback.json');
+
+          if (fs.existsSync(fallbackPath)) {
+            const fallbackData = JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
+            console.log(`[STORIES MINIMAL] Using static comment count fallback for accurate counts`);
+
+            stories.forEach((story) => {
+              if (story.storyId && fallbackData[story.storyId]) {
+                commentCountMap[story.storyId] = fallbackData[story.storyId];
+              } else {
+                commentCountMap[story.storyId] = story.commentCount || 0;
+              }
+            });
+          } else {
+            // Final fallback to story document comment counts
+            stories.forEach((story) => {
+              if (story.storyId) {
+                commentCountMap[story.storyId] = story.commentCount || 0;
+              }
+            });
+          }
+        } catch (fallbackError) {
+          console.warn(`[STORIES MINIMAL] Static fallback failed:`, fallbackError.message);
+          // Final fallback to story document comment counts
           stories.forEach((story) => {
             if (story.storyId) {
               commentCountMap[story.storyId] = story.commentCount || 0;
             }
           });
         }
+      }
       } else {
         console.log(
           `[STORIES MINIMAL] Using cached comment counts for better performance`,
