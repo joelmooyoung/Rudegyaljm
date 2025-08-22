@@ -201,7 +201,7 @@ export default async function handler(req, res) {
         publishedAt: story.createdAt || new Date(),
         createdAt: story.createdAt || new Date(),
         updatedAt: story.createdAt || new Date(),
-        viewCount: story.viewCount || story.views || 0,
+        viewCount: Math.max(story.viewCount || 0, story.views || 0),
         rating: story.rating || story.averageRating || 0,
         ratingCount: story.ratingCount || 0,
         likeCount: story.likeCount || 0,
