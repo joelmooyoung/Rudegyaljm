@@ -1066,6 +1066,22 @@ export function createServer() {
     }
   });
 
+  // Add test fix viewcount route
+  app.get("/api/test-fix-viewcount", async (req, res) => {
+    console.log(`[SERVER] Test fix viewcount request`);
+    try {
+      const { default: handler } = await import("../api/test-fix-viewcount.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import test fix viewcount handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Test fix viewcount handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
