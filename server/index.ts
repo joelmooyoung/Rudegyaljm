@@ -836,6 +836,22 @@ export function createServer() {
     }
   });
 
+  // Add bulk stats route for performance optimization
+  app.get("/api/stories-bulk-stats", async (req, res) => {
+    console.log("[SERVER] Bulk stats request");
+    try {
+      const { default: handler } = await import("../api/stories-bulk-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import bulk stats handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Bulk stats handler not available",
+        error: error.message
+      });
+    }
+  });
+
   // Add stories aggregate stats route
   app.get("/api/stories-aggregate-stats", async (req, res) => {
     console.log(`[SERVER] Stories aggregate stats request`);
