@@ -716,6 +716,8 @@ const App = () => {
         return <ErrorLogs onBack={handleBackToHome} />;
       case "admin-reading-stats":
         return <UserReadingStats onBack={handleBackToHome} />;
+      case "admin-stats-management":
+        return <StatsManagement onBack={handleBackToHome} />;
       case "admin-email-test":
         return <EmailTest onBack={handleBackToHome} />;
       case "direct-email-test":
