@@ -94,8 +94,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   // Function to refresh story stats
   const refreshStoryStats = async () => {
     try {
-      const statsResponse = await fetch(
+      const statsResponse = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
+        {},
+        10000 // 10 second cache TTL for stats
       );
       if (statsResponse.ok) {
         const responseText = await statsResponse.text();
