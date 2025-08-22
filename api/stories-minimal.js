@@ -21,6 +21,9 @@ export default async function handler(req, res) {
   const limit = parseInt(req.query.limit) || 8; // Reduced to 8 stories per page for better performance
   const skip = (page - 1) * limit;
 
+  // Option to skip expensive comment count aggregation for better performance
+  const includeRealCommentCounts = req.query.includeRealCommentCounts === 'true';
+
   try {
     console.log("[STORIES MINIMAL] Loading minimal story metadata...");
 
