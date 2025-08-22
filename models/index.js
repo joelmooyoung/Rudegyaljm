@@ -155,3 +155,7 @@ export const ErrorLog =
 export const UserStoryRead =
   mongoose.models.UserStoryRead ||
   mongoose.model("UserStoryRead", userStoryReadSchema);
+
+// Import and export StoryStatsCache
+import StoryStatsCache from "./StoryStatsCache.js";
+export { StoryStatsCache };
