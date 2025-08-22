@@ -277,15 +277,20 @@ const App = () => {
   };
 
   const handleBackFromReader = () => {
-    setReadingStory(null);
-    setCurrentView("home");
-    console.log(`📖 Returning from story detail to page ${returnPage}`);
+    console.log(`📖 Starting return from story detail to page ${returnPage}`);
 
-    // Clear returnPage after Home component has processed it
+    // Small delay to ensure any pending API calls (like view increment) complete
     setTimeout(() => {
-      console.log(`🧹 Clearing returnPage`);
-      setReturnPage(undefined);
-    }, 1000);
+      setReadingStory(null);
+      setCurrentView("home");
+      console.log(`📖 Returned from story detail to page ${returnPage}`);
+
+      // Clear returnPage after Home component has processed it
+      setTimeout(() => {
+        console.log(`🧹 Clearing returnPage`);
+        setReturnPage(undefined);
+      }, 1500);
+    }, 200);
   };
 
   const handleNavigateToAbout = () => {
