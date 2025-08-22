@@ -1114,6 +1114,22 @@ export function createServer() {
     }
   });
 
+  // Add check Amsterdam state route
+  app.get("/api/check-amsterdam-state", async (req, res) => {
+    console.log(`[SERVER] Check Amsterdam state request`);
+    try {
+      const { default: handler } = await import("../api/check-amsterdam-state.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import check Amsterdam state handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Check Amsterdam state handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
