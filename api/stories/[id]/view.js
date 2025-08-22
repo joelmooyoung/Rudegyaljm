@@ -28,8 +28,24 @@ export default async function handler(req, res) {
       `[STORY VIEW API] Recording view for story ${id} by user ${userId || sessionId || "anonymous"}`,
     );
 
-    // Connect to production database
-    await connectToDatabase();
+    // Connect to production database with timeout protection
+    const connectPromise = connectToDatabase();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database connection timeout')), 3000)
+    );
+
+    try {
+      await Promise.race([connectPromise, timeoutPromise]);
+    } catch (dbError) {
+      console.warn(`[STORY VIEW API] Database connection failed: ${dbError.message}`);
+      return res.status(200).json({
+        success: false,
+        message: "View recording temporarily unavailable due to database issues",
+        fallback: true,
+        storyId: id,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     // Find and update the story view count in MongoDB
     console.log(`[STORY VIEW API DEBUG] Looking for story with storyId: ${id}`);
