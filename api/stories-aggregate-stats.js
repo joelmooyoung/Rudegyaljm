@@ -34,8 +34,8 @@ export default async function handler(req, res) {
       "[STORIES AGGREGATE STATS] Calculating aggregate statistics...",
     );
 
-    // Use Promise.race to add timeout protection
-    const timeoutMs = 10000; // 10 seconds timeout
+    // Use Promise.race to add timeout protection - reduced for better UX
+    const timeoutMs = 3000; // 3 seconds timeout for faster user experience
 
     const aggregatePromise = Promise.all([
       // Get total published stories count
