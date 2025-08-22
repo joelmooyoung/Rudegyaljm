@@ -420,25 +420,24 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use cached stats with fallback to minimal API
+  // STORIES ENDPOINT - Use minimal API with real comment counts for reliability
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Trying cached stats API with fallback...");
+    console.log("📚 [STORIES] Using minimal API with real comment counts for reliability...");
+
+    // Temporarily use minimal API directly while database connectivity is unstable
+    // This ensures fast, reliable loading with accurate comment counts
+    req.query.includeRealCommentCounts = 'true';
+
     try {
-      const { default: cachedHandler } = await import("../api/stories-cached.js");
-      return cachedHandler(req, res);
+      const { default: minimalHandler } = await import("../api/stories-minimal.js");
+      return minimalHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Cached handler failed, falling back to minimal API:", error);
-      try {
-        const { default: minimalHandler } = await import("../api/stories-minimal.js");
-        return minimalHandler(req, res);
-      } catch (fallbackError) {
-        console.error("📚 [STORIES] Both handlers failed:", fallbackError);
-        return res.status(500).json({
-          success: false,
-          message: "Stories service temporarily unavailable",
-          error: fallbackError.message,
-        });
-      }
+      console.error("📚 [STORIES] Minimal API failed:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Stories service temporarily unavailable",
+        error: error.message,
+      });
     }
   });
 
