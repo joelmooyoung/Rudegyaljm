@@ -110,7 +110,9 @@ export default async function handler(req, res) {
       performance: {
         queryTimeMs: queryTime,
         usingCachedStats: true,
-        databaseQueries: 2 // Only 2 queries: stories+stats join + count
+        databaseQueries: 3, // Simple approach: stories + cached stats + count
+        cachedStatsFound: cachedStats.length,
+        totalStoriesRequested: stories.length
       },
       timestamp: new Date().toISOString()
     });
