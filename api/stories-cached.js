@@ -40,8 +40,8 @@ export default async function handler(req, res) {
       return minimalHandler(req, res);
     }
 
-    // Add timeout protection for database operations
-    const timeoutMs = 5000; // 5 second timeout
+    // Add timeout protection for database operations - reduced for faster fallback
+    const timeoutMs = 2000; // 2 second timeout for faster user experience
 
     const dbOperations = async () => {
       // Simple approach: Get stories first, then get their cached stats
