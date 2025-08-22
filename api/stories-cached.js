@@ -39,41 +39,58 @@ export default async function handler(req, res) {
       return minimalHandler(req, res);
     }
 
-    // Simple approach: Get stories first, then get their cached stats
-    console.log("[STORIES CACHED] Getting stories...");
-    const stories = await Story.find({ published: true })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select('storyId title author category tags excerpt accessLevel image audioUrl createdAt updatedAt')
-      .lean(); // Use lean() for better performance
+    // Add timeout protection for database operations
+    const timeoutMs = 5000; // 5 second timeout
 
-    console.log(`[STORIES CACHED] Found ${stories.length} stories, getting cached stats...`);
+    const dbOperations = async () => {
+      // Simple approach: Get stories first, then get their cached stats
+      console.log("[STORIES CACHED] Getting stories...");
+      const stories = await Story.find({ published: true })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('storyId title author category tags excerpt accessLevel image audioUrl createdAt updatedAt')
+        .lean(); // Use lean() for better performance
 
-    // Get story IDs for cache lookup
-    const storyIds = stories.map(story => story.storyId);
+      console.log(`[STORIES CACHED] Found ${stories.length} stories, getting cached stats...`);
 
-    // Get cached stats for these stories
-    console.log(`[STORIES CACHED] Looking up cached stats for story IDs:`, storyIds.slice(0, 3));
+      // Get story IDs for cache lookup
+      const storyIds = stories.map(story => story.storyId);
 
-    const cachedStats = await StoryStatsCache.find({
-      storyId: { $in: storyIds }
-    }).lean();
+      // Get cached stats for these stories
+      console.log(`[STORIES CACHED] Looking up cached stats for story IDs:`, storyIds.slice(0, 3));
 
-    console.log(`[STORIES CACHED] Found ${cachedStats.length} cached stats entries`);
+      const cachedStats = await StoryStatsCache.find({
+        storyId: { $in: storyIds }
+      }).lean();
 
-    if (cachedStats.length > 0) {
-      console.log(`[STORIES CACHED] Sample cached stat:`, cachedStats[0]);
-    }
+      console.log(`[STORIES CACHED] Found ${cachedStats.length} cached stats entries`);
+
+      if (cachedStats.length > 0) {
+        console.log(`[STORIES CACHED] Sample cached stat:`, cachedStats[0]);
+      }
+
+      // Get total count for pagination (separate query but still efficient)
+      const totalStories = await Story.countDocuments({ published: true });
+
+      return { stories, cachedStats, totalStories };
+    };
+
+    // Execute with timeout protection
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database operation timeout')), timeoutMs)
+    );
+
+    const { stories, cachedStats, totalStories } = await Promise.race([
+      dbOperations(),
+      timeoutPromise
+    ]);
 
     // Create a map for fast lookup
     const statsMap = new Map();
     cachedStats.forEach(stat => {
       statsMap.set(stat.storyId, stat);
     });
-
-    // Get total count for pagination (separate query but still efficient)
-    const totalStories = await Story.countDocuments({ published: true });
     const totalPages = Math.ceil(totalStories / limit);
 
     // Transform to expected format using cached stats
