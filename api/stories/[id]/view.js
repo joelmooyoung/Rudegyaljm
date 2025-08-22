@@ -36,12 +36,15 @@ export default async function handler(req, res) {
     const now = Date.now();
 
     if (lastView && (now - lastView) < RATE_LIMIT_MS) {
-      console.log(`[STORY VIEW API] Rate limited: Recent view detected for ${viewKey}`);
+      const timeSinceLastView = now - lastView;
+      console.log(`[STORY VIEW API] Rate limited: ${timeSinceLastView}ms since last view for ${viewKey} (limit: ${RATE_LIMIT_MS}ms)`);
       return res.status(200).json({
         success: true,
         message: "View already recorded recently",
         rateLimited: true,
         storyId: id,
+        timeSinceLastView,
+        rateLimitMs: RATE_LIMIT_MS,
         timestamp: new Date().toISOString(),
       });
     }
