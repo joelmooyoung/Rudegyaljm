@@ -81,44 +81,52 @@ export default function StoryMaintenance({
           storiesArray = [];
         }
 
-        // Convert date strings back to Date objects and fetch real stats
+        // Convert date strings back to Date objects and fetch real stats in bulk
         const validStories = storiesArray.filter(story => story && story.id && story.title);
-        const storiesWithDates = await Promise.all(
-          validStories.map(async (story: any) => {
-            const baseStory = {
-              ...story,
-              title: story.title || "Untitled",
-              author: story.author || "Unknown Author",
-              tags: Array.isArray(story.tags) ? story.tags : [],
-              createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
-              updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
-              viewCount: story.viewCount || 0,
-              likeCount: story.likeCount || 0,
-              rating: story.rating || 0,
-              ratingCount: story.ratingCount || 0,
-              commentCount: story.commentCount || 0,
-            };
 
-            // Fetch real stats for each story
-            try {
-              const statsResponse = await fetch(`/api/stories/${story.id}/stats`);
-              if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                if (statsData.success) {
-                  baseStory.viewCount = statsData.stats.viewCount || 0;
-                  baseStory.likeCount = statsData.stats.likeCount || 0;
-                  baseStory.rating = statsData.stats.rating || 0;
-                  baseStory.ratingCount = statsData.stats.ratingCount || 0;
-                  baseStory.commentCount = statsData.stats.commentCount || 0;
-                }
+        // Prepare base stories with default values
+        const storiesWithDates = validStories.map((story: any) => ({
+          ...story,
+          title: story.title || "Untitled",
+          author: story.author || "Unknown Author",
+          tags: Array.isArray(story.tags) ? story.tags : [],
+          createdAt: story.createdAt ? new Date(story.createdAt) : new Date(),
+          updatedAt: story.updatedAt ? new Date(story.updatedAt) : new Date(),
+          viewCount: story.viewCount || 0,
+          likeCount: story.likeCount || 0,
+          rating: story.rating || 0,
+          ratingCount: story.ratingCount || 0,
+          commentCount: story.commentCount || 0,
+        }));
+
+        // Fetch real stats for ALL stories in one API call
+        if (validStories.length > 0) {
+          try {
+            const storyIds = validStories.map(story => story.id).join(',');
+            console.log(`📊 Fetching bulk stats for ${validStories.length} stories...`);
+
+            const statsResponse = await fetch(`/api/stories-bulk-stats?storyIds=${encodeURIComponent(storyIds)}`);
+            if (statsResponse.ok) {
+              const bulkStatsData = await statsResponse.json();
+              if (bulkStatsData.success) {
+                // Update stories with real stats
+                storiesWithDates.forEach((story, index) => {
+                  const stats = bulkStatsData.stats[story.id];
+                  if (stats) {
+                    story.viewCount = stats.viewCount || 0;
+                    story.likeCount = stats.likeCount || 0;
+                    story.rating = stats.rating || 0;
+                    story.ratingCount = stats.ratingCount || 0;
+                    story.commentCount = stats.commentCount || 0;
+                  }
+                });
+                console.log(`📊 ✅ Updated ${validStories.length} stories with real stats`);
               }
-            } catch (statsError) {
-              console.warn(`Failed to fetch stats for story ${story.id}:`, statsError);
             }
-
-            return baseStory;
-          })
-        );
+          } catch (statsError) {
+            console.warn(`Failed to fetch bulk stats:`, statsError);
+          }
+        }
 
         setStories(storiesWithDates);
       } else {
