@@ -194,8 +194,11 @@ export default function Home({
       setCurrentPage(returnToPage);
       sessionStorage.setItem("home-current-page", returnToPage.toString());
 
-      // Fetch fresh data with updated stats
-      fetchStories(returnToPage);
+      // Fetch fresh data with updated stats after a short delay to ensure DB updates are complete
+      setTimeout(() => {
+        console.log(`🔄 Fetching fresh stats after 500ms delay`);
+        fetchStories(returnToPage);
+      }, 500);
 
       // Clear flag after short delay
       setTimeout(() => {
