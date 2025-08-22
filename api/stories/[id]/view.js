@@ -47,33 +47,58 @@ export default async function handler(req, res) {
       });
     }
 
-    // Find and update the story view count in MongoDB
+    // Find and update the story view count in MongoDB with timeout protection
     console.log(`[STORY VIEW API DEBUG] Looking for story with storyId: ${id}`);
 
-    // First ensure viewCount field exists and is a number - check current story
-    let currentStory = await Story.findOne({ storyId: id });
-    if (!currentStory) {
-      return res.status(404).json({
+    const dbOperations = async () => {
+      // First ensure viewCount field exists and is a number - check current story
+      let currentStory = await Story.findOne({ storyId: id });
+      if (!currentStory) {
+        throw new Error("Story not found");
+      }
+
+      console.log(`[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount}`);
+
+      // Initialize viewCount if it's null/undefined
+      if (
+        currentStory.viewCount === undefined ||
+        currentStory.viewCount === null ||
+        isNaN(currentStory.viewCount)
+      ) {
+        console.log(`[STORY VIEW API DEBUG] Initializing viewCount to 0`);
+        await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
+      }
+
+      // Now increment the view count
+      console.log(`[STORY VIEW API DEBUG] Incrementing view count...`);
+      const story = await Story.findOneAndUpdate(
+        { storyId: id },
+        { $inc: { viewCount: 1 } },
+        { new: true, upsert: false },
+      );
+
+      return story;
+    };
+
+    // Execute with timeout protection
+    const dbTimeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Database operation timeout')), 5000)
+    );
+
+    let story;
+    try {
+      story = await Promise.race([dbOperations(), dbTimeoutPromise]);
+    } catch (dbOpError) {
+      console.error(`[STORY VIEW API] Database operation failed: ${dbOpError.message}`);
+      return res.status(200).json({
         success: false,
-        message: "Story not found",
+        message: "View increment failed due to database timeout",
+        error: dbOpError.message,
+        storyId: id,
+        fallback: true,
+        timestamp: new Date().toISOString(),
       });
     }
-
-    // Initialize viewCount if it's null/undefined
-    if (
-      currentStory.viewCount === undefined ||
-      currentStory.viewCount === null ||
-      isNaN(currentStory.viewCount)
-    ) {
-      await Story.findOneAndUpdate({ storyId: id }, { $set: { viewCount: 0 } });
-    }
-
-    // Now increment the view count
-    const story = await Story.findOneAndUpdate(
-      { storyId: id },
-      { $inc: { viewCount: 1 } },
-      { new: true, upsert: false },
-    );
 
     // Get the actual view count from the raw object to ensure we read correctly
     const storyObj = story?.toObject();
