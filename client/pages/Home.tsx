@@ -133,8 +133,8 @@ export default function Home({
     setError(null);
 
     try {
-      const apiUrl = `/api/stories?page=${page}&limit=8&includeRealCommentCounts=true`;
-      console.log(`📞 Calling API: ${apiUrl}`);
+      const apiUrl = `/api/stories?page=${page}&limit=8`;
+      console.log(`📞 Calling cached stats API: ${apiUrl}`);
 
       const response = await fetch(apiUrl);
       console.log(`📡 Response status: ${response.status}`);
