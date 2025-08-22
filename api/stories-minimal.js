@@ -23,6 +23,7 @@ export default async function handler(req, res) {
 
   // Option to skip expensive comment count aggregation for better performance
   const includeRealCommentCounts = req.query.includeRealCommentCounts === 'true';
+  console.log(`[STORIES MINIMAL] includeRealCommentCounts param: ${req.query.includeRealCommentCounts} -> ${includeRealCommentCounts}`);
 
   try {
     console.log("[STORIES MINIMAL] Loading minimal story metadata...");
