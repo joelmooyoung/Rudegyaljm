@@ -32,67 +32,32 @@ export default async function handler(req, res) {
 
     await connectToDatabase();
 
-    // Single efficient query: Get stories with their cached stats in one join operation
-    const pipeline = [
-      // Match published stories
-      { $match: { published: true } },
-      
-      // Sort by creation date (newest first)
-      { $sort: { createdAt: -1 } },
-      
-      // Join with stats cache
-      {
-        $lookup: {
-          from: 'storystatsches', // MongoDB collection name (pluralized)
-          localField: 'storyId',
-          foreignField: 'storyId',
-          as: 'statsCache'
-        }
-      },
-      
-      // Add stats fields from cache (with fallbacks)
-      {
-        $addFields: {
-          cachedViewCount: { $ifNull: [{ $arrayElemAt: ['$statsCache.viewCount', 0] }, 0] },
-          cachedLikeCount: { $ifNull: [{ $arrayElemAt: ['$statsCache.likeCount', 0] }, 0] },
-          cachedCommentCount: { $ifNull: [{ $arrayElemAt: ['$statsCache.commentCount', 0] }, 0] },
-          cachedRating: { $ifNull: [{ $arrayElemAt: ['$statsCache.rating', 0] }, 0] },
-          cachedRatingCount: { $ifNull: [{ $arrayElemAt: ['$statsCache.ratingCount', 0] }, 0] },
-          lastStatsUpdate: { $arrayElemAt: ['$statsCache.lastCalculated', 0] }
-        }
-      },
-      
-      // Project only needed fields for better performance
-      {
-        $project: {
-          storyId: 1,
-          title: 1,
-          author: 1,
-          category: 1,
-          tags: 1,
-          excerpt: 1,
-          accessLevel: 1,
-          image: 1,
-          audioUrl: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          // Use cached stats
-          viewCount: '$cachedViewCount',
-          likeCount: '$cachedLikeCount', 
-          commentCount: '$cachedCommentCount',
-          rating: '$cachedRating',
-          ratingCount: '$cachedRatingCount',
-          lastStatsUpdate: 1
-        }
-      },
-      
-      // Pagination
-      { $skip: skip },
-      { $limit: limit }
-    ];
+    // Simple approach: Get stories first, then get their cached stats
+    console.log("[STORIES CACHED] Getting stories...");
+    const stories = await Story.find({ published: true })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select('storyId title author category tags excerpt accessLevel image audioUrl createdAt updatedAt')
+      .lean(); // Use lean() for better performance
 
-    // Execute the aggregation pipeline
-    const stories = await Story.aggregate(pipeline);
+    console.log(`[STORIES CACHED] Found ${stories.length} stories, getting cached stats...`);
+
+    // Get story IDs for cache lookup
+    const storyIds = stories.map(story => story.storyId);
+
+    // Get cached stats for these stories
+    const cachedStats = await StoryStatsCache.find({
+      storyId: { $in: storyIds }
+    }).lean();
+
+    console.log(`[STORIES CACHED] Found ${cachedStats.length} cached stats entries`);
+
+    // Create a map for fast lookup
+    const statsMap = new Map();
+    cachedStats.forEach(stat => {
+      statsMap.set(stat.storyId, stat);
+    });
 
     // Get total count for pagination (separate query but still efficient)
     const totalStories = await Story.countDocuments({ published: true });
