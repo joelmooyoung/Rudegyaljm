@@ -21,6 +21,7 @@ import StoryReader from "./pages/StoryReader";
 import LoginLogs from "./pages/admin/LoginLogs";
 import ErrorLogs from "./pages/admin/ErrorLogs";
 import UserReadingStats from "./pages/admin/UserReadingStats";
+import StatsManagement from "./pages/admin/StatsManagement";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
