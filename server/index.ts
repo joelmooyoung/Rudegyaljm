@@ -420,16 +420,32 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use minimal API for fast reliable response
+  // STORIES ENDPOINT - Use cached stats for optimal performance
   app.get("/api/stories", async (req, res) => {
-    console.log("📚 [STORIES] Using minimal API for fast reliable response...");
+    console.log("📚 [STORIES] Using cached stats API for optimal performance...");
+    try {
+      const { default: cachedHandler } = await import("../api/stories-cached.js");
+      return cachedHandler(req, res);
+    } catch (error) {
+      console.error("📚 [STORIES] Failed to import cached handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Cached stories handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // FALLBACK: Stories minimal API (for compatibility)
+  app.get("/api/stories-minimal", async (req, res) => {
+    console.log("📚 [STORIES MINIMAL] Fallback to minimal API...");
     try {
       const { default: minimalHandler } = await import(
         "../api/stories-minimal.js"
       );
       return minimalHandler(req, res);
     } catch (error) {
-      console.error("📚 [STORIES] Failed to import minimal handler:", error);
+      console.error("📚 [STORIES MINIMAL] Failed to import minimal handler:", error);
       return res.status(500).json({
         success: false,
         message: "Minimal handler not available",
