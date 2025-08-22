@@ -73,13 +73,24 @@ export default async function handler(req, res) {
         console.log(`[STORY VIEW API DEBUG] ViewCount exists (${actualViewCount}), proceeding with increment`);
       }
 
-      // Now increment the view count
-      console.log(`[STORY VIEW API DEBUG] Incrementing view count...`);
+      // Now increment the view count - ensure we use the right field
+      console.log(`[STORY VIEW API DEBUG] Incrementing view count from ${actualViewCount}...`);
+
+      // Use atomic increment to prevent race conditions
       const story = await Story.findOneAndUpdate(
         { storyId: id },
-        { $inc: { viewCount: 1 } },
-        { new: true, upsert: false },
+        {
+          $inc: { viewCount: 1 },
+          $set: { updatedAt: new Date() }
+        },
+        {
+          new: true,
+          upsert: false,
+          runValidators: false  // Skip validation for performance
+        },
       );
+
+      console.log(`[STORY VIEW API DEBUG] MongoDB increment completed`);
 
       return story;
     };
