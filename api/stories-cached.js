@@ -93,7 +93,9 @@ export default async function handler(req, res) {
       cachedStats = result.cachedStats;
       totalStories = result.totalStories;
     } catch (timeoutError) {
-      console.warn("[STORIES CACHED] Database operations timed out, falling back to minimal API");
+      console.warn("[STORIES CACHED] Database operations timed out, falling back to minimal API with real comment counts");
+      // Ensure we get real comment counts in the fallback
+      req.query.includeRealCommentCounts = 'true';
       const { default: minimalHandler } = await import("./stories-minimal.js");
       return minimalHandler(req, res);
     }
