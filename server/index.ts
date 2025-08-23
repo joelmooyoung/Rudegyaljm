@@ -172,7 +172,7 @@ export function createServer() {
         },
       });
     } catch (error) {
-      console.error("👑 [CREATE ADMIN] ��� Error:", error);
+      console.error("👑 [CREATE ADMIN] ❌ Error:", error);
       res.status(500).json({
         success: false,
         message: "Failed to create admin user",
@@ -1622,6 +1622,22 @@ export function createServer() {
       return res.status(500).json({
         success: false,
         message: "Test stories API handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add simple story debug route
+  app.get("/api/simple-story-debug", async (req, res) => {
+    console.log(`[SERVER] Simple story debug request`);
+    try {
+      const { default: handler } = await import("../api/simple-story-debug.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import simple-story-debug handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Simple story debug handler not available",
         error: error.message,
       });
     }
