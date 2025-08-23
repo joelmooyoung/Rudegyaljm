@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories API Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; white-space: pre-wrap; }
+        .error { background: #ffe6e6; border-color: #ff9999; }
+        .success { background: #e6ffe6; border-color: #99ff99; }
+    </style>
+</head>
+<body>
+    <h1>Stories API Debug Test</h1>
+    
+    <button onclick="testStoriesCount()">1. Test Stories Count</button>
+    <button onclick="testStoriesAPI()">2. Test Stories API</button>
+    <button onclick="testAdminStoriesAPI()">3. Test Admin Stories API</button>
+    <button onclick="testPublicStoriesAPI()">4. Test Public Stories API</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function displayResult(title, data, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.innerHTML = `<h3>${title}</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testStoriesCount() {
+            clearResults();
+            try {
+                console.log('Testing stories count...');
+                const response = await fetch('/api/test-stories-api');
+                const data = await response.json();
+                displayResult('Stories Count Test', data);
+            } catch (error) {
+                displayResult('Stories Count Test - ERROR', { error: error.message }, true);
+            }
+        }
+
+        async function testStoriesAPI() {
+            clearResults();
+            try {
+                console.log('Testing main stories API...');
+                const response = await fetch('/api/stories');
+                const data = await response.json();
+                displayResult('Main Stories API', { 
+                    count: data.length,
+                    first_5_stories: data.slice(0, 5).map(s => ({
+                        id: s.id,
+                        title: s.title,
+                        isPublished: s.isPublished,
+                        author: s.author
+                    }))
+                });
+            } catch (error) {
+                displayResult('Main Stories API - ERROR', { error: error.message }, true);
+            }
+        }
+
+        async function testAdminStoriesAPI() {
+            clearResults();
+            try {
+                console.log('Testing admin stories API...');
+                const response = await fetch('/api/stories?admin=true');
+                const data = await response.json();
+                displayResult('Admin Stories API (admin=true)', { 
+                    count: data.length,
+                    first_5_stories: data.slice(0, 5).map(s => ({
+                        id: s.id,
+                        title: s.title,
+                        isPublished: s.isPublished,
+                        author: s.author
+                    }))
+                });
+            } catch (error) {
+                displayResult('Admin Stories API - ERROR', { error: error.message }, true);
+            }
+        }
+
+        async function testPublicStoriesAPI() {
+            clearResults();
+            try {
+                console.log('Testing public stories API...');
+                const response = await fetch('/api/stories?admin=false');
+                const data = await response.json();
+                displayResult('Public Stories API (admin=false)', { 
+                    count: data.length,
+                    first_5_stories: data.slice(0, 5).map(s => ({
+                        id: s.id,
+                        title: s.title,
+                        isPublished: s.isPublished,
+                        author: s.author
+                    }))
+                });
+            } catch (error) {
+                displayResult('Public Stories API - ERROR', { error: error.message }, true);
+            }
+        }
+
+        // Auto-run the count test on page load
+        window.onload = function() {
+            testStoriesCount();
+        };
+    </script>
+</body>
+</html>
