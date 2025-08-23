@@ -208,6 +208,10 @@ export const togglePublishStory: RequestHandler = async (req, res) => {
     story.isPublished = !story.isPublished;
     const updatedStory = await story.save();
 
+    // Invalidate story and stats caches
+    await triggerStoryCacheInvalidation();
+    console.log(`[DEBUG] 🗑️ Cache invalidated for story publication toggle`);
+
     res.json(toStoryResponse(updatedStory));
   } catch (error) {
     const errorMessage =
