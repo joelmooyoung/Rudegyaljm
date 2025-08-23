@@ -805,6 +805,10 @@ export default function Home({
                       <AlertTriangle className="h-4 w-4 mr-2" />
                       Emergency Clear
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={toggleCacheBypass}>
+                      <Database className="h-4 w-4 mr-2" />
+                      {landingStatsCache.isBypass() ? 'Enable Cache' : 'Disable Cache'}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
