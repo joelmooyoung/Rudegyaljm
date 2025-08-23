@@ -198,6 +198,57 @@ export default function StoryMaintenance({
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
+  const publishAllStories = async () => {
+    const unpublishedCount = stories.filter(story => !story.isPublished).length;
+
+    if (unpublishedCount === 0) {
+      alert("All stories are already published!");
+      return;
+    }
+
+    if (
+      confirm(
+        `Are you sure you want to publish ALL ${unpublishedCount} unpublished stories? This will make them visible to all users.`
+      )
+    ) {
+      try {
+        setIsPublishingAll(true);
+        console.log('🌐 Publishing all stories...');
+
+        const response = await fetch('/api/admin/publish-all-stories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Bulk publish result:', result);
+
+          // Update local state to reflect all stories as published
+          setStories(prevStories =>
+            prevStories.map(story => ({
+              ...story,
+              isPublished: true
+            }))
+          );
+
+          alert(`Successfully published ${result.storiesUpdated} stories!`);
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Failed to publish all stories:', errorData);
+          alert(`Failed to publish stories: ${errorData.message || response.statusText}`);
+        }
+      } catch (error) {
+        console.error('❌ Error publishing all stories:', error);
+        alert(`Error publishing stories: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsPublishingAll(false);
+      }
+    }
+  };
+
   const handleDeleteStory = async (storyId: string) => {
     if (
       confirm(
