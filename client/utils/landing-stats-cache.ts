@@ -24,13 +24,37 @@ export class LandingStatsCache {
   }
 
   /**
+   * Check if localStorage is available
+   */
+  private static isLocalStorageAvailable(): boolean {
+    try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return false;
+      }
+      // Test localStorage access
+      const testKey = '__cache_test__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
    * Get cached data if it exists and hasn't expired
    */
   static getCachedData(page: number, limit: number, includeRealCommentCounts: boolean = true): LandingStatsData | null {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('📋 localStorage not available, skipping cache check');
+        return null;
+      }
+
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
       console.log(`📋 Checking cache for: ${cacheKey}`);
-      
+
       const cachedItem = localStorage.getItem(cacheKey);
       
       if (!cachedItem) {
