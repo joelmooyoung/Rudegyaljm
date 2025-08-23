@@ -66,16 +66,28 @@ export class LandingStatsCache {
    */
   static getCachedData(page: number, limit: number, includeRealCommentCounts: boolean = true): LandingStatsData | null {
     try {
-      // Check if localStorage is available
-      if (!this.isLocalStorageAvailable()) {
-        console.log('📋 localStorage not available, skipping cache check');
+      // Ultra-defensive localStorage availability check
+      let isAvailable = false;
+      try {
+        isAvailable = this.isLocalStorageAvailable();
+      } catch (availabilityError) {
+        console.log('📋 Error checking localStorage availability, assuming unavailable');
+        return null;
+      }
+
+      if (!isAvailable) {
         return null;
       }
 
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
-      console.log(`📋 Checking cache for: ${cacheKey}`);
 
-      const cachedItem = localStorage.getItem(cacheKey);
+      let cachedItem;
+      try {
+        cachedItem = window.localStorage.getItem(cacheKey);
+      } catch (getItemError) {
+        console.log('📋 Error accessing localStorage.getItem, cache unavailable');
+        return null;
+      }
       
       if (!cachedItem) {
         console.log(`🔍 No cache found for: ${cacheKey}`);
