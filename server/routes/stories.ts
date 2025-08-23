@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { Story, StoryRequest } from "@shared/api";
 import { StoryModel, ErrorLogModel, toStoryResponse } from "../models";
+import { triggerStoryCacheInvalidation } from "../lib/cache-manager.js";
 
 // Helper function to log errors to MongoDB
 const logError = async (
