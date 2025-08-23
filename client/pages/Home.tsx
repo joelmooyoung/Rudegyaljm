@@ -50,6 +50,7 @@ import {
 } from "lucide-react";
 import { Story, User as UserType } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
+import { landingStatsCache } from "@/utils/landing-stats-cache";
 
 interface HomeProps {
   user?: UserType;
