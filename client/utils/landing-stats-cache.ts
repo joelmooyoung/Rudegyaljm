@@ -324,10 +324,22 @@ export class LandingStatsCache {
         };
       }
 
-      const keys = Object.keys(localStorage);
-      const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
+      // Use safer method to iterate over localStorage
+      const landingStatsKeys: string[] = [];
+
+      // Get all localStorage keys safely
+      for (let i = 0; i < localStorage.length; i++) {
+        try {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(CACHE_PREFIX)) {
+            landingStatsKeys.push(key);
+          }
+        } catch (keyError) {
+          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i} during stats`);
+        }
+      }
+
       const now = Date.now();
-      
       let expiredCount = 0;
       let validCount = 0;
       let totalSize = 0;
