@@ -16,17 +16,17 @@ export default async function handler(req, res) {
 
   try {
     await connectToDatabase();
-    
+
     if (mongoose.connection.readyState !== 1) {
       return res.status(500).json({
         success: false,
-        message: "Database connection not available"
+        message: "Database connection not available",
       });
     }
 
     const db = mongoose.connection.db;
     const { queryType = "all", includeExamples = false } = req.query;
-    
+
     console.log(`[RUN EXPLAIN] Running EXPLAIN analysis for: ${queryType}`);
 
     // Date calculations used in actual queries
@@ -39,42 +39,57 @@ export default async function handler(req, res) {
     // === USER COLLECTION ANALYSIS ===
     if (queryType === "all" || queryType === "users") {
       console.log("[RUN EXPLAIN] Analyzing User collection queries...");
-      
+
       try {
         // Query 1: Active users count (used in dashboard)
-        const activeUsersExplain = await db.collection("users")
+        const activeUsersExplain = await db
+          .collection("users")
           .find({ active: true })
           .explain("executionStats");
 
         // Query 2: Users by type (dashboard aggregation)
-        const usersByTypeExplain = await db.collection("users")
+        const usersByTypeExplain = await db
+          .collection("users")
           .aggregate([
             { $match: { active: true } },
-            { $group: { _id: "$type", count: { $sum: 1 } } }
+            { $group: { _id: "$type", count: { $sum: 1 } } },
           ])
           .explain("executionStats");
 
         // Query 3: New users this week (time-based query)
-        const newUsersWeekExplain = await db.collection("users")
+        const newUsersWeekExplain = await db
+          .collection("users")
           .find({
             active: true,
-            createdAt: { $gte: oneWeekAgo }
+            createdAt: { $gte: oneWeekAgo },
           })
           .explain("executionStats");
 
         // Query 4: All users with sorting (user management page)
-        const allUsersSortedExplain = await db.collection("users")
+        const allUsersSortedExplain = await db
+          .collection("users")
           .find({}, { projection: { password: 0, __v: 0 } })
           .sort({ createdAt: -1 })
           .explain("executionStats");
 
         explainResults.users = {
-          activeUsersCount: analyzeExplainResult(activeUsersExplain, "Active Users Count"),
-          usersByType: analyzeExplainResult(usersByTypeExplain, "Users by Type Aggregation"),
-          newUsersThisWeek: analyzeExplainResult(newUsersWeekExplain, "New Users This Week"),
-          allUsersSorted: analyzeExplainResult(allUsersSortedExplain, "All Users Sorted")
+          activeUsersCount: analyzeExplainResult(
+            activeUsersExplain,
+            "Active Users Count",
+          ),
+          usersByType: analyzeExplainResult(
+            usersByTypeExplain,
+            "Users by Type Aggregation",
+          ),
+          newUsersThisWeek: analyzeExplainResult(
+            newUsersWeekExplain,
+            "New Users This Week",
+          ),
+          allUsersSorted: analyzeExplainResult(
+            allUsersSortedExplain,
+            "All Users Sorted",
+          ),
         };
-
       } catch (userError) {
         explainResults.users = { error: userError.message };
       }
@@ -83,38 +98,48 @@ export default async function handler(req, res) {
     // === STORY COLLECTION ANALYSIS ===
     if (queryType === "all" || queryType === "stories") {
       console.log("[RUN EXPLAIN] Analyzing Story collection queries...");
-      
+
       try {
         // Query 1: Published stories count
-        const publishedCountExplain = await db.collection("stories")
+        const publishedCountExplain = await db
+          .collection("stories")
           .find({ published: true })
           .explain("executionStats");
 
         // Query 2: Published stories with sorting and pagination (landing page)
-        const publishedSortedExplain = await db.collection("stories")
+        const publishedSortedExplain = await db
+          .collection("stories")
           .find(
             { published: true },
             {
               projection: {
-                storyId: 1, title: 1, author: 1, category: 1,
-                accessLevel: 1, createdAt: 1, viewCount: 1, views: 1
-              }
-            }
+                storyId: 1,
+                title: 1,
+                author: 1,
+                category: 1,
+                accessLevel: 1,
+                createdAt: 1,
+                viewCount: 1,
+                views: 1,
+              },
+            },
           )
           .sort({ createdAt: -1 })
           .limit(8)
           .explain("executionStats");
 
         // Query 3: Stories by category aggregation
-        const storiesByCategoryExplain = await db.collection("stories")
+        const storiesByCategoryExplain = await db
+          .collection("stories")
           .aggregate([
             { $match: { published: true } },
-            { $group: { _id: "$category", count: { $sum: 1 } } }
+            { $group: { _id: "$category", count: { $sum: 1 } } },
           ])
           .explain("executionStats");
 
         // Query 4: Story statistics aggregation (dashboard)
-        const storyStatsExplain = await db.collection("stories")
+        const storyStatsExplain = await db
+          .collection("stories")
           .aggregate([
             { $match: { published: true } },
             {
@@ -125,9 +150,9 @@ export default async function handler(req, res) {
                   $sum: {
                     $max: [
                       { $ifNull: ["$viewCount", 0] },
-                      { $ifNull: ["$views", 0] }
-                    ]
-                  }
+                      { $ifNull: ["$views", 0] },
+                    ],
+                  },
                 },
                 totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } },
               },
@@ -136,12 +161,23 @@ export default async function handler(req, res) {
           .explain("executionStats");
 
         explainResults.stories = {
-          publishedCount: analyzeExplainResult(publishedCountExplain, "Published Stories Count"),
-          publishedSorted: analyzeExplainResult(publishedSortedExplain, "Published Stories Sorted"),
-          storiesByCategory: analyzeExplainResult(storiesByCategoryExplain, "Stories by Category"),
-          storyStats: analyzeExplainResult(storyStatsExplain, "Story Statistics Aggregation")
+          publishedCount: analyzeExplainResult(
+            publishedCountExplain,
+            "Published Stories Count",
+          ),
+          publishedSorted: analyzeExplainResult(
+            publishedSortedExplain,
+            "Published Stories Sorted",
+          ),
+          storiesByCategory: analyzeExplainResult(
+            storiesByCategoryExplain,
+            "Stories by Category",
+          ),
+          storyStats: analyzeExplainResult(
+            storyStatsExplain,
+            "Story Statistics Aggregation",
+          ),
         };
-
       } catch (storyError) {
         explainResults.stories = { error: storyError.message };
       }
@@ -150,43 +186,55 @@ export default async function handler(req, res) {
     // === COMMENT COLLECTION ANALYSIS ===
     if (queryType === "all" || queryType === "comments") {
       console.log("[RUN EXPLAIN] Analyzing Comment collection queries...");
-      
+
       try {
         // Query 1: Comments this week
-        const commentsWeekExplain = await db.collection("comments")
+        const commentsWeekExplain = await db
+          .collection("comments")
           .find({ createdAt: { $gte: oneWeekAgo } })
           .explain("executionStats");
 
         // Query 2: Most commented stories
-        const mostCommentedExplain = await db.collection("comments")
+        const mostCommentedExplain = await db
+          .collection("comments")
           .aggregate([
             { $group: { _id: "$storyId", commentCount: { $sum: 1 } } },
             { $sort: { commentCount: -1 } },
-            { $limit: 10 }
+            { $limit: 10 },
           ])
           .explain("executionStats");
 
         // Query 3: Comments by story IDs (N+1 pattern check)
-        const sampleStoryIds = await db.collection("stories")
+        const sampleStoryIds = await db
+          .collection("stories")
           .find({ published: true }, { projection: { storyId: 1 } })
           .limit(5)
           .toArray();
-        
-        const storyIds = sampleStoryIds.map(s => s.storyId);
-        
-        const commentsByStoriesExplain = await db.collection("comments")
+
+        const storyIds = sampleStoryIds.map((s) => s.storyId);
+
+        const commentsByStoriesExplain = await db
+          .collection("comments")
           .aggregate([
             { $match: { storyId: { $in: storyIds } } },
-            { $group: { _id: "$storyId", count: { $sum: 1 } } }
+            { $group: { _id: "$storyId", count: { $sum: 1 } } },
           ])
           .explain("executionStats");
 
         explainResults.comments = {
-          commentsThisWeek: analyzeExplainResult(commentsWeekExplain, "Comments This Week"),
-          mostCommented: analyzeExplainResult(mostCommentedExplain, "Most Commented Stories"),
-          commentsByStories: analyzeExplainResult(commentsByStoriesExplain, "Comments by Story IDs")
+          commentsThisWeek: analyzeExplainResult(
+            commentsWeekExplain,
+            "Comments This Week",
+          ),
+          mostCommented: analyzeExplainResult(
+            mostCommentedExplain,
+            "Most Commented Stories",
+          ),
+          commentsByStories: analyzeExplainResult(
+            commentsByStoriesExplain,
+            "Comments by Story IDs",
+          ),
         };
-
       } catch (commentError) {
         explainResults.comments = { error: commentError.message };
       }
@@ -195,29 +243,36 @@ export default async function handler(req, res) {
     // === LOGIN LOG ANALYSIS ===
     if (queryType === "all" || queryType === "loginlogs") {
       console.log("[RUN EXPLAIN] Analyzing LoginLog collection queries...");
-      
+
       try {
         // Query 1: Successful logins this week
-        const successfulLoginsExplain = await db.collection("loginlogs")
+        const successfulLoginsExplain = await db
+          .collection("loginlogs")
           .find({
             timestamp: { $gte: oneWeekAgo },
-            success: true
+            success: true,
           })
           .explain("executionStats");
 
         // Query 2: Login success rate analysis
-        const loginSuccessRateExplain = await db.collection("loginlogs")
+        const loginSuccessRateExplain = await db
+          .collection("loginlogs")
           .aggregate([
             { $match: { timestamp: { $gte: oneMonthAgo } } },
-            { $group: { _id: "$success", count: { $sum: 1 } } }
+            { $group: { _id: "$success", count: { $sum: 1 } } },
           ])
           .explain("executionStats");
 
         explainResults.loginlogs = {
-          successfulLogins: analyzeExplainResult(successfulLoginsExplain, "Successful Logins This Week"),
-          loginSuccessRate: analyzeExplainResult(loginSuccessRateExplain, "Login Success Rate Analysis")
+          successfulLogins: analyzeExplainResult(
+            successfulLoginsExplain,
+            "Successful Logins This Week",
+          ),
+          loginSuccessRate: analyzeExplainResult(
+            loginSuccessRateExplain,
+            "Login Success Rate Analysis",
+          ),
         };
-
       } catch (loginError) {
         explainResults.loginlogs = { error: loginError.message };
       }
@@ -225,29 +280,38 @@ export default async function handler(req, res) {
 
     // === USER STORY READS ANALYSIS ===
     if (queryType === "all" || queryType === "userstoryreads") {
-      console.log("[RUN EXPLAIN] Analyzing UserStoryRead collection queries...");
-      
+      console.log(
+        "[RUN EXPLAIN] Analyzing UserStoryRead collection queries...",
+      );
+
       try {
         // Query 1: Reads this week
-        const readsWeekExplain = await db.collection("userstoryreads")
+        const readsWeekExplain = await db
+          .collection("userstoryreads")
           .find({ timestamp: { $gte: oneWeekAgo } })
           .explain("executionStats");
 
         // Query 2: Most read stories this week
-        const mostReadExplain = await db.collection("userstoryreads")
+        const mostReadExplain = await db
+          .collection("userstoryreads")
           .aggregate([
             { $match: { timestamp: { $gte: oneWeekAgo } } },
             { $group: { _id: "$storyId", readCount: { $sum: 1 } } },
             { $sort: { readCount: -1 } },
-            { $limit: 10 }
+            { $limit: 10 },
           ])
           .explain("executionStats");
 
         explainResults.userstoryreads = {
-          readsThisWeek: analyzeExplainResult(readsWeekExplain, "Reads This Week"),
-          mostRead: analyzeExplainResult(mostReadExplain, "Most Read Stories This Week")
+          readsThisWeek: analyzeExplainResult(
+            readsWeekExplain,
+            "Reads This Week",
+          ),
+          mostRead: analyzeExplainResult(
+            mostReadExplain,
+            "Most Read Stories This Week",
+          ),
         };
-
       } catch (readError) {
         explainResults.userstoryreads = { error: readError.message };
       }
@@ -266,22 +330,22 @@ export default async function handler(req, res) {
         collectionsAnalyzed: Object.keys(explainResults).length,
         totalQueries: getTotalQueriesCount(explainResults),
         criticalIssues: criticalIssues.length,
-        recommendedIndexes: recommendations.filter(r => r.type === "index").length
+        recommendedIndexes: recommendations.filter((r) => r.type === "index")
+          .length,
       },
       explainResults,
       overallAnalysis,
       criticalIssues,
       recommendations,
       nextSteps: generateNextSteps(criticalIssues),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[RUN EXPLAIN] Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to run EXPLAIN analysis", 
-      error: error.message
+      message: "Failed to run EXPLAIN analysis",
+      error: error.message,
     });
   }
 }
@@ -293,12 +357,12 @@ function analyzeExplainResult(explainResult, queryName) {
     performance: "unknown",
     issues: [],
     indexesUsed: [],
-    recommendations: []
+    recommendations: [],
   };
 
   try {
     let stats;
-    
+
     // Handle different explain result formats
     if (explainResult.executionStats) {
       stats = explainResult.executionStats;
@@ -316,33 +380,36 @@ function analyzeExplainResult(explainResult, queryName) {
         totalDocsReturned: stats.totalDocsReturned || 0,
         executionTimeMillis: stats.executionTimeMillisEstimate || 0,
         totalKeysExamined: stats.totalKeysExamined || 0,
-        indexHit: (stats.totalKeysExamined || 0) > 0
+        indexHit: (stats.totalKeysExamined || 0) > 0,
       };
 
       // Analyze execution stages
       if (stats.executionStages) {
         const stage = stats.executionStages;
-        
+
         if (stage.stage === "COLLSCAN") {
           analysis.issues.push({
             type: "full_collection_scan",
             severity: "critical",
-            message: "Query is performing a full collection scan - requires index",
-            impact: "High CPU usage and slow response times"
+            message:
+              "Query is performing a full collection scan - requires index",
+            impact: "High CPU usage and slow response times",
           });
           analysis.performance = "critical";
         } else if (stage.stage === "IXSCAN") {
           analysis.indexesUsed.push(stage.indexName || "unknown");
           analysis.performance = "good";
-          
+
           // Check index efficiency
-          const efficiency = analysis.executionStats.totalDocsReturned / Math.max(analysis.executionStats.totalDocsExamined, 1);
+          const efficiency =
+            analysis.executionStats.totalDocsReturned /
+            Math.max(analysis.executionStats.totalDocsExamined, 1);
           if (efficiency < 0.1) {
             analysis.issues.push({
               type: "inefficient_index",
               severity: "medium",
               message: `Index scan efficiency: ${(efficiency * 100).toFixed(1)}% - consider more selective index`,
-              impact: "Moderate performance impact"
+              impact: "Moderate performance impact",
             });
           }
         }
@@ -352,33 +419,41 @@ function analyzeExplainResult(explainResult, queryName) {
       if (analysis.executionStats.executionTimeMillis > 100) {
         analysis.issues.push({
           type: "slow_execution",
-          severity: analysis.executionStats.executionTimeMillis > 1000 ? "high" : "medium",
+          severity:
+            analysis.executionStats.executionTimeMillis > 1000
+              ? "high"
+              : "medium",
           message: `Query execution time: ${analysis.executionStats.executionTimeMillis}ms`,
-          impact: "User experience degradation"
+          impact: "User experience degradation",
         });
       }
 
       // Document examination ratio
-      if (analysis.executionStats.totalDocsExamined > analysis.executionStats.totalDocsReturned * 10) {
+      if (
+        analysis.executionStats.totalDocsExamined >
+        analysis.executionStats.totalDocsReturned * 10
+      ) {
         analysis.issues.push({
           type: "excessive_scanning",
           severity: "medium",
           message: `Examining ${analysis.executionStats.totalDocsExamined} docs to return ${analysis.executionStats.totalDocsReturned}`,
-          impact: "Inefficient resource usage"
+          impact: "Inefficient resource usage",
         });
       }
     }
 
     // Generate specific recommendations
     if (analysis.issues.length > 0) {
-      analysis.recommendations = generateQueryRecommendations(queryName, analysis.issues);
+      analysis.recommendations = generateQueryRecommendations(
+        queryName,
+        analysis.issues,
+      );
     }
-
   } catch (analysisError) {
     analysis.issues.push({
       type: "analysis_error",
       severity: "low",
-      message: `Could not analyze explain result: ${analysisError.message}`
+      message: `Could not analyze explain result: ${analysisError.message}`,
     });
   }
 
@@ -388,7 +463,7 @@ function analyzeExplainResult(explainResult, queryName) {
 function generateQueryRecommendations(queryName, issues) {
   const recommendations = [];
 
-  issues.forEach(issue => {
+  issues.forEach((issue) => {
     switch (issue.type) {
       case "full_collection_scan":
         if (queryName.includes("Active Users")) {
@@ -396,20 +471,28 @@ function generateQueryRecommendations(queryName, issues) {
         } else if (queryName.includes("Published Stories")) {
           recommendations.push("Create index: { published: 1, createdAt: -1 }");
         } else if (queryName.includes("Week") || queryName.includes("Month")) {
-          recommendations.push("Create index on date field: { createdAt: -1 } or { timestamp: -1 }");
+          recommendations.push(
+            "Create index on date field: { createdAt: -1 } or { timestamp: -1 }",
+          );
         }
         break;
-        
+
       case "inefficient_index":
-        recommendations.push("Consider compound index with more selective fields first");
+        recommendations.push(
+          "Consider compound index with more selective fields first",
+        );
         break;
-        
+
       case "slow_execution":
-        recommendations.push("Add appropriate indexes and consider query optimization");
+        recommendations.push(
+          "Add appropriate indexes and consider query optimization",
+        );
         break;
-        
+
       case "excessive_scanning":
-        recommendations.push("Create covering index or more selective compound index");
+        recommendations.push(
+          "Create covering index or more selective compound index",
+        );
         break;
     }
   });
@@ -425,19 +508,19 @@ function generateOverallAnalysis(explainResults) {
 
   Object.entries(explainResults).forEach(([collection, queries]) => {
     if (queries.error) return;
-    
+
     collectionIssues[collection] = { total: 0, issues: 0, critical: 0 };
-    
-    Object.values(queries).forEach(query => {
+
+    Object.values(queries).forEach((query) => {
       if (query.queryName) {
         totalQueries++;
         collectionIssues[collection].total++;
-        
+
         if (query.issues.length > 0) {
           queriesWithIssues++;
           collectionIssues[collection].issues++;
-          
-          if (query.issues.some(i => i.severity === "critical")) {
+
+          if (query.issues.some((i) => i.severity === "critical")) {
             criticalQueries++;
             collectionIssues[collection].critical++;
           }
@@ -450,8 +533,10 @@ function generateOverallAnalysis(explainResults) {
     totalQueries,
     queriesWithIssues,
     criticalQueries,
-    healthScore: Math.round(((totalQueries - criticalQueries) / totalQueries) * 100),
-    collectionIssues
+    healthScore: Math.round(
+      ((totalQueries - criticalQueries) / totalQueries) * 100,
+    ),
+    collectionIssues,
   };
 }
 
@@ -460,16 +545,16 @@ function identifyCriticalIssues(explainResults) {
 
   Object.entries(explainResults).forEach(([collection, queries]) => {
     if (queries.error) return;
-    
-    Object.values(queries).forEach(query => {
+
+    Object.values(queries).forEach((query) => {
       if (query.issues) {
-        query.issues.forEach(issue => {
+        query.issues.forEach((issue) => {
           if (issue.severity === "critical") {
             criticalIssues.push({
               collection,
               queryName: query.queryName,
               issue,
-              recommendations: query.recommendations
+              recommendations: query.recommendations,
             });
           }
         });
@@ -486,50 +571,64 @@ function generatePracticalRecommendations(explainResults) {
   // Check for missing indexes on active field
   if (explainResults.users) {
     const activeUsersQuery = explainResults.users.activeUsersCount;
-    if (activeUsersQuery && activeUsersQuery.issues.some(i => i.type === "full_collection_scan")) {
+    if (
+      activeUsersQuery &&
+      activeUsersQuery.issues.some((i) => i.type === "full_collection_scan")
+    ) {
       recommendations.push({
         type: "index",
         priority: "high",
         collection: "users",
         index: "{ active: 1 }",
         reason: "Active users filtering requires index for performance",
-        queries: ["Active Users Count", "Users by Type"]
+        queries: ["Active Users Count", "Users by Type"],
       });
     }
   }
 
-  // Check for missing indexes on published field  
+  // Check for missing indexes on published field
   if (explainResults.stories) {
     const publishedQuery = explainResults.stories.publishedCount;
-    if (publishedQuery && publishedQuery.issues.some(i => i.type === "full_collection_scan")) {
+    if (
+      publishedQuery &&
+      publishedQuery.issues.some((i) => i.type === "full_collection_scan")
+    ) {
       recommendations.push({
         type: "index",
         priority: "critical",
-        collection: "stories", 
+        collection: "stories",
         index: "{ published: 1, createdAt: -1 }",
-        reason: "Published stories with sorting is the most common query pattern",
-        queries: ["Published Stories Count", "Published Stories Sorted", "Story Statistics"]
+        reason:
+          "Published stories with sorting is the most common query pattern",
+        queries: [
+          "Published Stories Count",
+          "Published Stories Sorted",
+          "Story Statistics",
+        ],
       });
     }
   }
 
   // Check for time-based query optimization
   const timeBasedCollections = ["comments", "loginlogs", "userstoryreads"];
-  timeBasedCollections.forEach(collection => {
+  timeBasedCollections.forEach((collection) => {
     if (explainResults[collection]) {
-      const hasTimeIssues = Object.values(explainResults[collection]).some(query => 
-        query.issues && query.issues.some(i => i.type === "full_collection_scan")
+      const hasTimeIssues = Object.values(explainResults[collection]).some(
+        (query) =>
+          query.issues &&
+          query.issues.some((i) => i.type === "full_collection_scan"),
       );
-      
+
       if (hasTimeIssues) {
-        const timeField = collection === "loginlogs" ? "timestamp" : "createdAt";
+        const timeField =
+          collection === "loginlogs" ? "timestamp" : "createdAt";
         recommendations.push({
           type: "index",
           priority: "high",
           collection,
           index: `{ ${timeField}: -1 }`,
           reason: "Time-based analytics require date field indexing",
-          queries: [`${collection} time-based queries`]
+          queries: [`${collection} time-based queries`],
         });
       }
     }
@@ -547,15 +646,15 @@ function generateNextSteps(criticalIssues) {
       action: "Create Missing Indexes",
       description: `${criticalIssues.length} critical issues found requiring immediate index creation`,
       command: "POST /api/admin/optimize-database-indexes",
-      priority: "immediate"
+      priority: "immediate",
     });
-    
+
     steps.push({
       step: 2,
       action: "Re-run Analysis",
       description: "Verify index creation resolved critical issues",
       command: "GET /api/admin/run-explain-analysis",
-      priority: "immediate"
+      priority: "immediate",
     });
   } else {
     steps.push({
@@ -563,7 +662,7 @@ function generateNextSteps(criticalIssues) {
       action: "Performance Testing",
       description: "No critical issues found - run performance testing",
       command: "GET /api/admin/test-statistics-performance",
-      priority: "normal"
+      priority: "normal",
     });
   }
 
@@ -572,7 +671,7 @@ function generateNextSteps(criticalIssues) {
     action: "Monitor Performance",
     description: "Set up ongoing monitoring of query performance",
     command: "Implement query timing logs in statistics endpoints",
-    priority: "normal"
+    priority: "normal",
   });
 
   return steps;
@@ -580,9 +679,9 @@ function generateNextSteps(criticalIssues) {
 
 function getTotalQueriesCount(explainResults) {
   let total = 0;
-  Object.values(explainResults).forEach(collection => {
+  Object.values(explainResults).forEach((collection) => {
     if (collection.error) return;
-    Object.values(collection).forEach(query => {
+    Object.values(collection).forEach((query) => {
       if (query.queryName) total++;
     });
   });

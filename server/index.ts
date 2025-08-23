@@ -1161,7 +1161,10 @@ export function createServer() {
       const { default: handler } = await import("../api/dashboard-stats.js");
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import dashboard stats handler:", error);
+      console.error(
+        "[SERVER] Failed to import dashboard stats handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Dashboard stats handler not available",
@@ -1174,10 +1177,15 @@ export function createServer() {
   app.get("/api/dashboard-stats-cached", async (req, res) => {
     console.log(`[SERVER] Cached dashboard stats request`);
     try {
-      const { default: handler } = await import("../api/dashboard-stats-cached.js");
+      const { default: handler } = await import(
+        "../api/dashboard-stats-cached.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import cached dashboard stats handler:", error);
+      console.error(
+        "[SERVER] Failed to import cached dashboard stats handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Cached dashboard stats handler not available",
@@ -1193,7 +1201,10 @@ export function createServer() {
       const { default: handler } = await import("../api/cache-management.js");
       return handler(req, res);
     } catch (error) {
-      console.error("[SERVER] Failed to import cache management handler:", error);
+      console.error(
+        "[SERVER] Failed to import cache management handler:",
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Cache management handler not available",
@@ -1580,7 +1591,10 @@ export function createServer() {
       const { default: handler } = await import("../api/debug-story-count.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import debug-story-count handler:`, error);
+      console.error(
+        `[SERVER] Failed to import debug-story-count handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Debug story count handler not available",
@@ -1596,7 +1610,10 @@ export function createServer() {
       const { default: handler } = await import("../api/test-stories-api.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-stories-api handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-stories-api handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test stories API handler not available",
@@ -1612,7 +1629,10 @@ export function createServer() {
       const { default: handler } = await import("../api/simple-story-debug.js");
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import simple-story-debug handler:`, error);
+      console.error(
+        `[SERVER] Failed to import simple-story-debug handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Simple story debug handler not available",
@@ -1625,10 +1645,15 @@ export function createServer() {
   app.get("/api/database-diagnostic", async (req, res) => {
     console.log(`[SERVER] Database diagnostic request`);
     try {
-      const { default: handler } = await import("../api/database-diagnostic.js");
+      const { default: handler } = await import(
+        "../api/database-diagnostic.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import database-diagnostic handler:`, error);
+      console.error(
+        `[SERVER] Failed to import database-diagnostic handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Database diagnostic handler not available",
@@ -1641,10 +1666,15 @@ export function createServer() {
   app.get("/api/test-diagnostic-simple", async (req, res) => {
     console.log(`[SERVER] Test diagnostic simple request`);
     try {
-      const { default: handler } = await import("../api/test-diagnostic-simple.js");
+      const { default: handler } = await import(
+        "../api/test-diagnostic-simple.js"
+      );
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] Failed to import test-diagnostic-simple handler:`, error);
+      console.error(
+        `[SERVER] Failed to import test-diagnostic-simple handler:`,
+        error,
+      );
       return res.status(500).json({
         success: false,
         message: "Test diagnostic simple handler not available",

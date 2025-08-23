@@ -22,19 +22,19 @@ export default async function handler(req, res) {
           const healthCheck = await cacheManager.healthCheck();
           return res.json({
             success: true,
-            health: healthCheck
+            health: healthCheck,
           });
         } else if (action === "stats") {
           const stats = cacheManager.getStats();
           return res.json({
             success: true,
-            stats: stats
+            stats: stats,
           });
         } else {
           // Default: return comprehensive cache information
           const [healthCheck, stats] = await Promise.all([
             cacheManager.healthCheck(),
-            Promise.resolve(cacheManager.getStats())
+            Promise.resolve(cacheManager.getStats()),
           ]);
 
           return res.json({
@@ -46,9 +46,10 @@ export default async function handler(req, res) {
                 health: "/api/cache-management?action=health",
                 stats: "/api/cache-management?action=stats",
                 clear: "POST /api/cache-management with action=clear",
-                invalidate: "POST /api/cache-management with action=invalidate&pattern=*"
-              }
-            }
+                invalidate:
+                  "POST /api/cache-management with action=invalidate&pattern=*",
+              },
+            },
           });
         }
       }
@@ -62,27 +63,32 @@ export default async function handler(req, res) {
           console.log("[CACHE MANAGEMENT] 🗑️ All cache cleared via API");
           return res.json({
             success: true,
-            message: "All cache cleared successfully"
+            message: "All cache cleared successfully",
           });
         } else if (action === "invalidate") {
           if (pattern) {
             await cacheManager.invalidatePattern(pattern);
-            console.log(`[CACHE MANAGEMENT] 🗑️ Pattern '${pattern}' invalidated via API`);
+            console.log(
+              `[CACHE MANAGEMENT] 🗑️ Pattern '${pattern}' invalidated via API`,
+            );
             return res.json({
               success: true,
-              message: `Cache pattern '${pattern}' invalidated successfully`
+              message: `Cache pattern '${pattern}' invalidated successfully`,
             });
           } else if (key) {
             await cacheManager.invalidate(key);
-            console.log(`[CACHE MANAGEMENT] 🗑️ Key '${key}' invalidated via API`);
+            console.log(
+              `[CACHE MANAGEMENT] 🗑️ Key '${key}' invalidated via API`,
+            );
             return res.json({
               success: true,
-              message: `Cache key '${key}' invalidated successfully`
+              message: `Cache key '${key}' invalidated successfully`,
             });
           } else {
             return res.status(400).json({
               success: false,
-              message: "Either 'pattern' or 'key' must be provided for invalidation"
+              message:
+                "Either 'pattern' or 'key' must be provided for invalidation",
             });
           }
         } else if (action === "invalidate-stats") {
@@ -90,26 +96,27 @@ export default async function handler(req, res) {
           console.log("[CACHE MANAGEMENT] 🗑️ Stats cache invalidated via API");
           return res.json({
             success: true,
-            message: "Statistics cache invalidated successfully"
+            message: "Statistics cache invalidated successfully",
           });
         } else if (action === "invalidate-users") {
           await cacheManager.invalidateUserCache();
           console.log("[CACHE MANAGEMENT] 🗑️ User cache invalidated via API");
           return res.json({
             success: true,
-            message: "User cache invalidated successfully"
+            message: "User cache invalidated successfully",
           });
         } else if (action === "invalidate-stories") {
           await cacheManager.invalidateStoryCache();
           console.log("[CACHE MANAGEMENT] 🗑️ Story cache invalidated via API");
           return res.json({
             success: true,
-            message: "Story cache invalidated successfully"
+            message: "Story cache invalidated successfully",
           });
         } else {
           return res.status(400).json({
             success: false,
-            message: "Invalid action. Supported actions: clear, invalidate, invalidate-stats, invalidate-users, invalidate-stories"
+            message:
+              "Invalid action. Supported actions: clear, invalidate, invalidate-stats, invalidate-users, invalidate-stories",
           });
         }
       }
@@ -120,14 +127,14 @@ export default async function handler(req, res) {
         console.log("[CACHE MANAGEMENT] 🗑️ All cache cleared via DELETE");
         return res.json({
           success: true,
-          message: "All cache cleared successfully"
+          message: "All cache cleared successfully",
         });
       }
 
       default:
         return res.status(405).json({
           success: false,
-          message: "Method not allowed"
+          message: "Method not allowed",
         });
     }
   } catch (error) {
@@ -135,7 +142,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       success: false,
       message: "Cache management operation failed",
-      error: error.message
+      error: error.message,
     });
   }
 }

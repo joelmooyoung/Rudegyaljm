@@ -96,7 +96,9 @@ export default async function handler(req, res) {
 
     // Invalidate user and stats caches
     await triggerUserCacheInvalidation();
-    console.log(`[REGISTER API] 🗑️ Cache invalidated for new user registration`);
+    console.log(
+      `[REGISTER API] 🗑️ Cache invalidated for new user registration`,
+    );
 
     // Generate simple token (in production, use JWT)
     const token = `auth_${newUser.userId}_${Date.now()}`;

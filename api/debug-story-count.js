@@ -34,35 +34,36 @@ export default async function handler(req, res) {
 
     // Count all stories
     const totalCount = await Story.countDocuments({});
-    
+
     // Count published stories
     const publishedCount = await Story.countDocuments({ published: true });
-    
+
     // Count unpublished stories
     const unpublishedCount = await Story.countDocuments({ published: false });
-    
+
     // Get sample of story titles with publish status
     const sampleStories = await Story.find({})
       .select("storyId title published author createdAt")
       .sort({ createdAt: -1 })
       .limit(20);
 
-    console.log(`[DEBUG STORY COUNT] Total: ${totalCount}, Published: ${publishedCount}, Unpublished: ${unpublishedCount}`);
+    console.log(
+      `[DEBUG STORY COUNT] Total: ${totalCount}, Published: ${publishedCount}, Unpublished: ${unpublishedCount}`,
+    );
 
     return res.status(200).json({
       success: true,
       totalCount,
       publishedCount,
       unpublishedCount,
-      sampleStories: sampleStories.map(story => ({
+      sampleStories: sampleStories.map((story) => ({
         id: story.storyId,
         title: story.title,
         published: story.published,
         author: story.author,
-        createdAt: story.createdAt
-      }))
+        createdAt: story.createdAt,
+      })),
     });
-
   } catch (error) {
     console.error(`[DEBUG STORY COUNT] Error:`, error);
     return res.status(500).json({

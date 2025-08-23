@@ -25,12 +25,11 @@ export default async function handler(req, res) {
       message: "Basic test working",
       timestamp: new Date().toISOString(),
       method: req.method,
-      url: req.url
+      url: req.url,
     };
 
     console.log(`[TEST BASIC] Returning:`, result);
     return res.status(200).json(result);
-
   } catch (error) {
     console.error(`[TEST BASIC] Error:`, error);
     return res.status(500).json({

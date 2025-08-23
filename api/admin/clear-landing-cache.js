@@ -2,7 +2,9 @@
 // This helps admins force cache refresh when content changes
 
 export default async function handler(req, res) {
-  console.log(`[CLEAR LANDING CACHE] ${req.method} /api/admin/clear-landing-cache`);
+  console.log(
+    `[CLEAR LANDING CACHE] ${req.method} /api/admin/clear-landing-cache`,
+  );
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -16,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed"
+      message: "Method not allowed",
     });
   }
 
@@ -32,18 +34,18 @@ export default async function handler(req, res) {
       message: "Landing page cache clear signal sent",
       timestamp: Date.now(),
       instructions: {
-        clientAction: "Clear localStorage cache with key pattern 'landing_stats_*'",
+        clientAction:
+          "Clear localStorage cache with key pattern 'landing_stats_*'",
         cachePattern: "landing_stats_*",
-        clearAll: true
-      }
+        clearAll: true,
+      },
     });
-
   } catch (error) {
     console.error("[CLEAR LANDING CACHE] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to clear cache",
-      error: error.message
+      error: error.message,
     });
   }
 }

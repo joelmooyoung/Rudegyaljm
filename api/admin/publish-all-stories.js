@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: "Method not allowed. Use POST to publish all stories."
+      message: "Method not allowed. Use POST to publish all stories.",
     });
   }
 
@@ -34,19 +34,19 @@ export default async function handler(req, res) {
         success: true,
         message: "All stories are already published",
         storiesUpdated: 0,
-        totalStories: await Story.countDocuments()
+        totalStories: await Story.countDocuments(),
       });
     }
 
     // Update all stories to published = true
     const updateResult = await Story.updateMany(
       { published: false },
-      { 
-        $set: { 
+      {
+        $set: {
           published: true,
-          updatedAt: new Date()
-        }
-      }
+          updatedAt: new Date(),
+        },
+      },
     );
 
     console.log(`[PUBLISH ALL] Update result:`, updateResult);
@@ -55,8 +55,12 @@ export default async function handler(req, res) {
     const totalStories = await Story.countDocuments();
     const publishedStories = await Story.countDocuments({ published: true });
 
-    console.log(`[PUBLISH ALL] ✅ Successfully published ${updateResult.modifiedCount} stories`);
-    console.log(`[PUBLISH ALL] Total stories: ${totalStories}, Published: ${publishedStories}`);
+    console.log(
+      `[PUBLISH ALL] ✅ Successfully published ${updateResult.modifiedCount} stories`,
+    );
+    console.log(
+      `[PUBLISH ALL] Total stories: ${totalStories}, Published: ${publishedStories}`,
+    );
 
     return res.status(200).json({
       success: true,
@@ -65,15 +69,14 @@ export default async function handler(req, res) {
       totalStories: totalStories,
       publishedStories: publishedStories,
       unpublishedStories: totalStories - publishedStories,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[PUBLISH ALL] Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to publish stories",
-      error: error.message
+      error: error.message,
     });
   }
 }
