@@ -43,17 +43,8 @@ export default async function handler(req, res) {
     // Execute all queries in parallel for maximum efficiency
     const startTime = Date.now();
 
-    const [
-      // 1. Get total count and paginated stories in one optimized query
-      totalStories,
-      stories,
-      // 2. Get aggregate stats efficiently
-      aggregateStats,
-      // 3. Get total comments (if needed)
-      totalComments,
-      // 4. Get real comment counts for current page stories (if requested)
-      commentCounts
-    ] = await Promise.all([
+    // First get basic data without dependencies
+    const [totalStories, stories, aggregateStats, totalComments] = await Promise.all([
       // Total published stories count
       storiesCollection.countDocuments({ published: true }),
 
@@ -98,13 +89,13 @@ export default async function handler(req, res) {
             $group: {
               _id: null,
               totalLikes: { $sum: { $ifNull: ["$likeCount", 0] } },
-              totalViews: { 
-                $sum: { 
+              totalViews: {
+                $sum: {
                   $max: [
-                    { $ifNull: ["$viewCount", 0] }, 
+                    { $ifNull: ["$viewCount", 0] },
                     { $ifNull: ["$views", 0] }
-                  ] 
-                } 
+                  ]
+                }
               },
               totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } },
             },
@@ -127,23 +118,23 @@ export default async function handler(req, res) {
           { $count: "totalComments" }
         ])
         .toArray(),
-
-      // Real comment counts for current page stories (conditional)
-      includeRealCommentCounts && stories?.length > 0
-        ? commentsCollection
-            .aggregate([
-              { 
-                $match: { 
-                  storyId: { 
-                    $in: stories.map(story => story.storyId).filter(id => id) 
-                  } 
-                } 
-              },
-              { $group: { _id: "$storyId", count: { $sum: 1 } } },
-            ])
-            .toArray()
-        : Promise.resolve([])
     ]);
+
+    // Now get comment counts if requested (depends on stories being loaded)
+    const commentCounts = includeRealCommentCounts && stories?.length > 0
+      ? await commentsCollection
+          .aggregate([
+            {
+              $match: {
+                storyId: {
+                  $in: stories.map(story => story.storyId).filter(id => id)
+                }
+              }
+            },
+            { $group: { _id: "$storyId", count: { $sum: 1 } } },
+          ])
+          .toArray()
+      : [];
 
     const queryTime = Date.now() - startTime;
     console.log(`[LANDING STATS] All queries completed in ${queryTime}ms`);
