@@ -90,23 +90,45 @@ export class LandingStatsCache {
       }
       
       if (!cachedItem) {
-        console.log(`🔍 No cache found for: ${cacheKey}`);
         return null;
       }
 
-      const cacheEntry: CacheEntry = JSON.parse(cachedItem);
+      let cacheEntry: CacheEntry;
+      try {
+        cacheEntry = JSON.parse(cachedItem);
+      } catch (parseError) {
+        console.log('📋 Error parsing cached data, removing corrupted entry');
+        try {
+          window.localStorage.removeItem(cacheKey);
+        } catch (removeError) {
+          // Ignore remove errors
+        }
+        return null;
+      }
+
+      // Validate cache entry structure
+      if (!cacheEntry || typeof cacheEntry.expiry !== 'number' || !cacheEntry.data) {
+        console.log('📋 Invalid cache entry structure, removing');
+        try {
+          window.localStorage.removeItem(cacheKey);
+        } catch (removeError) {
+          // Ignore remove errors
+        }
+        return null;
+      }
+
       const now = Date.now();
 
       // Check if cache has expired
       if (now > cacheEntry.expiry) {
-        console.log(`⏰ Cache expired for: ${cacheKey} (expired ${((now - cacheEntry.expiry) / 1000).toFixed(1)}s ago)`);
-        this.removeCachedData(page, limit, includeRealCommentCounts);
+        try {
+          this.removeCachedData(page, limit, includeRealCommentCounts);
+        } catch (removeError) {
+          console.log('📋 Error removing expired cache entry');
+        }
         return null;
       }
 
-      const timeRemaining = (cacheEntry.expiry - now) / 1000;
-      console.log(`✅ Cache hit for: ${cacheKey} (${timeRemaining.toFixed(1)}s remaining)`);
-      
       return cacheEntry.data;
     } catch (error) {
       console.error('❌ Error reading from cache:', error);
