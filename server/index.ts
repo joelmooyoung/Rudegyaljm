@@ -1595,6 +1595,22 @@ export function createServer() {
     }
   });
 
+  // Add debug story count route
+  app.get("/api/debug-story-count", async (req, res) => {
+    console.log(`[SERVER] Debug story count request`);
+    try {
+      const { default: handler } = await import("../api/debug-story-count.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import debug-story-count handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Debug story count handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add direct test route to check routing
   app.get("/api/test-direct", (req, res) => {
     console.log(`[SERVER] Direct test route called`);
@@ -2008,7 +2024,7 @@ export function createServer() {
 
     try {
       await connectToDatabase();
-      console.log("🚀 [FORCE CREATE ADMIN] Database connected");
+      console.log("�� [FORCE CREATE ADMIN] Database connected");
 
       const saltRounds = 12;
       const adminPassword = "admin123";
@@ -2054,7 +2070,7 @@ export function createServer() {
           await newUser.save();
 
           console.log(
-            `🚀 [FORCE CREATE ADMIN] ✅ Created admin user: ${adminData.email}`,
+            `���� [FORCE CREATE ADMIN] ✅ Created admin user: ${adminData.email}`,
           );
 
           results.push({
