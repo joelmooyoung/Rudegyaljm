@@ -183,6 +183,20 @@ export default async function handler(req, res) {
       issues: diagnostic.issues.length
     });
 
+    // Ensure all data is JSON-serializable
+    try {
+      const testSerialization = JSON.stringify(diagnostic);
+      console.log(`[DATABASE DIAGNOSTIC] JSON serialization test passed (${testSerialization.length} chars)`);
+    } catch (serializationError) {
+      console.error(`[DATABASE DIAGNOSTIC] JSON serialization failed:`, serializationError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to serialize diagnostic data",
+        error: serializationError.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     return res.status(200).json(diagnostic);
 
   } catch (error) {
