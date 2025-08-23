@@ -1176,6 +1176,22 @@ export function createServer() {
     }
   });
 
+  // Add comprehensive dashboard stats endpoint (all landing page metrics)
+  app.get("/api/dashboard-stats", async (req, res) => {
+    console.log(`[SERVER] Comprehensive dashboard stats request`);
+    try {
+      const { default: handler } = await import("../api/dashboard-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import dashboard stats handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Dashboard stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
