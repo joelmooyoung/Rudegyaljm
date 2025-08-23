@@ -1659,6 +1659,22 @@ export function createServer() {
     }
   });
 
+  // Add test diagnostic simple route
+  app.get("/api/test-diagnostic-simple", async (req, res) => {
+    console.log(`[SERVER] Test diagnostic simple request`);
+    try {
+      const { default: handler } = await import("../api/test-diagnostic-simple.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-diagnostic-simple handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Test diagnostic simple handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add direct test route to check routing
   app.get("/api/test-direct", (req, res) => {
     console.log(`[SERVER] Direct test route called`);
