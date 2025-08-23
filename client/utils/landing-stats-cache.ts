@@ -68,13 +68,20 @@ export class LandingStatsCache {
    * Get cached data if it exists and hasn't expired
    */
   static getCachedData(page: number, limit: number, includeRealCommentCounts: boolean = true): LandingStatsData | null {
+    // Check if cache is in bypass mode
+    if (CACHE_BYPASS_MODE) {
+      return null;
+    }
+
     try {
       // Ultra-defensive localStorage availability check
       let isAvailable = false;
       try {
         isAvailable = this.isLocalStorageAvailable();
       } catch (availabilityError) {
-        console.log('📋 Error checking localStorage availability, assuming unavailable');
+        // Enable bypass mode if localStorage checks are consistently failing
+        console.log('📋 localStorage availability check failed, enabling bypass mode');
+        CACHE_BYPASS_MODE = true;
         return null;
       }
 
