@@ -895,10 +895,17 @@ export default function Home({
             {/* Cache debug info for admins */}
             {user.role === "admin" && !isCacheHit && !isLoading && (
               <div className="flex justify-center mb-4">
-                <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-xs text-yellow-400">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                  <span>No cache (localStorage: {typeof localStorage !== 'undefined' ? 'available' : 'unavailable'})</span>
-                </div>
+                {landingStatsCache.isBypass() ? (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-xs text-red-400">
+                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                    <span>Cache DISABLED (bypass mode)</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-xs text-yellow-400">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <span>No cache (localStorage: {typeof localStorage !== 'undefined' ? 'available' : 'unavailable'})</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
