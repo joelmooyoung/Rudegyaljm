@@ -283,7 +283,9 @@ export default async function handler(req, res) {
       success: true,
       data: dashboardData,
       cached: false,
-      fresh: true
+      fresh: true,
+      cacheSource: cacheManager.redisClient ? "Redis" : "Memory",
+      cacheStats: cacheManager.getStats()
     });
 
   } catch (error) {
