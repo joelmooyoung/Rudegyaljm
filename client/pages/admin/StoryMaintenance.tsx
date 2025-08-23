@@ -161,12 +161,34 @@ export default function StoryMaintenance({
           }
         }
 
+        // Complete debug information
+        debugData.validStoriesCount = validStories.length;
+        debugData.finalStoriesCount = storiesWithDates.length;
+        debugData.publishedCount = storiesWithDates.filter(s => s.isPublished).length;
+        debugData.unpublishedCount = storiesWithDates.filter(s => !s.isPublished).length;
+        debugData.storySample = storiesWithDates.slice(0, 5).map(s => ({
+          id: s.id,
+          title: s.title,
+          isPublished: s.isPublished,
+          author: s.author
+        }));
+
+        setDebugInfo(debugData);
         setStories(storiesWithDates);
       } else {
         const errorMsg = `Failed to fetch stories: ${response.status} ${response.statusText}`;
         console.error(errorMsg);
         setError(errorMsg);
         setStories([]);
+
+        // Set debug info for error case
+        setDebugInfo({
+          apiUrl: `${baseUrl}?admin=true`,
+          responseStatus: response.status,
+          responseOk: response.ok,
+          error: errorMsg,
+          timestamp: new Date().toISOString()
+        });
       }
     } catch (error) {
       const errorMsg = `Error fetching stories: ${error instanceof Error ? error.message : "Unknown error"}`;
