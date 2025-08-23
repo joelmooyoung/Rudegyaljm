@@ -299,6 +299,22 @@ export default function Home({
     }
   }, [refreshTrigger]);
 
+  // Cache management functions for admins
+  const clearLandingStatsCache = () => {
+    console.log('🧹 Admin clearing landing stats cache');
+    landingStatsCache.clear();
+    setIsCacheHit(false);
+    setCacheAge(null);
+    // Force fresh fetch
+    fetchStories(currentPage, true);
+  };
+
+  const getCacheStats = () => {
+    const stats = landingStatsCache.stats();
+    console.log('📊 Cache statistics:', stats);
+    return stats;
+  };
+
   // Note: fetchAggregateStats removed - now combined with fetchStories for better performance
 
   // Reset to page 1 when filters change
