@@ -289,11 +289,13 @@ export default function Home({
     }
   }, [currentPage]);
 
-  // Handle refresh trigger
+  // Handle refresh trigger (force fresh data)
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0 && !isRestoringFromReturn) {
-      console.log(`🔄 Refresh triggered: fetching page ${currentPage}`);
-      fetchStories(currentPage);
+      console.log(`🔄 Refresh triggered: forcing fresh fetch for page ${currentPage}`);
+      // Clear cache for current page and force fresh fetch
+      landingStatsCache.remove(currentPage, 8, true);
+      fetchStories(currentPage, true);
     }
   }, [refreshTrigger]);
 
