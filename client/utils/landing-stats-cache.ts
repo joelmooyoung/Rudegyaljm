@@ -376,6 +376,62 @@ export const remoteCacheInvalidation = {
   }
 };
 
+/**
+ * Cache health check and debugging utilities
+ */
+export const cacheHealthCheck = {
+  /**
+   * Test if cache system is working properly
+   */
+  test(): boolean {
+    try {
+      console.log('🔧 Testing cache system...');
+
+      // Check localStorage availability
+      if (!LandingStatsCache['isLocalStorageAvailable']()) {
+        console.log('❌ Cache test failed: localStorage not available');
+        return false;
+      }
+
+      // Test basic cache operations
+      const testData = {
+        stories: [],
+        pagination: { totalPages: 1 },
+        aggregateStats: { totalStories: 0 },
+        timestamp: new Date().toISOString()
+      };
+
+      LandingStatsCache.setCachedData(999, 8, true, testData);
+      const retrieved = LandingStatsCache.getCachedData(999, 8, true);
+      LandingStatsCache.removeCachedData(999, 8, true);
+
+      if (retrieved && retrieved.timestamp === testData.timestamp) {
+        console.log('✅ Cache test passed: All operations working');
+        return true;
+      } else {
+        console.log('❌ Cache test failed: Data mismatch');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Cache test failed with error:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Get detailed cache environment info
+   */
+  getEnvironmentInfo() {
+    return {
+      hasWindow: typeof window !== 'undefined',
+      hasLocalStorage: typeof localStorage !== 'undefined',
+      isLocalStorageAvailable: LandingStatsCache['isLocalStorageAvailable'](),
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
+      timestamp: new Date().toISOString()
+    };
+  }
+};
+
 // Export convenience functions for common operations
 export const landingStatsCache = {
   get: LandingStatsCache.getCachedData,
@@ -387,6 +443,8 @@ export const landingStatsCache = {
   isFresh: LandingStatsCache.isCacheFresh,
   // Remote invalidation
   remote: remoteCacheInvalidation,
+  // Health check utilities
+  health: cacheHealthCheck,
 };
 
 export default LandingStatsCache;
