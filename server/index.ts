@@ -1208,6 +1208,22 @@ export function createServer() {
     }
   });
 
+  // Add cache management endpoint (monitoring and admin)
+  app.all("/api/cache-management", async (req, res) => {
+    console.log(`[SERVER] Cache management request: ${req.method}`);
+    try {
+      const { default: handler } = await import("../api/cache-management.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import cache management handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Cache management handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
