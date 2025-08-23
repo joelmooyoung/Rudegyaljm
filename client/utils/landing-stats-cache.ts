@@ -183,6 +183,12 @@ export class LandingStatsCache {
    */
   static cleanupExpiredEntries(): void {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('🧹 localStorage not available, skipping cleanup');
+        return;
+      }
+
       const keys = Object.keys(localStorage);
       const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
       const now = Date.now();
