@@ -607,6 +607,20 @@ export default function StoryMaintenance({
                       </div>
                     </div>
                   )}
+
+                  {testResult && (
+                    <div className="pt-4 border-t border-amber-200">
+                      <strong>🧪 Simple Test Result:</strong>
+                      <div className="mt-2 p-3 bg-white rounded border text-sm">
+                        <div>Status: <span className={testResult.success ? "text-green-700 font-medium" : "text-red-700 font-medium"}>{testResult.success ? "✅ Passed" : "❌ Failed"}</span></div>
+                        <div>Database: <span className={testResult.database_connected ? "text-green-700" : "text-red-700"}>{testResult.database_connected ? "Connected" : "Disconnected"}</span></div>
+                        <div>Total Stories: <span className="font-medium">{testResult.total_stories || 0}</span></div>
+                        {testResult.first_story && (
+                          <div>First Story: <span className="font-medium">{testResult.first_story.title}</span> by {testResult.first_story.author}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
