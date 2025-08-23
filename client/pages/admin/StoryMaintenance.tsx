@@ -395,6 +395,107 @@ export default function StoryMaintenance({
         </div>
       </header>
 
+      {/* Debug Information Section */}
+      {debugInfo && (
+        <div className="container mx-auto px-4 py-4">
+          <Card className="mb-4 border-amber-200 bg-amber-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                    DEBUG INFO
+                  </Badge>
+                  <span className="text-sm text-amber-700">
+                    Stories API Response Analysis
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDebug(!showDebug)}
+                  className="text-amber-700 hover:bg-amber-100"
+                >
+                  {showDebug ? "Hide" : "Show"} Details
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-amber-800">
+                    {debugInfo.extractedCount || 0}
+                  </div>
+                  <div className="text-sm text-amber-600">Stories Returned</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-700">
+                    {debugInfo.publishedCount || 0}
+                  </div>
+                  <div className="text-sm text-green-600">Published</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-700">
+                    {debugInfo.unpublishedCount || 0}
+                  </div>
+                  <div className="text-sm text-orange-600">Unpublished</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-700">
+                    {filteredStories.length}
+                  </div>
+                  <div className="text-sm text-blue-600">Filtered/Displayed</div>
+                </div>
+              </div>
+
+              {showDebug && (
+                <div className="space-y-4 pt-4 border-t border-amber-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <strong>API URL:</strong> {debugInfo.apiUrl}
+                    </div>
+                    <div>
+                      <strong>Response Status:</strong> {debugInfo.responseStatus}
+                    </div>
+                    <div>
+                      <strong>Data Format:</strong> {debugInfo.sourceFormat}
+                    </div>
+                    <div>
+                      <strong>Last Updated:</strong> {new Date(debugInfo.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+
+                  {debugInfo.warning && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                      <strong className="text-red-800">Warning:</strong> {debugInfo.warning}
+                    </div>
+                  )}
+
+                  {debugInfo.storySample && debugInfo.storySample.length > 0 && (
+                    <div>
+                      <strong>Sample Stories (first 5):</strong>
+                      <div className="mt-2 space-y-1">
+                        {debugInfo.storySample.map((story: any, index: number) => (
+                          <div key={index} className="text-xs bg-white p-2 rounded border">
+                            <span className="font-medium">{story.title}</span>
+                            <span className="text-gray-500"> by {story.author}</span>
+                            <Badge
+                              variant={story.isPublished ? "default" : "secondary"}
+                              className="ml-2 text-xs"
+                            >
+                              {story.isPublished ? "Published" : "Draft"}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
         <div className="mb-6 flex flex-col md:flex-row gap-4">
