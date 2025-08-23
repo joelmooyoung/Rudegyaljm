@@ -194,9 +194,8 @@ export default function Home({
 
   // Initial load
   useEffect(() => {
-    console.log(`🚀 Component mounted - loading page ${currentPage}`);
-    fetchStories(currentPage);
-    fetchAggregateStats();
+    console.log(`🚀 Component mounted - loading page ${currentPage} (optimized)`);
+    fetchStories(currentPage); // Now includes aggregate stats!
   }, []); // Only run on mount
 
   // Handle return page restoration (highest priority)
