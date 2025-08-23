@@ -116,6 +116,10 @@ export const createStory: RequestHandler = async (req, res) => {
 
     const savedStory = await newStory.save();
 
+    // Invalidate story and stats caches
+    await triggerStoryCacheInvalidation();
+    console.log(`[DEBUG] 🗑️ Cache invalidated for new story creation`);
+
     console.log(`[DEBUG] Story created with ID: ${savedStory._id}`);
     console.log(`[DEBUG] New story:`, {
       id: savedStory._id.toString(),
