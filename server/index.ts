@@ -2149,6 +2149,9 @@ export function createServer() {
       } else if (pathSegments.length === 2) {
         // Two levels: /api/auth/login -> ../api/auth/login.js
         modulePath = `../api/${pathSegments[0]}/${pathSegments[1]}.js`;
+      } else if (pathSegments.length === 3) {
+        // Three levels: /api/admin/optimize-database-indexes -> ../api/admin/optimize-database-indexes.js
+        modulePath = `../api/${pathSegments[0]}/${pathSegments[1]}/${pathSegments[2]}.js`;
       } else {
         return next();
       }
