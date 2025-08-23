@@ -241,9 +241,15 @@ export default function Home({
     }
   };
 
-  // Initial load
+  // Initial load with cache system check
   useEffect(() => {
     console.log(`🚀 Component mounted - loading page ${currentPage} (optimized)`);
+
+    // Test cache system health on mount
+    const cacheWorking = landingStatsCache.health.test();
+    const envInfo = landingStatsCache.health.getEnvironmentInfo();
+    console.log('🔧 Cache system status:', { cacheWorking, envInfo });
+
     fetchStories(currentPage); // Now includes aggregate stats!
   }, []); // Only run on mount
 
