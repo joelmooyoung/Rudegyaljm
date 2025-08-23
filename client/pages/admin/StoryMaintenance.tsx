@@ -539,6 +539,135 @@ export default function StoryMaintenance({
         </div>
       )}
 
+      {/* Database Diagnostic Results */}
+      {diagnostic && (
+        <div className="container mx-auto px-4 py-4">
+          <Card className="mb-4 border-blue-200 bg-blue-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                  DATABASE DIAGNOSTIC
+                </Badge>
+                <span className="text-sm text-blue-700">
+                  Complete Database Analysis
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-blue-800">
+                      {diagnostic.stories?.total || 0}
+                    </div>
+                    <div className="text-sm text-blue-600">Total Stories</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-green-700">
+                      {diagnostic.stories?.published || 0}
+                    </div>
+                    <div className="text-sm text-green-600">Published</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-purple-700">
+                      {diagnostic.collections?.count || 0}
+                    </div>
+                    <div className="text-sm text-purple-600">Collections</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-orange-700">
+                      {Object.keys(diagnostic.stories?.byAuthor || {}).length}
+                    </div>
+                    <div className="text-sm text-orange-600">Authors</div>
+                  </div>
+                </div>
+
+                {/* Issues */}
+                {diagnostic.issues && diagnostic.issues.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-red-800 mb-2">🚨 Issues Found:</h4>
+                    <ul className="space-y-1">
+                      {diagnostic.issues.map((issue: string, index: number) => (
+                        <li key={index} className="text-red-700 text-sm">• {issue}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Story Distribution */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded border p-4">
+                    <h4 className="font-semibold mb-2">Stories by Author</h4>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {Object.entries(diagnostic.stories?.byAuthor || {}).map(([author, count]) => (
+                        <div key={author} className="flex justify-between text-sm">
+                          <span>{author}</span>
+                          <span className="font-medium">{count as number}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded border p-4">
+                    <h4 className="font-semibold mb-2">Stories by Category</h4>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {Object.entries(diagnostic.stories?.byCategory || {}).map(([category, count]) => (
+                        <div key={category} className="flex justify-between text-sm">
+                          <span>{category}</span>
+                          <span className="font-medium">{count as number}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-white rounded border p-4">
+                  <h4 className="font-semibold mb-2">📅 Recent Activity</h4>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Today:</span>
+                      <span className="font-medium ml-1">{diagnostic.stories?.createdToday || 0}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">This Week:</span>
+                      <span className="font-medium ml-1">{diagnostic.stories?.createdThisWeek || 0}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">This Month:</span>
+                      <span className="font-medium ml-1">{diagnostic.stories?.createdThisMonth || 0}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Date Range */}
+                {diagnostic.stories?.oldestStory && diagnostic.stories?.newestStory && (
+                  <div className="bg-white rounded border p-4">
+                    <h4 className="font-semibold mb-2">📊 Date Range</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Oldest:</span>
+                        <div className="font-medium">{diagnostic.stories.oldestStory.title}</div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(diagnostic.stories.oldestStory.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Newest:</span>
+                        <div className="font-medium">{diagnostic.stories.newestStory.title}</div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(diagnostic.stories.newestStory.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
         <div className="mb-6 flex flex-col md:flex-row gap-4">
