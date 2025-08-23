@@ -271,9 +271,17 @@ export default async function handler(req, res) {
 
         console.log(`[STORIES API] ✅ Deleted story ${deleteId}`);
 
+        // Add cache invalidation header to signal clients to clear cache
+        res.setHeader("X-Cache-Invalidate", "landing-stats");
+        res.setHeader("X-Cache-Reason", "story-deleted");
+
         return res.status(200).json({
           success: true,
           message: "Story deleted successfully",
+          cacheInvalidation: {
+            clearCache: true,
+            reason: "story-deleted"
+          }
         });
 
       default:
