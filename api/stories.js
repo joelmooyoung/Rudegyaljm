@@ -54,9 +54,16 @@ export default async function handler(req, res) {
 
     switch (req.method) {
       case "GET":
-        console.log(`[STORIES API] Fetching all stories`);
+        console.log(`[STORIES API] Fetching stories`);
 
-        const stories = await Story.find({ published: true })
+        // Check if request includes admin parameter to get all stories (published and unpublished)
+        const includeUnpublished = req.query.admin === 'true' || req.query.includeUnpublished === 'true';
+
+        // For admin requests, get all stories; for public requests, only published
+        const query = includeUnpublished ? {} : { published: true };
+        console.log(`[STORIES API] Query filter:`, query, `(includeUnpublished: ${includeUnpublished})`);
+
+        const stories = await Story.find(query)
           .sort({ createdAt: -1 })
           .select("-__v");
 
