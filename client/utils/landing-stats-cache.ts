@@ -24,27 +24,39 @@ export class LandingStatsCache {
   }
 
   /**
-   * Check if localStorage is available
+   * Check if localStorage is available with ultra-defensive approach
    */
   private static isLocalStorageAvailable(): boolean {
     try {
+      // Check if we're in a browser environment
       if (typeof window === 'undefined') {
-        console.log('🌐 Running in server-side context, localStorage not available');
         return false;
       }
 
-      if (typeof localStorage === 'undefined') {
-        console.log('🚫 localStorage is not defined in this environment');
+      // Use a more defensive check for localStorage
+      let storage;
+      try {
+        storage = window.localStorage;
+      } catch (storageError) {
         return false;
       }
 
-      // Test localStorage access
-      const testKey = '__cache_test__';
-      localStorage.setItem(testKey, 'test');
-      localStorage.removeItem(testKey);
-      return true;
+      if (!storage) {
+        return false;
+      }
+
+      // Test localStorage access with minimal footprint
+      try {
+        const testKey = '__test_cache_access__';
+        storage.setItem(testKey, '1');
+        const testValue = storage.getItem(testKey);
+        storage.removeItem(testKey);
+        return testValue === '1';
+      } catch (accessError) {
+        return false;
+      }
     } catch (error) {
-      console.log(`🔒 localStorage access failed: ${error.message} (likely privacy mode or security restrictions)`);
+      // Catch any unexpected errors
       return false;
     }
   }
