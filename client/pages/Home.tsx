@@ -779,6 +779,16 @@ export default function Home({
                 <div className="text-muted-foreground">Whispered Secrets</div>
               </div>
             </div>
+
+            {/* Cache status indicator */}
+            {isCacheHit && cacheAge !== null && (
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-xs text-green-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span>Cached data ({(cacheAge / 1000).toFixed(1)}s old)</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {user.role === "free" && (
@@ -1034,7 +1044,7 @@ export default function Home({
                 <div className="break-all">
                   ���️ support@Rudegyalconfessions.com
                 </div>
-                <div className="break-all">���� Rudegyalconfessions.com</div>
+                <div className="break-all">🌐 Rudegyalconfessions.com</div>
               </div>
             </div>
           </div>
