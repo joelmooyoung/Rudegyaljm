@@ -152,6 +152,10 @@ export const updateStory: RequestHandler = async (req, res) => {
     Object.assign(story, storyData);
     const updatedStory = await story.save();
 
+    // Invalidate story and stats caches
+    await triggerStoryCacheInvalidation();
+    console.log(`[DEBUG] 🗑️ Cache invalidated for story update`);
+
     res.json(toStoryResponse(updatedStory));
   } catch (error) {
     const errorMessage =
