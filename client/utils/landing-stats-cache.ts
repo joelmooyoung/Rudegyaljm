@@ -131,16 +131,15 @@ export class LandingStatsCache {
 
       return cacheEntry.data;
     } catch (error) {
-      console.error('❌ Error reading from cache:', error);
-      // If localStorage is corrupted or has issues, try to clean up the problematic entry
-      if (this.isLocalStorageAvailable()) {
-        try {
+      console.log('❌ Unexpected error in cache read operation');
+      // Try to clean up the problematic entry with ultra-defensive approach
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
           const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
-          localStorage.removeItem(cacheKey);
-          console.log(`🧹 Removed corrupted cache entry: ${cacheKey}`);
-        } catch (cleanupError) {
-          console.error('❌ Error cleaning up corrupted cache:', cleanupError);
+          window.localStorage.removeItem(cacheKey);
         }
+      } catch (cleanupError) {
+        // Ignore cleanup errors
       }
       return null;
     }
