@@ -187,16 +187,61 @@ export class LandingStatsCache {
         return;
       }
 
-      const keys = Object.keys(localStorage);
-      const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
-      
-      landingStatsKeys.forEach(key => {
-        localStorage.removeItem(key);
+      // Use safer method to iterate over localStorage
+      const keysToRemove: string[] = [];
+
+      // Get all localStorage keys safely
+      for (let i = 0; i < localStorage.length; i++) {
+        try {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(CACHE_PREFIX)) {
+            keysToRemove.push(key);
+          }
+        } catch (keyError) {
+          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i}`);
+        }
+      }
+
+      // Remove the keys
+      let removedCount = 0;
+      keysToRemove.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+          removedCount++;
+        } catch (removeError) {
+          console.log(`⚠️ Failed to remove key: ${key}`, removeError);
+        }
       });
-      
-      console.log(`🧹 Cleared ${landingStatsKeys.length} landing stats cache entries`);
+
+      console.log(`🧹 Cleared ${removedCount} landing stats cache entries`);
     } catch (error) {
       console.error('❌ Error clearing cache:', error);
+
+      // Fallback: try to remove known patterns one by one
+      try {
+        console.log('🔄 Attempting fallback cache clear...');
+        const commonPatterns = [
+          'landing_stats_page_1_limit_8_comments_true',
+          'landing_stats_page_2_limit_8_comments_true',
+          'landing_stats_page_3_limit_8_comments_true',
+        ];
+
+        let fallbackRemoved = 0;
+        commonPatterns.forEach(pattern => {
+          try {
+            if (localStorage.getItem(pattern)) {
+              localStorage.removeItem(pattern);
+              fallbackRemoved++;
+            }
+          } catch (fallbackError) {
+            // Ignore individual key removal errors
+          }
+        });
+
+        console.log(`🧹 Fallback: Cleared ${fallbackRemoved} cache entries`);
+      } catch (fallbackError) {
+        console.error('❌ Fallback cache clear also failed:', fallbackError);
+      }
     }
   }
 
