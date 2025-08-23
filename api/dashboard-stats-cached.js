@@ -1,12 +1,6 @@
 import { connectToDatabase } from "../lib/mongodb.js";
 import mongoose from "mongoose";
-
-// In-memory cache for dashboard stats
-let dashboardCache = {
-  data: null,
-  timestamp: null,
-  ttl: 5 * 60 * 1000, // 5 minutes cache TTL
-};
+import cacheManager, { CACHE_CONFIG } from "../lib/cache-manager.js";
 
 export default async function handler(req, res) {
   console.log(`[DASHBOARD STATS CACHED] ${req.method} /api/dashboard-stats-cached`);
