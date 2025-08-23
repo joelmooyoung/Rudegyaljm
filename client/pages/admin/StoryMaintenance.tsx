@@ -434,14 +434,32 @@ export default function StoryMaintenance({
                     Stories API Response Analysis
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowDebug(!showDebug)}
-                  className="text-amber-700 hover:bg-amber-100"
-                >
-                  {showDebug ? "Hide" : "Show"} Details
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowDebug(!showDebug)}
+                    className="text-amber-700 hover:bg-amber-100"
+                  >
+                    {showDebug ? "Hide" : "Show"} Details
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={runDatabaseDiagnostic}
+                    disabled={isRunningDiagnostic}
+                    className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                  >
+                    {isRunningDiagnostic ? (
+                      <>
+                        <div className="animate-spin h-3 w-3 mr-2 border border-blue-600 border-t-transparent rounded-full"></div>
+                        Running...
+                      </>
+                    ) : (
+                      "🔍 Run Full Diagnostic"
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
