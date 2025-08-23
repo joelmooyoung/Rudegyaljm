@@ -53,6 +53,8 @@ export default function StoryMaintenance({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPublishingAll, setIsPublishingAll] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
