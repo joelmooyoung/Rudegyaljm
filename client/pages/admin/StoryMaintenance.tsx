@@ -73,10 +73,27 @@ export default function StoryMaintenance({
 
       // Add admin parameter to get all stories (published and unpublished)
       const apiUrl = `${baseUrl}?admin=true`;
+      console.log('🔍 [FETCH STORIES] Making request to:', apiUrl);
+      console.log('🔍 [FETCH STORIES] Full URL breakdown:', {
+        hostname: window.location.hostname,
+        isBuilderPreview,
+        baseUrl,
+        finalUrl: apiUrl
+      });
+
       const response = await fetch(apiUrl);
+      console.log('🔍 [FETCH STORIES] Response details:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        headers: Array.from(response.headers.entries())
+      });
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Stories API response:", data);
+        console.log('🔍 [FETCH STORIES] Raw response data:', data);
+        console.log('🔍 [FETCH STORIES] Response data type:', typeof data);
+        console.log('🔍 [FETCH STORIES] Response data keys:', Object.keys(data || {}));
 
         // Capture debug information
         const debugData = {
