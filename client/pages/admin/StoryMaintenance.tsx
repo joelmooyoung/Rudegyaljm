@@ -513,6 +513,14 @@ export default function StoryMaintenance({
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={runSimpleTest}
+                    className="text-green-700 border-green-200 hover:bg-green-50"
+                  >
+                    🧪 Simple Test
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={runDatabaseDiagnostic}
                     disabled={isRunningDiagnostic}
                     className="text-blue-700 border-blue-200 hover:bg-blue-50"
@@ -523,7 +531,7 @@ export default function StoryMaintenance({
                         Running...
                       </>
                     ) : (
-                      "🔍 Run Full Diagnostic"
+                      "🔍 Full Diagnostic"
                     )}
                   </Button>
                 </div>
