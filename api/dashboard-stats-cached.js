@@ -288,14 +288,16 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("[DASHBOARD STATS CACHED] Error:", error);
-    
-    // Return cached data if available, even if stale
-    if (dashboardCache.data) {
+
+    // Try to return any cached data, even if potentially stale
+    const staleCachedData = await cacheManager.get(cacheKey);
+    if (staleCachedData) {
       console.log("[DASHBOARD STATS CACHED] Returning stale cache due to error");
       res.setHeader("X-Cache", "STALE");
+      res.setHeader("X-Cache-Source", cacheManager.redisClient ? "Redis" : "Memory");
       return res.json({
         success: true,
-        data: dashboardCache.data,
+        data: staleCachedData.data,
         cached: true,
         stale: true,
         error: "Fresh data unavailable, using cached data"
