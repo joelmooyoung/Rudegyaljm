@@ -420,30 +420,8 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Use minimal API with real comment counts for reliability
-  app.get("/api/stories", async (req, res) => {
-    console.log(
-      "📚 [STORIES] Using minimal API with real comment counts for reliability...",
-    );
-
-    // Temporarily use minimal API directly while database connectivity is unstable
-    // This ensures fast, reliable loading with accurate comment counts
-    req.query.includeRealCommentCounts = "true";
-
-    try {
-      const { default: minimalHandler } = await import(
-        "../api/stories-minimal.js"
-      );
-      return minimalHandler(req, res);
-    } catch (error) {
-      console.error("📚 [STORIES] Minimal API failed:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Stories service temporarily unavailable",
-        error: error.message,
-      });
-    }
-  });
+  // STORIES ENDPOINT - Let dynamic routing handle this for admin support
+  // Removed explicit route to allow ../api/stories.js to handle admin=true parameter properly
 
   // FALLBACK: Stories minimal API (for compatibility)
   app.get("/api/stories-minimal", async (req, res) => {
