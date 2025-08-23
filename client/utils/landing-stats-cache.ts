@@ -319,7 +319,7 @@ export class LandingStatsCache {
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
-        console.log('🧹 localStorage not available, skipping cleanup');
+        console.log('��� localStorage not available, skipping cleanup');
         return;
       }
 
@@ -624,6 +624,10 @@ export const landingStatsCache = {
   cleanup: LandingStatsCache.cleanupExpiredEntries,
   stats: LandingStatsCache.getCacheStats,
   isFresh: LandingStatsCache.isCacheFresh,
+  // Bypass mode management
+  enableBypass: LandingStatsCache.enableBypassMode,
+  disableBypass: LandingStatsCache.disableBypassMode,
+  isBypass: LandingStatsCache.isBypassMode,
   // Remote invalidation
   remote: remoteCacheInvalidation,
   // Health check utilities
