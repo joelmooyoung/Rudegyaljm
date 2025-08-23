@@ -144,14 +144,14 @@ export default async function handler(req, res) {
       };
     }
 
-    // Sample of all stories
+    // Sample of all stories with safe data handling
     diagnostic.stories.sampleStories = allStories.map(story => ({
-      id: story.storyId,
-      title: story.title,
-      author: story.author,
-      category: story.category,
-      published: story.published,
-      createdAt: story.createdAt
+      id: story.storyId || 'unknown',
+      title: story.title || 'Untitled',
+      author: story.author || 'Unknown Author',
+      category: story.category || 'Unknown',
+      published: Boolean(story.published),
+      createdAt: story.createdAt ? story.createdAt.toISOString() : new Date().toISOString()
     }));
 
     // Check for potential issues
