@@ -75,18 +75,36 @@ export default function StoryMaintenance({
         const data = await response.json();
         console.log("Stories API response:", data);
 
+        // Capture debug information
+        const debugData = {
+          apiUrl,
+          responseStatus: response.status,
+          responseOk: response.ok,
+          rawDataType: Array.isArray(data) ? 'array' : typeof data,
+          rawDataLength: Array.isArray(data) ? data.length : (data?.stories?.length || data?.data?.length || 'unknown'),
+          responseKeys: typeof data === 'object' ? Object.keys(data || {}) : [],
+          timestamp: new Date().toISOString()
+        };
+
         // Handle different response formats and ensure data is an array
         let storiesArray = [];
         if (Array.isArray(data)) {
           storiesArray = data;
+          debugData.sourceFormat = 'direct array';
         } else if (data && Array.isArray(data.stories)) {
           storiesArray = data.stories;
+          debugData.sourceFormat = 'data.stories array';
         } else if (data && Array.isArray(data.data)) {
           storiesArray = data.data;
+          debugData.sourceFormat = 'data.data array';
         } else {
           console.warn("Stories API returned unexpected format:", data);
           storiesArray = [];
+          debugData.sourceFormat = 'unknown/fallback';
+          debugData.warning = 'Unexpected API response format';
         }
+
+        debugData.extractedCount = storiesArray.length;
 
         // Convert date strings back to Date objects and fetch real stats in bulk
         const validStories = storiesArray.filter(
