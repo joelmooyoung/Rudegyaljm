@@ -14,27 +14,32 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Check cache validity
-  const now = Date.now();
+  // Check cache validity using cache manager
   const forceRefresh = req.query.refresh === 'true';
-  
-  if (!forceRefresh && dashboardCache.data && dashboardCache.timestamp && 
-      (now - dashboardCache.timestamp) < dashboardCache.ttl) {
-    
-    const cacheAge = now - dashboardCache.timestamp;
-    console.log(`[DASHBOARD STATS CACHED] ✅ Returning cached data (${Math.round(cacheAge / 1000)}s old)`);
-    
-    // Add cache headers
-    res.setHeader("X-Cache", "HIT");
-    res.setHeader("X-Cache-Age", Math.round(cacheAge / 1000));
-    res.setHeader("Cache-Control", `public, max-age=${Math.round((dashboardCache.ttl - cacheAge) / 1000)}`);
-    
-    return res.json({
-      success: true,
-      data: dashboardCache.data,
-      cached: true,
-      cacheAge: `${Math.round(cacheAge / 1000)}s`
-    });
+  const cacheKey = cacheManager.getDashboardStatsKey('cached');
+
+  if (!forceRefresh) {
+    const cachedData = await cacheManager.get(cacheKey);
+    if (cachedData) {
+      console.log(`[DASHBOARD STATS CACHED] ✅ Cache HIT for ${cacheKey}`);
+
+      // Add cache headers
+      res.setHeader("X-Cache", "HIT");
+      res.setHeader("X-Cache-Source", cacheManager.redisClient ? "Redis" : "Memory");
+      res.setHeader("Cache-Control", `public, max-age=${CACHE_CONFIG.STATS_TTL / 1000}`);
+
+      return res.json({
+        success: true,
+        data: cachedData.data,
+        cached: true,
+        cacheSource: cacheManager.redisClient ? "Redis" : "Memory",
+        cacheStats: cacheManager.getStats()
+      });
+    }
+
+    console.log(`[DASHBOARD STATS CACHED] ❌ Cache MISS for ${cacheKey}`);
+  } else {
+    console.log(`[DASHBOARD STATS CACHED] 🔄 Force refresh requested`);
   }
 
   try {
