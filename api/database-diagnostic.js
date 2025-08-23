@@ -127,20 +127,20 @@ export default async function handler(req, res) {
       createdAt: { $gte: monthStart }
     });
 
-    // Get oldest and newest stories
+    // Get oldest and newest stories with safe date handling
     if (allStories.length > 0) {
       diagnostic.stories.newestStory = {
-        id: allStories[0].storyId,
-        title: allStories[0].title,
-        author: allStories[0].author,
-        createdAt: allStories[0].createdAt
+        id: allStories[0].storyId || 'unknown',
+        title: allStories[0].title || 'Untitled',
+        author: allStories[0].author || 'Unknown Author',
+        createdAt: allStories[0].createdAt ? allStories[0].createdAt.toISOString() : new Date().toISOString()
       };
 
       diagnostic.stories.oldestStory = {
-        id: allStories[allStories.length - 1].storyId,
-        title: allStories[allStories.length - 1].title,
-        author: allStories[allStories.length - 1].author,
-        createdAt: allStories[allStories.length - 1].createdAt
+        id: allStories[allStories.length - 1].storyId || 'unknown',
+        title: allStories[allStories.length - 1].title || 'Untitled',
+        author: allStories[allStories.length - 1].author || 'Unknown Author',
+        createdAt: allStories[allStories.length - 1].createdAt ? allStories[allStories.length - 1].createdAt.toISOString() : new Date().toISOString()
       };
     }
 
