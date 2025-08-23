@@ -248,31 +248,7 @@ export default function Home({
     }
   }, [refreshTrigger]);
 
-  // Fetch aggregate stats for header display
-  const fetchAggregateStats = async () => {
-    try {
-      console.log("📊 Fetching aggregate stats...");
-      const isBuilderPreview = window.location.hostname.includes("builder.my");
-      const apiUrl = isBuilderPreview
-        ? "https://rudegyaljm-amber.vercel.app/api/stories-aggregate-stats"
-        : "/api/stories-aggregate-stats";
-      const response = await fetch(apiUrl);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("📊 Aggregate stats response:", data);
-
-        if (data.success && data.stats) {
-          setAggregateStats(data.stats);
-          console.log("📊 Updated aggregate stats:", data.stats);
-        }
-      } else {
-        console.warn("Failed to fetch aggregate stats:", response.status);
-      }
-    } catch (error) {
-      console.error("Error fetching aggregate stats:", error);
-    }
-  };
+  // Note: fetchAggregateStats removed - now combined with fetchStories for better performance
 
   // Reset to page 1 when filters change
   useEffect(() => {
