@@ -1192,6 +1192,22 @@ export function createServer() {
     }
   });
 
+  // Add cached dashboard stats endpoint (optimized with 5min cache)
+  app.get("/api/dashboard-stats-cached", async (req, res) => {
+    console.log(`[SERVER] Cached dashboard stats request`);
+    try {
+      const { default: handler } = await import("../api/dashboard-stats-cached.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import cached dashboard stats handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Cached dashboard stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
