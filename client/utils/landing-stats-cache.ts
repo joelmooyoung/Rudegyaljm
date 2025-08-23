@@ -245,6 +245,51 @@ export class LandingStatsCache {
   }
 }
 
+/**
+ * Remote cache invalidation support
+ * Allows server to signal cache clear via API
+ */
+export const remoteCacheInvalidation = {
+  /**
+   * Clear cache based on server invalidation signal
+   */
+  async checkAndClearIfInvalidated(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/admin/clear-landing-cache', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.instructions?.clearAll) {
+          console.log('🌐 Server requested cache clear, clearing all landing stats cache');
+          LandingStatsCache.clearAllCache();
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('❌ Error checking cache invalidation:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Set up periodic check for cache invalidation (every 2 minutes)
+   */
+  setupPeriodicCheck(): () => void {
+    const interval = setInterval(() => {
+      remoteCacheInvalidation.checkAndClearIfInvalidated();
+    }, 2 * 60 * 1000); // Check every 2 minutes
+
+    // Return cleanup function
+    return () => clearInterval(interval);
+  }
+};
+
 // Export convenience functions for common operations
 export const landingStatsCache = {
   get: LandingStatsCache.getCachedData,
@@ -254,6 +299,8 @@ export const landingStatsCache = {
   cleanup: LandingStatsCache.cleanupExpiredEntries,
   stats: LandingStatsCache.getCacheStats,
   isFresh: LandingStatsCache.isCacheFresh,
+  // Remote invalidation
+  remote: remoteCacheInvalidation,
 };
 
 export default LandingStatsCache;
