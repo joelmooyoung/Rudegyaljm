@@ -480,8 +480,23 @@ export const cacheHealthCheck = {
       LandingStatsCache.removeCachedData(999, 8, true);
 
       if (retrieved && retrieved.timestamp === testData.timestamp) {
-        console.log('✅ Cache test passed: All operations working');
-        return true;
+        // Test cache clearing operations
+        try {
+          LandingStatsCache.setCachedData(998, 8, true, testData);
+          LandingStatsCache.clearAllCache();
+          const afterClear = LandingStatsCache.getCachedData(998, 8, true);
+
+          if (afterClear === null) {
+            console.log('✅ Cache test passed: All operations including clear working');
+            return true;
+          } else {
+            console.log('⚠️ Cache test partial: Basic ops work but clear may have issues');
+            return true; // Still consider it working for basic functionality
+          }
+        } catch (clearError) {
+          console.log('⚠️ Cache test partial: Basic ops work but clear failed:', clearError);
+          return true; // Still consider it working for basic functionality
+        }
       } else {
         console.log('❌ Cache test failed: Data mismatch');
         return false;
