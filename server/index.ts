@@ -1160,6 +1160,22 @@ export function createServer() {
     }
   });
 
+  // Add optimized landing stats endpoint (combines stories + aggregate stats)
+  app.get("/api/landing-stats", async (req, res) => {
+    console.log(`[SERVER] Optimized landing stats request`);
+    try {
+      const { default: handler } = await import("../api/landing-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import landing stats handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Landing stats handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add unified stats route for admin pages
   app.all("/api/admin/unified-stats", async (req, res) => {
     console.log(`[SERVER] Unified stats request`);
