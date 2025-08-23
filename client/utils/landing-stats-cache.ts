@@ -124,9 +124,9 @@ export class LandingStatsCache {
       this.cleanupExpiredEntries();
     } catch (error) {
       console.error('❌ Error writing to cache:', error);
-      
-      // If localStorage is full, try to clear expired entries and retry
-      if (error.name === 'QuotaExceededError') {
+
+      // Handle specific localStorage errors
+      if (error.name === 'QuotaExceededError' || error.message?.includes('quota')) {
         console.log('🧹 LocalStorage quota exceeded, cleaning up...');
         this.cleanupExpiredEntries();
         try {
@@ -141,6 +141,10 @@ export class LandingStatsCache {
         } catch (retryError) {
           console.error('❌ Failed to cache even after cleanup:', retryError);
         }
+      } else if (error.name === 'SecurityError') {
+        console.log('🔒 localStorage access denied (privacy mode or security settings)');
+      } else {
+        console.error('❌ Unexpected localStorage error:', error.message);
       }
     }
   }
