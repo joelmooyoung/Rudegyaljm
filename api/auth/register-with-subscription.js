@@ -181,6 +181,10 @@ export default async function handler(req, res) {
         `[REGISTER WITH SUBSCRIPTION] ✅ User created in database: ${email}`,
       );
 
+      // Invalidate user and stats caches
+      await triggerUserCacheInvalidation();
+      console.log(`[REGISTER WITH SUBSCRIPTION] 🗑️ Cache invalidated for new user registration`);
+
       // Generate token
       const token = `reg_token_${userData.userId}_${Date.now()}`;
 
