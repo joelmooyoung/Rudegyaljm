@@ -592,6 +592,14 @@ export default function StoryMaintenance({
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={runBasicTest}
+                    className="text-purple-700 border-purple-200 hover:bg-purple-50"
+                  >
+                    🏁 Basic Test
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={runSimpleTest}
                     className="text-green-700 border-green-200 hover:bg-green-50"
                   >
