@@ -322,6 +322,24 @@ export default function StoryMaintenance({
               </Badge>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={publishAllStories}
+                disabled={isPublishingAll}
+                className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+              >
+                {isPublishingAll ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 mr-2 border-2 border-green-600 border-t-transparent rounded-full"></div>
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-4 w-4 mr-2" />
+                    Publish All
+                  </>
+                )}
+              </Button>
               <Button variant="outline" onClick={onCommentsMaintenance}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Comments
