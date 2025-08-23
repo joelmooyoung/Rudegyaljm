@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "../../lib/mongodb.js";
 import { User } from "../../models/index.js";
+import { triggerUserCacheInvalidation } from "../../lib/cache-manager.js";
 
 // Password validation
 const validatePassword = (password) => {
