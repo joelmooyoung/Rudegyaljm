@@ -288,6 +288,11 @@ export class LandingStatsCache {
    */
   static isCacheFresh(page: number, limit: number, includeRealCommentCounts: boolean): boolean {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        return false;
+      }
+
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
       const cachedItem = localStorage.getItem(cacheKey);
       
