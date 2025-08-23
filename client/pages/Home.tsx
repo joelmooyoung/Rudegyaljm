@@ -104,6 +104,8 @@ export default function Home({
   });
   const [isLoadingStories, setIsLoadingStories] = useState(false);
   const [isRestoringFromReturn, setIsRestoringFromReturn] = useState(false);
+  const [isCacheHit, setIsCacheHit] = useState(false);
+  const [cacheAge, setCacheAge] = useState<number | null>(null);
 
   const categories = [
     "all",
