@@ -784,6 +784,10 @@ export default function Home({
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Clear Cache
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={emergencyClearCache}>
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Emergency Clear
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
