@@ -124,20 +124,73 @@ const userStoryReadSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// Indexes for better performance
+// Indexes for better performance and statistics queries
+
+// === USER SCHEMA INDEXES ===
 userSchema.index({ email: 1 });
 userSchema.index({ userId: 1 });
+// Statistics optimized indexes
+userSchema.index({ createdAt: -1 }); // For user registration analytics
+userSchema.index({ active: 1, createdAt: -1 }); // For active user registration counts
+userSchema.index({ type: 1, active: 1 }); // For user type distribution analytics
+userSchema.index({ country: 1, active: 1 }); // For country-based user analytics
+userSchema.index({ active: 1 }); // For active user counts
+
+// === STORY SCHEMA INDEXES ===
 storySchema.index({ storyId: 1 });
 storySchema.index({ published: 1 });
 storySchema.index({ category: 1 });
+// Statistics optimized indexes
+storySchema.index({ published: 1, createdAt: -1 }); // For published stories with date sorting
+storySchema.index({ published: 1, category: 1 }); // For category-based analytics
+storySchema.index({ published: 1, accessLevel: 1 }); // For access level analytics
+storySchema.index({ published: 1, views: -1 }); // For most viewed stories
+storySchema.index({ published: 1, likeCount: -1 }); // For most liked stories
+storySchema.index({ published: 1, averageRating: -1 }); // For top rated stories
+storySchema.index({ createdAt: -1 }); // For story publication analytics
+
+// === COMMENT SCHEMA INDEXES ===
 commentSchema.index({ storyId: 1 });
 commentSchema.index({ userId: 1 });
+// Statistics optimized indexes
+commentSchema.index({ createdAt: -1 }); // For comment analytics by date
+commentSchema.index({ storyId: 1, createdAt: -1 }); // For story comment history
+
+// === LIKE SCHEMA INDEXES ===
 likeSchema.index({ storyId: 1, userId: 1 }, { unique: true });
+// Statistics optimized indexes
+likeSchema.index({ storyId: 1 }); // For story like aggregations
+likeSchema.index({ createdAt: -1 }); // For like analytics by date
+likeSchema.index({ storyId: 1, createdAt: -1 }); // For story like history
+
+// === RATING SCHEMA INDEXES ===
 ratingSchema.index({ storyId: 1, userId: 1 }, { unique: true });
+// Statistics optimized indexes
+ratingSchema.index({ storyId: 1 }); // For story rating aggregations
+ratingSchema.index({ createdAt: -1 }); // For rating analytics by date
+ratingSchema.index({ storyId: 1, createdAt: -1 }); // For story rating history
+
+// === LOGIN LOG SCHEMA INDEXES ===
+// Statistics optimized indexes
+loginLogSchema.index({ timestamp: -1 }); // For login analytics by date
+loginLogSchema.index({ timestamp: -1, success: 1 }); // For successful login analytics
+loginLogSchema.index({ country: 1, timestamp: -1 }); // For country-based login analytics
+loginLogSchema.index({ userId: 1, timestamp: -1 }); // For user-specific login history
+loginLogSchema.index({ success: 1 }); // For login success rate analytics
+
+// === ERROR LOG SCHEMA INDEXES ===
+// Statistics optimized indexes
+errorLogSchema.index({ timestamp: -1 }); // For error analytics by date
+errorLogSchema.index({ endpoint: 1, timestamp: -1 }); // For endpoint-specific error analytics
+
+// === USER STORY READ SCHEMA INDEXES ===
 userStoryReadSchema.index({ userId: 1 });
 userStoryReadSchema.index({ storyId: 1 });
 userStoryReadSchema.index({ userId: 1, storyId: 1 });
 userStoryReadSchema.index({ timestamp: -1 });
+// Statistics optimized indexes
+userStoryReadSchema.index({ storyId: 1, timestamp: -1 }); // For story reading analytics
+userStoryReadSchema.index({ userId: 1, timestamp: -1 }); // For user reading analytics
 
 // Export models
 export const User = mongoose.models.User || mongoose.model("User", userSchema);
