@@ -293,6 +293,29 @@ export default function StoryMaintenance({
     }
   };
 
+  const runDatabaseDiagnostic = async () => {
+    try {
+      setIsRunningDiagnostic(true);
+      console.log('🔍 Running database diagnostic...');
+
+      const response = await fetch('/api/database-diagnostic');
+      if (response.ok) {
+        const result = await response.json();
+        console.log('📊 Database diagnostic result:', result);
+        setDiagnostic(result);
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Failed to run diagnostic:', errorData);
+        alert(`Failed to run diagnostic: ${errorData.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error('❌ Error running diagnostic:', error);
+      alert(`Error running diagnostic: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsRunningDiagnostic(false);
+    }
+  };
+
   const handleDeleteStory = async (storyId: string) => {
     if (
       confirm(
