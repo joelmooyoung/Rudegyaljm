@@ -159,6 +159,12 @@ export class LandingStatsCache {
    */
   static clearAllCache(): void {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('🧹 localStorage not available, skipping cache clear');
+        return;
+      }
+
       const keys = Object.keys(localStorage);
       const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
       
