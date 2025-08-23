@@ -120,9 +120,9 @@ export default function Home({
     "Seductive",
   ];
 
-  // Fetch stories and stats from optimized combined endpoint
-  const fetchStories = async (page = currentPage) => {
-    console.log(`🔄 fetchStories called with page ${page} (using optimized endpoint)`);
+  // Fetch stories and stats from optimized combined endpoint with caching
+  const fetchStories = async (page = currentPage, forceFresh = false) => {
+    console.log(`🔄 fetchStories called with page ${page} (using optimized endpoint with caching)`);
 
     // Prevent multiple simultaneous requests
     if (isLoadingStories) {
@@ -130,14 +130,56 @@ export default function Home({
       return;
     }
 
+    const limit = 8;
+    const includeRealCommentCounts = true;
+
+    // Check cache first (unless forced refresh)
+    if (!forceFresh) {
+      const cachedData = landingStatsCache.get(page, limit, includeRealCommentCounts);
+      if (cachedData) {
+        console.log(`🎯 Cache hit! Using cached data for page ${page}`);
+        setIsCacheHit(true);
+        setCacheAge(Date.now() - new Date(cachedData.timestamp).getTime());
+
+        // Use cached data immediately
+        if (cachedData.stories && Array.isArray(cachedData.stories)) {
+          setStories(cachedData.stories);
+
+          if (cachedData.pagination) {
+            setPagination(cachedData.pagination);
+          }
+
+          if (cachedData.aggregateStats) {
+            setAggregateStats(cachedData.aggregateStats);
+          }
+
+          console.log(`📊 Loaded from cache: ${cachedData.stories.length} stories`);
+        }
+
+        // Still check if we should refresh in background for very old cache
+        if (!landingStatsCache.isFresh(page, limit, includeRealCommentCounts)) {
+          console.log(`🔄 Cache is getting old, refreshing in background...`);
+          // Continue to fetch fresh data but don't set loading state
+        } else {
+          setIsLoading(false);
+          setIsLoadingStories(false);
+          return;
+        }
+      }
+    }
+
     setIsLoadingStories(true);
-    setIsLoading(true);
+    if (!isCacheHit || forceFresh) {
+      setIsLoading(true);
+    }
     setError(null);
+    setIsCacheHit(false);
+    setCacheAge(null);
 
     try {
       // Use optimized endpoint that combines stories + aggregate stats
       const timestamp = Date.now();
-      const apiUrl = `/api/landing-stats?page=${page}&limit=8&includeRealCommentCounts=true&t=${timestamp}`;
+      const apiUrl = `/api/landing-stats?page=${page}&limit=${limit}&includeRealCommentCounts=${includeRealCommentCounts}&t=${timestamp}`;
       console.log(`📞 Calling optimized landing stats API: ${apiUrl}`);
 
       const response = await fetch(apiUrl);
@@ -168,6 +210,10 @@ export default function Home({
             setAggregateStats(data.aggregateStats);
             console.log(`📊 Aggregate stats updated:`, data.aggregateStats);
           }
+
+          // Cache the fresh data
+          landingStatsCache.set(page, limit, includeRealCommentCounts, data);
+          console.log(`💾 Cached fresh data for page ${page}`);
 
           // Log performance improvement
           if (data.performance) {
