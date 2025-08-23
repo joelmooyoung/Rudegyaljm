@@ -299,17 +299,47 @@ export default function StoryMaintenance({
       console.log('🔍 Running database diagnostic...');
 
       const response = await fetch('/api/database-diagnostic');
+      console.log('📡 Diagnostic response status:', response.status, response.statusText);
+
       if (response.ok) {
-        const result = await response.json();
-        console.log('📊 Database diagnostic result:', result);
-        setDiagnostic(result);
+        // Get response as text first to debug parsing issues
+        const responseText = await response.text();
+        console.log('📄 Raw response text:', responseText);
+
+        try {
+          // Try to parse as JSON
+          const result = JSON.parse(responseText);
+          console.log('📊 Database diagnostic result:', result);
+          setDiagnostic(result);
+        } catch (parseError) {
+          console.error('❌ JSON parsing failed:', parseError);
+          console.error('📄 Failed to parse response:', responseText);
+          alert(`Failed to parse diagnostic response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
+          return;
+        }
       } else {
-        const errorData = await response.json();
-        console.error('❌ Failed to run diagnostic:', errorData);
-        alert(`Failed to run diagnostic: ${errorData.message || response.statusText}`);
+        // Handle error response
+        try {
+          const errorText = await response.text();
+          console.error('❌ Error response text:', errorText);
+
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { message: errorText || response.statusText };
+          }
+
+          console.error('❌ Failed to run diagnostic:', errorData);
+          alert(`Failed to run diagnostic: ${errorData.message || response.statusText}`);
+        } catch (textError) {
+          console.error('❌ Failed to read error response:', textError);
+          alert(`Failed to run diagnostic: ${response.status} ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error('❌ Error running diagnostic:', error);
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       alert(`Error running diagnostic: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsRunningDiagnostic(false);
