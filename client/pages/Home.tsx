@@ -117,9 +117,9 @@ export default function Home({
     "Seductive",
   ];
 
-  // Fetch stories from server
+  // Fetch stories and stats from optimized combined endpoint
   const fetchStories = async (page = currentPage) => {
-    console.log(`🔄 fetchStories called with page ${page}`);
+    console.log(`🔄 fetchStories called with page ${page} (using optimized endpoint)`);
 
     // Prevent multiple simultaneous requests
     if (isLoadingStories) {
@@ -132,30 +132,43 @@ export default function Home({
     setError(null);
 
     try {
-      // Add timestamp to bust any cache and ensure fresh data
+      // Use optimized endpoint that combines stories + aggregate stats
       const timestamp = Date.now();
-      const apiUrl = `/api/stories?page=${page}&limit=8&t=${timestamp}`;
-      console.log(`📞 Calling fresh stats API: ${apiUrl}`);
+      const apiUrl = `/api/landing-stats?page=${page}&limit=8&includeRealCommentCounts=true&t=${timestamp}`;
+      console.log(`📞 Calling optimized landing stats API: ${apiUrl}`);
 
       const response = await fetch(apiUrl);
       console.log(`📡 Response status: ${response.status}`);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("✅ Stories API response received:", data);
+        console.log("✅ Optimized landing stats response received:", {
+          storiesCount: data.stories?.length,
+          aggregateStats: data.aggregateStats,
+          queryTime: data.performance?.queryTime
+        });
 
         if (data && data.stories && Array.isArray(data.stories)) {
           console.log(`📚 Processing ${data.stories.length} stories`);
           setStories(data.stories);
 
+          // Update pagination info
           if (data.pagination) {
             setPagination(data.pagination);
             console.log(`📄 Pagination set:`, data.pagination);
-            console.log(
-              `📄 Total pages: ${data.pagination.totalPages}, Current page: ${data.pagination.currentPage}`,
-            );
           } else {
             console.log("❌ No pagination data in response");
+          }
+
+          // Update aggregate stats (no separate API call needed!)
+          if (data.aggregateStats) {
+            setAggregateStats(data.aggregateStats);
+            console.log(`📊 Aggregate stats updated:`, data.aggregateStats);
+          }
+
+          // Log performance improvement
+          if (data.performance) {
+            console.log(`⚡ Performance: ${data.performance.queryTime}ms for ${data.performance.queriesOptimized} combined queries`);
           }
         } else {
           console.error("❌ Invalid response format:", data);
@@ -165,7 +178,7 @@ export default function Home({
         console.error(
           `❌ API error: ${response.status} ${response.statusText}`,
         );
-        setError(`Failed to fetch stories: ${response.status}`);
+        setError(`Failed to fetch landing data: ${response.status}`);
       }
     } catch (error) {
       console.error("❌ Network error:", error);
