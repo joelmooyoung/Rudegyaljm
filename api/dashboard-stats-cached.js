@@ -321,18 +321,11 @@ export default async function handler(req, res) {
   }
 }
 
-// Export cache management functions
+// Export cache management functions using the new cache manager
 export const clearDashboardCache = () => {
-  dashboardCache = { data: null, timestamp: null, ttl: dashboardCache.ttl };
-  console.log("[DASHBOARD STATS CACHED] Cache manually cleared");
+  return cacheManager.invalidatePattern('dashboard:*');
 };
 
 export const getDashboardCacheInfo = () => {
-  return {
-    hasData: !!dashboardCache.data,
-    age: dashboardCache.timestamp ? Date.now() - dashboardCache.timestamp : null,
-    ttl: dashboardCache.ttl,
-    isValid: dashboardCache.data && dashboardCache.timestamp && 
-             (Date.now() - dashboardCache.timestamp) < dashboardCache.ttl
-  };
+  return cacheManager.getStats();
 };
