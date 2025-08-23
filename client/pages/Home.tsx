@@ -307,12 +307,23 @@ export default function Home({
 
   // Cache management functions for admins
   const clearLandingStatsCache = () => {
-    console.log('🧹 Admin clearing landing stats cache');
-    landingStatsCache.clear();
-    setIsCacheHit(false);
-    setCacheAge(null);
-    // Force fresh fetch
-    fetchStories(currentPage, true);
+    try {
+      console.log('🧹 Admin clearing landing stats cache');
+      landingStatsCache.clear();
+      setIsCacheHit(false);
+      setCacheAge(null);
+      console.log('✅ Cache cleared successfully');
+      // Force fresh fetch
+      fetchStories(currentPage, true);
+    } catch (error) {
+      console.error('❌ Error clearing cache from admin action:', error);
+      // Still try to fetch fresh data even if cache clear failed
+      try {
+        fetchStories(currentPage, true);
+      } catch (fetchError) {
+        console.error('❌ Error fetching fresh data after cache clear failure:', fetchError);
+      }
+    }
   };
 
   const getCacheStats = () => {
