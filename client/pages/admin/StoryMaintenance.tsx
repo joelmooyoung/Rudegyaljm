@@ -294,6 +294,33 @@ export default function StoryMaintenance({
     }
   };
 
+  const runDirectTest = async () => {
+    try {
+      console.log('⚡ Running direct API test (inline route)...');
+
+      const response = await fetch('/api/test-direct');
+      console.log('📡 Direct test response status:', response.status, response.statusText);
+
+      const responseText = await response.text();
+      console.log('📄 Direct test response text:', responseText);
+
+      if (response.ok) {
+        try {
+          const result = JSON.parse(responseText);
+          console.log('⚡ Direct test result:', result);
+          alert(`✅ Direct route test passed!\n\nMessage: ${result.message}\nThis proves basic server routing works.`);
+        } catch (parseError) {
+          alert(`❌ Direct test JSON parsing failed:\n\nResponse: ${responseText}\n\nThis indicates a fundamental JSON issue.`);
+        }
+      } else {
+        alert(`❌ Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`);
+      }
+    } catch (error) {
+      console.error('❌ Error running direct test:', error);
+      alert(`❌ Error running direct test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const runBasicTest = async () => {
     try {
       console.log('🏁 Running basic API test...');
