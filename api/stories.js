@@ -150,6 +150,10 @@ export default async function handler(req, res) {
         await newStory.save();
         console.log(`[STORIES API] ✅ Created story ${storyId}`);
 
+        // Add cache invalidation header to signal clients to clear cache
+        res.setHeader("X-Cache-Invalidate", "landing-stats");
+        res.setHeader("X-Cache-Reason", "story-created");
+
         return res.status(201).json({
           success: true,
           message: "Story created successfully",
@@ -160,6 +164,10 @@ export default async function handler(req, res) {
             category: newStory.category,
             published: newStory.published,
           },
+          cacheInvalidation: {
+            clearCache: true,
+            reason: "story-created"
+          }
         });
 
       case "PUT":
