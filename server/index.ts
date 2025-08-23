@@ -1643,6 +1643,22 @@ export function createServer() {
     }
   });
 
+  // Add database diagnostic route
+  app.get("/api/database-diagnostic", async (req, res) => {
+    console.log(`[SERVER] Database diagnostic request`);
+    try {
+      const { default: handler } = await import("../api/database-diagnostic.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import database-diagnostic handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Database diagnostic handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add direct test route to check routing
   app.get("/api/test-direct", (req, res) => {
     console.log(`[SERVER] Direct test route called`);
