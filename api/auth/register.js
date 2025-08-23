@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "../../lib/mongodb.js";
 import { User } from "../../models/index.js";
+import { triggerUserCacheInvalidation } from "../../lib/cache-manager.js";
 
 export default async function handler(req, res) {
   console.log(`[REGISTER API] ${req.method} /api/auth/register`);
