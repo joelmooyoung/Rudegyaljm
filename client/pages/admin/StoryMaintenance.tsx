@@ -294,6 +294,42 @@ export default function StoryMaintenance({
     }
   };
 
+  const runSimpleTest = async () => {
+    try {
+      console.log('🧪 Running simple diagnostic test...');
+
+      const response = await fetch('/api/test-diagnostic-simple');
+      console.log('📡 Simple test response status:', response.status, response.statusText);
+
+      if (response.ok) {
+        const responseText = await response.text();
+        console.log('📄 Simple test response text:', responseText);
+
+        try {
+          const result = JSON.parse(responseText);
+          console.log('🧪 Simple test result:', result);
+          setTestResult(result);
+
+          if (result.success) {
+            alert(`✅ Simple test passed!\n\nDatabase: ${result.database_connected ? 'Connected' : 'Disconnected'}\nStories: ${result.total_stories}\nFirst story: ${result.first_story?.title || 'None'}`);
+          } else {
+            alert(`❌ Simple test failed: ${result.message}`);
+          }
+        } catch (parseError) {
+          console.error('❌ Simple test JSON parsing failed:', parseError);
+          alert(`Failed to parse test response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Simple test error response:', errorText);
+        alert(`Simple test failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('❌ Error running simple test:', error);
+      alert(`Error running simple test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const runDatabaseDiagnostic = async () => {
     try {
       setIsRunningDiagnostic(true);
