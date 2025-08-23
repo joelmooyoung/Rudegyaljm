@@ -94,6 +94,10 @@ export default async function handler(req, res) {
     await newUser.save();
     console.log(`[REGISTER API] ✅ Created user: ${username}`);
 
+    // Invalidate user and stats caches
+    await triggerUserCacheInvalidation();
+    console.log(`[REGISTER API] 🗑️ Cache invalidated for new user registration`);
+
     // Generate simple token (in production, use JWT)
     const token = `auth_${newUser.userId}_${Date.now()}`;
 
