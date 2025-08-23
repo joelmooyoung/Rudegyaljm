@@ -332,6 +332,45 @@ export default function Home({
     return stats;
   };
 
+  // Emergency cache clear for situations where normal clear fails
+  const emergencyClearCache = () => {
+    try {
+      console.log('🚨 Emergency cache clear initiated');
+
+      // Direct localStorage manipulation as fallback
+      if (typeof localStorage !== 'undefined') {
+        const keysToRemove = [];
+        try {
+          // Try the safer iteration method first
+          for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key && key.includes('landing_stats_')) {
+              keysToRemove.push(key);
+            }
+          }
+
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          console.log(`🧹 Emergency: Removed ${keysToRemove.length} cache entries`);
+        } catch (emergencyError) {
+          console.log('🚨 Emergency method also failed, trying nuclear option');
+          // Nuclear option: clear all localStorage (be careful!)
+          try {
+            localStorage.clear();
+            console.log('☢️ Nuclear option: Cleared all localStorage');
+          } catch (nuclearError) {
+            console.error('💥 Nuclear option failed:', nuclearError);
+          }
+        }
+      }
+
+      setIsCacheHit(false);
+      setCacheAge(null);
+      fetchStories(currentPage, true);
+    } catch (error) {
+      console.error('❌ Emergency cache clear failed:', error);
+    }
+  };
+
   // Note: fetchAggregateStats removed - now combined with fetchStories for better performance
 
   // Reset to page 1 when filters change
