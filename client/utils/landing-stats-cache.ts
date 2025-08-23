@@ -28,15 +28,23 @@ export class LandingStatsCache {
    */
   private static isLocalStorageAvailable(): boolean {
     try {
-      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      if (typeof window === 'undefined') {
+        console.log('🌐 Running in server-side context, localStorage not available');
         return false;
       }
+
+      if (typeof localStorage === 'undefined') {
+        console.log('🚫 localStorage is not defined in this environment');
+        return false;
+      }
+
       // Test localStorage access
       const testKey = '__cache_test__';
       localStorage.setItem(testKey, 'test');
       localStorage.removeItem(testKey);
       return true;
     } catch (error) {
+      console.log(`🔒 localStorage access failed: ${error.message} (likely privacy mode or security restrictions)`);
       return false;
     }
   }
