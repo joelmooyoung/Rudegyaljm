@@ -229,6 +229,17 @@ export class LandingStatsCache {
     totalSize: number;
   } {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('📊 localStorage not available, returning empty stats');
+        return {
+          totalEntries: 0,
+          expiredEntries: 0,
+          validEntries: 0,
+          totalSize: 0
+        };
+      }
+
       const keys = Object.keys(localStorage);
       const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
       const now = Date.now();
