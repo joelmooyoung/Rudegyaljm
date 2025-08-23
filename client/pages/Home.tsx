@@ -723,6 +723,11 @@ export default function Home({
                       <Mail className="h-4 w-4 mr-2" />
                       Email Test
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={clearLandingStatsCache}>
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Clear Cache
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
