@@ -337,6 +337,9 @@ export default function Home({
     try {
       console.log('🚨 Emergency cache clear initiated');
 
+      // Enable bypass mode to prevent further cache errors
+      landingStatsCache.enableBypass();
+
       // Direct localStorage manipulation as fallback
       if (typeof localStorage !== 'undefined') {
         const keysToRemove = [];
@@ -352,14 +355,7 @@ export default function Home({
           keysToRemove.forEach(key => localStorage.removeItem(key));
           console.log(`🧹 Emergency: Removed ${keysToRemove.length} cache entries`);
         } catch (emergencyError) {
-          console.log('🚨 Emergency method also failed, trying nuclear option');
-          // Nuclear option: clear all localStorage (be careful!)
-          try {
-            localStorage.clear();
-            console.log('☢️ Nuclear option: Cleared all localStorage');
-          } catch (nuclearError) {
-            console.error('💥 Nuclear option failed:', nuclearError);
-          }
+          console.log('🚨 Emergency method also failed, cache bypass mode enabled');
         }
       }
 
@@ -368,6 +364,27 @@ export default function Home({
       fetchStories(currentPage, true);
     } catch (error) {
       console.error('❌ Emergency cache clear failed:', error);
+      // Ensure bypass mode is enabled if everything fails
+      landingStatsCache.enableBypass();
+    }
+  };
+
+  // Toggle cache bypass mode
+  const toggleCacheBypass = () => {
+    try {
+      if (landingStatsCache.isBypass()) {
+        landingStatsCache.disableBypass();
+        console.log('✅ Cache re-enabled');
+      } else {
+        landingStatsCache.enableBypass();
+        console.log('🚫 Cache disabled');
+      }
+
+      setIsCacheHit(false);
+      setCacheAge(null);
+      fetchStories(currentPage, true);
+    } catch (error) {
+      console.error('❌ Error toggling cache bypass:', error);
     }
   };
 
