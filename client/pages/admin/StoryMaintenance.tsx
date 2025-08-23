@@ -30,6 +30,7 @@ import {
   Calendar,
   MessageSquare,
   Heart,
+  Globe,
 } from "lucide-react";
 import { Story } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
