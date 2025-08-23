@@ -294,6 +294,41 @@ export default function StoryMaintenance({
     }
   };
 
+  const runBasicTest = async () => {
+    try {
+      console.log('🏁 Running basic API test...');
+
+      const response = await fetch('/api/test-basic');
+      console.log('📡 Basic test response status:', response.status, response.statusText);
+
+      if (response.ok) {
+        const responseText = await response.text();
+        console.log('📄 Basic test response text:', responseText);
+
+        try {
+          const result = JSON.parse(responseText);
+          console.log('🏁 Basic test result:', result);
+
+          if (result.success) {
+            alert(`✅ Basic API test passed!\n\nMessage: ${result.message}\nAPI routing is working correctly.`);
+          } else {
+            alert(`❌ Basic test failed: ${result.message}`);
+          }
+        } catch (parseError) {
+          console.error('❌ Basic test JSON parsing failed:', parseError);
+          alert(`❌ Basic test JSON parsing failed:\n\nResponse: ${responseText}\n\nError: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Basic test error response:', errorText);
+        alert(`❌ Basic test failed: ${response.status} ${response.statusText}\n\nThis indicates an API routing issue.`);
+      }
+    } catch (error) {
+      console.error('❌ Error running basic test:', error);
+      alert(`❌ Error running basic test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const runSimpleTest = async () => {
     try {
       console.log('🧪 Running simple diagnostic test...');
