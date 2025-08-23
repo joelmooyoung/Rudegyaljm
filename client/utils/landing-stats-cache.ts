@@ -18,6 +18,9 @@ interface CacheEntry {
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 const CACHE_PREFIX = 'landing_stats_';
 
+// Global flag to disable cache if it's causing persistent issues
+let CACHE_BYPASS_MODE = false;
+
 export class LandingStatsCache {
   private static generateCacheKey(page: number, limit: number, includeRealCommentCounts: boolean): string {
     return `${CACHE_PREFIX}page_${page}_limit_${limit}_comments_${includeRealCommentCounts}`;
