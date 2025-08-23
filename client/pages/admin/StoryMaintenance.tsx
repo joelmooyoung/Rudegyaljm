@@ -297,35 +297,85 @@ export default function StoryMaintenance({
   const runBasicTest = async () => {
     try {
       console.log('🏁 Running basic API test...');
+      console.log('🏁 Current URL:', window.location.href);
+      console.log('🏁 Test URL:', window.location.origin + '/api/test-basic');
 
       const response = await fetch('/api/test-basic');
       console.log('📡 Basic test response status:', response.status, response.statusText);
+      console.log('📡 Basic test response URL:', response.url);
+      console.log('📡 Basic test response type:', response.type);
+      console.log('📡 Basic test response headers:', Array.from(response.headers.entries()));
 
-      if (response.ok) {
-        const responseText = await response.text();
-        console.log('📄 Basic test response text:', responseText);
+      const responseText = await response.text();
+      console.log('📄 Basic test response text (length:', responseText.length, ')');
+      console.log('📄 Basic test response text:', responseText);
+      console.log('📄 Response starts with:', responseText.substring(0, 50));
+      console.log('📄 Response ends with:', responseText.substring(Math.max(0, responseText.length - 50)));
 
-        try {
-          const result = JSON.parse(responseText);
-          console.log('🏁 Basic test result:', result);
+      // Detailed analysis of what we received
+      const analysis = {
+        isEmpty: responseText.trim() === '',
+        isHTML: responseText.trim().startsWith('<'),
+        isJSON: responseText.trim().startsWith('{') || responseText.trim().startsWith('['),
+        containsHTML: responseText.includes('<!DOCTYPE') || responseText.includes('<html'),
+        containsError: responseText.toLowerCase().includes('error'),
+        contains404: responseText.includes('404') || responseText.includes('Not Found'),
+        containsAgeVerification: responseText.toLowerCase().includes('age') && responseText.toLowerCase().includes('verification'),
+        length: responseText.length
+      };
 
-          if (result.success) {
-            alert(`✅ Basic API test passed!\n\nMessage: ${result.message}\nAPI routing is working correctly.`);
-          } else {
-            alert(`❌ Basic test failed: ${result.message}`);
-          }
-        } catch (parseError) {
-          console.error('❌ Basic test JSON parsing failed:', parseError);
-          alert(`❌ Basic test JSON parsing failed:\n\nResponse: ${responseText}\n\nError: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
-        }
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Basic test error response:', errorText);
-        alert(`❌ Basic test failed: ${response.status} ${response.statusText}\n\nThis indicates an API routing issue.`);
+      console.log('📊 Response analysis:', analysis);
+
+      if (analysis.isEmpty) {
+        alert('❌ API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.');
+        return;
       }
+
+      if (analysis.isHTML || analysis.containsHTML) {
+        alert(`❌ API returned HTML instead of JSON\n\nThis suggests:\n- API routing is not working\n- Age verification is blocking the request\n- 404 error page\n\nResponse starts with: "${responseText.substring(0, 100)}"`);
+        return;
+      }
+
+      if (analysis.contains404) {
+        alert('❌ API endpoint not found (404)\n\nThe /api/test-basic endpoint is not registered properly in the server.');
+        return;
+      }
+
+      if (analysis.containsAgeVerification) {
+        alert('❌ Age verification is blocking API access\n\nThe age verification middleware is preventing API calls.');
+        return;
+      }
+
+      if (!analysis.isJSON) {
+        alert(`❌ Response is not JSON format\n\nReceived: "${responseText.substring(0, 200)}"\n\nExpected JSON starting with { or [`);
+        return;
+      }
+
+      // Try to parse JSON
+      try {
+        const result = JSON.parse(responseText);
+        console.log('🏁 Basic test result:', result);
+
+        if (result.success) {
+          alert(`✅ Basic API test passed!\n\nMessage: ${result.message}\nAPI routing is working correctly.`);
+        } else {
+          alert(`❌ Basic test failed: ${result.message}`);
+        }
+      } catch (parseError) {
+        console.error('❌ Basic test JSON parsing failed:', parseError);
+        console.error('❌ Parse error details:', {
+          name: parseError instanceof Error ? parseError.name : 'Unknown',
+          message: parseError instanceof Error ? parseError.message : 'Unknown',
+          position: parseError instanceof Error && 'position' in parseError ? parseError.position : 'Unknown'
+        });
+
+        alert(`❌ JSON parsing failed despite looking like JSON\n\nResponse: "${responseText}"\n\nParse Error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}\n\nThis suggests malformed JSON.`);
+      }
+
     } catch (error) {
       console.error('❌ Error running basic test:', error);
-      alert(`❌ Error running basic test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
+      alert(`❌ Network or fetch error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nThis suggests a network connectivity issue.`);
     }
   };
 
