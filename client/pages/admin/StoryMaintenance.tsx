@@ -300,10 +300,35 @@ export default function StoryMaintenance({
 
       const response = await fetch('/api/test-diagnostic-simple');
       console.log('📡 Simple test response status:', response.status, response.statusText);
+      console.log('📡 Simple test response headers:', Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
         const responseText = await response.text();
-        console.log('📄 Simple test response text:', responseText);
+        console.log('📄 Simple test response text (length:', responseText.length, '):', responseText);
+        console.log('📄 Response text type:', typeof responseText);
+        console.log('📄 Response text first 100 chars:', responseText.substring(0, 100));
+        console.log('📄 Response text last 100 chars:', responseText.substring(Math.max(0, responseText.length - 100)));
+
+        // Check if response is empty
+        if (!responseText || responseText.trim() === '') {
+          console.error('❌ Empty response received');
+          alert('❌ Empty response received from API');
+          return;
+        }
+
+        // Check if response looks like HTML (common when there's a routing issue)
+        if (responseText.trim().startsWith('<')) {
+          console.error('❌ Received HTML instead of JSON:', responseText.substring(0, 200));
+          alert('❌ Received HTML instead of JSON - check API routing');
+          return;
+        }
+
+        // Check if response looks like an error page
+        if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+          console.error('❌ Received HTML error page:', responseText.substring(0, 300));
+          alert('❌ Received HTML error page instead of JSON response');
+          return;
+        }
 
         try {
           const result = JSON.parse(responseText);
@@ -317,15 +342,34 @@ export default function StoryMaintenance({
           }
         } catch (parseError) {
           console.error('❌ Simple test JSON parsing failed:', parseError);
-          alert(`Failed to parse test response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
+          console.error('❌ Parse error details:', {
+            name: parseError instanceof Error ? parseError.name : 'Unknown',
+            message: parseError instanceof Error ? parseError.message : 'Unknown error',
+            stack: parseError instanceof Error ? parseError.stack : 'No stack'
+          });
+
+          // Try to identify what might be wrong with the JSON
+          const trimmed = responseText.trim();
+          if (trimmed === '') {
+            alert('❌ Empty response - API might not be working');
+          } else if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+            alert(`❌ Response doesn't look like JSON. Starts with: "${trimmed.substring(0, 50)}"`);
+          } else {
+            alert(`❌ Invalid JSON format. Parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+          }
         }
       } else {
         const errorText = await response.text();
         console.error('❌ Simple test error response:', errorText);
-        alert(`Simple test failed: ${response.status} ${response.statusText}`);
+        alert(`Simple test failed: ${response.status} ${response.statusText}\n\nResponse: ${errorText.substring(0, 200)}`);
       }
     } catch (error) {
       console.error('❌ Error running simple test:', error);
+      console.error('❌ Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack'
+      });
       alert(`Error running simple test: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
