@@ -164,12 +164,18 @@ export class LandingStatsCache {
     includeRealCommentCounts: boolean,
     data: LandingStatsData
   ): void {
+    // Check if cache is in bypass mode
+    if (CACHE_BYPASS_MODE) {
+      return;
+    }
+
     try {
       // Ultra-defensive localStorage availability check
       let isAvailable = false;
       try {
         isAvailable = this.isLocalStorageAvailable();
       } catch (availabilityError) {
+        CACHE_BYPASS_MODE = true;
         return;
       }
 
