@@ -70,9 +70,7 @@ export default async function handler(req, res) {
               image: 1,
               tags: 1,
               excerpt: 1,
-              // Exclude heavy fields
-              content: 0,
-              audioUrl: 0
+              // Only include what we need, heavy fields automatically excluded
             },
           },
         )
