@@ -140,6 +140,12 @@ export class LandingStatsCache {
    */
   static removeCachedData(page: number, limit: number, includeRealCommentCounts: boolean): void {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('🗑️ localStorage not available, skipping cache removal');
+        return;
+      }
+
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
       localStorage.removeItem(cacheKey);
       console.log(`🗑️ Removed cache for: ${cacheKey}`);
