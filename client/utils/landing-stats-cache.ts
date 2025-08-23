@@ -256,12 +256,25 @@ export class LandingStatsCache {
         return;
       }
 
-      const keys = Object.keys(localStorage);
-      const landingStatsKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
+      // Use safer method to iterate over localStorage
+      const keysToCheck: string[] = [];
+
+      // Get all localStorage keys safely
+      for (let i = 0; i < localStorage.length; i++) {
+        try {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(CACHE_PREFIX)) {
+            keysToCheck.push(key);
+          }
+        } catch (keyError) {
+          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i} during cleanup`);
+        }
+      }
+
       const now = Date.now();
       let cleanedCount = 0;
 
-      landingStatsKeys.forEach(key => {
+      keysToCheck.forEach(key => {
         try {
           const cachedItem = localStorage.getItem(key);
           if (cachedItem) {
@@ -273,8 +286,12 @@ export class LandingStatsCache {
           }
         } catch (error) {
           // If we can't parse it, remove it
-          localStorage.removeItem(key);
-          cleanedCount++;
+          try {
+            localStorage.removeItem(key);
+            cleanedCount++;
+          } catch (removeError) {
+            console.log(`⚠️ Failed to remove corrupted cache entry: ${key}`);
+          }
         }
       });
 
