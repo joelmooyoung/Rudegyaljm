@@ -260,23 +260,24 @@ export default async function handler(req, res) {
       }
     };
 
-    // Update cache
-    dashboardCache = {
+    // Update cache using cache manager
+    await cacheManager.set(cacheKey, {
       data: dashboardData,
-      timestamp: now,
-      ttl: dashboardCache.ttl
-    };
+      generatedAt: new Date().toISOString()
+    }, CACHE_CONFIG.STATS_TTL);
 
     console.log(`[DASHBOARD STATS CACHED] ✅ Fresh data generated and cached:`, {
       totalUsers: dashboardData.users.total,
       totalStories: dashboardData.stories.total,
       queryTime: `${queryTime}ms`,
-      queriesOptimized: 17
+      queriesOptimized: 17,
+      cacheKey: cacheKey
     });
 
     // Add cache headers
     res.setHeader("X-Cache", "MISS");
-    res.setHeader("Cache-Control", `public, max-age=${dashboardCache.ttl / 1000}`);
+    res.setHeader("X-Cache-Source", cacheManager.redisClient ? "Redis" : "Memory");
+    res.setHeader("Cache-Control", `public, max-age=${CACHE_CONFIG.STATS_TTL / 1000}`);
 
     return res.json({
       success: true,
