@@ -239,7 +239,7 @@ export class LandingStatsCache {
       localStorage.removeItem(cacheKey);
       console.log(`🗑️ Removed cache for: ${cacheKey}`);
     } catch (error) {
-      console.error('❌ Error removing from cache:', error);
+      console.error('�� Error removing from cache:', error);
     }
   }
 
@@ -450,6 +450,10 @@ export class LandingStatsCache {
    * Useful for deciding whether to show a refresh indicator
    */
   static isCacheFresh(page: number, limit: number, includeRealCommentCounts: boolean): boolean {
+    if (CACHE_BYPASS_MODE) {
+      return false;
+    }
+
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
@@ -457,18 +461,41 @@ export class LandingStatsCache {
       }
 
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
-      const cachedItem = localStorage.getItem(cacheKey);
-      
+      const cachedItem = window.localStorage.getItem(cacheKey);
+
       if (!cachedItem) return false;
 
       const cacheEntry: CacheEntry = JSON.parse(cachedItem);
       const now = Date.now();
       const halfExpiryTime = cacheEntry.expiry - (CACHE_DURATION / 2);
-      
+
       return now < halfExpiryTime;
     } catch (error) {
       return false;
     }
+  }
+
+  /**
+   * Enable cache bypass mode (disables all cache operations)
+   */
+  static enableBypassMode(): void {
+    CACHE_BYPASS_MODE = true;
+    console.log('🚫 Cache bypass mode enabled - all cache operations disabled');
+  }
+
+  /**
+   * Disable cache bypass mode (re-enables cache operations)
+   */
+  static disableBypassMode(): void {
+    CACHE_BYPASS_MODE = false;
+    console.log('✅ Cache bypass mode disabled - cache operations re-enabled');
+  }
+
+  /**
+   * Check if cache is in bypass mode
+   */
+  static isBypassMode(): boolean {
+    return CACHE_BYPASS_MODE;
   }
 }
 
