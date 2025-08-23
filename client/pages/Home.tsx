@@ -879,7 +879,7 @@ export default function Home({
                 Failed to load stories
               </h3>
               <p className="text-muted-foreground mb-4">{error}</p>
-              <Button onClick={fetchStories} className="btn-seductive">
+              <Button onClick={() => fetchStories(currentPage, true)} className="btn-seductive">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </Button>
@@ -1034,7 +1034,7 @@ export default function Home({
                 <div className="break-all">
                   ���️ support@Rudegyalconfessions.com
                 </div>
-                <div className="break-all">🌐 Rudegyalconfessions.com</div>
+                <div className="break-all">���� Rudegyalconfessions.com</div>
               </div>
             </div>
           </div>
