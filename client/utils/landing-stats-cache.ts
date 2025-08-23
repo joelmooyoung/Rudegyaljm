@@ -156,9 +156,15 @@ export class LandingStatsCache {
     data: LandingStatsData
   ): void {
     try {
-      // Check if localStorage is available
-      if (!this.isLocalStorageAvailable()) {
-        console.log('💾 localStorage not available, skipping cache write');
+      // Ultra-defensive localStorage availability check
+      let isAvailable = false;
+      try {
+        isAvailable = this.isLocalStorageAvailable();
+      } catch (availabilityError) {
+        return;
+      }
+
+      if (!isAvailable) {
         return;
       }
 
