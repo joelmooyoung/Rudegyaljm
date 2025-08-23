@@ -1675,6 +1675,22 @@ export function createServer() {
     }
   });
 
+  // Add basic test route
+  app.get("/api/test-basic", async (req, res) => {
+    console.log(`[SERVER] Basic test request`);
+    try {
+      const { default: handler } = await import("../api/test-basic.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import test-basic handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Basic test handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Add direct test route to check routing
   app.get("/api/test-direct", (req, res) => {
     console.log(`[SERVER] Direct test route called`);
