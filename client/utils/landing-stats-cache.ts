@@ -86,12 +86,18 @@ export class LandingStatsCache {
    * Store data in cache with expiration
    */
   static setCachedData(
-    page: number, 
-    limit: number, 
-    includeRealCommentCounts: boolean, 
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
     data: LandingStatsData
   ): void {
     try {
+      // Check if localStorage is available
+      if (!this.isLocalStorageAvailable()) {
+        console.log('💾 localStorage not available, skipping cache write');
+        return;
+      }
+
       const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
       const expiry = Date.now() + CACHE_DURATION;
       
