@@ -77,26 +77,27 @@ export default async function handler(req, res) {
               storyId: story.storyId,
             });
 
+            // Safely handle all data types to prevent JSON serialization issues
             return {
-              id: story.storyId,
-              title: story.title,
-              author: story.author,
-              excerpt: story.excerpt || story.content.substring(0, 200) + "...",
-              content: story.content,
-              tags: story.tags,
-              category: story.category,
+              id: story.storyId || 'unknown',
+              title: story.title || 'Untitled',
+              author: story.author || 'Unknown Author',
+              excerpt: story.excerpt || (story.content ? story.content.substring(0, 200) + "..." : 'No excerpt available'),
+              content: story.content || '',
+              tags: Array.isArray(story.tags) ? story.tags : [],
+              category: story.category || 'Unknown',
               accessLevel: story.accessLevel || "free",
-              isPublished: story.published,
+              isPublished: Boolean(story.published),
               // Use production statistics from MongoDB (use raw object to ensure we get actual values)
-              rating: storyObj.rating || 0,
-              ratingCount: storyObj.ratingCount || 0,
-              viewCount: storyObj.viewCount || 0,
-              commentCount: commentCount, // Use real comment count from Comment collection
-              likeCount: storyObj.likeCount || 0,
-              image: story.image, // Use actual image from database
-              audioUrl: story.audioUrl, // Use actual audio from database
-              createdAt: story.createdAt,
-              updatedAt: story.updatedAt,
+              rating: Number(storyObj.rating || 0),
+              ratingCount: Number(storyObj.ratingCount || 0),
+              viewCount: Number(storyObj.viewCount || 0),
+              commentCount: Number(commentCount || 0), // Use real comment count from Comment collection
+              likeCount: Number(storyObj.likeCount || 0),
+              image: story.image || null, // Use actual image from database
+              audioUrl: story.audioUrl || null, // Use actual audio from database
+              createdAt: story.createdAt ? story.createdAt.toISOString() : new Date().toISOString(),
+              updatedAt: story.updatedAt ? story.updatedAt.toISOString() : new Date().toISOString(),
             };
           }),
         );
