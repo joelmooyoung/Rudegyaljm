@@ -75,8 +75,21 @@ export default function StoryMaintenance({
       const apiUrl = `${baseUrl}?admin=true`;
       const response = await fetch(apiUrl);
       if (response.ok) {
-        const data = await response.json();
-        console.log("Stories API response:", data);
+        // Get response as text first to debug parsing issues
+        const responseText = await response.text();
+        console.log("Stories API raw response (length:", responseText.length, ")");
+        console.log("Stories API raw response preview:", responseText.substring(0, 500));
+
+        let data;
+        try {
+          data = JSON.parse(responseText);
+          console.log("Stories API response parsed successfully:", data);
+        } catch (parseError) {
+          console.error("❌ JSON parsing failed:", parseError);
+          console.error("❌ Response text that failed to parse:", responseText);
+          setError(`Failed to parse stories response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
+          return;
+        }
 
         // Capture debug information
         const debugData = {
