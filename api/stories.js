@@ -90,12 +90,11 @@ export default async function handler(req, res) {
             }
 
             // Safely handle all data types to prevent JSON serialization issues
-            return {
+            const result = {
               id: story.storyId || 'unknown',
               title: story.title || 'Untitled',
               author: story.author || 'Unknown Author',
-              excerpt: story.excerpt || (story.content ? story.content.substring(0, 200) + "..." : 'No excerpt available'),
-              content: story.content || '',
+              excerpt: story.excerpt || 'No excerpt available',
               tags: Array.isArray(story.tags) ? story.tags : [],
               category: story.category || 'Unknown',
               accessLevel: story.accessLevel || "free",
@@ -111,6 +110,13 @@ export default async function handler(req, res) {
               createdAt: story.createdAt ? story.createdAt.toISOString() : new Date().toISOString(),
               updatedAt: story.updatedAt ? story.updatedAt.toISOString() : new Date().toISOString(),
             };
+
+            // Only include content for non-admin requests (to keep response size manageable)
+            if (!includeUnpublished && story.content) {
+              result.content = story.content;
+            }
+
+            return result;
           }),
         );
 
