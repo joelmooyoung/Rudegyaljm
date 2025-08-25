@@ -72,22 +72,29 @@ export default async function handler(req, res) {
           .sort({ createdAt: -1 })
           .select(selectFields);
 
+        // Get all comment counts in one aggregation query for better performance
+        console.log(`[STORIES API] Fetching comment counts for ${stories.length} stories...`);
+        let commentCountMap = {};
+        try {
+          const commentCounts = await Comment.aggregate([
+            { $match: { storyId: { $in: stories.map(s => s.storyId) } } },
+            { $group: { _id: "$storyId", count: { $sum: 1 } } }
+          ]);
+
+          commentCounts.forEach(item => {
+            commentCountMap[item._id] = item.count;
+          });
+          console.log(`[STORIES API] Got comment counts for ${commentCounts.length} stories`);
+        } catch (commentError) {
+          console.warn(`[STORIES API] Failed to get bulk comment counts:`, commentError);
+        }
+
         // Transform MongoDB documents to frontend format using production data
-        const transformedStories = await Promise.all(
-          stories.map(async (story) => {
+        const transformedStories = stories.map((story) => {
             const storyObj = story.toObject();
 
-            // Get real comment count from Comment collection with error handling
-            let commentCount = 0;
-            try {
-              commentCount = await Comment.countDocuments({
-                storyId: story.storyId,
-              });
-            } catch (commentError) {
-              console.warn(`[STORIES API] Failed to get comment count for story ${story.storyId}:`, commentError);
-              // Fallback to stored comment count
-              commentCount = storyObj.commentCount || 0;
-            }
+            // Use bulk comment count from aggregation
+            const commentCount = commentCountMap[story.storyId] || storyObj.commentCount || 0;
 
             // Safely handle all data types to prevent JSON serialization issues
             const result = {
@@ -117,8 +124,7 @@ export default async function handler(req, res) {
             }
 
             return result;
-          }),
-        );
+        });
 
         console.log(
           `[STORIES API] Found ${transformedStories.length} stories (includeUnpublished: ${includeUnpublished})`,
