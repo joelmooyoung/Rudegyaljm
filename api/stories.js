@@ -63,9 +63,14 @@ export default async function handler(req, res) {
         const query = includeUnpublished ? {} : { published: true };
         console.log(`[STORIES API] Query filter:`, query, `(includeUnpublished: ${includeUnpublished})`);
 
+        // For admin requests, limit fields to avoid massive response
+        const selectFields = includeUnpublished
+          ? "storyId title author excerpt category tags accessLevel published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt image audioUrl"
+          : "-__v";
+
         const stories = await Story.find(query)
           .sort({ createdAt: -1 })
-          .select("-__v");
+          .select(selectFields);
 
         // Transform MongoDB documents to frontend format using production data
         const transformedStories = await Promise.all(
