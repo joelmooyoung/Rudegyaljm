@@ -63,9 +63,9 @@ export default async function handler(req, res) {
         const query = includeUnpublished ? {} : { published: true };
         console.log(`[STORIES API] Query filter:`, query, `(includeUnpublished: ${includeUnpublished})`);
 
-        // For admin requests, limit fields to avoid massive response
+        // For admin requests, use minimal fields for fast loading
         const selectFields = includeUnpublished
-          ? "storyId title author excerpt category tags accessLevel published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt image audioUrl"
+          ? "storyId title author category published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt"
           : "-__v";
 
         // For admin requests, add pagination to improve performance
