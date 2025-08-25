@@ -112,6 +112,29 @@ export default async function handler(req, res) {
         console.log(
           `[STORIES API] Found ${transformedStories.length} stories (includeUnpublished: ${includeUnpublished})`,
         );
+
+        // Test JSON serialization before sending response
+        try {
+          const testSerialization = JSON.stringify(transformedStories);
+          console.log(`[STORIES API] JSON serialization test passed (${testSerialization.length} chars)`);
+        } catch (serializationError) {
+          console.error(`[STORIES API] JSON serialization failed:`, serializationError);
+
+          // Find problematic story
+          for (let i = 0; i < transformedStories.length; i++) {
+            try {
+              JSON.stringify(transformedStories[i]);
+            } catch (storyError) {
+              console.error(`[STORIES API] Story ${i} (${transformedStories[i]?.id}) failed serialization:`, storyError);
+              // Remove problematic story
+              transformedStories.splice(i, 1);
+              i--; // Adjust index after removal
+            }
+          }
+
+          console.log(`[STORIES API] Removed problematic stories, returning ${transformedStories.length} stories`);
+        }
+
         return res.status(200).json(transformedStories);
 
       case "POST":
