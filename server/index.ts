@@ -1393,6 +1393,33 @@ export function createServer() {
     }
   });
 
+  // Catch-all handler for other API routes (must be at the end)
+  app.all("/api/*", async (req, res) => {
+    console.log(`[SERVER] Catch-all API request: ${req.method} ${req.path}`);
+
+    // Extract the path after /api/
+    const apiPath = req.path.replace(/^\/api\//, '');
+
+    try {
+      // Try to import the corresponding API file
+      const { default: handler } = await import(`../api/${apiPath}.js`);
+      console.log(`[SERVER] Successfully imported handler for ${apiPath}`);
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] No handler found for ${req.path}:`, error.message);
+      return res.status(404).json({
+        success: false,
+        message: `API endpoint not found: ${req.path}`,
+        availableEndpoints: [
+          "/api/stories",
+          "/api/auth/login",
+          "/api/comments",
+          "/api/test-basic"
+        ]
+      });
+    }
+  });
+
   // Add admin route for stats calculation
   app.post("/api/admin/calculate-all-stats", async (req, res) => {
     console.log("[SERVER] Admin stats calculation request");
