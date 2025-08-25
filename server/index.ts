@@ -420,8 +420,22 @@ export function createServer() {
     });
   });
 
-  // STORIES ENDPOINT - Let dynamic routing handle this for admin support
-  // Removed explicit route to allow ../api/stories.js to handle admin=true parameter properly
+  // STORIES ENDPOINT - Main stories API with admin support
+  app.all("/api/stories", async (req, res) => {
+    console.log(`[SERVER] Stories API request: ${req.method} /api/stories`);
+    console.log(`[SERVER] Query parameters:`, req.query);
+    try {
+      const { default: handler } = await import("../api/stories.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error("[SERVER] Failed to import stories handler:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Stories handler not available",
+        error: error.message,
+      });
+    }
+  });
 
   // FALLBACK: Stories minimal API (for compatibility)
   app.get("/api/stories-minimal", async (req, res) => {
