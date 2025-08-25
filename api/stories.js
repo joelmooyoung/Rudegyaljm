@@ -72,29 +72,15 @@ export default async function handler(req, res) {
           .sort({ createdAt: -1 })
           .select(selectFields);
 
-        // Get all comment counts in one aggregation query for better performance
-        console.log(`[STORIES API] Fetching comment counts for ${stories.length} stories...`);
-        let commentCountMap = {};
-        try {
-          const commentCounts = await Comment.aggregate([
-            { $match: { storyId: { $in: stories.map(s => s.storyId) } } },
-            { $group: { _id: "$storyId", count: { $sum: 1 } } }
-          ]);
-
-          commentCounts.forEach(item => {
-            commentCountMap[item._id] = item.count;
-          });
-          console.log(`[STORIES API] Got comment counts for ${commentCounts.length} stories`);
-        } catch (commentError) {
-          console.warn(`[STORIES API] Failed to get bulk comment counts:`, commentError);
-        }
+        // For admin requests, skip real-time comment counts for faster response
+        console.log(`[STORIES API] Fast admin mode - using stored comment counts for ${stories.length} stories`);
 
         // Transform MongoDB documents to frontend format using production data
         const transformedStories = stories.map((story) => {
             const storyObj = story.toObject();
 
-            // Use bulk comment count from aggregation
-            const commentCount = commentCountMap[story.storyId] || storyObj.commentCount || 0;
+            // For admin interface, use stored comment count for speed
+            const commentCount = storyObj.commentCount || 0;
 
             // Safely handle all data types to prevent JSON serialization issues
             const result = {
