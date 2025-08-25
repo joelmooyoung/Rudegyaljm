@@ -68,9 +68,18 @@ export default async function handler(req, res) {
           ? "storyId title author excerpt category tags accessLevel published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt image audioUrl"
           : "-__v";
 
+        // For admin requests, add pagination to improve performance
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || (includeUnpublished ? 20 : 50); // Smaller limit for admin
+        const skip = (page - 1) * limit;
+
+        console.log(`[STORIES API] Fetching page ${page}, limit ${limit}, skip ${skip}`);
+
         const stories = await Story.find(query)
           .sort({ createdAt: -1 })
-          .select(selectFields);
+          .select(selectFields)
+          .skip(skip)
+          .limit(limit);
 
         // For admin requests, skip real-time comment counts for faster response
         console.log(`[STORIES API] Fast admin mode - using stored comment counts for ${stories.length} stories`);
