@@ -72,10 +72,17 @@ export default async function handler(req, res) {
           stories.map(async (story) => {
             const storyObj = story.toObject();
 
-            // Get real comment count from Comment collection
-            const commentCount = await Comment.countDocuments({
-              storyId: story.storyId,
-            });
+            // Get real comment count from Comment collection with error handling
+            let commentCount = 0;
+            try {
+              commentCount = await Comment.countDocuments({
+                storyId: story.storyId,
+              });
+            } catch (commentError) {
+              console.warn(`[STORIES API] Failed to get comment count for story ${story.storyId}:`, commentError);
+              // Fallback to stored comment count
+              commentCount = storyObj.commentCount || 0;
+            }
 
             // Safely handle all data types to prevent JSON serialization issues
             return {
