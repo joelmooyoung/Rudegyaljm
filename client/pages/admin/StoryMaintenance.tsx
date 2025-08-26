@@ -441,7 +441,7 @@ export default function StoryMaintenance({
         responseText.length,
         ")",
       );
-      console.log("��� Basic test response text:", responseText);
+      console.log("📄 Basic test response text:", responseText);
       console.log("📄 Response starts with:", responseText.substring(0, 50));
       console.log(
         "📄 Response ends with:",
@@ -785,7 +785,25 @@ export default function StoryMaintenance({
       }
     } catch (error) {
       console.error("❌ Error running migration:", error);
-      alert(`Error running migration: ${error instanceof Error ? error.message : "Unknown error"}`);
+      console.error("❌ Error details:", {
+        name: error instanceof Error ? error.name : "Unknown",
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : "No stack trace",
+      });
+
+      // More detailed error message
+      let errorMessage = "Unknown error";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        // Check for specific error types
+        if (error.message.includes("text@[native code]")) {
+          errorMessage = "Response body reading error - please try again";
+        } else if (error.message.includes("NetworkError") || error.message.includes("fetch")) {
+          errorMessage = "Network connection error - check your internet connection";
+        }
+      }
+
+      alert(`Error running migration: ${errorMessage}\n\nCheck the browser console for more details.`);
     } finally {
       setIsMigrating(false);
     }
