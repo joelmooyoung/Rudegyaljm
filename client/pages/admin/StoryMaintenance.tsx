@@ -470,7 +470,7 @@ export default function StoryMaintenance({
 
       if (analysis.isEmpty) {
         alert(
-          "��� API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.",
+          "❌ API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.",
         );
         return;
       }
@@ -719,7 +719,7 @@ export default function StoryMaintenance({
     } catch (error) {
       console.error("❌ Error running diagnostic:", error);
       console.error(
-        "����� Error stack:",
+        "��� Error stack:",
         error instanceof Error ? error.stack : "No stack trace",
       );
       alert(
@@ -929,6 +929,13 @@ export default function StoryMaintenance({
               <Button variant="outline" onClick={onCommentsMaintenance}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Comments
+              </Button>
+              <Button
+                variant="outline"
+                onClick={testMigrationAPI}
+                className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
+              >
+                🧪 Test API
               </Button>
               <Button
                 variant="outline"
