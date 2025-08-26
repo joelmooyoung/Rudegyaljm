@@ -48,12 +48,14 @@ interface StoryMaintenanceProps {
   onBack: () => void;
   onEditStory: (story: Story | null, mode: "add" | "edit") => void;
   onCommentsMaintenance: () => void;
+  refreshTrigger?: number;
 }
 
 export default function StoryMaintenance({
   onBack,
   onEditStory,
   onCommentsMaintenance,
+  refreshTrigger = 0,
 }: StoryMaintenanceProps) {
   const [stories, setStories] = useState<Story[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -273,10 +275,10 @@ export default function StoryMaintenance({
     }
   };
 
-  // Load stories on component mount and when page changes
+  // Load stories on component mount, when page changes, or when refresh is triggered
   useEffect(() => {
     fetchStories();
-  }, [currentPage]);
+  }, [currentPage, refreshTrigger]);
 
   const filteredStories = stories.filter((story) => {
     // Defensive programming - ensure story has required properties
