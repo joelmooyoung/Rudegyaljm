@@ -160,13 +160,12 @@ export default async function handler(req, res) {
         views: beforeObj.views
       });
 
-      // Increment both viewCount and views fields for consistency
+      // Increment only the views field (correct schema field)
       const updateResult = await Story.updateOne(
         { storyId: id },
         {
           $inc: {
-            viewCount: 1,
-            views: 1, // Also increment views field to prevent conflicts
+            views: 1, // This is the correct schema field
           },
           $set: { updatedAt: new Date() },
         },
