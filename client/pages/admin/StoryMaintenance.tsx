@@ -734,7 +734,7 @@ export default function StoryMaintenance({
     try {
       console.log("🧪 Testing migration API connectivity...");
 
-      const response = await fetch("/api/admin/test-migration");
+      const response = await fetch("/api/test-migration");
       const responseText = await response.text();
 
       console.log("📡 Test response status:", response.status);
