@@ -108,15 +108,22 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       console.log(`📊 Stats from API (cached: ${!forceRefresh}, TTL: ${cacheTTL}ms):`, stats);
       console.log(`📊 Setting commentCount to: ${stats.commentCount}`);
       console.log(`📊 StoryReader stats update - viewCount: ${stats.viewCount}, rating: ${stats.averageRating || stats.rating}, likes: ${stats.likeCount}`);
-      setStoryStats((prev) => ({
-        rating: stats.averageRating || stats.rating || prev.rating,
-        ratingCount: stats.ratingCount || prev.ratingCount,
-        // Only update viewCount if the API returns a higher count (prevents overwriting fresh increments)
-        viewCount: Math.max(stats.viewCount || 0, prev.viewCount || 0),
-        commentCount: stats.commentCount || prev.commentCount,
-        likeCount:
-          stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
-      }));
+
+      setStoryStats((prev) => {
+        const newViewCount = Math.max(stats.viewCount || 0, prev.viewCount || 0);
+        const viewCountAction = newViewCount > (prev.viewCount || 0) ? 'UPDATED' : 'PRESERVED';
+        console.log(`📊 ViewCount: API=${stats.viewCount}, Previous=${prev.viewCount}, New=${newViewCount} (${viewCountAction})`);
+
+        return {
+          rating: stats.averageRating || stats.rating || prev.rating,
+          ratingCount: stats.ratingCount || prev.ratingCount,
+          // Only update viewCount if the API returns a higher count (prevents overwriting fresh increments)
+          viewCount: newViewCount,
+          commentCount: stats.commentCount || prev.commentCount,
+          likeCount:
+            stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
+        };
+      });
     } catch (error) {
       console.error("Failed to refresh story stats:", error);
     }
@@ -271,7 +278,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               ? commentsResponseData
               : commentsResponseData?.data || commentsResponseData || [];
 
-            console.log("📝 Loaded comments for story:", commentsData);
+            console.log("��� Loaded comments for story:", commentsData);
             console.log(`📝 Total comments from API: ${commentsData.length}`);
 
             // Check which comments are being filtered out
