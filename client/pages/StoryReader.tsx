@@ -424,8 +424,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           likeCount: result.newLikeCount || prev.likeCount,
         }));
 
-        // Also refresh story stats to sync with server
-        await refreshStoryStats();
+        // Also refresh story stats to sync with server (force fresh data)
+        await refreshStoryStats(true);
       } else {
         console.error("Failed to toggle like");
       }
@@ -468,8 +468,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           ratingCount: result.newRatingCount || prev.ratingCount,
         }));
 
-        // Also refresh story stats to sync with server
-        await refreshStoryStats();
+        // Also refresh story stats to sync with server (force fresh data)
+        await refreshStoryStats(true);
       } else {
         console.error("Failed to submit rating");
       }
@@ -529,8 +529,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           commentCount: prev.commentCount + 1,
         }));
 
-        // Also refresh story stats to sync with server
-        await refreshStoryStats();
+        // Also refresh story stats to sync with server (force fresh data)
+        await refreshStoryStats(true);
       } else {
         console.error("Failed to submit comment");
       }
