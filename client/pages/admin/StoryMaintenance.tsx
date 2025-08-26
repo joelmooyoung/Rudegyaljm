@@ -874,6 +874,24 @@ export default function StoryMaintenance({
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Comments
               </Button>
+              <Button
+                variant="outline"
+                onClick={runStatsMigration}
+                disabled={isMigrating}
+                className="bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700"
+              >
+                {isMigrating ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 mr-2 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+                    Migrating...
+                  </>
+                ) : (
+                  <>
+                    <Star className="h-4 w-4 mr-2" />
+                    Fix Stats
+                  </>
+                )}
+              </Button>
               <Button onClick={() => onEditStory(null, "add")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Story
