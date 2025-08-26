@@ -71,6 +71,7 @@ export default function StoryMaintenance({
   const [testResult, setTestResult] = useState<any>(null);
   const [isMigrating, setIsMigrating] = useState(false);
   const [migrationResult, setMigrationResult] = useState<any>(null);
+  const [connectionDebug, setConnectionDebug] = useState<any>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
