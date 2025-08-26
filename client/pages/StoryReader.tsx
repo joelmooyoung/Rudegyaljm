@@ -328,24 +328,34 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         await refreshStoryStats();
 
         // Load user interaction (rating and like status) - only for logged-in users
+        // Use the stats endpoint which already returns user interaction data
         if (user && user.id) {
           try {
             const interactionResponse = await fetch(
-              `/api/stories/${story.id}/user-interaction?userId=${encodeURIComponent(user.id)}`,
+              `/api/stories/${story.id}/stats?userId=${encodeURIComponent(user.id)}`,
             );
 
             // Read response text once and reuse it
             const interactionResponseText = await interactionResponse.text();
 
             if (interactionResponse.ok) {
-              let interactionData;
+              let responseData;
               try {
-                interactionData = JSON.parse(interactionResponseText);
-                setUserRating(interactionData.rating || 0);
-                setIsLiked(interactionData.liked || false);
+                responseData = JSON.parse(interactionResponseText);
+
+                // Extract user interaction data from stats response
+                const userInteraction = responseData.userInteraction;
+                if (userInteraction) {
+                  setUserRating(userInteraction.rating || 0);
+                  setIsLiked(userInteraction.liked || false);
+                } else {
+                  // No user interaction data found
+                  setUserRating(0);
+                  setIsLiked(false);
+                }
               } catch (jsonError) {
                 console.warn(
-                  "Failed to parse interaction JSON response:",
+                  "Failed to parse stats JSON response:",
                   interactionResponseText,
                 );
                 setUserRating(0);
@@ -353,7 +363,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               }
             } else {
               console.warn(
-                `User interaction API returned ${interactionResponse.status}:`,
+                `Stats API returned ${interactionResponse.status}:`,
                 interactionResponseText,
               );
               setUserRating(0);
