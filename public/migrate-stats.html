@@ -29,12 +29,13 @@
         async function runMigration() {
             const btn = document.getElementById('migrateBtn');
             const result = document.getElementById('result');
-            
+
             btn.disabled = true;
             btn.textContent = 'Running Migration...';
             result.innerHTML = '<p class="loading">Migration in progress...</p>';
-            
+
             try {
+                // Use relative URL so it works with any development server
                 const response = await fetch('/api/admin/migrate-story-stats', {
                     method: 'POST',
                     headers: {
