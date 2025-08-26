@@ -1122,7 +1122,10 @@ export default function StoryDetail({
               {/* Additional Statistics Row */}
               <div className="grid md:grid-cols-2 gap-6 mt-6">
                 <div className="space-y-2">
-                  <Label htmlFor="commentCount" className="flex items-center gap-2">
+                  <Label
+                    htmlFor="commentCount"
+                    className="flex items-center gap-2"
+                  >
                     <MessageSquare className="h-4 w-4" />
                     Comments
                   </Label>
@@ -1141,7 +1144,10 @@ export default function StoryDetail({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="likeCount" className="flex items-center gap-2">
+                  <Label
+                    htmlFor="likeCount"
+                    className="flex items-center gap-2"
+                  >
                     <Heart className="h-4 w-4 text-red-500" />
                     Likes
                   </Label>

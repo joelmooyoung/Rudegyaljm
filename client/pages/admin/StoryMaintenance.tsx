@@ -170,7 +170,9 @@ export default function StoryMaintenance({
         if (paginationData) {
           setTotalStories(paginationData.total);
           setTotalPages(paginationData.totalPages);
-          console.log(`📄 Pagination: Page ${paginationData.page} of ${paginationData.totalPages} (${paginationData.total} total stories)`);
+          console.log(
+            `📄 Pagination: Page ${paginationData.page} of ${paginationData.totalPages} (${paginationData.total} total stories)`,
+          );
         }
 
         // Convert date strings back to Date objects and fetch real stats in bulk
@@ -1478,8 +1480,14 @@ export default function StoryMaintenance({
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        currentPage > 1 && setCurrentPage(currentPage - 1)
+                      }
+                      className={
+                        currentPage <= 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
 
@@ -1527,8 +1535,15 @@ export default function StoryMaintenance({
 
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
-                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        currentPage < totalPages &&
+                        setCurrentPage(currentPage + 1)
+                      }
+                      className={
+                        currentPage >= totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -1539,8 +1554,10 @@ export default function StoryMaintenance({
           {/* Pagination Info */}
           {!isLoading && totalStories > 0 && (
             <div className="text-center mt-4 text-sm text-muted-foreground">
-              Showing {Math.min(pageSize, filteredStories.length)} of {filteredStories.length} filtered stories
-              {totalStories !== filteredStories.length && ` (${totalStories} total)`}
+              Showing {Math.min(pageSize, filteredStories.length)} of{" "}
+              {filteredStories.length} filtered stories
+              {totalStories !== filteredStories.length &&
+                ` (${totalStories} total)`}
               {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
             </div>
           )}
