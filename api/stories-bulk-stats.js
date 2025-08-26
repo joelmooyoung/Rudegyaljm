@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     stories.forEach((story) => {
       const storyObj = story.toObject();
       const storyStats = {
-        viewCount: storyObj.viewCount || 0,
+        viewCount: storyObj.viewCount || storyObj.views || 0, // Use same fallback as view API
         likeCount: storyObj.likeCount || 0,
         rating: storyObj.rating || 0,
         ratingCount: storyObj.ratingCount || 0,
