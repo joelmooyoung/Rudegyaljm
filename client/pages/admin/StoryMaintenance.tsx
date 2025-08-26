@@ -277,6 +277,7 @@ export default function StoryMaintenance({
 
   // Load stories on component mount, when page changes, or when refresh is triggered
   useEffect(() => {
+    console.log(`[STORY MAINTENANCE] 🔄 Fetching stories - page: ${currentPage}, refreshTrigger: ${refreshTrigger}`);
     fetchStories();
   }, [currentPage, refreshTrigger]);
 
