@@ -104,8 +104,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       );
 
       const stats = response.data || response.stats || response;
-      console.log(`📊 Stats from API (cached: ${!forceRefresh}):`, stats);
+      console.log(`📊 Stats from API (cached: ${!forceRefresh}, TTL: ${cacheTTL}ms):`, stats);
       console.log(`📊 Setting commentCount to: ${stats.commentCount}`);
+      console.log(`📊 StoryReader stats update - viewCount: ${stats.viewCount}, rating: ${stats.averageRating || stats.rating}, likes: ${stats.likeCount}`);
       setStoryStats((prev) => ({
         rating: stats.averageRating || stats.rating || prev.rating,
         ratingCount: stats.ratingCount || prev.ratingCount,
