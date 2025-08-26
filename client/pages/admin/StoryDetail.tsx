@@ -147,21 +147,71 @@ export default function StoryDetail({
 
   // Save state
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingStory, setIsLoadingStory] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Fetch complete story details when editing
+  const fetchCompleteStory = async (storyId: string) => {
+    try {
+      setIsLoadingStory(true);
+      setLoadError(null);
+
+      console.log(`[STORY DETAIL] Fetching complete story details for ${storyId}`);
+      const response = await fetch(`/api/stories/${storyId}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch story: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.story) {
+        const completeStory = result.story;
+        console.log(`[STORY DETAIL] ✅ Loaded complete story:`, completeStory);
+
+        setFormData(completeStory);
+        setTagsInput(completeStory.tags?.join(", ") || "");
+
+        // Set image preview if story has an image
+        if (completeStory.image) {
+          setImagePreview(completeStory.image);
+        }
+
+        // Set audio URL if story has audio
+        if (completeStory.audioUrl) {
+          setAudioUrl(completeStory.audioUrl);
+        }
+      } else {
+        throw new Error(result.message || "Failed to load story details");
+      }
+    } catch (error) {
+      console.error(`[STORY DETAIL] ❌ Error loading story:`, error);
+      setLoadError(error instanceof Error ? error.message : "Failed to load story");
+    } finally {
+      setIsLoadingStory(false);
+    }
+  };
 
   useEffect(() => {
-    if (story) {
+    if (mode === "edit" && story?.id) {
+      // For edit mode, fetch complete story details
+      fetchCompleteStory(story.id);
+    } else if (story) {
+      // For add mode or when story data is already complete
       setFormData(story);
       setTagsInput(story.tags?.join(", ") || "");
+
       // Set image preview if story has an image
       if (story.image) {
         setImagePreview(story.image);
       }
+
       // Set audio URL if story has audio
       if (story.audioUrl) {
         setAudioUrl(story.audioUrl);
       }
     }
-  }, [story]);
+  }, [story, mode]);
 
   const categories = [
     "Free",
