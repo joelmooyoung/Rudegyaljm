@@ -70,12 +70,15 @@ export default async function handler(req, res) {
         console.log(`[BULK STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
           storyId: story.storyId,
           dbViewCount: storyObj.viewCount,
+          dbViews: storyObj.views,
+          finalViewCount: storyObj.viewCount || storyObj.views || 0,
           dbLikeCount: storyObj.likeCount,
           dbRating: storyObj.rating,
           dbRatingCount: storyObj.ratingCount,
           dbCommentCount: storyObj.commentCount,
           realCommentCount: commentCountMap[story.storyId],
-          finalStats: storyStats
+          finalStats: storyStats,
+          allFields: Object.keys(storyObj)
         });
       }
 
