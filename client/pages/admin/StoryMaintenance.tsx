@@ -731,39 +731,90 @@ export default function StoryMaintenance({
   };
 
   const testMigrationAPI = async () => {
+    let response;
     try {
       console.log("🧪 Testing migration API connectivity...");
+      console.log("🔗 Fetching: /api/test-migration");
 
-      const response = await fetch("/api/test-migration");
-      const responseText = await response.text();
+      response = await fetch("/api/test-migration", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        }
+      });
 
-      console.log("📡 Test response status:", response.status);
-      console.log("📄 Test response text:", responseText);
+      console.log("📡 Response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries()),
+        url: response.url
+      });
+
+      // Check if response body is readable
+      if (!response.body) {
+        throw new Error("Response has no body");
+      }
+
+      // Clone response before reading to avoid consumption issues
+      const responseClone = response.clone();
+      let responseText = "";
+
+      try {
+        responseText = await responseClone.text();
+        console.log("📄 Response text received:", {
+          length: responseText.length,
+          preview: responseText.substring(0, 200),
+          isEmpty: responseText.trim() === ""
+        });
+      } catch (textError) {
+        console.error("❌ Error reading response text:", textError);
+        throw new Error(`Failed to read response: ${textError.message}`);
+      }
 
       if (response.ok) {
+        if (!responseText || responseText.trim() === "") {
+          alert("❌ Migration API returned empty response");
+          return;
+        }
+
         try {
           const result = JSON.parse(responseText);
+          console.log("✅ Parsed JSON result:", result);
           alert(`✅ Migration API test successful!\n\nMessage: ${result.message}\nTimestamp: ${result.timestamp}`);
         } catch (parseError) {
-          alert(`❌ Test response parsing failed: ${parseError.message}\n\nResponse: ${responseText}`);
+          console.error("❌ JSON parse error:", parseError);
+          alert(`❌ Test response parsing failed: ${parseError.message}\n\nResponse preview: ${responseText.substring(0, 200)}`);
         }
       } else {
-        alert(`❌ Migration API test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`);
+        console.error("❌ Non-OK response:", response.status, response.statusText);
+        alert(`❌ Migration API test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText.substring(0, 200)}`);
       }
     } catch (error) {
       console.error("❌ Error testing migration API:", error);
+      console.error("❌ Error type:", typeof error);
+      console.error("❌ Error constructor:", error.constructor.name);
+      console.error("❌ Error stack:", error.stack);
 
+      // Enhanced error analysis
       let errorMessage = "Unknown error";
+      let technicalDetails = "";
+
       if (error instanceof Error) {
         errorMessage = error.message;
+        technicalDetails = `Name: ${error.name}, Constructor: ${error.constructor.name}`;
+
         if (errorMessage.includes("text@[native code]") || errorMessage.includes("body is disturbed") || errorMessage.includes("locked")) {
-          errorMessage = "Response body reading error - please try again";
-        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch")) {
-          errorMessage = "Network connection error";
+          errorMessage = "Response body reading error - the server response was consumed multiple times. This is a browser/fetch API issue.";
+        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch") || errorMessage.includes("Failed to fetch")) {
+          errorMessage = "Network connection error - check your internet connection or server availability";
+        } else if (errorMessage.includes("TypeError") && errorMessage.includes("text")) {
+          errorMessage = "Response text reading error - the response body may be corrupted or already consumed";
         }
       }
 
-      alert(`❌ Migration API test error: ${errorMessage}\n\nCheck the browser console for details.`);
+      alert(`❌ Migration API test error: ${errorMessage}\n\nTechnical details: ${technicalDetails}\n\nCheck the browser console for full details.`);
     }
   };
 
