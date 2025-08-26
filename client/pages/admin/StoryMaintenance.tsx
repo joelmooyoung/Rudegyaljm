@@ -77,8 +77,8 @@ export default function StoryMaintenance({
         ? "https://rudegyaljm-amber.vercel.app/api/stories"
         : "/api/stories";
 
-      // Add admin parameter to get all stories (published and unpublished)
-      const apiUrl = `${baseUrl}?admin=true`;
+      // Add admin parameter and pagination to get stories page by page
+      const apiUrl = `${baseUrl}?admin=true&page=${currentPage}&limit=${pageSize}`;
       console.log("🔍 [FETCH STORIES] Making request to:", apiUrl);
       console.log("🔍 [FETCH STORIES] Full URL breakdown:", {
         hostname: window.location.hostname,
