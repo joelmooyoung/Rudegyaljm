@@ -97,6 +97,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   const refreshStoryStats = async (forceRefresh = false) => {
     try {
       const cacheTTL = forceRefresh ? 0 : 2000; // 2 seconds cache TTL (down from 10), 0 to bypass cache
+      console.log(`📊 [${story.title}] Refreshing stats - forceRefresh: ${forceRefresh}, cacheTTL: ${cacheTTL}`);
       const response = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
         {},
