@@ -1118,6 +1118,47 @@ export default function StoryDetail({
                 </div>
               </div>
 
+              {/* Additional Statistics Row */}
+              <div className="grid md:grid-cols-2 gap-6 mt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="commentCount" className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    Comments
+                  </Label>
+                  <Input
+                    id="commentCount"
+                    type="number"
+                    min="0"
+                    value={formData.commentCount || 0}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "commentCount",
+                        parseInt(e.target.value) || 0,
+                      )
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="likeCount" className="flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    Likes
+                  </Label>
+                  <Input
+                    id="likeCount"
+                    type="number"
+                    min="0"
+                    value={formData.likeCount || 0}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "likeCount",
+                        parseInt(e.target.value) || 0,
+                      )
+                    }
+                  />
+                </div>
+              </div>
+
               {/* Publishing Status */}
               <div className="mt-6 pt-6 border-t">
                 <div className="flex items-center space-x-2">
