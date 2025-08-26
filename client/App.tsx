@@ -58,6 +58,7 @@ const App = () => {
   const [storyMode, setStoryMode] = useState<"add" | "edit">("add");
   const [readingStory, setReadingStory] = useState<Story | null>(null);
   const [refreshStories, setRefreshStories] = useState<number>(0);
+  const [refreshAdminStories, setRefreshAdminStories] = useState<number>(0); // Trigger to refresh admin stories
   const [returnPage, setReturnPage] = useState<number | undefined>(undefined);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userMode, setUserMode] = useState<"add" | "edit">("add");
@@ -418,7 +419,8 @@ const App = () => {
         const savedStory = await response.json();
         console.log("[STORY SAVE] ✅ Story saved successfully:", savedStory);
         alert("Story saved successfully!");
-        // Navigate back to story maintenance
+        // Trigger refresh of admin stories and navigate back
+        setRefreshAdminStories(prev => prev + 1);
         setCurrentView("admin-stories");
       } else {
         const errorData = await response.text();
@@ -653,6 +655,7 @@ const App = () => {
             onBack={handleBackToHome}
             onEditStory={handleEditStory}
             onCommentsMaintenance={handleCommentsMaintenance}
+            refreshTrigger={refreshAdminStories}
           />
         );
       case "admin-story-detail":
