@@ -170,7 +170,6 @@ export default async function handler(req, res) {
       const afterUpdate = await Story.findOne({ storyId: id });
       const afterObj = afterUpdate.toObject();
       console.log(`[STORY VIEW API DEBUG] AFTER UPDATE:`, {
-        viewCount: afterObj.viewCount,
         views: afterObj.views,
         updateResult: updateResult
       });
