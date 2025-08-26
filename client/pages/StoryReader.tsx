@@ -94,17 +94,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   };
 
   // Function to refresh story stats
-  const refreshStoryStats = async () => {
+  const refreshStoryStats = async (forceRefresh = false) => {
     try {
+      const cacheTTL = forceRefresh ? 0 : 2000; // 2 seconds cache TTL (down from 10), 0 to bypass cache
       const response = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
         {},
-        10000, // 10 second cache TTL for stats
+        cacheTTL,
       );
 
       const stats = response.data || response.stats || response;
-      console.log(`📊 Initial stats from API (cached):`, stats);
-      console.log(`📊 Setting initial commentCount to: ${stats.commentCount}`);
+      console.log(`📊 Stats from API (cached: ${!forceRefresh}):`, stats);
+      console.log(`📊 Setting commentCount to: ${stats.commentCount}`);
       setStoryStats((prev) => ({
         rating: stats.averageRating || stats.rating || prev.rating,
         ratingCount: stats.ratingCount || prev.ratingCount,
