@@ -100,9 +100,9 @@ export default async function handler(req, res) {
         throw new Error("Story not found");
       }
 
-      // Get the actual viewCount from raw object (handles Mongoose property access issues)
+      // Get the actual view count from raw object (use views field - correct schema field)
       const storyObj = currentStory.toObject();
-      const actualViewCount = storyObj.viewCount || storyObj.views;
+      const actualViewCount = storyObj.views || 0;
 
       console.log(
         `[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`,
