@@ -32,6 +32,15 @@ import {
   Heart,
   Globe,
 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Story } from "@shared/api";
 import { makeApiRequest } from "@/utils/api-config";
 
@@ -262,10 +271,10 @@ export default function StoryMaintenance({
     }
   };
 
-  // Load stories on component mount
+  // Load stories on component mount and when page changes
   useEffect(() => {
     fetchStories();
-  }, []);
+  }, [currentPage]);
 
   const filteredStories = stories.filter((story) => {
     // Defensive programming - ensure story has required properties
