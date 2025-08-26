@@ -216,12 +216,26 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             }
           } catch (error) {
             console.error("Failed to record story read:", error);
+
+            // Safely extract error message to prevent text@[native code] errors
+            let errorMessage = "Unknown error";
+            try {
+              if (error instanceof Error) {
+                errorMessage = error.message;
+              } else if (error && typeof error === 'object' && 'message' in error) {
+                errorMessage = String(error.message);
+              } else {
+                errorMessage = String(error);
+              }
+            } catch (msgError) {
+              errorMessage = "Error message could not be extracted";
+            }
+
             console.error("Story read error details:", {
               userId: user?.id,
               storyId: story?.id,
               storyTitle: story?.title,
-              errorMessage:
-                error instanceof Error ? error.message : "Unknown error",
+              errorMessage: errorMessage,
             });
             // Don't break the user experience if read tracking fails
           }
