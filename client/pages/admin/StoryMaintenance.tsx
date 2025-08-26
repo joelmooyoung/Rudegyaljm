@@ -1106,6 +1106,13 @@ Check console for full details.`);
               </Button>
               <Button
                 variant="outline"
+                onClick={showConnectionDebug}
+                className="bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700"
+              >
+                🔍 Debug
+              </Button>
+              <Button
+                variant="outline"
                 onClick={simpleConnectivityTest}
                 className="bg-cyan-50 hover:bg-cyan-100 border-cyan-200 text-cyan-700"
               >
