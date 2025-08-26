@@ -682,7 +682,7 @@ export default function StoryMaintenance({
         try {
           // Try to parse as JSON
           const result = JSON.parse(responseText);
-          console.log("��� Database diagnostic result:", result);
+          console.log("📊 Database diagnostic result:", result);
           setDiagnostic(result);
         } catch (parseError) {
           console.error("❌ JSON parsing failed:", parseError);
@@ -752,7 +752,18 @@ export default function StoryMaintenance({
       }
     } catch (error) {
       console.error("❌ Error testing migration API:", error);
-      alert(`❌ Migration API test error: ${error instanceof Error ? error.message : "Unknown error"}`);
+
+      let errorMessage = "Unknown error";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (errorMessage.includes("text@[native code]") || errorMessage.includes("body is disturbed") || errorMessage.includes("locked")) {
+          errorMessage = "Response body reading error - please try again";
+        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch")) {
+          errorMessage = "Network connection error";
+        }
+      }
+
+      alert(`❌ Migration API test error: ${errorMessage}\n\nCheck the browser console for details.`);
     }
   };
 
