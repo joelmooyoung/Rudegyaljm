@@ -106,10 +106,10 @@ export default async function handler(req, res) {
             id: story.storyId || "unknown",
             title: story.title || "Untitled",
             author: story.author || "Unknown Author",
-            excerpt: "Loading...", // Simplified for admin interface
-            tags: [], // Simplified for admin interface
+            excerpt: story.excerpt || (story.content ? story.content.substring(0, 150) + '...' : 'No excerpt available'), // Use actual excerpt or preview
+            tags: Array.isArray(story.tags) ? story.tags : [], // Use actual tags
             category: story.category || "Unknown",
-            accessLevel: "free", // Default for admin interface
+            accessLevel: story.accessLevel || "free",
             isPublished: Boolean(story.published),
             // Use production statistics from MongoDB (use raw object to ensure we get actual values)
             rating: Number(storyObj.rating || 0),
@@ -117,8 +117,8 @@ export default async function handler(req, res) {
             viewCount: Number(storyObj.viewCount || 0),
             commentCount: Number(commentCount || 0),
             likeCount: Number(storyObj.likeCount || 0),
-            image: null, // Simplified for admin interface
-            audioUrl: null, // Simplified for admin interface
+            image: story.image || null, // Include actual image for previews
+            audioUrl: story.audioUrl || null, // Include actual audio URL
             createdAt: story.createdAt
               ? story.createdAt.toISOString()
               : new Date().toISOString(),
