@@ -1,10 +1,9 @@
-// Individual Story API endpoint for PUT/DELETE operations
+// Individual story API endpoint - returns complete story details
 import { connectToDatabase } from "../../lib/mongodb.js";
-import { Story } from "../../models/index.js";
+import { Story, Comment } from "../../models/index.js";
 
 export default async function handler(req, res) {
-  const { id } = req.query || {};
-  console.log(`[STORY API] ${req.method} /api/stories/${id}`);
+  console.log(`[STORY API] ${req.method} /api/stories/${req.query.id}`);
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,150 +14,21 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (!id) {
-    return res.status(400).json({
-      success: false,
-      message: "Story ID is required",
-    });
-  }
-
   try {
-    if (req.method === "PUT") {
-      console.log(`[STORY API] Updating story ${id} with data:`, req.body);
+    const { id } = req.query;
 
-      // For reliable stories (development), we'll just return success
-      // since they're hardcoded in the server
-      if (id.startsWith("story-reliable-")) {
-        console.log(`[STORY API] ✅ Reliable story ${id} updated (simulated)`);
-        return res.status(200).json({
-          success: true,
-          message: "Story updated successfully",
-          story: {
-            id: id,
-            ...req.body,
-            updatedAt: new Date(),
-          },
-        });
-      }
-
-      // Try database update for real stories
-      try {
-        await connectToDatabase();
-
-        const updateData = {
-          title: req.body.title,
-          content: req.body.content,
-          author: req.body.author,
-          category: req.body.category,
-          tags: req.body.tags || [],
-          image: req.body.image,
-          excerpt: req.body.excerpt,
-          accessLevel: req.body.accessLevel || "free",
-          published: req.body.published || false,
-          rating: req.body.rating || 0,
-          ratingCount: req.body.ratingCount || 0,
-          viewCount: req.body.viewCount || 0,
-          audioUrl: req.body.audioUrl, // Include audio URL
-          updatedAt: new Date(),
-        };
-
-        const updatedStory = await Story.findOneAndUpdate(
-          { storyId: id },
-          updateData,
-          { new: true, runValidators: true },
-        );
-
-        if (!updatedStory) {
-          return res.status(404).json({
-            success: false,
-            message: "Story not found",
-          });
-        }
-
-        console.log(`[STORY API] ✅ Database story ${id} updated successfully`);
-        return res.status(200).json({
-          success: true,
-          message: "Story updated successfully",
-          story: {
-            id: updatedStory.storyId,
-            title: updatedStory.title,
-            content: updatedStory.content,
-            author: updatedStory.author,
-            category: updatedStory.category,
-            tags: updatedStory.tags,
-            image: updatedStory.image,
-            excerpt: updatedStory.excerpt,
-            accessLevel: updatedStory.accessLevel,
-            isPublished: updatedStory.published,
-            rating: updatedStory.rating,
-            ratingCount: updatedStory.ratingCount,
-            viewCount: updatedStory.viewCount,
-            audioUrl: updatedStory.audioUrl,
-            createdAt: updatedStory.createdAt,
-            updatedAt: updatedStory.updatedAt,
-          },
-        });
-      } catch (dbError) {
-        console.error(`[STORY API] Database error for ${id}:`, dbError.message);
-        // Fallback: simulate success for development
-        return res.status(200).json({
-          success: true,
-          message: "Story updated successfully (fallback)",
-          story: {
-            id: id,
-            ...req.body,
-            updatedAt: new Date(),
-          },
-        });
-      }
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Story ID is required",
+      });
     }
 
-    if (req.method === "DELETE") {
-      console.log(`[STORY API] Deleting story ${id}`);
+    await connectToDatabase();
 
-      // Don't allow deletion of reliable stories
-      if (id.startsWith("story-reliable-")) {
-        return res.status(400).json({
-          success: false,
-          message: "Cannot delete reliable story",
-        });
-      }
-
-      try {
-        await connectToDatabase();
-
-        const deletedStory = await Story.findOneAndDelete({ storyId: id });
-
-        if (!deletedStory) {
-          return res.status(404).json({
-            success: false,
-            message: "Story not found",
-          });
-        }
-
-        console.log(`[STORY API] ✅ Story ${id} deleted successfully`);
-        return res.status(200).json({
-          success: true,
-          message: "Story deleted successfully",
-        });
-      } catch (dbError) {
-        console.error(
-          `[STORY API] Database error deleting ${id}:`,
-          dbError.message,
-        );
-        return res.status(500).json({
-          success: false,
-          message: "Failed to delete story",
-          error: dbError.message,
-        });
-      }
-    }
-
-    if (req.method === "GET") {
-      console.log(`[STORY API] Getting story ${id}`);
-
-      try {
-        await connectToDatabase();
+    switch (req.method) {
+      case "GET":
+        console.log(`[STORY API] Fetching story ${id}`);
 
         const story = await Story.findOne({ storyId: id });
 
@@ -169,46 +39,121 @@ export default async function handler(req, res) {
           });
         }
 
+        // Get real comment count
+        let commentCount = 0;
+        try {
+          commentCount = await Comment.countDocuments({ storyId: story.storyId });
+        } catch (commentError) {
+          console.warn(`[STORY API] Failed to get comment count:`, commentError);
+          commentCount = story.commentCount || 0;
+        }
+
+        // Transform story data with complete details
+        const storyObj = story.toObject();
+        const completeStory = {
+          id: story.storyId,
+          title: story.title || 'Untitled',
+          author: story.author || 'Unknown Author',
+          excerpt: story.excerpt || '',
+          content: story.content || '',
+          tags: Array.isArray(story.tags) ? story.tags : [],
+          category: story.category || 'Unknown',
+          accessLevel: story.accessLevel || "free",
+          isPublished: Boolean(story.published),
+          rating: Number(storyObj.rating || 0),
+          ratingCount: Number(storyObj.ratingCount || 0),
+          viewCount: Number(storyObj.viewCount || 0),
+          commentCount: Number(commentCount || 0),
+          likeCount: Number(storyObj.likeCount || 0),
+          image: story.image || null,
+          audioUrl: story.audioUrl || null,
+          createdAt: story.createdAt ? story.createdAt.toISOString() : new Date().toISOString(),
+          updatedAt: story.updatedAt ? story.updatedAt.toISOString() : new Date().toISOString(),
+        };
+
+        console.log(`[STORY API] ✅ Returning complete story details for ${id}`);
         return res.status(200).json({
           success: true,
-          story: {
-            id: story.storyId,
-            title: story.title,
-            content: story.content,
-            author: story.author,
-            category: story.category,
-            tags: story.tags,
-            image: story.image,
-            excerpt: story.excerpt,
-            accessLevel: story.accessLevel,
-            isPublished: story.published,
-            rating: story.rating,
-            ratingCount: story.ratingCount,
-            viewCount: story.viewCount,
-            audioUrl: story.audioUrl,
-            createdAt: story.createdAt,
-            updatedAt: story.updatedAt,
-          },
+          story: completeStory
         });
-      } catch (dbError) {
-        console.error(
-          `[STORY API] Database error getting ${id}:`,
-          dbError.message,
-        );
-        return res.status(500).json({
-          success: false,
-          message: "Failed to get story",
-          error: dbError.message,
-        });
-      }
-    }
 
-    return res.status(405).json({
-      success: false,
-      message: "Method not allowed",
-    });
+      case "PUT":
+        console.log(`[STORY API] Updating story ${id}`);
+        
+        const existingStory = await Story.findOne({ storyId: id });
+        if (!existingStory) {
+          return res.status(404).json({
+            success: false,
+            message: "Story not found",
+          });
+        }
+
+        // Update fields
+        const updateFields = {};
+        if (req.body.title !== undefined) updateFields.title = req.body.title;
+        if (req.body.content !== undefined) updateFields.content = req.body.content;
+        if (req.body.author !== undefined) updateFields.author = req.body.author;
+        if (req.body.category !== undefined) updateFields.category = req.body.category;
+        if (req.body.tags !== undefined) updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
+        if (req.body.image !== undefined) updateFields.image = req.body.image;
+        if (req.body.excerpt !== undefined) updateFields.excerpt = req.body.excerpt;
+        if (req.body.accessLevel !== undefined) updateFields.accessLevel = req.body.accessLevel;
+        if (req.body.hasOwnProperty("isPublished")) updateFields.published = req.body.isPublished;
+        if (req.body.hasOwnProperty("viewCount")) updateFields.viewCount = req.body.viewCount;
+        if (req.body.hasOwnProperty("rating")) updateFields.rating = req.body.rating;
+        if (req.body.hasOwnProperty("ratingCount")) updateFields.ratingCount = req.body.ratingCount;
+        if (req.body.hasOwnProperty("commentCount")) updateFields.commentCount = req.body.commentCount;
+        if (req.body.hasOwnProperty("likeCount")) updateFields.likeCount = req.body.likeCount;
+        if (req.body.audioUrl !== undefined) updateFields.audioUrl = req.body.audioUrl;
+
+        updateFields.updatedAt = new Date();
+
+        const updatedStory = await Story.findOneAndUpdate(
+          { storyId: id },
+          updateFields,
+          { new: true }
+        );
+
+        console.log(`[STORY API] ✅ Updated story ${id}`);
+
+        return res.status(200).json({
+          success: true,
+          message: "Story updated successfully",
+          story: {
+            id: updatedStory.storyId,
+            title: updatedStory.title,
+            author: updatedStory.author,
+            category: updatedStory.category,
+            isPublished: updatedStory.published,
+          }
+        });
+
+      case "DELETE":
+        console.log(`[STORY API] Deleting story ${id}`);
+        
+        const deletedStory = await Story.findOneAndDelete({ storyId: id });
+        if (!deletedStory) {
+          return res.status(404).json({
+            success: false,
+            message: "Story not found",
+          });
+        }
+
+        console.log(`[STORY API] ✅ Deleted story ${id}`);
+
+        return res.status(200).json({
+          success: true,
+          message: "Story deleted successfully",
+        });
+
+      default:
+        return res.status(405).json({
+          success: false,
+          message: `Method ${req.method} not allowed`,
+        });
+    }
   } catch (error) {
-    console.error(`[STORY API] ❌ Error for ${id}:`, error);
+    console.error(`[STORY API] Error:`, error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
