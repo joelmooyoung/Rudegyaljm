@@ -1143,6 +1143,13 @@ Check console for full details.`);
                   </>
                 )}
               </Button>
+              <Button
+                variant="outline"
+                onClick={testFieldMapping}
+                className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
+              >
+                🔧 Test Fields
+              </Button>
               <Button onClick={() => onEditStory(null, "add")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Story
