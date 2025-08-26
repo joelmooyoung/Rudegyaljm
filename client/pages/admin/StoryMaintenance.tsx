@@ -730,6 +730,52 @@ export default function StoryMaintenance({
     }
   };
 
+  const simpleConnectivityTest = async () => {
+    try {
+      console.log("🔍 Running simple connectivity test...");
+
+      // Use XMLHttpRequest as fallback to avoid fetch issues
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/test-migration', true);
+      xhr.setRequestHeader('Accept', 'application/json');
+
+      const result = await new Promise((resolve, reject) => {
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              resolve({ success: true, data, status: xhr.status });
+            } catch (parseError) {
+              resolve({ success: false, error: 'JSON parse error', responseText: xhr.responseText, status: xhr.status });
+            }
+          } else {
+            resolve({ success: false, error: 'HTTP error', status: xhr.status, responseText: xhr.responseText });
+          }
+        };
+
+        xhr.onerror = function() {
+          reject(new Error('Network error'));
+        };
+
+        xhr.ontimeout = function() {
+          reject(new Error('Request timeout'));
+        };
+
+        xhr.timeout = 10000; // 10 second timeout
+        xhr.send();
+      });
+
+      if (result.success) {
+        alert(`✅ Simple connectivity test successful!\n\nStatus: ${result.status}\nMessage: ${result.data.message}`);
+      } else {
+        alert(`❌ Simple connectivity test failed: ${result.error}\n\nStatus: ${result.status}\nResponse: ${result.responseText?.substring(0, 200)}`);
+      }
+    } catch (error) {
+      console.error("❌ Simple connectivity test error:", error);
+      alert(`❌ Simple connectivity test error: ${error.message}`);
+    }
+  };
+
   const testMigrationAPI = async () => {
     let response;
     try {
