@@ -457,6 +457,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   const handleSubmitComment = async () => {
     if (!newComment.trim() || isSubmittingComment) return;
 
+    // Check if user is logged in
+    if (!user || !user.id) {
+      alert("Please log in to post comments");
+      return;
+    }
+
     setIsSubmittingComment(true);
 
     try {
