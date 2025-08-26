@@ -152,7 +152,6 @@ export default async function handler(req, res) {
       const beforeUpdate = await Story.findOne({ storyId: id });
       const beforeObj = beforeUpdate.toObject();
       console.log(`[STORY VIEW API DEBUG] BEFORE UPDATE:`, {
-        viewCount: beforeObj.viewCount,
         views: beforeObj.views
       });
 
