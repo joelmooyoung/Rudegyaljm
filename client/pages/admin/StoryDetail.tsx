@@ -156,11 +156,15 @@ export default function StoryDetail({
       setIsLoadingStory(true);
       setLoadError(null);
 
-      console.log(`[STORY DETAIL] Fetching complete story details for ${storyId}`);
+      console.log(
+        `[STORY DETAIL] Fetching complete story details for ${storyId}`,
+      );
       const response = await fetch(`/api/stories/${storyId}`);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch story: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch story: ${response.status} ${response.statusText}`,
+        );
       }
 
       const result = await response.json();
@@ -186,7 +190,9 @@ export default function StoryDetail({
       }
     } catch (error) {
       console.error(`[STORY DETAIL] ❌ Error loading story:`, error);
-      setLoadError(error instanceof Error ? error.message : "Failed to load story");
+      setLoadError(
+        error instanceof Error ? error.message : "Failed to load story",
+      );
     } finally {
       setIsLoadingStory(false);
     }
@@ -658,16 +664,18 @@ export default function StoryDetail({
         console.log(`[STORY DETAIL] Updating story ${formData.id} via API`);
 
         const response = await fetch(`/api/stories/${formData.id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(storyData),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || `Failed to update story: ${response.status}`);
+          throw new Error(
+            errorData.message || `Failed to update story: ${response.status}`,
+          );
         }
 
         const result = await response.json();
@@ -681,7 +689,9 @@ export default function StoryDetail({
     } catch (error) {
       console.error("[STORY DETAIL] Save failed:", error);
       // Show error to user
-      alert(`Failed to save story: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Failed to save story: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsSaving(false);
     }
@@ -700,7 +710,9 @@ export default function StoryDetail({
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
           <h2 className="text-lg font-semibold mb-2">Loading Story Details</h2>
-          <p className="text-muted-foreground">Fetching complete story information...</p>
+          <p className="text-muted-foreground">
+            Fetching complete story information...
+          </p>
         </div>
       </div>
     );
@@ -714,7 +726,9 @@ export default function StoryDetail({
           <div className="h-12 w-12 text-destructive mx-auto mb-4">
             <FileText className="h-full w-full" />
           </div>
-          <h2 className="text-lg font-semibold mb-2 text-destructive">Failed to Load Story</h2>
+          <h2 className="text-lg font-semibold mb-2 text-destructive">
+            Failed to Load Story
+          </h2>
           <p className="text-muted-foreground mb-4">{loadError}</p>
           <div className="flex gap-2 justify-center">
             <Button variant="outline" onClick={onBack}>

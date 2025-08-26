@@ -42,9 +42,14 @@ export default async function handler(req, res) {
         // Get real comment count
         let commentCount = 0;
         try {
-          commentCount = await Comment.countDocuments({ storyId: story.storyId });
+          commentCount = await Comment.countDocuments({
+            storyId: story.storyId,
+          });
         } catch (commentError) {
-          console.warn(`[STORY API] Failed to get comment count:`, commentError);
+          console.warn(
+            `[STORY API] Failed to get comment count:`,
+            commentError,
+          );
           commentCount = story.commentCount || 0;
         }
 
@@ -52,12 +57,12 @@ export default async function handler(req, res) {
         const storyObj = story.toObject();
         const completeStory = {
           id: story.storyId,
-          title: story.title || 'Untitled',
-          author: story.author || 'Unknown Author',
-          excerpt: story.excerpt || '',
-          content: story.content || '',
+          title: story.title || "Untitled",
+          author: story.author || "Unknown Author",
+          excerpt: story.excerpt || "",
+          content: story.content || "",
           tags: Array.isArray(story.tags) ? story.tags : [],
-          category: story.category || 'Unknown',
+          category: story.category || "Unknown",
           accessLevel: story.accessLevel || "free",
           isPublished: Boolean(story.published),
           rating: Number(storyObj.rating || 0),
@@ -67,19 +72,25 @@ export default async function handler(req, res) {
           likeCount: Number(storyObj.likeCount || 0),
           image: story.image || null,
           audioUrl: story.audioUrl || null,
-          createdAt: story.createdAt ? story.createdAt.toISOString() : new Date().toISOString(),
-          updatedAt: story.updatedAt ? story.updatedAt.toISOString() : new Date().toISOString(),
+          createdAt: story.createdAt
+            ? story.createdAt.toISOString()
+            : new Date().toISOString(),
+          updatedAt: story.updatedAt
+            ? story.updatedAt.toISOString()
+            : new Date().toISOString(),
         };
 
-        console.log(`[STORY API] ✅ Returning complete story details for ${id}`);
+        console.log(
+          `[STORY API] ✅ Returning complete story details for ${id}`,
+        );
         return res.status(200).json({
           success: true,
-          story: completeStory
+          story: completeStory,
         });
 
       case "PUT":
         console.log(`[STORY API] Updating story ${id}`);
-        
+
         const existingStory = await Story.findOne({ storyId: id });
         if (!existingStory) {
           return res.status(404).json({
@@ -91,27 +102,40 @@ export default async function handler(req, res) {
         // Update fields
         const updateFields = {};
         if (req.body.title !== undefined) updateFields.title = req.body.title;
-        if (req.body.content !== undefined) updateFields.content = req.body.content;
-        if (req.body.author !== undefined) updateFields.author = req.body.author;
-        if (req.body.category !== undefined) updateFields.category = req.body.category;
-        if (req.body.tags !== undefined) updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
+        if (req.body.content !== undefined)
+          updateFields.content = req.body.content;
+        if (req.body.author !== undefined)
+          updateFields.author = req.body.author;
+        if (req.body.category !== undefined)
+          updateFields.category = req.body.category;
+        if (req.body.tags !== undefined)
+          updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
         if (req.body.image !== undefined) updateFields.image = req.body.image;
-        if (req.body.excerpt !== undefined) updateFields.excerpt = req.body.excerpt;
-        if (req.body.accessLevel !== undefined) updateFields.accessLevel = req.body.accessLevel;
-        if (req.body.hasOwnProperty("isPublished")) updateFields.published = req.body.isPublished;
-        if (req.body.hasOwnProperty("viewCount")) updateFields.viewCount = req.body.viewCount;
-        if (req.body.hasOwnProperty("rating")) updateFields.rating = req.body.rating;
-        if (req.body.hasOwnProperty("ratingCount")) updateFields.ratingCount = req.body.ratingCount;
-        if (req.body.hasOwnProperty("commentCount")) updateFields.commentCount = req.body.commentCount;
-        if (req.body.hasOwnProperty("likeCount")) updateFields.likeCount = req.body.likeCount;
-        if (req.body.audioUrl !== undefined) updateFields.audioUrl = req.body.audioUrl;
+        if (req.body.excerpt !== undefined)
+          updateFields.excerpt = req.body.excerpt;
+        if (req.body.accessLevel !== undefined)
+          updateFields.accessLevel = req.body.accessLevel;
+        if (req.body.hasOwnProperty("isPublished"))
+          updateFields.published = req.body.isPublished;
+        if (req.body.hasOwnProperty("viewCount"))
+          updateFields.viewCount = req.body.viewCount;
+        if (req.body.hasOwnProperty("rating"))
+          updateFields.rating = req.body.rating;
+        if (req.body.hasOwnProperty("ratingCount"))
+          updateFields.ratingCount = req.body.ratingCount;
+        if (req.body.hasOwnProperty("commentCount"))
+          updateFields.commentCount = req.body.commentCount;
+        if (req.body.hasOwnProperty("likeCount"))
+          updateFields.likeCount = req.body.likeCount;
+        if (req.body.audioUrl !== undefined)
+          updateFields.audioUrl = req.body.audioUrl;
 
         updateFields.updatedAt = new Date();
 
         const updatedStory = await Story.findOneAndUpdate(
           { storyId: id },
           updateFields,
-          { new: true }
+          { new: true },
         );
 
         console.log(`[STORY API] ✅ Updated story ${id}`);
@@ -125,12 +149,12 @@ export default async function handler(req, res) {
             author: updatedStory.author,
             category: updatedStory.category,
             isPublished: updatedStory.published,
-          }
+          },
         });
 
       case "DELETE":
         console.log(`[STORY API] Deleting story ${id}`);
-        
+
         const deletedStory = await Story.findOneAndDelete({ storyId: id });
         if (!deletedStory) {
           return res.status(404).json({

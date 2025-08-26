@@ -106,7 +106,11 @@ export default async function handler(req, res) {
             id: story.storyId || "unknown",
             title: story.title || "Untitled",
             author: story.author || "Unknown Author",
-            excerpt: story.excerpt || (story.content ? story.content.substring(0, 150) + '...' : 'No excerpt available'), // Use actual excerpt or preview
+            excerpt:
+              story.excerpt ||
+              (story.content
+                ? story.content.substring(0, 150) + "..."
+                : "No excerpt available"), // Use actual excerpt or preview
             tags: Array.isArray(story.tags) ? story.tags : [], // Use actual tags
             category: story.category || "Unknown",
             accessLevel: story.accessLevel || "free",
