@@ -1165,7 +1165,7 @@ export default function StoryMaintenance({
                 {diagnostic.issues && diagnostic.issues.length > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <h4 className="font-semibold text-red-800 mb-2">
-                      🚨 Issues Found:
+                      ���� Issues Found:
                     </h4>
                     <ul className="space-y-1">
                       {diagnostic.issues.map((issue: string, index: number) => (
@@ -1273,6 +1273,92 @@ export default function StoryMaintenance({
                       </div>
                     </div>
                   )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Migration Results */}
+      {migrationResult && (
+        <div className="container mx-auto px-4 py-4">
+          <Card className="mb-4 border-purple-200 bg-purple-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="bg-purple-100 text-purple-800 border-purple-300"
+                >
+                  STATS MIGRATION RESULTS
+                </Badge>
+                <span className="text-sm text-purple-700">
+                  {migrationResult.success ? "✅ Completed Successfully" : "❌ Failed"}
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-purple-800">
+                      {migrationResult.results?.summary?.totalProcessed || 0}
+                    </div>
+                    <div className="text-sm text-purple-600">Total Processed</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-green-700">
+                      {migrationResult.results?.summary?.successfulUpdates || 0}
+                    </div>
+                    <div className="text-sm text-green-600">Updated</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-blue-700">
+                      {migrationResult.results?.summary?.skippedNoChanges || 0}
+                    </div>
+                    <div className="text-sm text-blue-600">Skipped</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-orange-700">
+                      {migrationResult.results?.summary?.viewsSetTo454 || 0}
+                    </div>
+                    <div className="text-sm text-orange-600">Set to 454</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded border">
+                    <div className="text-2xl font-bold text-red-700">
+                      {migrationResult.results?.summary?.errors || 0}
+                    </div>
+                    <div className="text-sm text-red-600">Errors</div>
+                  </div>
+                </div>
+
+                {/* Changes Made */}
+                {migrationResult.results?.changes && migrationResult.results.changes.length > 0 && (
+                  <div className="bg-white rounded border p-4">
+                    <h4 className="font-semibold mb-2">📊 Changes Made (First 5):</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {migrationResult.results.changes.slice(0, 5).map((change: any, index: number) => (
+                        <div key={index} className="text-sm p-2 bg-gray-50 rounded border">
+                          <div className="font-medium">{change.title}</div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            Views: {change.before.views} → {change.after.views} |
+                            Likes: {change.before.likes} → {change.after.likes} |
+                            Ratings: {change.before.ratings} → {change.after.ratings}
+                          </div>
+                        </div>
+                      ))}
+                      {migrationResult.results.changes.length > 5 && (
+                        <div className="text-sm text-gray-500 text-center">
+                          ... and {migrationResult.results.changes.length - 5} more changes
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-xs text-gray-500">
+                  Migration completed at: {new Date(migrationResult.timestamp).toLocaleString()}
+                </div>
               </div>
             </CardContent>
           </Card>
