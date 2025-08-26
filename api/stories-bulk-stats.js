@@ -57,13 +57,29 @@ export default async function handler(req, res) {
     const statsMap = {};
     stories.forEach((story) => {
       const storyObj = story.toObject();
-      statsMap[story.storyId] = {
+      const storyStats = {
         viewCount: storyObj.viewCount || 0,
         likeCount: storyObj.likeCount || 0,
         rating: storyObj.rating || 0,
         ratingCount: storyObj.ratingCount || 0,
         commentCount: commentCountMap[story.storyId] || 0, // Use real comment count
       };
+
+      // Debug logging for specific story
+      if (story.storyId.toLowerCase().includes('amsterdam')) {
+        console.log(`[BULK STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
+          storyId: story.storyId,
+          dbViewCount: storyObj.viewCount,
+          dbLikeCount: storyObj.likeCount,
+          dbRating: storyObj.rating,
+          dbRatingCount: storyObj.ratingCount,
+          dbCommentCount: storyObj.commentCount,
+          realCommentCount: commentCountMap[story.storyId],
+          finalStats: storyStats
+        });
+      }
+
+      statsMap[story.storyId] = storyStats;
     });
 
     console.log(
