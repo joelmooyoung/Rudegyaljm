@@ -1616,6 +1616,61 @@ Check console for full details.`);
         </div>
       )}
 
+      {/* Connection Debug Info */}
+      {connectionDebug && (
+        <div className="container mx-auto px-4 py-4">
+          <Card className="mb-4 border-gray-200 bg-gray-50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="bg-gray-100 text-gray-800 border-gray-300"
+                >
+                  CONNECTION DEBUG
+                </Badge>
+                <span className="text-sm text-gray-700">
+                  Environment & Connectivity Information
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <strong>Current URL:</strong> {connectionDebug.currentURL}
+                  </div>
+                  <div>
+                    <strong>Protocol:</strong> {connectionDebug.protocol}
+                  </div>
+                  <div>
+                    <strong>Hostname:</strong> {connectionDebug.hostname}
+                  </div>
+                  <div>
+                    <strong>Port:</strong> {connectionDebug.port || 'default'}
+                  </div>
+                  <div>
+                    <strong>Online Status:</strong>
+                    <span className={connectionDebug.online ? "text-green-700 ml-1" : "text-red-700 ml-1"}>
+                      {connectionDebug.online ? "✅ Online" : "❌ Offline"}
+                    </span>
+                  </div>
+                  <div>
+                    <strong>Fetch Support:</strong>
+                    <span className={connectionDebug.fetchSupported ? "text-green-700 ml-1" : "text-red-700 ml-1"}>
+                      {connectionDebug.fetchSupported ? "✅ Supported" : "❌ Not Supported"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-500">
+                  Debug captured at: {new Date(connectionDebug.timestamp).toLocaleString()}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
         <div className="mb-6 flex flex-col md:flex-row gap-4">
