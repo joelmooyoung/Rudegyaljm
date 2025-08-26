@@ -226,7 +226,7 @@ export default async function handler(req, res) {
 
     // Get the actual view count from the raw object to ensure we read correctly
     const storyObj = story.toObject();
-    const actualViews = storyObj.viewCount || storyObj.views || 0;
+    const actualViews = storyObj.views || 0;
 
     console.log(`[STORY VIEW API DEBUG] MongoDB operation result:`, {
       found: !!story,
