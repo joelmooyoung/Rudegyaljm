@@ -225,8 +225,7 @@ export default async function handler(req, res) {
     console.log(`[STORY VIEW API DEBUG] MongoDB operation result:`, {
       found: !!story,
       storyId: story.storyId,
-      mongoResult_viewCount: story.viewCount,
-      rawObject_viewCount: storyObj.viewCount,
+      mongoResult_views: story.views,
       rawObject_views: storyObj.views,
       finalActualViews: actualViews,
       allRawFields: Object.keys(storyObj),
@@ -236,7 +235,6 @@ export default async function handler(req, res) {
     if (id.toLowerCase().includes('amsterdam')) {
       console.log(`[VIEW API] 🔍 AMSTERDAM AFTER INCREMENT:`, {
         storyId: id,
-        rawViewCount: storyObj.viewCount,
         rawViews: storyObj.views,
         finalActualViews: actualViews,
         mongoUpdateResult: updateResult
