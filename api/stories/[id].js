@@ -99,7 +99,7 @@ export default async function handler(req, res) {
           });
         }
 
-        // Update fields
+        // Update fields with correct schema field mapping
         const updateFields = {};
         if (req.body.title !== undefined) updateFields.title = req.body.title;
         if (req.body.content !== undefined)
@@ -117,10 +117,12 @@ export default async function handler(req, res) {
           updateFields.accessLevel = req.body.accessLevel;
         if (req.body.hasOwnProperty("isPublished"))
           updateFields.published = req.body.isPublished;
+
+        // FIX: Map admin interface field names to correct schema field names
         if (req.body.hasOwnProperty("viewCount"))
-          updateFields.viewCount = req.body.viewCount;
+          updateFields.views = req.body.viewCount; // Schema field is 'views', not 'viewCount'
         if (req.body.hasOwnProperty("rating"))
-          updateFields.rating = req.body.rating;
+          updateFields.averageRating = req.body.rating; // Schema field is 'averageRating', not 'rating'
         if (req.body.hasOwnProperty("ratingCount"))
           updateFields.ratingCount = req.body.ratingCount;
         if (req.body.hasOwnProperty("commentCount"))
@@ -129,6 +131,13 @@ export default async function handler(req, res) {
           updateFields.likeCount = req.body.likeCount;
         if (req.body.audioUrl !== undefined)
           updateFields.audioUrl = req.body.audioUrl;
+
+        console.log(`[STORY API] Mapped update fields:`, {
+          received: Object.keys(req.body),
+          mapped: Object.keys(updateFields),
+          viewCountMapping: req.body.hasOwnProperty("viewCount") ? `${req.body.viewCount} -> views` : "not provided",
+          ratingMapping: req.body.hasOwnProperty("rating") ? `${req.body.rating} -> averageRating` : "not provided"
+        });
 
         updateFields.updatedAt = new Date();
 
