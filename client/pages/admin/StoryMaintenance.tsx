@@ -682,7 +682,7 @@ export default function StoryMaintenance({
         try {
           // Try to parse as JSON
           const result = JSON.parse(responseText);
-          console.log("📊 Database diagnostic result:", result);
+          console.log("��� Database diagnostic result:", result);
           setDiagnostic(result);
         } catch (parseError) {
           console.error("❌ JSON parsing failed:", parseError);
@@ -822,10 +822,12 @@ export default function StoryMaintenance({
       if (error instanceof Error) {
         errorMessage = error.message;
         // Check for specific error types
-        if (error.message.includes("text@[native code]")) {
-          errorMessage = "Response body reading error - please try again";
-        } else if (error.message.includes("NetworkError") || error.message.includes("fetch")) {
+        if (errorMessage.includes("text@[native code]") || errorMessage.includes("body is disturbed") || errorMessage.includes("locked")) {
+          errorMessage = "Response body reading error - the API response was consumed multiple times. Please try again.";
+        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch")) {
           errorMessage = "Network connection error - check your internet connection";
+        } else if (errorMessage.includes("404") || errorMessage.includes("not found")) {
+          errorMessage = "Migration API endpoint not found - check server configuration";
         }
       }
 
