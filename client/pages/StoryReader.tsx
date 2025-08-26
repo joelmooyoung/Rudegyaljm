@@ -369,6 +369,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   }, [story.id, user.id]);
 
   const handleLike = async () => {
+    // Check if user is logged in
+    if (!user || !user.id) {
+      alert("Please log in to like stories");
+      return;
+    }
+
     try {
       const action = isLiked ? "unlike" : "like";
       const response = await fetch(`/api/stories/${story.id}/like`, {
@@ -404,6 +410,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
 
   const handleRating = async (rating: number) => {
     if (isSubmittingRating) return;
+
+    // Check if user is logged in
+    if (!user || !user.id) {
+      alert("Please log in to rate stories");
+      return;
+    }
 
     setIsSubmittingRating(true);
 
