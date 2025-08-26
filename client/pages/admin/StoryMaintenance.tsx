@@ -1075,6 +1075,13 @@ export default function StoryMaintenance({
               </Button>
               <Button
                 variant="outline"
+                onClick={simpleConnectivityTest}
+                className="bg-cyan-50 hover:bg-cyan-100 border-cyan-200 text-cyan-700"
+              >
+                🔍 Simple Test
+              </Button>
+              <Button
+                variant="outline"
                 onClick={testMigrationAPI}
                 className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
               >
