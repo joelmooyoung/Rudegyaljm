@@ -40,6 +40,7 @@ import {
   Copy,
   Link,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { Story } from "@shared/api";
 
