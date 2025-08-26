@@ -731,6 +731,36 @@ export default function StoryMaintenance({
     }
   };
 
+  const showConnectionDebug = () => {
+    const debugInfo = {
+      currentURL: window.location.href,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      port: window.location.port,
+      pathname: window.location.pathname,
+      userAgent: navigator.userAgent,
+      online: navigator.onLine,
+      fetchSupported: typeof fetch !== 'undefined',
+      xhrSupported: typeof XMLHttpRequest !== 'undefined',
+      timestamp: new Date().toISOString(),
+    };
+
+    setConnectionDebug(debugInfo);
+    console.log("🔍 Connection Debug Info:", debugInfo);
+
+    alert(`🔍 Connection Debug Info:
+
+URL: ${debugInfo.currentURL}
+Protocol: ${debugInfo.protocol}
+Hostname: ${debugInfo.hostname}
+Port: ${debugInfo.port || 'default'}
+Online: ${debugInfo.online}
+Fetch Support: ${debugInfo.fetchSupported}
+XHR Support: ${debugInfo.xhrSupported}
+
+Check console for full details.`);
+  };
+
   const simpleConnectivityTest = async () => {
     try {
       console.log("🔍 Running simple connectivity test...");
