@@ -278,7 +278,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               ? commentsResponseData
               : commentsResponseData?.data || commentsResponseData || [];
 
-            console.log("��� Loaded comments for story:", commentsData);
+            console.log("📝 Loaded comments for story:", commentsData);
             console.log(`📝 Total comments from API: ${commentsData.length}`);
 
             // Check which comments are being filtered out
@@ -691,6 +691,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                   <span>
                     {(storyStats.viewCount || 0).toLocaleString()} views
                   </span>
+                  <button
+                    onClick={() => refreshStoryStats(true)}
+                    className="ml-2 text-xs text-muted-foreground hover:text-foreground"
+                    title="Refresh stats"
+                  >
+                    🔄
+                  </button>
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-rating-star fill-current" />
