@@ -68,9 +68,9 @@ export default async function handler(req, res) {
           `(includeUnpublished: ${includeUnpublished})`,
         );
 
-        // For admin requests, include essential fields for proper display
+        // For admin requests, include essential fields for proper display - use correct schema field names
         const selectFields = includeUnpublished
-          ? "storyId title author excerpt category tags accessLevel published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt image audioUrl"
+          ? "storyId title author excerpt category tags accessLevel published featured views likeCount averageRating ratingCount commentCount createdAt updatedAt image audioUrl"
           : "-__v";
 
         // For admin requests, add pagination to improve performance
