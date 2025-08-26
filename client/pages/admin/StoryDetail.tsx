@@ -652,12 +652,36 @@ export default function StoryDetail({
       if (mode === "add") {
         storyData.id = Date.now().toString();
         storyData.createdAt = new Date();
+        await onSave(storyData);
+      } else {
+        // For edit mode, use the individual story API
+        console.log(`[STORY DETAIL] Updating story ${formData.id} via API`);
+
+        const response = await fetch(`/api/stories/${formData.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(storyData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Failed to update story: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("[STORY DETAIL] ✅ Story updated via API:", result);
+
+        // Call onSave to refresh the parent component
+        await onSave(storyData);
       }
 
-      await onSave(storyData);
       console.log("[STORY DETAIL] Save completed successfully");
     } catch (error) {
       console.error("[STORY DETAIL] Save failed:", error);
+      // Show error to user
+      alert(`Failed to save story: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
