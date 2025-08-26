@@ -441,7 +441,7 @@ export default function StoryMaintenance({
         responseText.length,
         ")",
       );
-      console.log("📄 Basic test response text:", responseText);
+      console.log("��� Basic test response text:", responseText);
       console.log("📄 Response starts with:", responseText.substring(0, 50));
       console.log(
         "📄 Response ends with:",
@@ -745,6 +745,9 @@ export default function StoryMaintenance({
           "Content-Type": "application/json",
         },
       });
+
+      console.log("📡 Migration response status:", response.status, response.statusText);
+      console.log("📡 Migration response headers:", Object.fromEntries(response.headers.entries()));
 
       // Read response as text first to avoid double consumption
       const responseText = await response.text();
