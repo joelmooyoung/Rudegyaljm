@@ -68,9 +68,9 @@ export default async function handler(req, res) {
           `(includeUnpublished: ${includeUnpublished})`,
         );
 
-        // For admin requests, use minimal fields for fast loading
+        // For admin requests, include essential fields for proper display
         const selectFields = includeUnpublished
-          ? "storyId title author category published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt"
+          ? "storyId title author excerpt category tags accessLevel published featured viewCount likeCount rating ratingCount commentCount createdAt updatedAt image audioUrl"
           : "-__v";
 
         // For admin requests, add pagination to improve performance
