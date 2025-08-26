@@ -108,12 +108,29 @@ export default async function handler(req, res) {
         `[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`,
       );
       console.log(
+        `[STORY VIEW API DEBUG] Raw object viewCount: ${storyObj.viewCount}`,
+      );
+      console.log(
+        `[STORY VIEW API DEBUG] Raw object views: ${storyObj.views}`,
+      );
+      console.log(
         `[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`,
       );
       console.log(
         `[STORY VIEW API DEBUG] All story fields:`,
         Object.keys(storyObj),
       );
+
+      // Debug for Amsterdam story specifically
+      if (id.toLowerCase().includes('amsterdam')) {
+        console.log(`[VIEW API] 🔍 AMSTERDAM BEFORE INCREMENT:`, {
+          storyId: id,
+          rawViewCount: storyObj.viewCount,
+          rawViews: storyObj.views,
+          actualViewCount: actualViewCount,
+          propertyAccess: currentStory.viewCount
+        });
+      }
 
       // Only initialize if the field truly doesn't exist - don't overwrite existing values
       if (actualViewCount === undefined || actualViewCount === null) {
