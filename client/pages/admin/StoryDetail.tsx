@@ -669,6 +669,45 @@ export default function StoryDetail({
     return div.textContent || div.innerText || "";
   };
 
+  // Show loading state while fetching complete story details
+  if (isLoadingStory) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
+          <h2 className="text-lg font-semibold mb-2">Loading Story Details</h2>
+          <p className="text-muted-foreground">Fetching complete story information...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if loading failed
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="h-12 w-12 text-destructive mx-auto mb-4">
+            <FileText className="h-full w-full" />
+          </div>
+          <h2 className="text-lg font-semibold mb-2 text-destructive">Failed to Load Story</h2>
+          <p className="text-muted-foreground mb-4">{loadError}</p>
+          <div className="flex gap-2 justify-center">
+            <Button variant="outline" onClick={onBack}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Stories
+            </Button>
+            {story?.id && (
+              <Button onClick={() => fetchCompleteStory(story.id)}>
+                Try Again
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -687,7 +726,7 @@ export default function StoryDetail({
             </div>
             <Button
               onClick={handleSave}
-              disabled={isSaving || isUploadingAudio}
+              disabled={isSaving || isUploadingAudio || isLoadingStory}
               className="bg-primary hover:bg-primary/90"
             >
               {isSaving ? (
