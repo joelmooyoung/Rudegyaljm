@@ -126,6 +126,20 @@ export default async function handler(req, res) {
             return result;
         });
 
+        // For admin requests, get total count for pagination
+        let totalCount = transformedStories.length;
+        let hasMore = false;
+
+        if (includeUnpublished) {
+          try {
+            totalCount = await Story.countDocuments(query);
+            hasMore = skip + transformedStories.length < totalCount;
+            console.log(`[STORIES API] Page ${page} of ${Math.ceil(totalCount / limit)} (${skip + 1}-${skip + transformedStories.length} of ${totalCount})`);
+          } catch (countError) {
+            console.warn(`[STORIES API] Failed to get total count:`, countError);
+          }
+        }
+
         console.log(
           `[STORIES API] Found ${transformedStories.length} stories (includeUnpublished: ${includeUnpublished})`,
         );
@@ -152,7 +166,24 @@ export default async function handler(req, res) {
           console.log(`[STORIES API] Removed problematic stories, returning ${transformedStories.length} stories`);
         }
 
-        return res.status(200).json(transformedStories);
+        // Return paginated response for admin requests
+        if (includeUnpublished) {
+          return res.status(200).json({
+            stories: transformedStories,
+            pagination: {
+              page: page,
+              limit: limit,
+              total: totalCount,
+              totalPages: Math.ceil(totalCount / limit),
+              hasMore: hasMore,
+              hasNext: hasMore,
+              hasPrev: page > 1
+            }
+          });
+        } else {
+          // Return simple array for public requests
+          return res.status(200).json(transformedStories);
+        }
 
       case "POST":
         console.log(`[STORIES API] Creating new story`);
