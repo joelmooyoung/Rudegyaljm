@@ -1404,6 +1404,44 @@ export function createServer() {
     }
   });
 
+  // Add migration test route
+  app.get("/api/test-migration", async (req, res) => {
+    console.log(`[SERVER] Migration test request`);
+    try {
+      const { default: handler } = await import("../api/test-migration.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(
+        `[SERVER] Failed to import test-migration handler:`,
+        error,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Migration test handler not available",
+        error: error.message,
+      });
+    }
+  });
+
+  // Add story stats migration route
+  app.post("/api/migrate-story-stats", async (req, res) => {
+    console.log(`[SERVER] Story stats migration request`);
+    try {
+      const { default: handler } = await import("../api/migrate-story-stats.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(
+        `[SERVER] Failed to import migrate-story-stats handler:`,
+        error,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Story stats migration handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Catch-all handler for other API routes (must be at the end)
   app.all("/api/*", async (req, res) => {
     console.log(`[SERVER] Catch-all API request: ${req.method} ${req.path}`);
