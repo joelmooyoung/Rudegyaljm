@@ -140,6 +140,10 @@ export default async function handler(req, res) {
 
         console.log(`[STORY API] ✅ Updated story ${id}`);
 
+        // Add cache invalidation headers to signal clients to clear cache
+        res.setHeader("X-Cache-Invalidate", "landing-stats,story-stats");
+        res.setHeader("X-Cache-Reason", "story-updated");
+
         return res.status(200).json({
           success: true,
           message: "Story updated successfully",
@@ -149,6 +153,10 @@ export default async function handler(req, res) {
             author: updatedStory.author,
             category: updatedStory.category,
             isPublished: updatedStory.published,
+          },
+          cacheInvalidation: {
+            clearCache: true,
+            reason: "story-updated",
           },
         });
 
