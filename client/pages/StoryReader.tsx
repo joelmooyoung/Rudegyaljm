@@ -313,39 +313,46 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         // Load current story statistics
         await refreshStoryStats();
 
-        // Load user interaction (rating and like status)
-        try {
-          const interactionResponse = await fetch(
-            `/api/stories/${story.id}/user-interaction?userId=${encodeURIComponent(user.id)}`,
-          );
+        // Load user interaction (rating and like status) - only for logged-in users
+        if (user && user.id) {
+          try {
+            const interactionResponse = await fetch(
+              `/api/stories/${story.id}/user-interaction?userId=${encodeURIComponent(user.id)}`,
+            );
 
-          // Read response text once and reuse it
-          const interactionResponseText = await interactionResponse.text();
+            // Read response text once and reuse it
+            const interactionResponseText = await interactionResponse.text();
 
-          if (interactionResponse.ok) {
-            let interactionData;
-            try {
-              interactionData = JSON.parse(interactionResponseText);
-              setUserRating(interactionData.rating || 0);
-              setIsLiked(interactionData.liked || false);
-            } catch (jsonError) {
+            if (interactionResponse.ok) {
+              let interactionData;
+              try {
+                interactionData = JSON.parse(interactionResponseText);
+                setUserRating(interactionData.rating || 0);
+                setIsLiked(interactionData.liked || false);
+              } catch (jsonError) {
+                console.warn(
+                  "Failed to parse interaction JSON response:",
+                  interactionResponseText,
+                );
+                setUserRating(0);
+                setIsLiked(false);
+              }
+            } else {
               console.warn(
-                "Failed to parse interaction JSON response:",
+                `User interaction API returned ${interactionResponse.status}:`,
                 interactionResponseText,
               );
               setUserRating(0);
               setIsLiked(false);
             }
-          } else {
-            console.warn(
-              `User interaction API returned ${interactionResponse.status}:`,
-              interactionResponseText,
-            );
+          } catch (interactionError) {
+            console.error("Error loading user interaction:", interactionError);
             setUserRating(0);
             setIsLiked(false);
           }
-        } catch (interactionError) {
-          console.error("Error loading user interaction:", interactionError);
+        } else {
+          // Set default values for non-logged-in users
+          console.log("User not logged in, setting default interaction values");
           setUserRating(0);
           setIsLiked(false);
         }
