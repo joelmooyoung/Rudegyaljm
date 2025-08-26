@@ -116,9 +116,11 @@ export default async function handler(req, res) {
     }
 
     console.log(`[STORY STATS API] ✅ Production stats for story ${id}:`, {
-      viewCount: storyObj.viewCount,
+      schemaViews: storyObj.views,
+      responseViewCount: storyObj.views || 0,
+      schemaAverageRating: storyObj.averageRating,
+      responseRating: storyObj.averageRating || 0,
       likeCount: storyObj.likeCount,
-      rating: storyObj.rating,
       commentCount: storyObj.commentCount,
       realCommentCount: realCommentCount,
     });
@@ -126,9 +128,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: storyObj.views || 0, // Use views field (correct schema field)
+        viewCount: storyObj.views || 0, // Schema field: views -> response: viewCount
         likeCount: storyObj.likeCount || 0,
-        rating: storyObj.rating || 0,
+        rating: storyObj.averageRating || 0, // Schema field: averageRating -> response: rating
         ratingCount: storyObj.ratingCount || 0,
         commentCount: realCommentCount, // Use real comment count
       },
