@@ -11,11 +11,17 @@ class RequestCache {
   ): Promise<T> {
     const cacheKey = this.createCacheKey(url, options);
 
-    // Check if we have a cached result that's still valid
-    const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < cached.ttl) {
-      console.log(`📋 Using cached result for ${url}`);
-      return cached.data;
+    // If TTL is 0, bypass cache entirely (force refresh)
+    if (ttlMs === 0) {
+      console.log(`🔄 Force refresh: bypassing cache for ${url}`);
+      this.cache.delete(cacheKey); // Clear any existing cache entry
+    } else {
+      // Check if we have a cached result that's still valid
+      const cached = this.cache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < cached.ttl) {
+        console.log(`📋 Using cached result for ${url}`);
+        return cached.data;
+      }
     }
 
     // Check if there's already a pending request for this URL
