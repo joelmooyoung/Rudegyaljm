@@ -59,6 +59,12 @@ export default function StoryMaintenance({
   const [isRunningDiagnostic, setIsRunningDiagnostic] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalStories, setTotalStories] = useState(0);
+  const [pageSize] = useState(20);
+
   const categories = ["all", "Romance", "Mystery", "Comedy", "Fantasy"];
 
   // Fetch stories from server with real stats
@@ -685,7 +691,7 @@ export default function StoryMaintenance({
     } catch (error) {
       console.error("❌ Error running diagnostic:", error);
       console.error(
-        "❌ Error stack:",
+        "��� Error stack:",
         error instanceof Error ? error.stack : "No stack trace",
       );
       alert(
