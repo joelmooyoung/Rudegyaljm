@@ -895,6 +895,45 @@ Check console for full details.`);
     }
   };
 
+  const testFieldMapping = async () => {
+    try {
+      console.log("🔧 Testing field mapping fixes...");
+
+      const response = await fetch("/api/test-field-mapping", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("🔧 Field mapping test result:", result);
+
+        if (result.success && result.testResults) {
+          let alertMessage = "✅ Field Mapping Test Results:\n\n";
+
+          result.testResults.forEach((test, index) => {
+            alertMessage += `Story ${index + 1}: ${test.title}\n`;
+            alertMessage += `  Raw Views: ${test.rawFields.views || 'null'} → Mapped ViewCount: ${test.mappedFields.viewCount}\n`;
+            alertMessage += `  Raw Rating: ${test.rawFields.averageRating || 'null'} → Mapped Rating: ${test.mappedFields.rating}\n`;
+            alertMessage += `  Rating Count: ${test.rawFields.ratingCount || 0}\n\n`;
+          });
+
+          alert(alertMessage);
+        } else {
+          alert(`❌ Field mapping test failed: ${result.message}`);
+        }
+      } else {
+        const errorText = await response.text();
+        alert(`❌ Field mapping test request failed: ${response.status} ${response.statusText}\n\nResponse: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("❌ Error testing field mapping:", error);
+      alert(`❌ Error testing field mapping: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  };
+
   const runStatsMigration = async () => {
     if (!confirm("This will update all story stats (views, likes, ratings) to match the views count. Stories with views under 100 will be set to 454. Continue?")) {
       return;
