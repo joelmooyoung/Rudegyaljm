@@ -135,15 +135,15 @@ export default async function handler(req, res) {
       // Only initialize if the field truly doesn't exist - don't overwrite existing values
       if (actualViewCount === undefined || actualViewCount === null) {
         console.log(
-          `[STORY VIEW API DEBUG] Field doesn't exist, initializing viewCount to 0`,
+          `[STORY VIEW API DEBUG] Views field doesn't exist, initializing to 0`,
         );
         await Story.findOneAndUpdate(
           { storyId: id },
-          { $set: { viewCount: 0 } },
+          { $set: { views: 0 } },
         );
       } else {
         console.log(
-          `[STORY VIEW API DEBUG] ViewCount exists (${actualViewCount}), proceeding with increment`,
+          `[STORY VIEW API DEBUG] Views field exists (${actualViewCount}), proceeding with increment`,
         );
       }
 
