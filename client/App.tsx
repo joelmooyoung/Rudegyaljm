@@ -420,7 +420,7 @@ const App = () => {
         console.log("[STORY SAVE] ✅ Story saved successfully:", savedStory);
         alert("Story saved successfully!");
         // Trigger refresh of admin stories and navigate back
-        setRefreshAdminStories(prev => prev + 1);
+        setRefreshAdminStories((prev) => prev + 1);
         setCurrentView("admin-stories");
       } else {
         const errorData = await response.text();
