@@ -36,10 +36,10 @@ export default async function handler(req, res) {
 
     await connectToDatabase();
 
-    // Get stories with stats in one query
+    // Get stories with stats in one query - use correct schema field names
     const stories = await Story.find({
       storyId: { $in: ids },
-    }).select("storyId viewCount likeCount rating ratingCount commentCount");
+    }).select("storyId views likeCount averageRating ratingCount commentCount");
 
     // Get real comment counts in one aggregation
     const commentCounts = await Comment.aggregate([
