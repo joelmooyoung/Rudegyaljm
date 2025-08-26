@@ -79,12 +79,15 @@ export default async function handler(req, res) {
         queryId: id,
         storyId: story?.storyId,
         dbViewCount: storyObj.viewCount,
+        dbViews: storyObj.views,
+        finalViewCount: storyObj.viewCount || storyObj.views || 0,
         dbLikeCount: storyObj.likeCount,
         dbRating: storyObj.rating,
         dbRatingCount: storyObj.ratingCount,
         dbCommentCount: storyObj.commentCount,
         realCommentCount: realCommentCount,
         mongoQuery: { storyId: id },
+        allFields: Object.keys(storyObj),
         timestamp: new Date().toISOString()
       });
     }
