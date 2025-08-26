@@ -136,12 +136,15 @@ export default function StoryMaintenance({
 
         // Handle different response formats and ensure data is an array
         let storiesArray = [];
+        let paginationData = null;
+
         if (Array.isArray(data)) {
           storiesArray = data;
           debugData.sourceFormat = "direct array";
         } else if (data && Array.isArray(data.stories)) {
           storiesArray = data.stories;
-          debugData.sourceFormat = "data.stories array";
+          paginationData = data.pagination;
+          debugData.sourceFormat = "data.stories array with pagination";
         } else if (data && Array.isArray(data.data)) {
           storiesArray = data.data;
           debugData.sourceFormat = "data.data array";
@@ -153,6 +156,13 @@ export default function StoryMaintenance({
         }
 
         debugData.extractedCount = storiesArray.length;
+
+        // Update pagination state if we have pagination data
+        if (paginationData) {
+          setTotalStories(paginationData.total);
+          setTotalPages(paginationData.totalPages);
+          console.log(`📄 Pagination: Page ${paginationData.page} of ${paginationData.totalPages} (${paginationData.total} total stories)`);
+        }
 
         // Convert date strings back to Date objects and fetch real stats in bulk
         const validStories = storiesArray.filter(
