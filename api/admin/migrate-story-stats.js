@@ -24,7 +24,17 @@ export default async function handler(req, res) {
   try {
     console.log("[STATS MIGRATION API] Starting one-time stats migration...");
 
-    await connectToDatabase();
+    try {
+      await connectToDatabase();
+      console.log("[STATS MIGRATION API] Database connected successfully");
+    } catch (dbError) {
+      console.error("[STATS MIGRATION API] Database connection failed:", dbError);
+      return res.status(500).json({
+        success: false,
+        message: "Database connection failed",
+        error: dbError.message,
+      });
+    }
 
     // Get all stories
     const stories = await Story.find({});
