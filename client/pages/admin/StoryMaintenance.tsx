@@ -370,7 +370,7 @@ export default function StoryMaintenance({
 
   const runDirectTest = async () => {
     try {
-      console.log("⚡ Running direct API test (inline route)...");
+      console.log("��� Running direct API test (inline route)...");
 
       const response = await fetch("/api/test-direct");
       console.log(
@@ -1468,6 +1468,80 @@ export default function StoryMaintenance({
                   );
                 })
                 .filter(Boolean)}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {!isLoading && filteredStories.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                      className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNum)}
+                          isActive={currentPage === pageNum}
+                          className="cursor-pointer"
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+
+                  {totalPages > 5 && currentPage < totalPages - 2 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="cursor-pointer"
+                        >
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+                      className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+
+          {/* Pagination Info */}
+          {!isLoading && totalStories > 0 && (
+            <div className="text-center mt-4 text-sm text-muted-foreground">
+              Showing {Math.min(pageSize, filteredStories.length)} of {filteredStories.length} filtered stories
+              {totalStories !== filteredStories.length && ` (${totalStories} total)`}
+              {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
             </div>
           )}
 
