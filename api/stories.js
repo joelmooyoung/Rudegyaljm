@@ -115,10 +115,10 @@ export default async function handler(req, res) {
             category: story.category || "Unknown",
             accessLevel: story.accessLevel || "free",
             isPublished: Boolean(story.published),
-            // Use production statistics from MongoDB (use raw object to ensure we get actual values)
-            rating: Number(storyObj.rating || 0),
+            // Use production statistics from MongoDB with correct field mapping
+            rating: Number(storyObj.averageRating || 0), // Schema field: averageRating -> response: rating
             ratingCount: Number(storyObj.ratingCount || 0),
-            viewCount: Number(storyObj.viewCount || 0),
+            viewCount: Number(storyObj.views || 0), // Schema field: views -> response: viewCount
             commentCount: Number(commentCount || 0),
             likeCount: Number(storyObj.likeCount || 0),
             image: story.image || null, // Include actual image for previews
