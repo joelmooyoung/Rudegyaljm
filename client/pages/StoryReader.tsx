@@ -328,11 +328,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           setComments([]);
         }
 
-        // Load current story statistics (with delay to ensure DB consistency after view increment)
-        // Use a small delay to ensure the database has been updated after view increment
-        setTimeout(() => {
-          refreshStoryStats(true);
-        }, 1000); // 1 second delay to allow DB to be consistent
+        // Load current story statistics (force fresh to sync with admin grid)
+        await refreshStoryStats(true);
 
         // Load user interaction (rating and like status) - only for logged-in users
         // Use the stats endpoint which already returns user interaction data
