@@ -53,7 +53,7 @@ export default async function handler(req, res) {
           commentCount = story.commentCount || 0;
         }
 
-        // Transform story data with complete details
+        // Transform story data with complete details and correct field mapping
         const storyObj = story.toObject();
         const completeStory = {
           id: story.storyId,
@@ -65,9 +65,10 @@ export default async function handler(req, res) {
           category: story.category || "Unknown",
           accessLevel: story.accessLevel || "free",
           isPublished: Boolean(story.published),
-          rating: Number(storyObj.rating || 0),
+          // FIX: Map schema fields to expected response fields
+          rating: Number(storyObj.averageRating || 0), // Schema field is 'averageRating'
           ratingCount: Number(storyObj.ratingCount || 0),
-          viewCount: Number(storyObj.viewCount || 0),
+          viewCount: Number(storyObj.views || 0), // Schema field is 'views'
           commentCount: Number(commentCount || 0),
           likeCount: Number(storyObj.likeCount || 0),
           image: story.image || null,
@@ -79,6 +80,15 @@ export default async function handler(req, res) {
             ? story.updatedAt.toISOString()
             : new Date().toISOString(),
         };
+
+        console.log(`[STORY API] Story field mapping:`, {
+          schemaViews: storyObj.views,
+          responseViewCount: completeStory.viewCount,
+          schemaAverageRating: storyObj.averageRating,
+          responseRating: completeStory.rating,
+          schemaRatingCount: storyObj.ratingCount,
+          responseRatingCount: completeStory.ratingCount
+        });
 
         console.log(
           `[STORY API] ✅ Returning complete story details for ${id}`,
