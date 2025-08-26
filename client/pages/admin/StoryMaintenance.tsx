@@ -746,30 +746,39 @@ export default function StoryMaintenance({
         },
       });
 
+      // Read response as text first to avoid double consumption
+      const responseText = await response.text();
+      console.log("📄 Migration response text:", responseText);
+
       if (response.ok) {
-        const result = await response.json();
-        console.log("📊 Migration result:", result);
-        setMigrationResult(result);
+        try {
+          const result = JSON.parse(responseText);
+          console.log("📊 Migration result:", result);
+          setMigrationResult(result);
 
-        if (result.success) {
-          alert(
-            `✅ Migration completed successfully!\n\n` +
-            `Stories processed: ${result.results.summary.totalProcessed}\n` +
-            `Updated: ${result.results.summary.successfulUpdates}\n` +
-            `Skipped: ${result.results.summary.skippedNoChanges}\n` +
-            `Errors: ${result.results.summary.errors}\n` +
-            `Views set to 454: ${result.results.summary.viewsSetTo454}`
-          );
+          if (result.success) {
+            alert(
+              `✅ Migration completed successfully!\n\n` +
+              `Stories processed: ${result.results.summary.totalProcessed}\n` +
+              `Updated: ${result.results.summary.successfulUpdates}\n` +
+              `Skipped: ${result.results.summary.skippedNoChanges}\n` +
+              `Errors: ${result.results.summary.errors}\n` +
+              `Views set to 454: ${result.results.summary.viewsSetTo454}`
+            );
 
-          // Refresh the stories list to show updated stats
-          fetchStories();
-        } else {
-          alert(`❌ Migration failed: ${result.message}`);
+            // Refresh the stories list to show updated stats
+            fetchStories();
+          } else {
+            alert(`❌ Migration failed: ${result.message}`);
+          }
+        } catch (parseError) {
+          console.error("❌ Failed to parse migration response:", parseError);
+          console.error("❌ Response text:", responseText);
+          alert(`Migration response parsing failed: ${parseError instanceof Error ? parseError.message : "JSON parse error"}`);
         }
       } else {
-        const errorText = await response.text();
-        console.error("❌ Migration error response:", errorText);
-        alert(`Migration failed: ${response.status} ${response.statusText}`);
+        console.error("❌ Migration error response:", responseText);
+        alert(`Migration failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText.substring(0, 200)}`);
       }
     } catch (error) {
       console.error("❌ Error running migration:", error);
