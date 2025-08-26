@@ -53,31 +53,32 @@ export default async function handler(req, res) {
       commentCountMap[item._id] = item.count;
     });
 
-    // Build response with actual stats
+    // Build response with actual stats - correct field mapping
     const statsMap = {};
     stories.forEach((story) => {
       const storyObj = story.toObject();
       const storyStats = {
-        viewCount: storyObj.views || 0, // Use views field (correct schema field)
+        viewCount: storyObj.views || 0, // Schema field: views -> response: viewCount
         likeCount: storyObj.likeCount || 0,
-        rating: storyObj.rating || 0,
+        rating: storyObj.averageRating || 0, // Schema field: averageRating -> response: rating
         ratingCount: storyObj.ratingCount || 0,
         commentCount: commentCountMap[story.storyId] || 0, // Use real comment count
       };
 
       // Debug logging for specific story
-      if (story.storyId.toLowerCase().includes("amsterdam")) {
-        console.log(`[BULK STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
+      if (story.storyId.toLowerCase().includes("amsterdam") || story.storyId.toLowerCase().includes("cram")) {
+        console.log(`[BULK STATS API] 🔍 STORY DEBUG (${story.storyId}):`, {
           storyId: story.storyId,
-          dbViews: storyObj.views,
-          finalViewCount: storyObj.views || 0,
-          dbLikeCount: storyObj.likeCount,
-          dbRating: storyObj.rating,
-          dbRatingCount: storyObj.ratingCount,
+          schemaViews: storyObj.views,
+          responseViewCount: storyStats.viewCount,
+          schemaAverageRating: storyObj.averageRating,
+          responseRating: storyStats.rating,
+          schemaRatingCount: storyObj.ratingCount,
+          responseRatingCount: storyStats.ratingCount,
           dbCommentCount: storyObj.commentCount,
           realCommentCount: commentCountMap[story.storyId],
           finalStats: storyStats,
-          allFields: Object.keys(storyObj),
+          allSchemaFields: Object.keys(storyObj),
         });
       }
 
