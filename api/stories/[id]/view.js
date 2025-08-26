@@ -152,6 +152,14 @@ export default async function handler(req, res) {
         `[STORY VIEW API DEBUG] About to increment viewCount from ${actualViewCount}...`,
       );
 
+      // Check current values before update
+      const beforeUpdate = await Story.findOne({ storyId: id });
+      const beforeObj = beforeUpdate.toObject();
+      console.log(`[STORY VIEW API DEBUG] BEFORE UPDATE:`, {
+        viewCount: beforeObj.viewCount,
+        views: beforeObj.views
+      });
+
       // Increment both viewCount and views fields for consistency
       const updateResult = await Story.updateOne(
         { storyId: id },
@@ -163,6 +171,15 @@ export default async function handler(req, res) {
           $set: { updatedAt: new Date() },
         },
       );
+
+      // Check values immediately after update
+      const afterUpdate = await Story.findOne({ storyId: id });
+      const afterObj = afterUpdate.toObject();
+      console.log(`[STORY VIEW API DEBUG] AFTER UPDATE:`, {
+        viewCount: afterObj.viewCount,
+        views: afterObj.views,
+        updateResult: updateResult
+      });
 
       console.log(
         `[STORY VIEW API DEBUG] MongoDB updateOne result:`,
