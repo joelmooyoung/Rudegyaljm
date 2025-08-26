@@ -73,6 +73,22 @@ export default async function handler(req, res) {
       },
     });
 
+    // Additional debug for Amsterdam story
+    if (id.toLowerCase().includes('amsterdam')) {
+      console.log(`[SINGLE STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
+        queryId: id,
+        storyId: story?.storyId,
+        dbViewCount: storyObj.viewCount,
+        dbLikeCount: storyObj.likeCount,
+        dbRating: storyObj.rating,
+        dbRatingCount: storyObj.ratingCount,
+        dbCommentCount: storyObj.commentCount,
+        realCommentCount: realCommentCount,
+        mongoQuery: { storyId: id },
+        timestamp: new Date().toISOString()
+      });
+    }
+
     if (!story) {
       return res.status(404).json({
         success: false,
