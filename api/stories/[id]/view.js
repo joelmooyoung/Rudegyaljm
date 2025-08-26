@@ -222,6 +222,17 @@ export default async function handler(req, res) {
       allRawFields: Object.keys(storyObj),
     });
 
+    // Debug for Amsterdam story specifically after increment
+    if (id.toLowerCase().includes('amsterdam')) {
+      console.log(`[VIEW API] 🔍 AMSTERDAM AFTER INCREMENT:`, {
+        storyId: id,
+        rawViewCount: storyObj.viewCount,
+        rawViews: storyObj.views,
+        finalActualViews: actualViews,
+        mongoUpdateResult: updateResult
+      });
+    }
+
     console.log(
       `[STORY VIEW API] ✅ View recorded for story ${id}. New view count: ${actualViews}`,
     );
