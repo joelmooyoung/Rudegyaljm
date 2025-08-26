@@ -111,7 +111,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       setStoryStats((prev) => ({
         rating: stats.averageRating || stats.rating || prev.rating,
         ratingCount: stats.ratingCount || prev.ratingCount,
-        viewCount: stats.viewCount || prev.viewCount,
+        // Only update viewCount if the API returns a higher count (prevents overwriting fresh increments)
+        viewCount: Math.max(stats.viewCount || 0, prev.viewCount || 0),
         commentCount: stats.commentCount || prev.commentCount,
         likeCount:
           stats.likeCount !== undefined ? stats.likeCount : prev.likeCount,
