@@ -823,28 +823,58 @@ export default function StoryMaintenance({
       return;
     }
 
+    let response;
     try {
       setIsMigrating(true);
       console.log("🔄 Running stats migration...");
+      console.log("🔗 Fetching: /api/migrate-story-stats");
 
-      const response = await fetch("/api/migrate-story-stats", {
+      response = await fetch("/api/migrate-story-stats", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
       });
 
-      console.log("📡 Migration response status:", response.status, response.statusText);
-      console.log("📡 Migration response headers:", Object.fromEntries(response.headers.entries()));
+      console.log("📡 Migration response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries()),
+        url: response.url
+      });
 
-      // Read response as text first to avoid double consumption
-      const responseText = await response.text();
-      console.log("📄 Migration response text:", responseText);
+      // Check if response body is readable
+      if (!response.body) {
+        throw new Error("Migration API returned no response body");
+      }
+
+      // Clone response before reading to avoid consumption issues
+      const responseClone = response.clone();
+      let responseText = "";
+
+      try {
+        responseText = await responseClone.text();
+        console.log("📄 Migration response text received:", {
+          length: responseText.length,
+          preview: responseText.substring(0, 300),
+          isEmpty: responseText.trim() === ""
+        });
+      } catch (textError) {
+        console.error("❌ Error reading migration response text:", textError);
+        throw new Error(`Failed to read migration response: ${textError.message}`);
+      }
 
       if (response.ok) {
+        if (!responseText || responseText.trim() === "") {
+          alert("❌ Migration API returned empty response");
+          return;
+        }
+
         try {
           const result = JSON.parse(responseText);
-          console.log("📊 Migration result:", result);
+          console.log("📊 Migration result parsed:", result);
           setMigrationResult(result);
 
           if (result.success) {
@@ -864,8 +894,8 @@ export default function StoryMaintenance({
           }
         } catch (parseError) {
           console.error("❌ Failed to parse migration response:", parseError);
-          console.error("❌ Response text:", responseText);
-          alert(`Migration response parsing failed: ${parseError instanceof Error ? parseError.message : "JSON parse error"}`);
+          console.error("❌ Response text that failed to parse:", responseText);
+          alert(`Migration response parsing failed: ${parseError instanceof Error ? parseError.message : "JSON parse error"}\n\nResponse preview: ${responseText.substring(0, 200)}`);
         }
       } else {
         console.error("❌ Migration error response:", responseText);
@@ -873,27 +903,30 @@ export default function StoryMaintenance({
       }
     } catch (error) {
       console.error("❌ Error running migration:", error);
-      console.error("❌ Error details:", {
-        name: error instanceof Error ? error.name : "Unknown",
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : "No stack trace",
-      });
+      console.error("❌ Error type:", typeof error);
+      console.error("❌ Error constructor:", error.constructor.name);
+      console.error("❌ Error stack:", error.stack);
 
-      // More detailed error message
+      // Enhanced error analysis
       let errorMessage = "Unknown error";
+      let technicalDetails = "";
+
       if (error instanceof Error) {
         errorMessage = error.message;
-        // Check for specific error types
+        technicalDetails = `Name: ${error.name}, Constructor: ${error.constructor.name}`;
+
         if (errorMessage.includes("text@[native code]") || errorMessage.includes("body is disturbed") || errorMessage.includes("locked")) {
-          errorMessage = "Response body reading error - the API response was consumed multiple times. Please try again.";
-        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch")) {
-          errorMessage = "Network connection error - check your internet connection";
+          errorMessage = "Response body reading error - the server response was consumed multiple times. This is a browser/fetch API issue.";
+        } else if (errorMessage.includes("NetworkError") || errorMessage.includes("fetch") || errorMessage.includes("Failed to fetch")) {
+          errorMessage = "Network connection error - check your internet connection or server availability";
+        } else if (errorMessage.includes("TypeError") && errorMessage.includes("text")) {
+          errorMessage = "Response text reading error - the response body may be corrupted or already consumed";
         } else if (errorMessage.includes("404") || errorMessage.includes("not found")) {
           errorMessage = "Migration API endpoint not found - check server configuration";
         }
       }
 
-      alert(`Error running migration: ${errorMessage}\n\nCheck the browser console for more details.`);
+      alert(`Error running migration: ${errorMessage}\n\nTechnical details: ${technicalDetails}\n\nCheck the browser console for full details.`);
     } finally {
       setIsMigrating(false);
     }
