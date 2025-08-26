@@ -126,7 +126,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       stats: {
-        viewCount: storyObj.viewCount || storyObj.views || 0, // Use same fallback as view API
+        viewCount: storyObj.views || 0, // Use views field (correct schema field)
         likeCount: storyObj.likeCount || 0,
         rating: storyObj.rating || 0,
         ratingCount: storyObj.ratingCount || 0,
