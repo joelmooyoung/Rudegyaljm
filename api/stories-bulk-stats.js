@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       };
 
       // Debug logging for specific story
-      if (story.storyId.toLowerCase().includes('amsterdam')) {
+      if (story.storyId.toLowerCase().includes("amsterdam")) {
         console.log(`[BULK STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
           storyId: story.storyId,
           dbViews: storyObj.views,
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
           dbCommentCount: storyObj.commentCount,
           realCommentCount: commentCountMap[story.storyId],
           finalStats: storyStats,
-          allFields: Object.keys(storyObj)
+          allFields: Object.keys(storyObj),
         });
       }
 

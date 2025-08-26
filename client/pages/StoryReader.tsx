@@ -78,7 +78,10 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             );
           }
         } catch (jsonError) {
-          console.warn("Failed to parse story JSON response:", storyResponseText);
+          console.warn(
+            "Failed to parse story JSON response:",
+            storyResponseText,
+          );
         }
       } else {
         console.warn(
@@ -97,7 +100,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
   const refreshStoryStats = async (forceRefresh = false) => {
     try {
       const cacheTTL = forceRefresh ? 0 : 2000; // 2 seconds cache TTL (down from 10), 0 to bypass cache
-      console.log(`📊 [${story.title}] Refreshing stats - forceRefresh: ${forceRefresh}, cacheTTL: ${cacheTTL}`);
+      console.log(
+        `📊 [${story.title}] Refreshing stats - forceRefresh: ${forceRefresh}, cacheTTL: ${cacheTTL}`,
+      );
       const response = await requestCache.fetch(
         `/api/stories/${encodeURIComponent(story.id)}/stats`,
         {},
@@ -105,14 +110,25 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
       );
 
       const stats = response.data || response.stats || response;
-      console.log(`📊 Stats from API (cached: ${!forceRefresh}, TTL: ${cacheTTL}ms):`, stats);
+      console.log(
+        `📊 Stats from API (cached: ${!forceRefresh}, TTL: ${cacheTTL}ms):`,
+        stats,
+      );
       console.log(`📊 Setting commentCount to: ${stats.commentCount}`);
-      console.log(`📊 StoryReader stats update - viewCount: ${stats.viewCount}, rating: ${stats.averageRating || stats.rating}, likes: ${stats.likeCount}`);
+      console.log(
+        `📊 StoryReader stats update - viewCount: ${stats.viewCount}, rating: ${stats.averageRating || stats.rating}, likes: ${stats.likeCount}`,
+      );
 
       setStoryStats((prev) => {
-        const newViewCount = Math.max(stats.viewCount || 0, prev.viewCount || 0);
-        const viewCountAction = newViewCount > (prev.viewCount || 0) ? 'UPDATED' : 'PRESERVED';
-        console.log(`📊 ViewCount: API=${stats.viewCount}, Previous=${prev.viewCount}, New=${newViewCount} (${viewCountAction})`);
+        const newViewCount = Math.max(
+          stats.viewCount || 0,
+          prev.viewCount || 0,
+        );
+        const viewCountAction =
+          newViewCount > (prev.viewCount || 0) ? "UPDATED" : "PRESERVED";
+        console.log(
+          `📊 ViewCount: API=${stats.viewCount}, Previous=${prev.viewCount}, New=${newViewCount} (${viewCountAction})`,
+        );
 
         return {
           rating: stats.averageRating || stats.rating || prev.rating,
@@ -233,7 +249,11 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             try {
               if (error instanceof Error) {
                 errorMessage = error.message;
-              } else if (error && typeof error === 'object' && 'message' in error) {
+              } else if (
+                error &&
+                typeof error === "object" &&
+                "message" in error
+              ) {
                 errorMessage = String(error.message);
               } else {
                 errorMessage = String(error);
@@ -823,7 +843,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                   </Button>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium">Rate this story:</span>
+                    <span className="text-sm font-medium">
+                      Rate this story:
+                    </span>
                     {renderStars(true)}
                   </div>
                 </div>
@@ -831,7 +853,9 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
                 <div className="flex items-center gap-6 p-4 bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Heart className="h-4 w-4" />
-                    <span className="text-sm">Log in to like and rate stories</span>
+                    <span className="text-sm">
+                      Log in to like and rate stories
+                    </span>
                   </div>
                 </div>
               )}

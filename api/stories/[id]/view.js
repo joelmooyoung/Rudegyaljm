@@ -107,9 +107,7 @@ export default async function handler(req, res) {
       console.log(
         `[STORY VIEW API DEBUG] Current story views: ${currentStory.views} (property access)`,
       );
-      console.log(
-        `[STORY VIEW API DEBUG] Raw object views: ${storyObj.views}`,
-      );
+      console.log(`[STORY VIEW API DEBUG] Raw object views: ${storyObj.views}`);
       console.log(
         `[STORY VIEW API DEBUG] Actual views from raw object: ${actualViewCount}`,
       );
@@ -119,12 +117,12 @@ export default async function handler(req, res) {
       );
 
       // Debug for Amsterdam story specifically
-      if (id.toLowerCase().includes('amsterdam')) {
+      if (id.toLowerCase().includes("amsterdam")) {
         console.log(`[VIEW API] 🔍 AMSTERDAM BEFORE INCREMENT:`, {
           storyId: id,
           rawViews: storyObj.views,
           actualViewCount: actualViewCount,
-          propertyAccess: currentStory.views
+          propertyAccess: currentStory.views,
         });
       }
 
@@ -133,10 +131,7 @@ export default async function handler(req, res) {
         console.log(
           `[STORY VIEW API DEBUG] Views field doesn't exist, initializing to 0`,
         );
-        await Story.findOneAndUpdate(
-          { storyId: id },
-          { $set: { views: 0 } },
-        );
+        await Story.findOneAndUpdate({ storyId: id }, { $set: { views: 0 } });
       } else {
         console.log(
           `[STORY VIEW API DEBUG] Views field exists (${actualViewCount}), proceeding with increment`,
@@ -152,7 +147,7 @@ export default async function handler(req, res) {
       const beforeUpdate = await Story.findOne({ storyId: id });
       const beforeObj = beforeUpdate.toObject();
       console.log(`[STORY VIEW API DEBUG] BEFORE UPDATE:`, {
-        views: beforeObj.views
+        views: beforeObj.views,
       });
 
       // Increment only the views field (correct schema field)
@@ -171,7 +166,7 @@ export default async function handler(req, res) {
       const afterObj = afterUpdate.toObject();
       console.log(`[STORY VIEW API DEBUG] AFTER UPDATE:`, {
         views: afterObj.views,
-        updateResult: updateResult
+        updateResult: updateResult,
       });
 
       console.log(
@@ -232,12 +227,12 @@ export default async function handler(req, res) {
     });
 
     // Debug for Amsterdam story specifically after increment
-    if (id.toLowerCase().includes('amsterdam')) {
+    if (id.toLowerCase().includes("amsterdam")) {
       console.log(`[VIEW API] 🔍 AMSTERDAM AFTER INCREMENT:`, {
         storyId: id,
         rawViews: storyObj.views,
         finalActualViews: actualViews,
-        mongoUpdateResult: updateResult
+        mongoUpdateResult: updateResult,
       });
     }
 

@@ -74,7 +74,7 @@ export default async function handler(req, res) {
     });
 
     // Additional debug for Amsterdam story
-    if (id.toLowerCase().includes('amsterdam')) {
+    if (id.toLowerCase().includes("amsterdam")) {
       console.log(`[SINGLE STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
         queryId: id,
         storyId: story?.storyId,
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         realCommentCount: realCommentCount,
         mongoQuery: { storyId: id },
         allFields: Object.keys(storyObj),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
