@@ -730,6 +730,55 @@ export default function StoryMaintenance({
     }
   };
 
+  const runStatsMigration = async () => {
+    if (!confirm("This will update all story stats (views, likes, ratings) to match the views count. Stories with views under 100 will be set to 454. Continue?")) {
+      return;
+    }
+
+    try {
+      setIsMigrating(true);
+      console.log("🔄 Running stats migration...");
+
+      const response = await fetch("/api/admin/migrate-story-stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("📊 Migration result:", result);
+        setMigrationResult(result);
+
+        if (result.success) {
+          alert(
+            `✅ Migration completed successfully!\n\n` +
+            `Stories processed: ${result.results.summary.totalProcessed}\n` +
+            `Updated: ${result.results.summary.successfulUpdates}\n` +
+            `Skipped: ${result.results.summary.skippedNoChanges}\n` +
+            `Errors: ${result.results.summary.errors}\n` +
+            `Views set to 454: ${result.results.summary.viewsSetTo454}`
+          );
+
+          // Refresh the stories list to show updated stats
+          fetchStories();
+        } else {
+          alert(`❌ Migration failed: ${result.message}`);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error("❌ Migration error response:", errorText);
+        alert(`Migration failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("❌ Error running migration:", error);
+      alert(`Error running migration: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
   const handleDeleteStory = async (storyId: string) => {
     if (
       confirm(
