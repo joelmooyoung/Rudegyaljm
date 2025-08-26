@@ -381,7 +381,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
     };
 
     loadInitialData();
-  }, [story.id, user.id]);
+  }, [story.id, user?.id]);
 
   const handleLike = async () => {
     // Check if user is logged in
