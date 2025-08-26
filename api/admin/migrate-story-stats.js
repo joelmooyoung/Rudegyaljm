@@ -4,10 +4,11 @@ import { Story } from "../../models/index.js";
 export default async function handler(req, res) {
   console.log(`[STATS MIGRATION API] ${req.method} /api/admin/migrate-story-stats`);
 
-  // Enable CORS
+  // Enable CORS and set content type
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Content-Type", "application/json");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
