@@ -765,7 +765,7 @@ export default function StoryMaintenance({
       setIsMigrating(true);
       console.log("🔄 Running stats migration...");
 
-      const response = await fetch("/api/admin/migrate-story-stats", {
+      const response = await fetch("/api/migrate-story-stats", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
