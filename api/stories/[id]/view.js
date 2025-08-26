@@ -105,16 +105,13 @@ export default async function handler(req, res) {
       const actualViewCount = storyObj.views || 0;
 
       console.log(
-        `[STORY VIEW API DEBUG] Current story viewCount: ${currentStory.viewCount} (property access)`,
-      );
-      console.log(
-        `[STORY VIEW API DEBUG] Raw object viewCount: ${storyObj.viewCount}`,
+        `[STORY VIEW API DEBUG] Current story views: ${currentStory.views} (property access)`,
       );
       console.log(
         `[STORY VIEW API DEBUG] Raw object views: ${storyObj.views}`,
       );
       console.log(
-        `[STORY VIEW API DEBUG] Actual viewCount from raw object: ${actualViewCount}`,
+        `[STORY VIEW API DEBUG] Actual views from raw object: ${actualViewCount}`,
       );
       console.log(
         `[STORY VIEW API DEBUG] All story fields:`,
@@ -125,10 +122,9 @@ export default async function handler(req, res) {
       if (id.toLowerCase().includes('amsterdam')) {
         console.log(`[VIEW API] 🔍 AMSTERDAM BEFORE INCREMENT:`, {
           storyId: id,
-          rawViewCount: storyObj.viewCount,
           rawViews: storyObj.views,
           actualViewCount: actualViewCount,
-          propertyAccess: currentStory.viewCount
+          propertyAccess: currentStory.views
         });
       }
 
