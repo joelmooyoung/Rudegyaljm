@@ -325,8 +325,8 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           setComments([]);
         }
 
-        // Load current story statistics
-        await refreshStoryStats();
+        // Load current story statistics (force fresh to sync with admin grid)
+        await refreshStoryStats(true);
 
         // Load user interaction (rating and like status) - only for logged-in users
         // Use the stats endpoint which already returns user interaction data
