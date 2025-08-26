@@ -766,41 +766,58 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Like and Rating */}
-              <div className="flex items-center gap-6">
-                <Button
-                  variant={isLiked ? "default" : "outline"}
-                  onClick={handleLike}
-                  className={isLiked ? "bg-red-500 hover:bg-red-600" : ""}
-                >
-                  <Heart
-                    className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`}
-                  />
-                  {isLiked ? "Liked" : "Like"}
-                </Button>
+              {user && user.id ? (
+                <div className="flex items-center gap-6">
+                  <Button
+                    variant={isLiked ? "default" : "outline"}
+                    onClick={handleLike}
+                    className={isLiked ? "bg-red-500 hover:bg-red-600" : ""}
+                  >
+                    <Heart
+                      className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                    />
+                    {isLiked ? "Liked" : "Like"}
+                  </Button>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium">Rate this story:</span>
-                  {renderStars(true)}
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium">Rate this story:</span>
+                    {renderStars(true)}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-6 p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Heart className="h-4 w-4" />
+                    <span className="text-sm">Log in to like and rate stories</span>
+                  </div>
+                </div>
+              )}
 
               {/* Comment Form */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">Add a comment:</label>
-                <Textarea
-                  placeholder="Share your thoughts about this story..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  rows={3}
-                />
-                <Button
-                  onClick={handleSubmitComment}
-                  disabled={!newComment.trim() || isSubmittingComment}
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  {isSubmittingComment ? "Posting..." : "Post Comment"}
-                </Button>
-              </div>
+              {user && user.id ? (
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Add a comment:</label>
+                  <Textarea
+                    placeholder="Share your thoughts about this story..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    rows={3}
+                  />
+                  <Button
+                    onClick={handleSubmitComment}
+                    disabled={!newComment.trim() || isSubmittingComment}
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {isSubmittingComment ? "Posting..." : "Post Comment"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                  <div className="text-sm text-muted-foreground text-center">
+                    Log in to post comments and join the discussion
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
