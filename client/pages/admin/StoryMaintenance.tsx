@@ -90,7 +90,6 @@ export default function StoryMaintenance({
       });
 
       if (response.ok) {
-<<<<<<< HEAD
         // Get response as text first to debug parsing issues
         const responseText = await response.text();
         console.log("Stories API raw response (length:", responseText.length, ")");
@@ -106,15 +105,6 @@ export default function StoryMaintenance({
           setError(`Failed to parse stories response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
           return;
         }
-=======
-        const data = await response.json();
-        console.log("🔍 [FETCH STORIES] Raw response data:", data);
-        console.log("🔍 [FETCH STORIES] Response data type:", typeof data);
-        console.log(
-          "🔍 [FETCH STORIES] Response data keys:",
-          Object.keys(data || {}),
-        );
->>>>>>> refs/remotes/origin/main
 
         // Capture debug information
         const debugData = {
