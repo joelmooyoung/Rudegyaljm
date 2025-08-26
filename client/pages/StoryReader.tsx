@@ -62,10 +62,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
         },
       );
 
+      // Read response text once and reuse it
+      const storyResponseText = await storyResponse.text();
+
       if (storyResponse.ok) {
-        const responseText = await storyResponse.text();
         try {
-          const storyResult = JSON.parse(responseText);
+          const storyResult = JSON.parse(storyResponseText);
           if (storyResult.success && storyResult.story) {
             console.log("Full story data loaded:", storyResult.story);
             setFullStory(storyResult.story);
@@ -76,12 +78,12 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             );
           }
         } catch (jsonError) {
-          console.warn("Failed to parse story JSON response:", responseText);
+          console.warn("Failed to parse story JSON response:", storyResponseText);
         }
       } else {
         console.warn(
           `Story API returned ${storyResponse.status}:`,
-          await storyResponse.text(),
+          storyResponseText,
         );
       }
     } catch (error) {
@@ -138,11 +140,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             },
           );
 
+          // Read response text once and reuse it
+          const viewResponseText = await viewResponse.text();
+
           // Update local view count
           if (viewResponse.ok) {
-            const responseText = await viewResponse.text();
             try {
-              const viewResult = JSON.parse(responseText);
+              const viewResult = JSON.parse(viewResponseText);
               // Use the actual view count from API response
               const newViewCount =
                 viewResult.newViewCount ||
@@ -157,13 +161,13 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
             } catch (jsonError) {
               console.warn(
                 "Failed to parse view count JSON response:",
-                responseText,
+                viewResponseText,
               );
             }
           } else {
             console.warn(
               `View count API returned ${viewResponse.status}:`,
-              await viewResponse.text(),
+              viewResponseText,
             );
           }
         } catch (viewError) {
@@ -189,31 +193,26 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               }),
             });
 
+            // Read response text once and reuse it
+            const readResponseText = await readResponse.text();
+
             if (readResponse.ok) {
-              const responseText = await readResponse.text();
               try {
-                const readResult = JSON.parse(responseText);
+                const readResult = JSON.parse(readResponseText);
                 console.log(
                   `📚 Story read recorded: User ${user.username} has read ${readResult.data?.totalReads || "unknown"} stories total`,
                 );
               } catch (jsonError) {
                 console.warn(
                   "Failed to parse read response JSON:",
-                  responseText,
+                  readResponseText,
                 );
                 console.log(`📚 Story read recorded for user ${user.username}`);
               }
             } else {
-              try {
-                const errorText = await readResponse.text();
-                console.warn(
-                  `User story read API returned ${readResponse.status}: ${errorText}`,
-                );
-              } catch (textError) {
-                console.warn(
-                  `User story read API returned ${readResponse.status}, could not read error response`,
-                );
-              }
+              console.warn(
+                `User story read API returned ${readResponse.status}: ${readResponseText}`,
+              );
             }
           } catch (error) {
             console.error("Failed to record story read:", error);
