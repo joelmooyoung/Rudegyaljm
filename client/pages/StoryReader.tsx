@@ -234,15 +234,18 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           const commentsResponse = await fetch(
             `/api/comments?storyId=${encodeURIComponent(story.id)}`,
           );
+
+          // Read response text once and reuse it
+          const commentsResponseText = await commentsResponse.text();
+
           if (commentsResponse.ok) {
-            const responseText = await commentsResponse.text();
             let commentsResponseData;
             try {
-              commentsResponseData = JSON.parse(responseText);
+              commentsResponseData = JSON.parse(commentsResponseText);
             } catch (jsonError) {
               console.warn(
                 "Failed to parse comments JSON response:",
-                responseText,
+                commentsResponseText,
               );
               commentsResponseData = [];
             }
@@ -299,7 +302,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           } else {
             console.warn(
               `Comments API returned ${commentsResponse.status}:`,
-              await commentsResponse.text(),
+              commentsResponseText,
             );
             setComments([]);
           }
@@ -316,17 +319,20 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           const interactionResponse = await fetch(
             `/api/stories/${story.id}/user-interaction?userId=${encodeURIComponent(user.id)}`,
           );
+
+          // Read response text once and reuse it
+          const interactionResponseText = await interactionResponse.text();
+
           if (interactionResponse.ok) {
-            const responseText = await interactionResponse.text();
             let interactionData;
             try {
-              interactionData = JSON.parse(responseText);
+              interactionData = JSON.parse(interactionResponseText);
               setUserRating(interactionData.rating || 0);
               setIsLiked(interactionData.liked || false);
             } catch (jsonError) {
               console.warn(
                 "Failed to parse interaction JSON response:",
-                responseText,
+                interactionResponseText,
               );
               setUserRating(0);
               setIsLiked(false);
@@ -334,7 +340,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
           } else {
             console.warn(
               `User interaction API returned ${interactionResponse.status}:`,
-              await interactionResponse.text(),
+              interactionResponseText,
             );
             setUserRating(0);
             setIsLiked(false);
