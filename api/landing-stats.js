@@ -22,7 +22,8 @@ export default async function handler(req, res) {
   const skip = (page - 1) * limit;
 
   // Option to include real comment counts
-  const includeRealCommentCounts = req.query.includeRealCommentCounts === "true";
+  const includeRealCommentCounts =
+    req.query.includeRealCommentCounts === "true";
 
   try {
     console.log("[LANDING STATS] Executing optimized combined query...");
@@ -44,102 +45,106 @@ export default async function handler(req, res) {
     const startTime = Date.now();
 
     // First get basic data without dependencies
-    const [totalStories, stories, aggregateStats, totalComments] = await Promise.all([
-      // Total published stories count
-      storiesCollection.countDocuments({ published: true }),
+    const [totalStories, stories, aggregateStats, totalComments] =
+      await Promise.all([
+        // Total published stories count
+        storiesCollection.countDocuments({ published: true }),
 
-      // Paginated stories with optimized projection
-      storiesCollection
-        .find(
-          { published: true },
-          {
-            projection: {
-              storyId: 1,
-              title: 1,
-              author: 1,
-              category: 1,
-              accessLevel: 1,
-              createdAt: 1,
-              viewCount: 1,
-              views: 1,
-              likeCount: 1,
-              commentCount: 1,
-              rating: 1,
-              averageRating: 1,
-              ratingCount: 1,
-              image: 1,
-              tags: 1,
-              excerpt: 1,
-              // Only include what we need, heavy fields automatically excluded
-            },
-          },
-        )
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .toArray(),
-
-      // Aggregate statistics in one efficient query
-      storiesCollection
-        .aggregate([
-          { $match: { published: true } },
-          {
-            $group: {
-              _id: null,
-              totalLikes: { $sum: { $ifNull: ["$likeCount", 0] } },
-              totalViews: {
-                $sum: {
-                  $max: [
-                    { $ifNull: ["$viewCount", 0] },
-                    { $ifNull: ["$views", 0] }
-                  ]
-                }
+        // Paginated stories with optimized projection
+        storiesCollection
+          .find(
+            { published: true },
+            {
+              projection: {
+                storyId: 1,
+                title: 1,
+                author: 1,
+                category: 1,
+                accessLevel: 1,
+                createdAt: 1,
+                viewCount: 1,
+                views: 1,
+                likeCount: 1,
+                commentCount: 1,
+                rating: 1,
+                averageRating: 1,
+                ratingCount: 1,
+                image: 1,
+                tags: 1,
+                excerpt: 1,
+                // Only include what we need, heavy fields automatically excluded
               },
-              totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } },
             },
-          },
-        ])
-        .toArray(),
+          )
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray(),
 
-      // Total comments across all published stories
-      commentsCollection
-        .aggregate([
-          {
-            $lookup: {
-              from: "stories",
-              localField: "storyId",
-              foreignField: "storyId",
-              as: "story",
+        // Aggregate statistics in one efficient query
+        storiesCollection
+          .aggregate([
+            { $match: { published: true } },
+            {
+              $group: {
+                _id: null,
+                totalLikes: { $sum: { $ifNull: ["$likeCount", 0] } },
+                totalViews: {
+                  $sum: {
+                    $max: [
+                      { $ifNull: ["$viewCount", 0] },
+                      { $ifNull: ["$views", 0] },
+                    ],
+                  },
+                },
+                totalRatings: { $sum: { $ifNull: ["$ratingCount", 0] } },
+              },
             },
-          },
-          { $match: { "story.published": true } },
-          { $count: "totalComments" }
-        ])
-        .toArray(),
-    ]);
+          ])
+          .toArray(),
 
-    // Now get comment counts if requested (depends on stories being loaded)
-    const commentCounts = includeRealCommentCounts && stories?.length > 0
-      ? await commentsCollection
+        // Total comments across all published stories
+        commentsCollection
           .aggregate([
             {
-              $match: {
-                storyId: {
-                  $in: stories.map(story => story.storyId).filter(id => id)
-                }
-              }
+              $lookup: {
+                from: "stories",
+                localField: "storyId",
+                foreignField: "storyId",
+                as: "story",
+              },
             },
-            { $group: { _id: "$storyId", count: { $sum: 1 } } },
+            { $match: { "story.published": true } },
+            { $count: "totalComments" },
           ])
-          .toArray()
-      : [];
+          .toArray(),
+      ]);
+
+    // Now get comment counts if requested (depends on stories being loaded)
+    const commentCounts =
+      includeRealCommentCounts && stories?.length > 0
+        ? await commentsCollection
+            .aggregate([
+              {
+                $match: {
+                  storyId: {
+                    $in: stories
+                      .map((story) => story.storyId)
+                      .filter((id) => id),
+                  },
+                },
+              },
+              { $group: { _id: "$storyId", count: { $sum: 1 } } },
+            ])
+            .toArray()
+        : [];
 
     const queryTime = Date.now() - startTime;
     console.log(`[LANDING STATS] All queries completed in ${queryTime}ms`);
 
     // Process results
     const totalPages = Math.ceil(totalStories / limit);
-    
+
     // Create comment count map for efficient lookup
     const commentCountMap = {};
     if (includeRealCommentCounts && commentCounts) {
@@ -154,7 +159,9 @@ export default async function handler(req, res) {
       id: story.storyId || story._id.toString(),
       title: story.title || "Untitled",
       content: "Click to read this captivating story...", // Placeholder
-      excerpt: story.excerpt || `A ${story.category || "passionate"} story by ${story.author}`,
+      excerpt:
+        story.excerpt ||
+        `A ${story.category || "passionate"} story by ${story.author}`,
       author: story.author || "Unknown Author",
       category: story.category || "Romance",
       tags: story.tags || ["passion", "romance"],
@@ -169,9 +176,9 @@ export default async function handler(req, res) {
       ratingCount: story.ratingCount || 0,
       likeCount: story.likeCount || 0,
       // Use real comment count if available, otherwise fall back to stored count
-      commentCount: includeRealCommentCounts 
-        ? (commentCountMap[story.storyId] || 0)
-        : (story.commentCount || 0),
+      commentCount: includeRealCommentCounts
+        ? commentCountMap[story.storyId] || 0
+        : story.commentCount || 0,
       image: story.image || null,
       audioUrl: null, // Excluded for performance
     }));
@@ -198,7 +205,7 @@ export default async function handler(req, res) {
     console.log(`[LANDING STATS] ✅ Returning optimized data:`, {
       storiesCount: transformedStories.length,
       aggregateStats: stats,
-      queryTime: `${queryTime}ms`
+      queryTime: `${queryTime}ms`,
     });
 
     return res.json({
@@ -210,14 +217,13 @@ export default async function handler(req, res) {
       performance: {
         queryTime: queryTime,
         queriesOptimized: 5, // Number of queries combined into parallel execution
-        includeRealCommentCounts: includeRealCommentCounts
+        includeRealCommentCounts: includeRealCommentCounts,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error("[LANDING STATS] Error:", error);
-    
+
     // Provide fallback response
     return res.status(500).json({
       success: false,
@@ -229,9 +235,9 @@ export default async function handler(req, res) {
           totalLikes: 270,
           totalViews: 52401,
           totalRatings: 1314,
-          totalComments: 41
-        }
-      }
+          totalComments: 41,
+        },
+      },
     });
   }
 }

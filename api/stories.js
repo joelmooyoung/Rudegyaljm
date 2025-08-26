@@ -57,11 +57,16 @@ export default async function handler(req, res) {
         console.log(`[STORIES API] Fetching stories`);
 
         // Check if request includes admin parameter to get all stories (published and unpublished)
-        const includeUnpublished = req.query.admin === 'true' || req.query.includeUnpublished === 'true';
+        const includeUnpublished =
+          req.query.admin === "true" || req.query.includeUnpublished === "true";
 
         // For admin requests, get all stories; for public requests, only published
         const query = includeUnpublished ? {} : { published: true };
-        console.log(`[STORIES API] Query filter:`, query, `(includeUnpublished: ${includeUnpublished})`);
+        console.log(
+          `[STORIES API] Query filter:`,
+          query,
+          `(includeUnpublished: ${includeUnpublished})`,
+        );
 
         // For admin requests, use minimal fields for fast loading
         const selectFields = includeUnpublished
@@ -216,8 +221,8 @@ export default async function handler(req, res) {
           },
           cacheInvalidation: {
             clearCache: true,
-            reason: "story-created"
-          }
+            reason: "story-created",
+          },
         });
 
       case "PUT":
@@ -294,8 +299,8 @@ export default async function handler(req, res) {
           },
           cacheInvalidation: {
             clearCache: true,
-            reason: "story-updated"
-          }
+            reason: "story-updated",
+          },
         });
 
       case "DELETE":
@@ -330,8 +335,8 @@ export default async function handler(req, res) {
           message: "Story deleted successfully",
           cacheInvalidation: {
             clearCache: true,
-            reason: "story-deleted"
-          }
+            reason: "story-deleted",
+          },
         });
 
       default:

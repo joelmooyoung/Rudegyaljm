@@ -35,11 +35,11 @@ export default async function handler(req, res) {
     // Test 1: Count all stories
     const totalCount = await Story.countDocuments({});
     console.log(`[TEST] Total stories in database: ${totalCount}`);
-    
+
     // Test 2: Count published stories
     const publishedCount = await Story.countDocuments({ published: true });
     console.log(`[TEST] Published stories: ${publishedCount}`);
-    
+
     // Test 3: Count unpublished stories
     const unpublishedCount = await Story.countDocuments({ published: false });
     console.log(`[TEST] Unpublished stories: ${unpublishedCount}`);
@@ -56,7 +56,9 @@ export default async function handler(req, res) {
     const publicStories = await Story.find(publicQuery)
       .sort({ createdAt: -1 })
       .select("-__v");
-    console.log(`[TEST] Public query returned: ${publicStories.length} stories`);
+    console.log(
+      `[TEST] Public query returned: ${publicStories.length} stories`,
+    );
 
     // Test 6: Get sample stories with titles and published status
     const sampleStories = await Story.find({})
@@ -64,16 +66,21 @@ export default async function handler(req, res) {
       .sort({ createdAt: -1 })
       .limit(15);
 
-    console.log(`[TEST] Sample stories:`, sampleStories.map(s => ({
-      id: s.storyId,
-      title: s.title,
-      published: s.published,
-      author: s.author
-    })));
+    console.log(
+      `[TEST] Sample stories:`,
+      sampleStories.map((s) => ({
+        id: s.storyId,
+        title: s.title,
+        published: s.published,
+        author: s.author,
+      })),
+    );
 
     // Test 7: Check if there's any limit being applied
     const allStoriesNoLimit = await Story.find({}).sort({ createdAt: -1 });
-    console.log(`[TEST] All stories without limit: ${allStoriesNoLimit.length}`);
+    console.log(
+      `[TEST] All stories without limit: ${allStoriesNoLimit.length}`,
+    );
 
     return res.status(200).json({
       success: true,
@@ -83,24 +90,23 @@ export default async function handler(req, res) {
         unpublishedCount,
         adminQueryCount: adminStories.length,
         publicQueryCount: publicStories.length,
-        allStoriesNoLimit: allStoriesNoLimit.length
+        allStoriesNoLimit: allStoriesNoLimit.length,
       },
-      sampleStories: sampleStories.map(story => ({
+      sampleStories: sampleStories.map((story) => ({
         id: story.storyId,
         title: story.title,
         published: story.published,
         author: story.author,
-        createdAt: story.createdAt
+        createdAt: story.createdAt,
       })),
       analysis: {
         database_connected: dbConnection.isConnected,
         admin_query_used: "{}",
         public_query_used: "{ published: true }",
         sort_used: "{ createdAt: -1 }",
-        select_used: "-__v"
-      }
+        select_used: "-__v",
+      },
     });
-
   } catch (error) {
     console.error(`[TEST STORIES API] Error:`, error);
     return res.status(500).json({

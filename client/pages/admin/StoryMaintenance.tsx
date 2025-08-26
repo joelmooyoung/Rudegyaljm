@@ -73,8 +73,24 @@ export default function StoryMaintenance({
 
       // Add admin parameter to get all stories (published and unpublished)
       const apiUrl = `${baseUrl}?admin=true`;
+      console.log("🔍 [FETCH STORIES] Making request to:", apiUrl);
+      console.log("🔍 [FETCH STORIES] Full URL breakdown:", {
+        hostname: window.location.hostname,
+        isBuilderPreview,
+        baseUrl,
+        finalUrl: apiUrl,
+      });
+
       const response = await fetch(apiUrl);
+      console.log("🔍 [FETCH STORIES] Response details:", {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        headers: Array.from(response.headers.entries()),
+      });
+
       if (response.ok) {
+<<<<<<< HEAD
         // Get response as text first to debug parsing issues
         const responseText = await response.text();
         console.log("Stories API raw response (length:", responseText.length, ")");
@@ -90,34 +106,45 @@ export default function StoryMaintenance({
           setError(`Failed to parse stories response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
           return;
         }
+=======
+        const data = await response.json();
+        console.log("🔍 [FETCH STORIES] Raw response data:", data);
+        console.log("🔍 [FETCH STORIES] Response data type:", typeof data);
+        console.log(
+          "🔍 [FETCH STORIES] Response data keys:",
+          Object.keys(data || {}),
+        );
+>>>>>>> refs/remotes/origin/main
 
         // Capture debug information
         const debugData = {
           apiUrl,
           responseStatus: response.status,
           responseOk: response.ok,
-          rawDataType: Array.isArray(data) ? 'array' : typeof data,
-          rawDataLength: Array.isArray(data) ? data.length : (data?.stories?.length || data?.data?.length || 'unknown'),
-          responseKeys: typeof data === 'object' ? Object.keys(data || {}) : [],
-          timestamp: new Date().toISOString()
+          rawDataType: Array.isArray(data) ? "array" : typeof data,
+          rawDataLength: Array.isArray(data)
+            ? data.length
+            : data?.stories?.length || data?.data?.length || "unknown",
+          responseKeys: typeof data === "object" ? Object.keys(data || {}) : [],
+          timestamp: new Date().toISOString(),
         };
 
         // Handle different response formats and ensure data is an array
         let storiesArray = [];
         if (Array.isArray(data)) {
           storiesArray = data;
-          debugData.sourceFormat = 'direct array';
+          debugData.sourceFormat = "direct array";
         } else if (data && Array.isArray(data.stories)) {
           storiesArray = data.stories;
-          debugData.sourceFormat = 'data.stories array';
+          debugData.sourceFormat = "data.stories array";
         } else if (data && Array.isArray(data.data)) {
           storiesArray = data.data;
-          debugData.sourceFormat = 'data.data array';
+          debugData.sourceFormat = "data.data array";
         } else {
           console.warn("Stories API returned unexpected format:", data);
           storiesArray = [];
-          debugData.sourceFormat = 'unknown/fallback';
-          debugData.warning = 'Unexpected API response format';
+          debugData.sourceFormat = "unknown/fallback";
+          debugData.warning = "Unexpected API response format";
         }
 
         debugData.extractedCount = storiesArray.length;
@@ -180,13 +207,17 @@ export default function StoryMaintenance({
         // Complete debug information
         debugData.validStoriesCount = validStories.length;
         debugData.finalStoriesCount = storiesWithDates.length;
-        debugData.publishedCount = storiesWithDates.filter(s => s.isPublished).length;
-        debugData.unpublishedCount = storiesWithDates.filter(s => !s.isPublished).length;
-        debugData.storySample = storiesWithDates.slice(0, 5).map(s => ({
+        debugData.publishedCount = storiesWithDates.filter(
+          (s) => s.isPublished,
+        ).length;
+        debugData.unpublishedCount = storiesWithDates.filter(
+          (s) => !s.isPublished,
+        ).length;
+        debugData.storySample = storiesWithDates.slice(0, 5).map((s) => ({
           id: s.id,
           title: s.title,
           isPublished: s.isPublished,
-          author: s.author
+          author: s.author,
         }));
 
         setDebugInfo(debugData);
@@ -203,7 +234,7 @@ export default function StoryMaintenance({
           responseStatus: response.status,
           responseOk: response.ok,
           error: errorMsg,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
     } catch (error) {
@@ -257,7 +288,9 @@ export default function StoryMaintenance({
   });
 
   const publishAllStories = async () => {
-    const unpublishedCount = stories.filter(story => !story.isPublished).length;
+    const unpublishedCount = stories.filter(
+      (story) => !story.isPublished,
+    ).length;
 
     if (unpublishedCount === 0) {
       alert("All stories are already published!");
@@ -266,41 +299,45 @@ export default function StoryMaintenance({
 
     if (
       confirm(
-        `Are you sure you want to publish ALL ${unpublishedCount} unpublished stories? This will make them visible to all users.`
+        `Are you sure you want to publish ALL ${unpublishedCount} unpublished stories? This will make them visible to all users.`,
       )
     ) {
       try {
         setIsPublishingAll(true);
-        console.log('🌐 Publishing all stories...');
+        console.log("🌐 Publishing all stories...");
 
-        const response = await fetch('/api/admin/publish-all-stories', {
-          method: 'POST',
+        const response = await fetch("/api/admin/publish-all-stories", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {
           const result = await response.json();
-          console.log('✅ Bulk publish result:', result);
+          console.log("✅ Bulk publish result:", result);
 
           // Update local state to reflect all stories as published
-          setStories(prevStories =>
-            prevStories.map(story => ({
+          setStories((prevStories) =>
+            prevStories.map((story) => ({
               ...story,
-              isPublished: true
-            }))
+              isPublished: true,
+            })),
           );
 
           alert(`Successfully published ${result.storiesUpdated} stories!`);
         } else {
           const errorData = await response.json();
-          console.error('❌ Failed to publish all stories:', errorData);
-          alert(`Failed to publish stories: ${errorData.message || response.statusText}`);
+          console.error("❌ Failed to publish all stories:", errorData);
+          alert(
+            `Failed to publish stories: ${errorData.message || response.statusText}`,
+          );
         }
       } catch (error) {
-        console.error('❌ Error publishing all stories:', error);
-        alert(`Error publishing stories: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error("❌ Error publishing all stories:", error);
+        alert(
+          `Error publishing stories: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       } finally {
         setIsPublishingAll(false);
       }
@@ -309,225 +346,324 @@ export default function StoryMaintenance({
 
   const runDirectTest = async () => {
     try {
-      console.log('⚡ Running direct API test (inline route)...');
+      console.log("⚡ Running direct API test (inline route)...");
 
-      const response = await fetch('/api/test-direct');
-      console.log('📡 Direct test response status:', response.status, response.statusText);
+      const response = await fetch("/api/test-direct");
+      console.log(
+        "📡 Direct test response status:",
+        response.status,
+        response.statusText,
+      );
 
       const responseText = await response.text();
-      console.log('📄 Direct test response text:', responseText);
+      console.log("📄 Direct test response text:", responseText);
 
       if (response.ok) {
         try {
           const result = JSON.parse(responseText);
-          console.log('⚡ Direct test result:', result);
-          alert(`✅ Direct route test passed!\n\nMessage: ${result.message}\nThis proves basic server routing works.`);
+          console.log("⚡ Direct test result:", result);
+          alert(
+            `✅ Direct route test passed!\n\nMessage: ${result.message}\nThis proves basic server routing works.`,
+          );
         } catch (parseError) {
-          alert(`❌ Direct test JSON parsing failed:\n\nResponse: ${responseText}\n\nThis indicates a fundamental JSON issue.`);
+          alert(
+            `❌ Direct test JSON parsing failed:\n\nResponse: ${responseText}\n\nThis indicates a fundamental JSON issue.`,
+          );
         }
       } else {
-        alert(`❌ Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`);
+        alert(
+          `❌ Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`,
+        );
       }
     } catch (error) {
-      console.error('❌ Error running direct test:', error);
-      alert(`❌ Error running direct test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("❌ Error running direct test:", error);
+      alert(
+        `❌ Error running direct test: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
   const runBasicTest = async () => {
     try {
-      console.log('🏁 Running basic API test...');
-      console.log('🏁 Current URL:', window.location.href);
-      console.log('🏁 Test URL:', window.location.origin + '/api/test-basic');
+      console.log("🏁 Running basic API test...");
+      console.log("🏁 Current URL:", window.location.href);
+      console.log("🏁 Test URL:", window.location.origin + "/api/test-basic");
 
-      const response = await fetch('/api/test-basic');
-      console.log('📡 Basic test response status:', response.status, response.statusText);
-      console.log('📡 Basic test response URL:', response.url);
-      console.log('📡 Basic test response type:', response.type);
-      console.log('📡 Basic test response headers:', Array.from(response.headers.entries()));
+      const response = await fetch("/api/test-basic");
+      console.log(
+        "📡 Basic test response status:",
+        response.status,
+        response.statusText,
+      );
+      console.log("📡 Basic test response URL:", response.url);
+      console.log("📡 Basic test response type:", response.type);
+      console.log(
+        "📡 Basic test response headers:",
+        Array.from(response.headers.entries()),
+      );
 
       const responseText = await response.text();
-      console.log('📄 Basic test response text (length:', responseText.length, ')');
-      console.log('📄 Basic test response text:', responseText);
-      console.log('📄 Response starts with:', responseText.substring(0, 50));
-      console.log('📄 Response ends with:', responseText.substring(Math.max(0, responseText.length - 50)));
+      console.log(
+        "📄 Basic test response text (length:",
+        responseText.length,
+        ")",
+      );
+      console.log("📄 Basic test response text:", responseText);
+      console.log("📄 Response starts with:", responseText.substring(0, 50));
+      console.log(
+        "📄 Response ends with:",
+        responseText.substring(Math.max(0, responseText.length - 50)),
+      );
 
       // Detailed analysis of what we received
       const analysis = {
-        isEmpty: responseText.trim() === '',
-        isHTML: responseText.trim().startsWith('<'),
-        isJSON: responseText.trim().startsWith('{') || responseText.trim().startsWith('['),
-        containsHTML: responseText.includes('<!DOCTYPE') || responseText.includes('<html'),
-        containsError: responseText.toLowerCase().includes('error'),
-        contains404: responseText.includes('404') || responseText.includes('Not Found'),
-        containsAgeVerification: responseText.toLowerCase().includes('age') && responseText.toLowerCase().includes('verification'),
-        length: responseText.length
+        isEmpty: responseText.trim() === "",
+        isHTML: responseText.trim().startsWith("<"),
+        isJSON:
+          responseText.trim().startsWith("{") ||
+          responseText.trim().startsWith("["),
+        containsHTML:
+          responseText.includes("<!DOCTYPE") || responseText.includes("<html"),
+        containsError: responseText.toLowerCase().includes("error"),
+        contains404:
+          responseText.includes("404") || responseText.includes("Not Found"),
+        containsAgeVerification:
+          responseText.toLowerCase().includes("age") &&
+          responseText.toLowerCase().includes("verification"),
+        length: responseText.length,
       };
 
-      console.log('📊 Response analysis:', analysis);
+      console.log("📊 Response analysis:", analysis);
 
       if (analysis.isEmpty) {
-        alert('❌ API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.');
+        alert(
+          "❌ API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.",
+        );
         return;
       }
 
       if (analysis.isHTML || analysis.containsHTML) {
-        alert(`❌ API returned HTML instead of JSON\n\nThis suggests:\n- API routing is not working\n- Age verification is blocking the request\n- 404 error page\n\nResponse starts with: "${responseText.substring(0, 100)}"`);
+        alert(
+          `❌ API returned HTML instead of JSON\n\nThis suggests:\n- API routing is not working\n- Age verification is blocking the request\n- 404 error page\n\nResponse starts with: "${responseText.substring(0, 100)}"`,
+        );
         return;
       }
 
       if (analysis.contains404) {
-        alert('❌ API endpoint not found (404)\n\nThe /api/test-basic endpoint is not registered properly in the server.');
+        alert(
+          "❌ API endpoint not found (404)\n\nThe /api/test-basic endpoint is not registered properly in the server.",
+        );
         return;
       }
 
       if (analysis.containsAgeVerification) {
-        alert('❌ Age verification is blocking API access\n\nThe age verification middleware is preventing API calls.');
+        alert(
+          "❌ Age verification is blocking API access\n\nThe age verification middleware is preventing API calls.",
+        );
         return;
       }
 
       if (!analysis.isJSON) {
-        alert(`❌ Response is not JSON format\n\nReceived: "${responseText.substring(0, 200)}"\n\nExpected JSON starting with { or [`);
+        alert(
+          `❌ Response is not JSON format\n\nReceived: "${responseText.substring(0, 200)}"\n\nExpected JSON starting with { or [`,
+        );
         return;
       }
 
       // Try to parse JSON
       try {
         const result = JSON.parse(responseText);
-        console.log('🏁 Basic test result:', result);
+        console.log("🏁 Basic test result:", result);
 
         if (result.success) {
-          alert(`✅ Basic API test passed!\n\nMessage: ${result.message}\nAPI routing is working correctly.`);
+          alert(
+            `✅ Basic API test passed!\n\nMessage: ${result.message}\nAPI routing is working correctly.`,
+          );
         } else {
           alert(`❌ Basic test failed: ${result.message}`);
         }
       } catch (parseError) {
-        console.error('❌ Basic test JSON parsing failed:', parseError);
-        console.error('❌ Parse error details:', {
-          name: parseError instanceof Error ? parseError.name : 'Unknown',
-          message: parseError instanceof Error ? parseError.message : 'Unknown',
-          position: parseError instanceof Error && 'position' in parseError ? parseError.position : 'Unknown'
+        console.error("❌ Basic test JSON parsing failed:", parseError);
+        console.error("❌ Parse error details:", {
+          name: parseError instanceof Error ? parseError.name : "Unknown",
+          message: parseError instanceof Error ? parseError.message : "Unknown",
+          position:
+            parseError instanceof Error && "position" in parseError
+              ? parseError.position
+              : "Unknown",
         });
 
-        alert(`❌ JSON parsing failed despite looking like JSON\n\nResponse: "${responseText}"\n\nParse Error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}\n\nThis suggests malformed JSON.`);
+        alert(
+          `❌ JSON parsing failed despite looking like JSON\n\nResponse: "${responseText}"\n\nParse Error: ${parseError instanceof Error ? parseError.message : "Unknown error"}\n\nThis suggests malformed JSON.`,
+        );
       }
-
     } catch (error) {
-      console.error('❌ Error running basic test:', error);
-      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
-      alert(`❌ Network or fetch error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nThis suggests a network connectivity issue.`);
+      console.error("❌ Error running basic test:", error);
+      console.error(
+        "❌ Error stack:",
+        error instanceof Error ? error.stack : "No stack",
+      );
+      alert(
+        `❌ Network or fetch error: ${error instanceof Error ? error.message : "Unknown error"}\n\nThis suggests a network connectivity issue.`,
+      );
     }
   };
 
   const runSimpleTest = async () => {
     try {
-      console.log('🧪 Running simple diagnostic test...');
+      console.log("🧪 Running simple diagnostic test...");
 
-      const response = await fetch('/api/test-diagnostic-simple');
-      console.log('📡 Simple test response status:', response.status, response.statusText);
-      console.log('📡 Simple test response headers:', Object.fromEntries(response.headers.entries()));
+      const response = await fetch("/api/test-diagnostic-simple");
+      console.log(
+        "📡 Simple test response status:",
+        response.status,
+        response.statusText,
+      );
+      console.log(
+        "📡 Simple test response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
 
       if (response.ok) {
         const responseText = await response.text();
-        console.log('📄 Simple test response text (length:', responseText.length, '):', responseText);
-        console.log('📄 Response text type:', typeof responseText);
-        console.log('📄 Response text first 100 chars:', responseText.substring(0, 100));
-        console.log('📄 Response text last 100 chars:', responseText.substring(Math.max(0, responseText.length - 100)));
+        console.log(
+          "📄 Simple test response text (length:",
+          responseText.length,
+          "):",
+          responseText,
+        );
+        console.log("📄 Response text type:", typeof responseText);
+        console.log(
+          "📄 Response text first 100 chars:",
+          responseText.substring(0, 100),
+        );
+        console.log(
+          "📄 Response text last 100 chars:",
+          responseText.substring(Math.max(0, responseText.length - 100)),
+        );
 
         // Check if response is empty
-        if (!responseText || responseText.trim() === '') {
-          console.error('❌ Empty response received');
-          alert('❌ Empty response received from API');
+        if (!responseText || responseText.trim() === "") {
+          console.error("❌ Empty response received");
+          alert("❌ Empty response received from API");
           return;
         }
 
         // Check if response looks like HTML (common when there's a routing issue)
-        if (responseText.trim().startsWith('<')) {
-          console.error('❌ Received HTML instead of JSON:', responseText.substring(0, 200));
-          alert('❌ Received HTML instead of JSON - check API routing');
+        if (responseText.trim().startsWith("<")) {
+          console.error(
+            "❌ Received HTML instead of JSON:",
+            responseText.substring(0, 200),
+          );
+          alert("❌ Received HTML instead of JSON - check API routing");
           return;
         }
 
         // Check if response looks like an error page
-        if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
-          console.error('❌ Received HTML error page:', responseText.substring(0, 300));
-          alert('❌ Received HTML error page instead of JSON response');
+        if (
+          responseText.includes("<!DOCTYPE") ||
+          responseText.includes("<html")
+        ) {
+          console.error(
+            "❌ Received HTML error page:",
+            responseText.substring(0, 300),
+          );
+          alert("❌ Received HTML error page instead of JSON response");
           return;
         }
 
         try {
           const result = JSON.parse(responseText);
-          console.log('🧪 Simple test result:', result);
+          console.log("🧪 Simple test result:", result);
           setTestResult(result);
 
           if (result.success) {
-            alert(`✅ Simple test passed!\n\nDatabase: ${result.database_connected ? 'Connected' : 'Disconnected'}\nStories: ${result.total_stories}\nFirst story: ${result.first_story?.title || 'None'}`);
+            alert(
+              `✅ Simple test passed!\n\nDatabase: ${result.database_connected ? "Connected" : "Disconnected"}\nStories: ${result.total_stories}\nFirst story: ${result.first_story?.title || "None"}`,
+            );
           } else {
             alert(`❌ Simple test failed: ${result.message}`);
           }
         } catch (parseError) {
-          console.error('❌ Simple test JSON parsing failed:', parseError);
-          console.error('❌ Parse error details:', {
-            name: parseError instanceof Error ? parseError.name : 'Unknown',
-            message: parseError instanceof Error ? parseError.message : 'Unknown error',
-            stack: parseError instanceof Error ? parseError.stack : 'No stack'
+          console.error("❌ Simple test JSON parsing failed:", parseError);
+          console.error("❌ Parse error details:", {
+            name: parseError instanceof Error ? parseError.name : "Unknown",
+            message:
+              parseError instanceof Error
+                ? parseError.message
+                : "Unknown error",
+            stack: parseError instanceof Error ? parseError.stack : "No stack",
           });
 
           // Try to identify what might be wrong with the JSON
           const trimmed = responseText.trim();
-          if (trimmed === '') {
-            alert('❌ Empty response - API might not be working');
-          } else if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
-            alert(`❌ Response doesn't look like JSON. Starts with: "${trimmed.substring(0, 50)}"`);
+          if (trimmed === "") {
+            alert("❌ Empty response - API might not be working");
+          } else if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+            alert(
+              `❌ Response doesn't look like JSON. Starts with: "${trimmed.substring(0, 50)}"`,
+            );
           } else {
-            alert(`❌ Invalid JSON format. Parse error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+            alert(
+              `❌ Invalid JSON format. Parse error: ${parseError instanceof Error ? parseError.message : "Unknown error"}`,
+            );
           }
         }
       } else {
         const errorText = await response.text();
-        console.error('❌ Simple test error response:', errorText);
-        alert(`Simple test failed: ${response.status} ${response.statusText}\n\nResponse: ${errorText.substring(0, 200)}`);
+        console.error("❌ Simple test error response:", errorText);
+        alert(
+          `Simple test failed: ${response.status} ${response.statusText}\n\nResponse: ${errorText.substring(0, 200)}`,
+        );
       }
     } catch (error) {
-      console.error('❌ Error running simple test:', error);
-      console.error('❌ Error details:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : 'No stack'
+      console.error("❌ Error running simple test:", error);
+      console.error("❌ Error details:", {
+        name: error instanceof Error ? error.name : "Unknown",
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : "No stack",
       });
-      alert(`Error running simple test: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Error running simple test: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
   const runDatabaseDiagnostic = async () => {
     try {
       setIsRunningDiagnostic(true);
-      console.log('🔍 Running database diagnostic...');
+      console.log("🔍 Running database diagnostic...");
 
-      const response = await fetch('/api/database-diagnostic');
-      console.log('📡 Diagnostic response status:', response.status, response.statusText);
+      const response = await fetch("/api/database-diagnostic");
+      console.log(
+        "📡 Diagnostic response status:",
+        response.status,
+        response.statusText,
+      );
 
       if (response.ok) {
         // Get response as text first to debug parsing issues
         const responseText = await response.text();
-        console.log('📄 Raw response text:', responseText);
+        console.log("📄 Raw response text:", responseText);
 
         try {
           // Try to parse as JSON
           const result = JSON.parse(responseText);
-          console.log('📊 Database diagnostic result:', result);
+          console.log("📊 Database diagnostic result:", result);
           setDiagnostic(result);
         } catch (parseError) {
-          console.error('❌ JSON parsing failed:', parseError);
-          console.error('📄 Failed to parse response:', responseText);
-          alert(`Failed to parse diagnostic response: ${parseError instanceof Error ? parseError.message : 'JSON parse error'}`);
+          console.error("❌ JSON parsing failed:", parseError);
+          console.error("📄 Failed to parse response:", responseText);
+          alert(
+            `Failed to parse diagnostic response: ${parseError instanceof Error ? parseError.message : "JSON parse error"}`,
+          );
           return;
         }
       } else {
         // Handle error response
         try {
           const errorText = await response.text();
-          console.error('❌ Error response text:', errorText);
+          console.error("❌ Error response text:", errorText);
 
           let errorData;
           try {
@@ -536,17 +672,26 @@ export default function StoryMaintenance({
             errorData = { message: errorText || response.statusText };
           }
 
-          console.error('❌ Failed to run diagnostic:', errorData);
-          alert(`Failed to run diagnostic: ${errorData.message || response.statusText}`);
+          console.error("❌ Failed to run diagnostic:", errorData);
+          alert(
+            `Failed to run diagnostic: ${errorData.message || response.statusText}`,
+          );
         } catch (textError) {
-          console.error('❌ Failed to read error response:', textError);
-          alert(`Failed to run diagnostic: ${response.status} ${response.statusText}`);
+          console.error("❌ Failed to read error response:", textError);
+          alert(
+            `Failed to run diagnostic: ${response.status} ${response.statusText}`,
+          );
         }
       }
     } catch (error) {
-      console.error('❌ Error running diagnostic:', error);
-      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      alert(`Error running diagnostic: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("❌ Error running diagnostic:", error);
+      console.error(
+        "❌ Error stack:",
+        error instanceof Error ? error.stack : "No stack trace",
+      );
+      alert(
+        `Error running diagnostic: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsRunningDiagnostic(false);
     }
@@ -663,7 +808,10 @@ export default function StoryMaintenance({
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                  <Badge
+                    variant="outline"
+                    className="bg-amber-100 text-amber-800 border-amber-300"
+                  >
                     DEBUG INFO
                   </Badge>
                   <span className="text-sm text-amber-700">
@@ -746,7 +894,9 @@ export default function StoryMaintenance({
                   <div className="text-2xl font-bold text-blue-700">
                     {filteredStories.length}
                   </div>
-                  <div className="text-sm text-blue-600">Filtered/Displayed</div>
+                  <div className="text-sm text-blue-600">
+                    Filtered/Displayed
+                  </div>
                 </div>
               </div>
 
@@ -757,51 +907,102 @@ export default function StoryMaintenance({
                       <strong>API URL:</strong> {debugInfo.apiUrl}
                     </div>
                     <div>
-                      <strong>Response Status:</strong> {debugInfo.responseStatus}
+                      <strong>Response Status:</strong>{" "}
+                      {debugInfo.responseStatus}
                     </div>
                     <div>
                       <strong>Data Format:</strong> {debugInfo.sourceFormat}
                     </div>
                     <div>
-                      <strong>Last Updated:</strong> {new Date(debugInfo.timestamp).toLocaleTimeString()}
+                      <strong>Last Updated:</strong>{" "}
+                      {new Date(debugInfo.timestamp).toLocaleTimeString()}
                     </div>
                   </div>
 
                   {debugInfo.warning && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                      <strong className="text-red-800">Warning:</strong> {debugInfo.warning}
+                      <strong className="text-red-800">Warning:</strong>{" "}
+                      {debugInfo.warning}
                     </div>
                   )}
 
-                  {debugInfo.storySample && debugInfo.storySample.length > 0 && (
-                    <div>
-                      <strong>Sample Stories (first 5):</strong>
-                      <div className="mt-2 space-y-1">
-                        {debugInfo.storySample.map((story: any, index: number) => (
-                          <div key={index} className="text-xs bg-white p-2 rounded border">
-                            <span className="font-medium">{story.title}</span>
-                            <span className="text-gray-500"> by {story.author}</span>
-                            <Badge
-                              variant={story.isPublished ? "default" : "secondary"}
-                              className="ml-2 text-xs"
-                            >
-                              {story.isPublished ? "Published" : "Draft"}
-                            </Badge>
-                          </div>
-                        ))}
+                  {debugInfo.storySample &&
+                    debugInfo.storySample.length > 0 && (
+                      <div>
+                        <strong>Sample Stories (first 5):</strong>
+                        <div className="mt-2 space-y-1">
+                          {debugInfo.storySample.map(
+                            (story: any, index: number) => (
+                              <div
+                                key={index}
+                                className="text-xs bg-white p-2 rounded border"
+                              >
+                                <span className="font-medium">
+                                  {story.title}
+                                </span>
+                                <span className="text-gray-500">
+                                  {" "}
+                                  by {story.author}
+                                </span>
+                                <Badge
+                                  variant={
+                                    story.isPublished ? "default" : "secondary"
+                                  }
+                                  className="ml-2 text-xs"
+                                >
+                                  {story.isPublished ? "Published" : "Draft"}
+                                </Badge>
+                              </div>
+                            ),
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {testResult && (
                     <div className="pt-4 border-t border-amber-200">
                       <strong>🧪 Simple Test Result:</strong>
                       <div className="mt-2 p-3 bg-white rounded border text-sm">
-                        <div>Status: <span className={testResult.success ? "text-green-700 font-medium" : "text-red-700 font-medium"}>{testResult.success ? "✅ Passed" : "❌ Failed"}</span></div>
-                        <div>Database: <span className={testResult.database_connected ? "text-green-700" : "text-red-700"}>{testResult.database_connected ? "Connected" : "Disconnected"}</span></div>
-                        <div>Total Stories: <span className="font-medium">{testResult.total_stories || 0}</span></div>
+                        <div>
+                          Status:{" "}
+                          <span
+                            className={
+                              testResult.success
+                                ? "text-green-700 font-medium"
+                                : "text-red-700 font-medium"
+                            }
+                          >
+                            {testResult.success ? "✅ Passed" : "❌ Failed"}
+                          </span>
+                        </div>
+                        <div>
+                          Database:{" "}
+                          <span
+                            className={
+                              testResult.database_connected
+                                ? "text-green-700"
+                                : "text-red-700"
+                            }
+                          >
+                            {testResult.database_connected
+                              ? "Connected"
+                              : "Disconnected"}
+                          </span>
+                        </div>
+                        <div>
+                          Total Stories:{" "}
+                          <span className="font-medium">
+                            {testResult.total_stories || 0}
+                          </span>
+                        </div>
                         {testResult.first_story && (
-                          <div>First Story: <span className="font-medium">{testResult.first_story.title}</span> by {testResult.first_story.author}</div>
+                          <div>
+                            First Story:{" "}
+                            <span className="font-medium">
+                              {testResult.first_story.title}
+                            </span>{" "}
+                            by {testResult.first_story.author}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -819,7 +1020,10 @@ export default function StoryMaintenance({
           <Card className="mb-4 border-blue-200 bg-blue-50">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                <Badge
+                  variant="outline"
+                  className="bg-blue-100 text-blue-800 border-blue-300"
+                >
                   DATABASE DIAGNOSTIC
                 </Badge>
                 <span className="text-sm text-blue-700">
@@ -860,10 +1064,14 @@ export default function StoryMaintenance({
                 {/* Issues */}
                 {diagnostic.issues && diagnostic.issues.length > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-red-800 mb-2">🚨 Issues Found:</h4>
+                    <h4 className="font-semibold text-red-800 mb-2">
+                      🚨 Issues Found:
+                    </h4>
                     <ul className="space-y-1">
                       {diagnostic.issues.map((issue: string, index: number) => (
-                        <li key={index} className="text-red-700 text-sm">• {issue}</li>
+                        <li key={index} className="text-red-700 text-sm">
+                          • {issue}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -874,23 +1082,37 @@ export default function StoryMaintenance({
                   <div className="bg-white rounded border p-4">
                     <h4 className="font-semibold mb-2">Stories by Author</h4>
                     <div className="space-y-1 max-h-32 overflow-y-auto">
-                      {Object.entries(diagnostic.stories?.byAuthor || {}).map(([author, count]) => (
-                        <div key={author} className="flex justify-between text-sm">
-                          <span>{author}</span>
-                          <span className="font-medium">{count as number}</span>
-                        </div>
-                      ))}
+                      {Object.entries(diagnostic.stories?.byAuthor || {}).map(
+                        ([author, count]) => (
+                          <div
+                            key={author}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>{author}</span>
+                            <span className="font-medium">
+                              {count as number}
+                            </span>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                   <div className="bg-white rounded border p-4">
                     <h4 className="font-semibold mb-2">Stories by Category</h4>
                     <div className="space-y-1 max-h-32 overflow-y-auto">
-                      {Object.entries(diagnostic.stories?.byCategory || {}).map(([category, count]) => (
-                        <div key={category} className="flex justify-between text-sm">
-                          <span>{category}</span>
-                          <span className="font-medium">{count as number}</span>
-                        </div>
-                      ))}
+                      {Object.entries(diagnostic.stories?.byCategory || {}).map(
+                        ([category, count]) => (
+                          <div
+                            key={category}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>{category}</span>
+                            <span className="font-medium">
+                              {count as number}
+                            </span>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>
@@ -901,41 +1123,56 @@ export default function StoryMaintenance({
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <span className="text-gray-600">Today:</span>
-                      <span className="font-medium ml-1">{diagnostic.stories?.createdToday || 0}</span>
+                      <span className="font-medium ml-1">
+                        {diagnostic.stories?.createdToday || 0}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-600">This Week:</span>
-                      <span className="font-medium ml-1">{diagnostic.stories?.createdThisWeek || 0}</span>
+                      <span className="font-medium ml-1">
+                        {diagnostic.stories?.createdThisWeek || 0}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-600">This Month:</span>
-                      <span className="font-medium ml-1">{diagnostic.stories?.createdThisMonth || 0}</span>
+                      <span className="font-medium ml-1">
+                        {diagnostic.stories?.createdThisMonth || 0}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Date Range */}
-                {diagnostic.stories?.oldestStory && diagnostic.stories?.newestStory && (
-                  <div className="bg-white rounded border p-4">
-                    <h4 className="font-semibold mb-2">📊 Date Range</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">Oldest:</span>
-                        <div className="font-medium">{diagnostic.stories.oldestStory.title}</div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(diagnostic.stories.oldestStory.createdAt).toLocaleDateString()}
+                {diagnostic.stories?.oldestStory &&
+                  diagnostic.stories?.newestStory && (
+                    <div className="bg-white rounded border p-4">
+                      <h4 className="font-semibold mb-2">📊 Date Range</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Oldest:</span>
+                          <div className="font-medium">
+                            {diagnostic.stories.oldestStory.title}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(
+                              diagnostic.stories.oldestStory.createdAt,
+                            ).toLocaleDateString()}
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Newest:</span>
-                        <div className="font-medium">{diagnostic.stories.newestStory.title}</div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(diagnostic.stories.newestStory.createdAt).toLocaleDateString()}
+                        <div>
+                          <span className="text-gray-600">Newest:</span>
+                          <div className="font-medium">
+                            {diagnostic.stories.newestStory.title}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(
+                              diagnostic.stories.newestStory.createdAt,
+                            ).toLocaleDateString()}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             </CardContent>
           </Card>

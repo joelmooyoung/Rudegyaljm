@@ -3,7 +3,9 @@ import { connectToDatabase } from "../lib/mongodb.js";
 import { Story } from "../models/index.js";
 
 export default async function handler(req, res) {
-  console.log(`[TEST DIAGNOSTIC SIMPLE] ${req.method} /api/test-diagnostic-simple`);
+  console.log(
+    `[TEST DIAGNOSTIC SIMPLE] ${req.method} /api/test-diagnostic-simple`,
+  );
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -29,7 +31,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: false,
         message: "Database not connected",
-        test: "connection_failed"
+        test: "connection_failed",
       });
     }
 
@@ -38,44 +40,51 @@ export default async function handler(req, res) {
     console.log(`[TEST DIAGNOSTIC SIMPLE] Found ${totalStories} stories`);
 
     // Get first story for testing
-    const firstStory = await Story.findOne({}).select("storyId title author createdAt");
-    
+    const firstStory = await Story.findOne({}).select(
+      "storyId title author createdAt",
+    );
+
     const result = {
       success: true,
       test: "passed",
       database_connected: true,
       total_stories: totalStories,
-      first_story: firstStory ? {
-        id: firstStory.storyId || 'unknown',
-        title: firstStory.title || 'Untitled',
-        author: firstStory.author || 'Unknown',
-        createdAt: firstStory.createdAt ? firstStory.createdAt.toISOString() : null
-      } : null,
-      timestamp: new Date().toISOString()
+      first_story: firstStory
+        ? {
+            id: firstStory.storyId || "unknown",
+            title: firstStory.title || "Untitled",
+            author: firstStory.author || "Unknown",
+            createdAt: firstStory.createdAt
+              ? firstStory.createdAt.toISOString()
+              : null,
+          }
+        : null,
+      timestamp: new Date().toISOString(),
     };
 
     // Test JSON serialization
     try {
       const testJson = JSON.stringify(result);
-      console.log(`[TEST DIAGNOSTIC SIMPLE] JSON test passed (${testJson.length} chars)`);
+      console.log(
+        `[TEST DIAGNOSTIC SIMPLE] JSON test passed (${testJson.length} chars)`,
+      );
     } catch (jsonError) {
       console.error(`[TEST DIAGNOSTIC SIMPLE] JSON test failed:`, jsonError);
       return res.status(500).json({
         success: false,
         message: "JSON serialization failed",
-        error: jsonError.message
+        error: jsonError.message,
       });
     }
 
     return res.status(200).json(result);
-
   } catch (error) {
     console.error(`[TEST DIAGNOSTIC SIMPLE] Error:`, error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
       error: error.message,
-      test: "failed"
+      test: "failed",
     });
   }
 }

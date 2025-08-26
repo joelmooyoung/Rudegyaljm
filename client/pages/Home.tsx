@@ -122,7 +122,9 @@ export default function Home({
 
   // Fetch stories and stats from optimized combined endpoint with caching
   const fetchStories = async (page = currentPage, forceFresh = false) => {
-    console.log(`🔄 fetchStories called with page ${page} (using optimized endpoint with caching)`);
+    console.log(
+      `🔄 fetchStories called with page ${page} (using optimized endpoint with caching)`,
+    );
 
     // Prevent multiple simultaneous requests
     if (isLoadingStories) {
@@ -135,7 +137,11 @@ export default function Home({
 
     // Check cache first (unless forced refresh)
     if (!forceFresh) {
-      const cachedData = landingStatsCache.get(page, limit, includeRealCommentCounts);
+      const cachedData = landingStatsCache.get(
+        page,
+        limit,
+        includeRealCommentCounts,
+      );
       if (cachedData) {
         console.log(`🎯 Cache hit! Using cached data for page ${page}`);
         setIsCacheHit(true);
@@ -153,7 +159,9 @@ export default function Home({
             setAggregateStats(cachedData.aggregateStats);
           }
 
-          console.log(`📊 Loaded from cache: ${cachedData.stories.length} stories`);
+          console.log(
+            `📊 Loaded from cache: ${cachedData.stories.length} stories`,
+          );
         }
 
         // Still check if we should refresh in background for very old cache
@@ -190,7 +198,7 @@ export default function Home({
         console.log("✅ Optimized landing stats response received:", {
           storiesCount: data.stories?.length,
           aggregateStats: data.aggregateStats,
-          queryTime: data.performance?.queryTime
+          queryTime: data.performance?.queryTime,
         });
 
         if (data && data.stories && Array.isArray(data.stories)) {
@@ -217,7 +225,9 @@ export default function Home({
 
           // Log performance improvement
           if (data.performance) {
-            console.log(`⚡ Performance: ${data.performance.queryTime}ms for ${data.performance.queriesOptimized} combined queries`);
+            console.log(
+              `⚡ Performance: ${data.performance.queryTime}ms for ${data.performance.queriesOptimized} combined queries`,
+            );
           }
         } else {
           console.error("❌ Invalid response format:", data);
@@ -243,12 +253,14 @@ export default function Home({
 
   // Initial load with cache system check
   useEffect(() => {
-    console.log(`🚀 Component mounted - loading page ${currentPage} (optimized)`);
+    console.log(
+      `🚀 Component mounted - loading page ${currentPage} (optimized)`,
+    );
 
     // Test cache system health on mount
     const cacheWorking = landingStatsCache.health.test();
     const envInfo = landingStatsCache.health.getEnvironmentInfo();
-    console.log('🔧 Cache system status:', { cacheWorking, envInfo });
+    console.log("🔧 Cache system status:", { cacheWorking, envInfo });
 
     fetchStories(currentPage); // Now includes aggregate stats!
   }, []); // Only run on mount
@@ -298,7 +310,9 @@ export default function Home({
   // Handle refresh trigger (force fresh data)
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0 && !isRestoringFromReturn) {
-      console.log(`🔄 Refresh triggered: forcing fresh fetch for page ${currentPage}`);
+      console.log(
+        `🔄 Refresh triggered: forcing fresh fetch for page ${currentPage}`,
+      );
       // Clear cache for current page and force fresh fetch
       landingStatsCache.remove(currentPage, 8, true);
       fetchStories(currentPage, true);
@@ -308,54 +322,61 @@ export default function Home({
   // Cache management functions for admins
   const clearLandingStatsCache = () => {
     try {
-      console.log('🧹 Admin clearing landing stats cache');
+      console.log("🧹 Admin clearing landing stats cache");
       landingStatsCache.clear();
       setIsCacheHit(false);
       setCacheAge(null);
-      console.log('✅ Cache cleared successfully');
+      console.log("✅ Cache cleared successfully");
       // Force fresh fetch
       fetchStories(currentPage, true);
     } catch (error) {
-      console.error('❌ Error clearing cache from admin action:', error);
+      console.error("❌ Error clearing cache from admin action:", error);
       // Still try to fetch fresh data even if cache clear failed
       try {
         fetchStories(currentPage, true);
       } catch (fetchError) {
-        console.error('❌ Error fetching fresh data after cache clear failure:', fetchError);
+        console.error(
+          "❌ Error fetching fresh data after cache clear failure:",
+          fetchError,
+        );
       }
     }
   };
 
   const getCacheStats = () => {
     const stats = landingStatsCache.stats();
-    console.log('📊 Cache statistics:', stats);
+    console.log("📊 Cache statistics:", stats);
     return stats;
   };
 
   // Emergency cache clear for situations where normal clear fails
   const emergencyClearCache = () => {
     try {
-      console.log('🚨 Emergency cache clear initiated');
+      console.log("🚨 Emergency cache clear initiated");
 
       // Enable bypass mode to prevent further cache errors
       landingStatsCache.enableBypass();
 
       // Direct localStorage manipulation as fallback
-      if (typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== "undefined") {
         const keysToRemove = [];
         try {
           // Try the safer iteration method first
           for (let i = localStorage.length - 1; i >= 0; i--) {
             const key = localStorage.key(i);
-            if (key && key.includes('landing_stats_')) {
+            if (key && key.includes("landing_stats_")) {
               keysToRemove.push(key);
             }
           }
 
-          keysToRemove.forEach(key => localStorage.removeItem(key));
-          console.log(`🧹 Emergency: Removed ${keysToRemove.length} cache entries`);
+          keysToRemove.forEach((key) => localStorage.removeItem(key));
+          console.log(
+            `🧹 Emergency: Removed ${keysToRemove.length} cache entries`,
+          );
         } catch (emergencyError) {
-          console.log('🚨 Emergency method also failed, cache bypass mode enabled');
+          console.log(
+            "🚨 Emergency method also failed, cache bypass mode enabled",
+          );
         }
       }
 
@@ -363,7 +384,7 @@ export default function Home({
       setCacheAge(null);
       fetchStories(currentPage, true);
     } catch (error) {
-      console.error('❌ Emergency cache clear failed:', error);
+      console.error("❌ Emergency cache clear failed:", error);
       // Ensure bypass mode is enabled if everything fails
       landingStatsCache.enableBypass();
     }
@@ -374,17 +395,17 @@ export default function Home({
     try {
       if (landingStatsCache.isBypass()) {
         landingStatsCache.disableBypass();
-        console.log('✅ Cache re-enabled');
+        console.log("✅ Cache re-enabled");
       } else {
         landingStatsCache.enableBypass();
-        console.log('🚫 Cache disabled');
+        console.log("🚫 Cache disabled");
       }
 
       setIsCacheHit(false);
       setCacheAge(null);
       fetchStories(currentPage, true);
     } catch (error) {
-      console.error('❌ Error toggling cache bypass:', error);
+      console.error("❌ Error toggling cache bypass:", error);
     }
   };
 
@@ -481,7 +502,9 @@ export default function Home({
 
     // Save current page to sessionStorage before navigating
     sessionStorage.setItem("home-current-page", currentPage.toString());
-    console.log(`💾 Saved page ${currentPage} to sessionStorage before story navigation`);
+    console.log(
+      `💾 Saved page ${currentPage} to sessionStorage before story navigation`,
+    );
 
     if (onReadStory) {
       // Pass the current page so we can return to it later
@@ -807,7 +830,9 @@ export default function Home({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={toggleCacheBypass}>
                       <Database className="h-4 w-4 mr-2" />
-                      {landingStatsCache.isBypass() ? 'Enable Cache' : 'Disable Cache'}
+                      {landingStatsCache.isBypass()
+                        ? "Enable Cache"
+                        : "Disable Cache"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -903,7 +928,13 @@ export default function Home({
                 ) : (
                   <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-xs text-yellow-400">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                    <span>No cache (localStorage: {typeof localStorage !== 'undefined' ? 'available' : 'unavailable'})</span>
+                    <span>
+                      No cache (localStorage:{" "}
+                      {typeof localStorage !== "undefined"
+                        ? "available"
+                        : "unavailable"}
+                      )
+                    </span>
                   </div>
                 )}
               </div>
@@ -1008,7 +1039,10 @@ export default function Home({
                 Failed to load stories
               </h3>
               <p className="text-muted-foreground mb-4">{error}</p>
-              <Button onClick={() => fetchStories(currentPage, true)} className="btn-seductive">
+              <Button
+                onClick={() => fetchStories(currentPage, true)}
+                className="btn-seductive"
+              >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </Button>

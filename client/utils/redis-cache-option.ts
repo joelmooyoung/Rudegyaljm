@@ -4,43 +4,60 @@
 /**
  * REDIS IMPLEMENTATION GUIDE
  * =========================
- * 
+ *
  * For production deployments with multiple servers or when localStorage
  * becomes insufficient, you can implement server-side Redis caching.
- * 
+ *
  * This approach moves caching from localStorage to a Redis server,
  * allowing cache sharing across multiple client sessions and servers.
  */
 
 // Example Redis cache interface that could replace landingStatsCache
 interface RedisLandingStatsCache {
-  get(page: number, limit: number, includeRealCommentCounts: boolean): Promise<any>;
-  set(page: number, limit: number, includeRealCommentCounts: boolean, data: any): Promise<void>;
-  remove(page: number, limit: number, includeRealCommentCounts: boolean): Promise<void>;
+  get(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): Promise<any>;
+  set(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+    data: any,
+  ): Promise<void>;
+  remove(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): Promise<void>;
   clear(): Promise<void>;
-  isFresh(page: number, limit: number, includeRealCommentCounts: boolean): Promise<boolean>;
+  isFresh(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): Promise<boolean>;
 }
 
 /**
  * IMPLEMENTATION STEPS:
  * =====================
- * 
+ *
  * 1. SERVER SETUP:
  *    - Install Redis: npm install redis
  *    - Add Redis connection to server/config/
  *    - Create API endpoints for cache operations
- * 
+ *
  * 2. API ENDPOINTS TO CREATE:
  *    - GET /api/cache/landing-stats/:key - Get cached data
- *    - POST /api/cache/landing-stats/:key - Set cached data  
+ *    - POST /api/cache/landing-stats/:key - Set cached data
  *    - DELETE /api/cache/landing-stats/:key - Remove cached data
  *    - DELETE /api/cache/landing-stats - Clear all cache
- * 
+ *
  * 3. CLIENT-SIDE ADAPTATION:
  *    - Replace localStorage calls with API calls
  *    - Add retry logic for network failures
  *    - Implement fallback to localStorage if Redis unavailable
- * 
+ *
  * 4. REDIS CONFIGURATION:
  *    - Set appropriate TTL (5 minutes = 300 seconds)
  *    - Configure memory policies (allkeys-lru recommended)
@@ -166,31 +183,31 @@ class RedisLandingStatsCache {
 /**
  * WHEN TO USE REDIS:
  * ==================
- * 
+ *
  * Consider Redis implementation when:
  * - Multiple server instances need shared cache
  * - localStorage size limits become problematic (>5-10MB)
  * - You need cache persistence across browser sessions
  * - Analytics show high cache hit rates justify server infrastructure
  * - You want centralized cache invalidation control
- * 
+ *
  * DEPLOYMENT OPTIONS:
  * ===================
- * 
+ *
  * 1. MANAGED REDIS SERVICES:
  *    - Vercel KV (Redis) - Built for Vercel deployments
  *    - AWS ElastiCache - Enterprise Redis hosting
  *    - Redis Cloud - Official Redis hosting
  *    - Upstash - Serverless Redis
- * 
+ *
  * 2. SELF-HOSTED:
  *    - Docker Redis container
  *    - Redis on VPS/dedicated server
  *    - Redis Cluster for high availability
- * 
+ *
  * MIGRATION STRATEGY:
  * ===================
- * 
+ *
  * 1. Implement Redis cache alongside localStorage
  * 2. Use feature flag to switch between implementations
  * 3. Monitor performance and hit rates
@@ -211,7 +228,7 @@ export const redisImplementationGuide = {
     4. Update client-side cache utility to use API
     5. Test with gradual rollout
     6. Monitor performance and costs
-  `
+  `,
 };
 
 export default redisImplementationGuide;

@@ -16,13 +16,17 @@ interface CacheEntry {
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-const CACHE_PREFIX = 'landing_stats_';
+const CACHE_PREFIX = "landing_stats_";
 
 // Global flag to disable cache if it's causing persistent issues
 let CACHE_BYPASS_MODE = false;
 
 export class LandingStatsCache {
-  private static generateCacheKey(page: number, limit: number, includeRealCommentCounts: boolean): string {
+  private static generateCacheKey(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): string {
     return `${CACHE_PREFIX}page_${page}_limit_${limit}_comments_${includeRealCommentCounts}`;
   }
 
@@ -32,7 +36,7 @@ export class LandingStatsCache {
   private static isLocalStorageAvailable(): boolean {
     try {
       // Check if we're in a browser environment
-      if (typeof window === 'undefined') {
+      if (typeof window === "undefined") {
         return false;
       }
 
@@ -50,11 +54,11 @@ export class LandingStatsCache {
 
       // Test localStorage access with minimal footprint
       try {
-        const testKey = '__test_cache_access__';
-        storage.setItem(testKey, '1');
+        const testKey = "__test_cache_access__";
+        storage.setItem(testKey, "1");
         const testValue = storage.getItem(testKey);
         storage.removeItem(testKey);
-        return testValue === '1';
+        return testValue === "1";
       } catch (accessError) {
         return false;
       }
@@ -67,7 +71,11 @@ export class LandingStatsCache {
   /**
    * Get cached data if it exists and hasn't expired
    */
-  static getCachedData(page: number, limit: number, includeRealCommentCounts: boolean = true): LandingStatsData | null {
+  static getCachedData(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean = true,
+  ): LandingStatsData | null {
     // Check if cache is in bypass mode
     if (CACHE_BYPASS_MODE) {
       return null;
@@ -80,7 +88,9 @@ export class LandingStatsCache {
         isAvailable = this.isLocalStorageAvailable();
       } catch (availabilityError) {
         // Enable bypass mode if localStorage checks are consistently failing
-        console.log('📋 localStorage availability check failed, enabling bypass mode');
+        console.log(
+          "📋 localStorage availability check failed, enabling bypass mode",
+        );
         CACHE_BYPASS_MODE = true;
         return null;
       }
@@ -89,16 +99,22 @@ export class LandingStatsCache {
         return null;
       }
 
-      const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+      const cacheKey = this.generateCacheKey(
+        page,
+        limit,
+        includeRealCommentCounts,
+      );
 
       let cachedItem;
       try {
         cachedItem = window.localStorage.getItem(cacheKey);
       } catch (getItemError) {
-        console.log('📋 Error accessing localStorage.getItem, cache unavailable');
+        console.log(
+          "📋 Error accessing localStorage.getItem, cache unavailable",
+        );
         return null;
       }
-      
+
       if (!cachedItem) {
         return null;
       }
@@ -107,7 +123,7 @@ export class LandingStatsCache {
       try {
         cacheEntry = JSON.parse(cachedItem);
       } catch (parseError) {
-        console.log('📋 Error parsing cached data, removing corrupted entry');
+        console.log("📋 Error parsing cached data, removing corrupted entry");
         try {
           window.localStorage.removeItem(cacheKey);
         } catch (removeError) {
@@ -117,8 +133,12 @@ export class LandingStatsCache {
       }
 
       // Validate cache entry structure
-      if (!cacheEntry || typeof cacheEntry.expiry !== 'number' || !cacheEntry.data) {
-        console.log('📋 Invalid cache entry structure, removing');
+      if (
+        !cacheEntry ||
+        typeof cacheEntry.expiry !== "number" ||
+        !cacheEntry.data
+      ) {
+        console.log("📋 Invalid cache entry structure, removing");
         try {
           window.localStorage.removeItem(cacheKey);
         } catch (removeError) {
@@ -134,18 +154,22 @@ export class LandingStatsCache {
         try {
           this.removeCachedData(page, limit, includeRealCommentCounts);
         } catch (removeError) {
-          console.log('📋 Error removing expired cache entry');
+          console.log("📋 Error removing expired cache entry");
         }
         return null;
       }
 
       return cacheEntry.data;
     } catch (error) {
-      console.log('❌ Unexpected error in cache read operation');
+      console.log("❌ Unexpected error in cache read operation");
       // Try to clean up the problematic entry with ultra-defensive approach
       try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+        if (typeof window !== "undefined" && window.localStorage) {
+          const cacheKey = this.generateCacheKey(
+            page,
+            limit,
+            includeRealCommentCounts,
+          );
           window.localStorage.removeItem(cacheKey);
         }
       } catch (cleanupError) {
@@ -162,7 +186,7 @@ export class LandingStatsCache {
     page: number,
     limit: number,
     includeRealCommentCounts: boolean,
-    data: LandingStatsData
+    data: LandingStatsData,
   ): void {
     // Check if cache is in bypass mode
     if (CACHE_BYPASS_MODE) {
@@ -183,43 +207,58 @@ export class LandingStatsCache {
         return;
       }
 
-      const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+      const cacheKey = this.generateCacheKey(
+        page,
+        limit,
+        includeRealCommentCounts,
+      );
       const expiry = Date.now() + CACHE_DURATION;
-      
+
       const cacheEntry: CacheEntry = {
         data,
         expiry,
-        cacheKey
+        cacheKey,
       };
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
-      console.log(`💾 Cached data for: ${cacheKey} (expires in ${CACHE_DURATION / 1000}s)`);
-      
+      console.log(
+        `💾 Cached data for: ${cacheKey} (expires in ${CACHE_DURATION / 1000}s)`,
+      );
+
       // Clean up old cache entries to prevent localStorage bloat
       this.cleanupExpiredEntries();
     } catch (error) {
-      console.error('❌ Error writing to cache:', error);
+      console.error("❌ Error writing to cache:", error);
 
       // Handle specific localStorage errors
-      if (error.name === 'QuotaExceededError' || error.message?.includes('quota')) {
-        console.log('🧹 LocalStorage quota exceeded, cleaning up...');
+      if (
+        error.name === "QuotaExceededError" ||
+        error.message?.includes("quota")
+      ) {
+        console.log("🧹 LocalStorage quota exceeded, cleaning up...");
         this.cleanupExpiredEntries();
         try {
-          const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+          const cacheKey = this.generateCacheKey(
+            page,
+            limit,
+            includeRealCommentCounts,
+          );
           const cacheEntry: CacheEntry = {
             data,
             expiry: Date.now() + CACHE_DURATION,
-            cacheKey
+            cacheKey,
           };
           localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
           console.log(`💾 Cached data after cleanup: ${cacheKey}`);
         } catch (retryError) {
-          console.error('❌ Failed to cache even after cleanup:', retryError);
+          console.error("❌ Failed to cache even after cleanup:", retryError);
         }
-      } else if (error.name === 'SecurityError') {
-        console.log('🔒 localStorage access denied (privacy mode or security settings)');
+      } else if (error.name === "SecurityError") {
+        console.log(
+          "🔒 localStorage access denied (privacy mode or security settings)",
+        );
       } else {
-        console.error('❌ Unexpected localStorage error:', error.message);
+        console.error("❌ Unexpected localStorage error:", error.message);
       }
     }
   }
@@ -227,19 +266,27 @@ export class LandingStatsCache {
   /**
    * Remove specific cached data
    */
-  static removeCachedData(page: number, limit: number, includeRealCommentCounts: boolean): void {
+  static removeCachedData(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): void {
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
-        console.log('🗑️ localStorage not available, skipping cache removal');
+        console.log("🗑️ localStorage not available, skipping cache removal");
         return;
       }
 
-      const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+      const cacheKey = this.generateCacheKey(
+        page,
+        limit,
+        includeRealCommentCounts,
+      );
       localStorage.removeItem(cacheKey);
       console.log(`🗑️ Removed cache for: ${cacheKey}`);
     } catch (error) {
-      console.error('�� Error removing from cache:', error);
+      console.error("�� Error removing from cache:", error);
     }
   }
 
@@ -250,7 +297,7 @@ export class LandingStatsCache {
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
-        console.log('🧹 localStorage not available, skipping cache clear');
+        console.log("🧹 localStorage not available, skipping cache clear");
         return;
       }
 
@@ -265,13 +312,15 @@ export class LandingStatsCache {
             keysToRemove.push(key);
           }
         } catch (keyError) {
-          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i}`);
+          console.log(
+            `⚠️ Skipping inaccessible localStorage key at index ${i}`,
+          );
         }
       }
 
       // Remove the keys
       let removedCount = 0;
-      keysToRemove.forEach(key => {
+      keysToRemove.forEach((key) => {
         try {
           localStorage.removeItem(key);
           removedCount++;
@@ -282,19 +331,19 @@ export class LandingStatsCache {
 
       console.log(`🧹 Cleared ${removedCount} landing stats cache entries`);
     } catch (error) {
-      console.error('❌ Error clearing cache:', error);
+      console.error("❌ Error clearing cache:", error);
 
       // Fallback: try to remove known patterns one by one
       try {
-        console.log('🔄 Attempting fallback cache clear...');
+        console.log("🔄 Attempting fallback cache clear...");
         const commonPatterns = [
-          'landing_stats_page_1_limit_8_comments_true',
-          'landing_stats_page_2_limit_8_comments_true',
-          'landing_stats_page_3_limit_8_comments_true',
+          "landing_stats_page_1_limit_8_comments_true",
+          "landing_stats_page_2_limit_8_comments_true",
+          "landing_stats_page_3_limit_8_comments_true",
         ];
 
         let fallbackRemoved = 0;
-        commonPatterns.forEach(pattern => {
+        commonPatterns.forEach((pattern) => {
           try {
             if (localStorage.getItem(pattern)) {
               localStorage.removeItem(pattern);
@@ -307,7 +356,7 @@ export class LandingStatsCache {
 
         console.log(`🧹 Fallback: Cleared ${fallbackRemoved} cache entries`);
       } catch (fallbackError) {
-        console.error('❌ Fallback cache clear also failed:', fallbackError);
+        console.error("❌ Fallback cache clear also failed:", fallbackError);
       }
     }
   }
@@ -319,7 +368,7 @@ export class LandingStatsCache {
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
-        console.log('��� localStorage not available, skipping cleanup');
+        console.log("��� localStorage not available, skipping cleanup");
         return;
       }
 
@@ -334,14 +383,16 @@ export class LandingStatsCache {
             keysToCheck.push(key);
           }
         } catch (keyError) {
-          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i} during cleanup`);
+          console.log(
+            `⚠️ Skipping inaccessible localStorage key at index ${i} during cleanup`,
+          );
         }
       }
 
       const now = Date.now();
       let cleanedCount = 0;
 
-      keysToCheck.forEach(key => {
+      keysToCheck.forEach((key) => {
         try {
           const cachedItem = localStorage.getItem(key);
           if (cachedItem) {
@@ -366,7 +417,7 @@ export class LandingStatsCache {
         console.log(`🧹 Cleaned up ${cleanedCount} expired cache entries`);
       }
     } catch (error) {
-      console.error('❌ Error during cache cleanup:', error);
+      console.error("❌ Error during cache cleanup:", error);
     }
   }
 
@@ -382,12 +433,12 @@ export class LandingStatsCache {
     try {
       // Check if localStorage is available
       if (!this.isLocalStorageAvailable()) {
-        console.log('📊 localStorage not available, returning empty stats');
+        console.log("📊 localStorage not available, returning empty stats");
         return {
           totalEntries: 0,
           expiredEntries: 0,
           validEntries: 0,
-          totalSize: 0
+          totalSize: 0,
         };
       }
 
@@ -402,7 +453,9 @@ export class LandingStatsCache {
             landingStatsKeys.push(key);
           }
         } catch (keyError) {
-          console.log(`⚠️ Skipping inaccessible localStorage key at index ${i} during stats`);
+          console.log(
+            `⚠️ Skipping inaccessible localStorage key at index ${i} during stats`,
+          );
         }
       }
 
@@ -411,7 +464,7 @@ export class LandingStatsCache {
       let validCount = 0;
       let totalSize = 0;
 
-      landingStatsKeys.forEach(key => {
+      landingStatsKeys.forEach((key) => {
         try {
           const cachedItem = localStorage.getItem(key);
           if (cachedItem) {
@@ -432,15 +485,15 @@ export class LandingStatsCache {
         totalEntries: landingStatsKeys.length,
         expiredEntries: expiredCount,
         validEntries: validCount,
-        totalSize
+        totalSize,
       };
     } catch (error) {
-      console.error('❌ Error getting cache stats:', error);
+      console.error("❌ Error getting cache stats:", error);
       return {
         totalEntries: 0,
         expiredEntries: 0,
         validEntries: 0,
-        totalSize: 0
+        totalSize: 0,
       };
     }
   }
@@ -449,7 +502,11 @@ export class LandingStatsCache {
    * Check if data should be considered fresh (less than 2.5 minutes old)
    * Useful for deciding whether to show a refresh indicator
    */
-  static isCacheFresh(page: number, limit: number, includeRealCommentCounts: boolean): boolean {
+  static isCacheFresh(
+    page: number,
+    limit: number,
+    includeRealCommentCounts: boolean,
+  ): boolean {
     if (CACHE_BYPASS_MODE) {
       return false;
     }
@@ -460,14 +517,18 @@ export class LandingStatsCache {
         return false;
       }
 
-      const cacheKey = this.generateCacheKey(page, limit, includeRealCommentCounts);
+      const cacheKey = this.generateCacheKey(
+        page,
+        limit,
+        includeRealCommentCounts,
+      );
       const cachedItem = window.localStorage.getItem(cacheKey);
 
       if (!cachedItem) return false;
 
       const cacheEntry: CacheEntry = JSON.parse(cachedItem);
       const now = Date.now();
-      const halfExpiryTime = cacheEntry.expiry - (CACHE_DURATION / 2);
+      const halfExpiryTime = cacheEntry.expiry - CACHE_DURATION / 2;
 
       return now < halfExpiryTime;
     } catch (error) {
@@ -480,7 +541,7 @@ export class LandingStatsCache {
    */
   static enableBypassMode(): void {
     CACHE_BYPASS_MODE = true;
-    console.log('🚫 Cache bypass mode enabled - all cache operations disabled');
+    console.log("🚫 Cache bypass mode enabled - all cache operations disabled");
   }
 
   /**
@@ -488,7 +549,7 @@ export class LandingStatsCache {
    */
   static disableBypassMode(): void {
     CACHE_BYPASS_MODE = false;
-    console.log('✅ Cache bypass mode disabled - cache operations re-enabled');
+    console.log("✅ Cache bypass mode disabled - cache operations re-enabled");
   }
 
   /**
@@ -509,24 +570,26 @@ export const remoteCacheInvalidation = {
    */
   async checkAndClearIfInvalidated(): Promise<boolean> {
     try {
-      const response = await fetch('/api/admin/clear-landing-cache', {
-        method: 'POST',
+      const response = await fetch("/api/admin/clear-landing-cache", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.instructions?.clearAll) {
-          console.log('🌐 Server requested cache clear, clearing all landing stats cache');
+          console.log(
+            "🌐 Server requested cache clear, clearing all landing stats cache",
+          );
           LandingStatsCache.clearAllCache();
           return true;
         }
       }
       return false;
     } catch (error) {
-      console.error('❌ Error checking cache invalidation:', error);
+      console.error("❌ Error checking cache invalidation:", error);
       return false;
     }
   },
@@ -535,13 +598,16 @@ export const remoteCacheInvalidation = {
    * Set up periodic check for cache invalidation (every 2 minutes)
    */
   setupPeriodicCheck(): () => void {
-    const interval = setInterval(() => {
-      remoteCacheInvalidation.checkAndClearIfInvalidated();
-    }, 2 * 60 * 1000); // Check every 2 minutes
+    const interval = setInterval(
+      () => {
+        remoteCacheInvalidation.checkAndClearIfInvalidated();
+      },
+      2 * 60 * 1000,
+    ); // Check every 2 minutes
 
     // Return cleanup function
     return () => clearInterval(interval);
-  }
+  },
 };
 
 /**
@@ -553,11 +619,11 @@ export const cacheHealthCheck = {
    */
   test(): boolean {
     try {
-      console.log('🔧 Testing cache system...');
+      console.log("🔧 Testing cache system...");
 
       // Check localStorage availability
-      if (!LandingStatsCache['isLocalStorageAvailable']()) {
-        console.log('❌ Cache test failed: localStorage not available');
+      if (!LandingStatsCache["isLocalStorageAvailable"]()) {
+        console.log("❌ Cache test failed: localStorage not available");
         return false;
       }
 
@@ -566,7 +632,7 @@ export const cacheHealthCheck = {
         stories: [],
         pagination: { totalPages: 1 },
         aggregateStats: { totalStories: 0 },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       LandingStatsCache.setCachedData(999, 8, true, testData);
@@ -581,22 +647,29 @@ export const cacheHealthCheck = {
           const afterClear = LandingStatsCache.getCachedData(998, 8, true);
 
           if (afterClear === null) {
-            console.log('✅ Cache test passed: All operations including clear working');
+            console.log(
+              "✅ Cache test passed: All operations including clear working",
+            );
             return true;
           } else {
-            console.log('⚠️ Cache test partial: Basic ops work but clear may have issues');
+            console.log(
+              "⚠️ Cache test partial: Basic ops work but clear may have issues",
+            );
             return true; // Still consider it working for basic functionality
           }
         } catch (clearError) {
-          console.log('⚠️ Cache test partial: Basic ops work but clear failed:', clearError);
+          console.log(
+            "⚠️ Cache test partial: Basic ops work but clear failed:",
+            clearError,
+          );
           return true; // Still consider it working for basic functionality
         }
       } else {
-        console.log('❌ Cache test failed: Data mismatch');
+        console.log("❌ Cache test failed: Data mismatch");
         return false;
       }
     } catch (error) {
-      console.error('❌ Cache test failed with error:', error);
+      console.error("❌ Cache test failed with error:", error);
       return false;
     }
   },
@@ -606,13 +679,13 @@ export const cacheHealthCheck = {
    */
   getEnvironmentInfo() {
     return {
-      hasWindow: typeof window !== 'undefined',
-      hasLocalStorage: typeof localStorage !== 'undefined',
-      isLocalStorageAvailable: LandingStatsCache['isLocalStorageAvailable'](),
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A',
-      timestamp: new Date().toISOString()
+      hasWindow: typeof window !== "undefined",
+      hasLocalStorage: typeof localStorage !== "undefined",
+      isLocalStorageAvailable: LandingStatsCache["isLocalStorageAvailable"](),
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "N/A",
+      timestamp: new Date().toISOString(),
     };
-  }
+  },
 };
 
 // Export convenience functions for common operations
