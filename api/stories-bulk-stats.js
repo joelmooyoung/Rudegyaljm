@@ -69,9 +69,8 @@ export default async function handler(req, res) {
       if (story.storyId.toLowerCase().includes('amsterdam')) {
         console.log(`[BULK STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
           storyId: story.storyId,
-          dbViewCount: storyObj.viewCount,
           dbViews: storyObj.views,
-          finalViewCount: storyObj.viewCount || storyObj.views || 0,
+          finalViewCount: storyObj.views || 0,
           dbLikeCount: storyObj.likeCount,
           dbRating: storyObj.rating,
           dbRatingCount: storyObj.ratingCount,
