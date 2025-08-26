@@ -360,6 +360,7 @@ export default function StoryReader({ story, user, onBack }: StoryReaderProps) {
               setIsLiked(false);
             }
           } catch (interactionError) {
+            // Safely log the error to prevent text@[native code] issues
             console.error("Error loading user interaction:", interactionError);
             setUserRating(0);
             setIsLiked(false);
