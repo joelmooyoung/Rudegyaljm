@@ -470,7 +470,7 @@ export default function StoryMaintenance({
 
       if (analysis.isEmpty) {
         alert(
-          "❌ API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.",
+          "��� API returned empty response\n\nThis suggests the API endpoint is not working or not registered properly.",
         );
         return;
       }
@@ -719,7 +719,7 @@ export default function StoryMaintenance({
     } catch (error) {
       console.error("❌ Error running diagnostic:", error);
       console.error(
-        "��� Error stack:",
+        "����� Error stack:",
         error instanceof Error ? error.stack : "No stack trace",
       );
       alert(
@@ -727,6 +727,32 @@ export default function StoryMaintenance({
       );
     } finally {
       setIsRunningDiagnostic(false);
+    }
+  };
+
+  const testMigrationAPI = async () => {
+    try {
+      console.log("🧪 Testing migration API connectivity...");
+
+      const response = await fetch("/api/admin/test-migration");
+      const responseText = await response.text();
+
+      console.log("📡 Test response status:", response.status);
+      console.log("📄 Test response text:", responseText);
+
+      if (response.ok) {
+        try {
+          const result = JSON.parse(responseText);
+          alert(`✅ Migration API test successful!\n\nMessage: ${result.message}\nTimestamp: ${result.timestamp}`);
+        } catch (parseError) {
+          alert(`❌ Test response parsing failed: ${parseError.message}\n\nResponse: ${responseText}`);
+        }
+      } else {
+        alert(`❌ Migration API test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`);
+      }
+    } catch (error) {
+      console.error("❌ Error testing migration API:", error);
+      alert(`❌ Migration API test error: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
