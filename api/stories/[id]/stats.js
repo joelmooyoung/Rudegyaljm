@@ -57,33 +57,34 @@ export default async function handler(req, res) {
     console.log(`[STORY STATS API DEBUG] Story object:`, {
       found: !!story,
       storyId: story?.storyId,
-      viewCount: story?.viewCount,
-      likeCount: story?.likeCount,
-      rating: story?.rating,
-      commentCount: story?.commentCount,
+      schemaViews: storyObj.views, // Correct schema field
+      schemaAverageRating: storyObj.averageRating, // Correct schema field
+      likeCount: storyObj.likeCount,
+      commentCount: storyObj.commentCount,
       realCommentCount: realCommentCount,
-      ratingCount: story?.ratingCount,
+      ratingCount: storyObj.ratingCount,
       allFields: story ? Object.keys(storyObj) : "no story",
       rawFieldValues: {
-        viewCount: storyObj.viewCount,
+        views: storyObj.views,
+        averageRating: storyObj.averageRating,
         likeCount: storyObj.likeCount,
-        rating: storyObj.rating,
         commentCount: storyObj.commentCount,
         ratingCount: storyObj.ratingCount,
       },
     });
 
-    // Additional debug for Amsterdam story
-    if (id.toLowerCase().includes("amsterdam")) {
-      console.log(`[SINGLE STATS API] 🔍 AMSTERDAM STORY DEBUG:`, {
+    // Additional debug for specific stories
+    if (id.toLowerCase().includes("amsterdam") || id.toLowerCase().includes("cram")) {
+      console.log(`[SINGLE STATS API] 🔍 STORY DEBUG (${id}):`, {
         queryId: id,
         storyId: story?.storyId,
-        dbViews: storyObj.views,
+        schemaViews: storyObj.views,
         finalViewCount: storyObj.views || 0,
-        dbLikeCount: storyObj.likeCount,
-        dbRating: storyObj.rating,
-        dbRatingCount: storyObj.ratingCount,
-        dbCommentCount: storyObj.commentCount,
+        schemaAverageRating: storyObj.averageRating,
+        finalRating: storyObj.averageRating || 0,
+        schemaLikeCount: storyObj.likeCount,
+        schemaRatingCount: storyObj.ratingCount,
+        schemaCommentCount: storyObj.commentCount,
         realCommentCount: realCommentCount,
         mongoQuery: { storyId: id },
         allFields: Object.keys(storyObj),
