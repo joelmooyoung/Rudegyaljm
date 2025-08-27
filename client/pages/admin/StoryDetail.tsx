@@ -1037,23 +1037,33 @@ export default function StoryDetail({
                           <Label>Plain Text Input</Label>
                           <span className="text-xs text-muted-foreground">
                             {plainTextInput.length.toLocaleString()} characters
-                            {isProcessingPreview && (
+                            {isProcessingPreview && processingTotal > 0 && (
+                              <span className="text-blue-600 ml-2">
+                                🔄 Processing {processingProgress}/{processingTotal}...
+                              </span>
+                            )}
+                            {isProcessingPreview && processingTotal === 0 && (
                               <span className="text-blue-600 ml-2">
                                 🔄 Processing...
                               </span>
                             )}
                             {!isProcessingPreview &&
-                              plainTextInput.length > 5000 && (
+                              (plainTextInput.length > 3000 || plainTextInput.split('\n\n').length > 100) && (
                                 <span className="text-orange-600 ml-2">
-                                  ⚠️ Large text - chunked processing will be
-                                  used
+                                  ⚡ Async processing will be used
                                 </span>
                               )}
                             {!isProcessingPreview &&
-                              plainTextInput.length > 3000 &&
-                              plainTextInput.length <= 5000 && (
+                              plainTextInput.length > 1000 &&
+                              plainTextInput.length <= 3000 && (
                                 <span className="text-yellow-600 ml-2">
-                                  ⚠️ Preview disabled for performance
+                                  ⚠️ Large text - preview may be slow
+                                </span>
+                              )}
+                            {!isProcessingPreview &&
+                              plainTextInput.length > 50000 && (
+                                <span className="text-red-600 ml-2">
+                                  🚨 Very large text - consider breaking into sections
                                 </span>
                               )}
                           </span>
