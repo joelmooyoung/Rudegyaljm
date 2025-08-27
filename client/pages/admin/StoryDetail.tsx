@@ -1157,6 +1157,18 @@ export default function StoryDetail({
                         </div>
                       )}
 
+                      {/* Error display */}
+                      {conversionError && (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                          <p className="text-sm text-red-700 font-medium">
+                            ❌ Conversion Error
+                          </p>
+                          <p className="text-sm text-red-600 mt-1">
+                            {conversionError}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="outline"
