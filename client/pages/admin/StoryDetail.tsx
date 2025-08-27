@@ -527,8 +527,8 @@ export default function StoryDetail({
 
       console.log("[IMAGE UPLOAD] Sending to API...");
 
-      // Upload compressed image to API
-      const response = await fetch("/api/upload-image.js", {
+      // Upload compressed image to API (corrected endpoint)
+      const response = await fetch("/api/upload-image", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -542,49 +542,39 @@ export default function StoryDetail({
       });
 
       console.log("[IMAGE UPLOAD] API response status:", response.status, response.statusText);
+      console.log("[IMAGE UPLOAD] Response headers:", Object.fromEntries(response.headers.entries()));
 
-      // Handle response properly to avoid body consumption issues
+      // Simplified response handling
       let result;
       try {
-        // Validate response object integrity before reading
-        if (!response || typeof response.text !== 'function') {
-          throw new Error("Invalid or corrupted response object");
+        if (!response.ok) {
+          // For non-200 responses, try to get error details
+          let errorText = "";
+          try {
+            errorText = await response.text();
+          } catch (textError) {
+            errorText = `Unable to read error response: ${textError.message}`;
+          }
+          throw new Error(`Upload failed: ${response.status} ${response.statusText}. ${errorText}`);
         }
 
-        if (response.bodyUsed) {
-          throw new Error("Response body already consumed");
+        // Parse successful response
+        result = await response.json();
+        console.log("[IMAGE UPLOAD] Parsed response:", {
+          success: result.success,
+          hasImageUrl: !!result.imageUrl,
+          error: result.error,
+          message: result.message
+        });
+      } catch (error) {
+        console.error("[IMAGE UPLOAD] Response processing error:", error);
+
+        // Re-throw with clearer message
+        if (error.message.includes("Upload failed:")) {
+          throw error; // Already formatted error from non-200 response
+        } else {
+          throw new Error(`Failed to process server response: ${error.message}`);
         }
-
-        // Read response with timeout protection
-        const textPromise = response.text();
-        const timeoutPromise = new Promise<string>((_, reject) =>
-          setTimeout(() => reject(new Error('Response reading timeout')), 10000)
-        );
-
-        const responseText = await Promise.race([textPromise, timeoutPromise]);
-        console.log("[IMAGE UPLOAD] Response text length:", responseText?.length || 0);
-        console.log("[IMAGE UPLOAD] Response text preview:", responseText?.substring(0, 200) || 'Empty');
-
-        if (!responseText.trim()) {
-          throw new Error("Empty response from server");
-        }
-
-        try {
-          result = JSON.parse(responseText);
-          console.log("[IMAGE UPLOAD] Parsed response:", {
-            success: result.success,
-            hasImageUrl: !!result.imageUrl,
-            error: result.error,
-            message: result.message
-          });
-        } catch (parseError) {
-          console.error("[IMAGE UPLOAD] JSON parse error:", parseError);
-          console.error("[IMAGE UPLOAD] Raw response that failed to parse:", responseText);
-          throw new Error(`Server returned invalid JSON: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
-        }
-      } catch (textError) {
-        console.error("[IMAGE UPLOAD] Response text reading error:", textError);
-        throw new Error(`Failed to read server response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
       }
 
       if (!response.ok) {
