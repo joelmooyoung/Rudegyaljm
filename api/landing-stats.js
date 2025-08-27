@@ -181,7 +181,7 @@ export default async function handler(req, res) {
         ? commentCountMap[story.storyId] || 0
         : story.commentCount || 0,
       image: story.image || null,
-      audioUrl: null, // Excluded for performance
+      audioUrl: story.audioUrl || null, // Include audioUrl for audio indicators
     }));
 
     // Prepare aggregate statistics
