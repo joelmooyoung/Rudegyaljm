@@ -1066,17 +1066,42 @@ export default function StoryDetail({
                         />
                       </div>
 
-                      {plainTextInput && (
+                      {/* Progress indicator for large text processing */}
+                      {isProcessingPreview && processingTotal > 0 && (
+                        <div className="space-y-3">
+                          <div className="text-center">
+                            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+                            <p className="text-sm font-medium text-muted-foreground">
+                              Processing large text...
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {processingProgress} / {processingTotal} paragraphs
+                            </p>
+                            {/* Progress bar */}
+                            <div className="w-full bg-muted rounded-full h-2 mt-2">
+                              <div
+                                className="bg-primary h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${(processingProgress / processingTotal) * 100}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* HTML Preview - only show when not processing */}
+                      {plainTextInput && !isProcessingPreview && (
                         <div className="space-y-2">
                           <Label>HTML Preview</Label>
                           <div className="border rounded-md p-3 bg-muted/50 text-sm">
                             <code className="text-xs text-muted-foreground block mb-2">
                               HTML Output:{" "}
                               {plainTextInput.length.toLocaleString()} chars
-                              {plainTextInput.length > 5000 &&
-                                " (Preview disabled for performance)"}
-                              {plainTextInput.length > 2000 &&
-                                plainTextInput.length <= 5000 &&
+                              {plainTextInput.length > 3000 &&
+                                " (Preview disabled for large text)"}
+                              {plainTextInput.length > 1000 &&
+                                plainTextInput.length <= 3000 &&
                                 " (Large text warning)"}
                             </code>
                             <div
