@@ -419,7 +419,7 @@ export default function StoryMaintenance({
 
   const runBasicTest = async () => {
     try {
-      console.log("���� Running basic API test...");
+      console.log("🏁 Running basic API test...");
       console.log("🏁 Current URL:", window.location.href);
       console.log("🏁 Test URL:", window.location.origin + "/api/test-basic");
 
@@ -746,7 +746,7 @@ export default function StoryMaintenance({
     };
 
     setConnectionDebug(debugInfo);
-    console.log("��� Connection Debug Info:", debugInfo);
+    console.log("🔍 Connection Debug Info:", debugInfo);
 
     alert(`🔍 Connection Debug Info:
 
@@ -917,6 +917,8 @@ Check console for full details.`);
   };
 
   // Removed complex safeReadResponse function - using direct response.json() instead
+  // This prevents "Response body already consumed" errors that occurred when the
+  // complex function tried to read response bodies that had already been processed
 
   const testSimpleConnectivity = async () => {
     try {
