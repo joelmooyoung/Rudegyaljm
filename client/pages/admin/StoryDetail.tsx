@@ -1579,8 +1579,13 @@ export default function StoryDetail({
                 <div className="mt-6 pt-4 border-t border-dashed border-yellow-300 bg-yellow-50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-medium text-yellow-800">🧪 Stats Testing</h4>
-                      <p className="text-xs text-yellow-700">Test if stats are saved correctly when creating new stories</p>
+                      <h4 className="text-sm font-medium text-yellow-800">
+                        🧪 Stats Testing
+                      </h4>
+                      <p className="text-xs text-yellow-700">
+                        Test if stats are saved correctly when creating new
+                        stories
+                      </p>
                     </div>
                     <button
                       type="button"
@@ -1591,7 +1596,9 @@ export default function StoryDetail({
                         handleInputChange("ratingCount", 25);
                         handleInputChange("commentCount", 8);
                         handleInputChange("likeCount", 42);
-                        alert("Test stats filled in! Now save the story and check if stats are preserved.");
+                        alert(
+                          "Test stats filled in! Now save the story and check if stats are preserved.",
+                        );
                       }}
                       className="text-xs px-3 py-1 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 rounded border border-yellow-400"
                     >

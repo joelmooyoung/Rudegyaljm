@@ -250,7 +250,7 @@ export default async function handler(req, res) {
           rating,
           ratingCount,
           commentCount,
-          likeCount
+          likeCount,
         });
 
         const newStory = new Story({
@@ -267,11 +267,11 @@ export default async function handler(req, res) {
           published,
           featured: false,
           // Map frontend field names to correct MongoDB schema field names
-          views: viewCount,          // Frontend: viewCount -> Schema: views
-          averageRating: rating,     // Frontend: rating -> Schema: averageRating
-          ratingCount: ratingCount,  // Same name in both
+          views: viewCount, // Frontend: viewCount -> Schema: views
+          averageRating: rating, // Frontend: rating -> Schema: averageRating
+          ratingCount: ratingCount, // Same name in both
           commentCount: commentCount, // Same name in both
-          likeCount: likeCount,      // Same name in both
+          likeCount: likeCount, // Same name in both
         });
 
         await newStory.save();
@@ -335,7 +335,8 @@ export default async function handler(req, res) {
         if (req.body.tags)
           updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
         if (req.body.image !== undefined) updateFields.image = req.body.image;
-        if (req.body.audioUrl !== undefined) updateFields.audioUrl = req.body.audioUrl;
+        if (req.body.audioUrl !== undefined)
+          updateFields.audioUrl = req.body.audioUrl;
         if (req.body.excerpt) updateFields.excerpt = req.body.excerpt;
         if (req.body.accessLevel)
           updateFields.accessLevel = req.body.accessLevel;
@@ -344,15 +345,15 @@ export default async function handler(req, res) {
 
         // Stats field mapping: Frontend -> MongoDB Schema
         if (req.body.hasOwnProperty("viewCount"))
-          updateFields.views = req.body.viewCount;        // Frontend: viewCount -> Schema: views
+          updateFields.views = req.body.viewCount; // Frontend: viewCount -> Schema: views
         if (req.body.hasOwnProperty("rating"))
-          updateFields.averageRating = req.body.rating;   // Frontend: rating -> Schema: averageRating
+          updateFields.averageRating = req.body.rating; // Frontend: rating -> Schema: averageRating
         if (req.body.hasOwnProperty("ratingCount"))
           updateFields.ratingCount = req.body.ratingCount; // Same name
         if (req.body.hasOwnProperty("commentCount"))
           updateFields.commentCount = req.body.commentCount; // Same name
         if (req.body.hasOwnProperty("likeCount"))
-          updateFields.likeCount = req.body.likeCount;     // Same name
+          updateFields.likeCount = req.body.likeCount; // Same name
 
         console.log(`[STORIES API] Update fields for stats:`, {
           viewCount: req.body.viewCount,
@@ -365,8 +366,8 @@ export default async function handler(req, res) {
             averageRating: updateFields.averageRating,
             ratingCount: updateFields.ratingCount,
             commentCount: updateFields.commentCount,
-            likeCount: updateFields.likeCount
-          }
+            likeCount: updateFields.likeCount,
+          },
         });
 
         const updatedStory = await Story.findOneAndUpdate(

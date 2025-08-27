@@ -47,7 +47,7 @@ export default function handler(req, res) {
       title: "Test Story Stats - " + Date.now(),
       content: "<p>This is a test story for verifying stats saving.</p>",
       author: "Test Author",
-      category: "Romance", 
+      category: "Romance",
       tags: ["test", "stats"],
       excerpt: "Testing stats saving functionality",
       accessLevel: "free",
@@ -59,14 +59,18 @@ export default function handler(req, res) {
       likeCount: 42,
     };
 
-    console.log("[TEST STORY STATS] Testing story creation with stats:", testStoryData);
+    console.log(
+      "[TEST STORY STATS] Testing story creation with stats:",
+      testStoryData,
+    );
 
     return res.status(200).json({
       success: true,
       message: "Use this data to test story creation",
       testData: testStoryData,
       instructions: "Send this data to POST /api/stories to test stats saving",
-      expectedBehavior: "Stats should be saved with the exact values provided, not reset to 0",
+      expectedBehavior:
+        "Stats should be saved with the exact values provided, not reset to 0",
     });
   }
 
