@@ -895,6 +895,60 @@ Check console for full details.`);
     }
   };
 
+  const testImageUpload = async () => {
+    try {
+      console.log("📷 Testing image upload API...");
+
+      // First test the endpoint availability
+      const testResponse = await fetch("/api/test-image-upload", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (testResponse.ok) {
+        const testResult = await testResponse.json();
+        console.log("📷 Image upload test endpoint result:", testResult);
+
+        // Now test the actual upload functionality
+        const uploadTestResponse = await fetch("/api/test-image-upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (uploadTestResponse.ok) {
+          const uploadResult = await uploadTestResponse.json();
+          console.log("📷 Image upload functionality test result:", uploadResult);
+
+          if (uploadResult.success) {
+            alert(
+              `✅ Image Upload Test Results:\n\n` +
+              `Endpoint Status: Working\n` +
+              `Upload API Status: ${uploadResult.uploadApiStatus}\n` +
+              `Upload Success: ${uploadResult.uploadApiResponse?.success || 'Unknown'}\n` +
+              `Error (if any): ${uploadResult.uploadApiResponse?.error || 'None'}\n\n` +
+              `The image upload functionality appears to be working correctly.`
+            );
+          } else {
+            alert(`❌ Image upload test failed: ${uploadResult.message}`);
+          }
+        } else {
+          const errorText = await uploadTestResponse.text();
+          alert(`❌ Image upload functionality test request failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}\n\nResponse: ${errorText}`);
+        }
+      } else {
+        const errorText = await testResponse.text();
+        alert(`❌ Image upload test endpoint failed: ${testResponse.status} ${testResponse.statusText}\n\nResponse: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("❌ Error testing image upload:", error);
+      alert(`❌ Error testing image upload: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  };
+
   const testFieldMapping = async () => {
     try {
       console.log("🔧 Testing field mapping fixes...");
