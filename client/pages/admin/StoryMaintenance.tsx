@@ -746,7 +746,7 @@ export default function StoryMaintenance({
     };
 
     setConnectionDebug(debugInfo);
-    console.log("���� Connection Debug Info:", debugInfo);
+    console.log("🔍 Connection Debug Info:", debugInfo);
 
     alert(`🔍 Connection Debug Info:
 
@@ -1218,7 +1218,7 @@ Check console for full details.`);
           alert(`❌ Image upload test failed: ${uploadResult?.message || 'Unknown upload test error'}`);
         }
       } else {
-        alert(`❌ Image upload test endpoint failed: ${testResult.data?.message || 'Unknown test endpoint error'}`);
+        alert(`❌ Image upload test endpoint failed: ${testResult?.message || 'Unknown test endpoint error'}`);
       }
     } catch (error) {
       console.error("❌ Error testing image upload:", error);
