@@ -610,19 +610,34 @@ export default function StoryDetail({
       console.error("[IMAGE UPLOAD] Error stack:", error instanceof Error ? error.stack : "No stack trace");
 
       let userMessage = "Failed to upload image.";
+
       if (error instanceof Error) {
-        if (error.message.includes("fetch")) {
-          userMessage += " Network error - please check your connection.";
-        } else if (error.message.includes("JSON") || error.message.includes("parse")) {
-          userMessage += " Server response error - please try again.";
-        } else if (error.message.includes("too large")) {
-          userMessage += " File too large - please choose a smaller image.";
-        } else {
-          userMessage += ` ${error.message}`;
+        const errorMsg = error.message.toLowerCase();
+
+        if (errorMsg.includes("network") || errorMsg.includes("fetch")) {
+          userMessage = "Network error - please check your connection and try again.";
+        } else if (errorMsg.includes("too large") || errorMsg.includes("size")) {
+          userMessage = "Image file is too large. Please choose a smaller image.";
+        } else if (errorMsg.includes("compression")) {
+          userMessage = "Image compression failed. Please try a different image.";
+        } else if (errorMsg.includes("invalid") || errorMsg.includes("format")) {
+          userMessage = "Invalid image format. Please use JPG, PNG, GIF, or WebP.";
+        } else if (errorMsg.includes("404") || errorMsg.includes("not found")) {
+          userMessage = "Upload service unavailable. Please try again later.";
+        } else if (errorMsg.includes("timeout")) {
+          userMessage = "Upload timed out. Please try again.";
+        } else if (error.message && error.message.trim()) {
+          userMessage = `Upload failed: ${error.message}`;
         }
       }
 
       alert(userMessage);
+
+      // Reset file input to allow retry with same file
+      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } finally {
       setIsUploadingImage(false);
     }
