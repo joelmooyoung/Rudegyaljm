@@ -265,39 +265,88 @@ export default function StoryDetail({
     chunkSize: number = 50,
     onProgress?: (done: number, total: number) => void
   ): Promise<string> => {
-    const paragraphs = text.split("\n\n");
-    let htmlChunks: string[] = [];
-
-    for (let i = 0; i < paragraphs.length; i += chunkSize) {
-      const chunk = paragraphs.slice(i, i + chunkSize);
-      htmlChunks.push(
-        ...chunk.map((paragraph) => {
-          if (!paragraph.trim()) return "";
-
-          const trimmed = paragraph.trim();
-
-          if (detectHeader(trimmed)) {
-            return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
-          }
-
-          // Paragraph with formatting
-          let formatted = paragraph
-            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-            .replace(/\*(.+?)\*/g, "<em>$1</em>")
-            .replace(/`(.+?)`/g, "<code>$1</code>")
-            .replace(/\n/g, "<br>");
-
-          return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
-        })
-      );
-
-      if (onProgress) onProgress(Math.min(i + chunk.length, paragraphs.length), paragraphs.length);
-
-      // Yield to browser to keep UI responsive
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    if (!text || !text.trim()) {
+      throw new Error("No text provided for conversion");
     }
 
-    return htmlChunks.filter((p) => p !== "").join("\n");
+    const paragraphs = text.split("\n\n");
+    const totalParagraphs = paragraphs.length;
+    let htmlChunks: string[] = [];
+
+    // Initialize progress
+    if (onProgress) onProgress(0, totalParagraphs);
+
+    try {
+      for (let i = 0; i < paragraphs.length; i += chunkSize) {
+        const chunk = paragraphs.slice(i, i + chunkSize);
+
+        const processedChunk = chunk.map((paragraph) => {
+          if (!paragraph.trim()) return "";
+
+          try {
+            const trimmed = paragraph.trim();
+
+            if (detectHeader(trimmed)) {
+              // Escape HTML to prevent XSS
+              const escaped = trimmed.replace(/[<>&"']/g, (char) => {
+                const escapeMap: { [key: string]: string } = {
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  '&': '&amp;',
+                  '"': '&quot;',
+                  "'": '&#39;'
+                };
+                return escapeMap[char];
+              });
+              return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${escaped}</h2>`;
+            }
+
+            // Paragraph with formatting - escape HTML first, then apply formatting
+            let formatted = paragraph
+              .replace(/[<>&"']/g, (char) => {
+                const escapeMap: { [key: string]: string } = {
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  '&': '&amp;',
+                  '"': '&quot;',
+                  "'": '&#39;'
+                };
+                return escapeMap[char];
+              })
+              .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+              .replace(/\*(.+?)\*/g, "<em>$1</em>")
+              .replace(/`(.+?)`/g, "<code>$1</code>")
+              .replace(/\n/g, "<br>");
+
+            return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
+          } catch (err) {
+            console.warn("Error processing paragraph:", err);
+            // Return a safe fallback for problematic paragraphs
+            return `<p style="margin: 1em 0; line-height: 1.6;">${paragraph.replace(/[<>&"']/g, '')}</p>`;
+          }
+        });
+
+        htmlChunks.push(...processedChunk);
+
+        // Update progress
+        const currentProgress = Math.min(i + chunk.length, totalParagraphs);
+        if (onProgress) onProgress(currentProgress, totalParagraphs);
+
+        // Yield to browser to keep UI responsive
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    } catch (error) {
+      console.error("Error in async conversion:", error);
+      throw new Error(`Conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    const result = htmlChunks.filter((p) => p !== "").join("\n");
+
+    if (!result.trim()) {
+      throw new Error("Conversion resulted in empty content");
+    }
+
+    return result;
   };
 
   // Simple synchronous converter for small texts
