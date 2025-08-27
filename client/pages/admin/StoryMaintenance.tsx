@@ -925,14 +925,18 @@ Check console for full details.`);
       // Additional validation for response object integrity
       try {
         // Test if we can access basic properties without errors
-        const testAccess = response.status && response.headers;
-        if (!testAccess) {
+        // Note: response.status can be 0, so we check for number type instead
+        const hasStatus = typeof response.status === 'number';
+        const hasHeaders = response.headers && typeof response.headers.entries === 'function';
+
+        if (!hasStatus || !hasHeaders) {
           return {
             success: false,
-            error: `Response object properties inaccessible for ${description}`
+            error: `Response object properties inaccessible for ${description} (status: ${hasStatus}, headers: ${hasHeaders})`
           };
         }
       } catch (accessError) {
+        console.error(`📷 Response object access error for ${description}:`, accessError);
         return {
           success: false,
           error: `Response object access error for ${description}: ${accessError instanceof Error ? accessError.message : 'Access failed'}`
