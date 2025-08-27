@@ -419,7 +419,7 @@ export default function StoryMaintenance({
 
   const runBasicTest = async () => {
     try {
-      console.log("🏁 Running basic API test...");
+      console.log("���� Running basic API test...");
       console.log("🏁 Current URL:", window.location.href);
       console.log("🏁 Test URL:", window.location.origin + "/api/test-basic");
 
@@ -746,7 +746,7 @@ export default function StoryMaintenance({
     };
 
     setConnectionDebug(debugInfo);
-    console.log("🔍 Connection Debug Info:", debugInfo);
+    console.log("��� Connection Debug Info:", debugInfo);
 
     alert(`🔍 Connection Debug Info:
 
@@ -916,150 +916,7 @@ Check console for full details.`);
     }
   };
 
-  // Robust response reader that handles various edge cases
-  const safeReadResponse = async (response: Response, description: string): Promise<{ success: boolean; data?: any; error?: string }> => {
-    try {
-      // Safe logging with error protection
-      let headersObj = {};
-      try {
-        if (response.headers && typeof response.headers.entries === 'function') {
-          headersObj = Object.fromEntries(response.headers.entries());
-        }
-      } catch (headersError) {
-        console.warn(`📷 Could not read headers for ${description}:`, headersError);
-        headersObj = { error: 'Headers not readable' };
-      }
-
-      console.log(`📷 Reading ${description} response:`, {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        bodyUsed: response.bodyUsed,
-        headers: headersObj
-      });
-
-      // Check if body was already consumed
-      if (response.bodyUsed) {
-        return {
-          success: false,
-          error: `Response body already consumed for ${description}`
-        };
-      }
-
-      // Check if response exists and has the right methods
-      if (!response || typeof response.text !== 'function') {
-        return {
-          success: false,
-          error: `Invalid response object for ${description} - response may be corrupted`
-        };
-      }
-
-      // Additional validation for response object integrity
-      try {
-        // Test if we can access basic properties without errors
-        // Note: response.status can be 0, so we check for number type instead
-        const hasStatus = typeof response.status === 'number';
-        const hasHeaders = response.headers && typeof response.headers.entries === 'function';
-
-        if (!hasStatus || !hasHeaders) {
-          return {
-            success: false,
-            error: `Response object properties inaccessible for ${description} (status: ${hasStatus}, headers: ${hasHeaders})`
-          };
-        }
-      } catch (accessError) {
-        console.error(`📷 Response object access error for ${description}:`, accessError);
-        return {
-          success: false,
-          error: `Response object access error for ${description}: ${accessError instanceof Error ? accessError.message : 'Access failed'}`
-        };
-      }
-
-      let responseText;
-      try {
-        // Use a timeout to prevent hanging
-        let textPromise;
-        let timeoutPromise;
-
-        try {
-          textPromise = response.text();
-        } catch (textInitError) {
-          console.error(`📷 Error initializing text read for ${description}:`, textInitError);
-          return {
-            success: false,
-            error: `Failed to initialize text reading for ${description}: ${textInitError instanceof Error ? textInitError.message : 'Text init error'}`
-          };
-        }
-
-        try {
-          timeoutPromise = new Promise<string>((_, reject) =>
-            setTimeout(() => reject(new Error('Response reading timeout')), 10000)
-          );
-        } catch (timeoutInitError) {
-          console.error(`📷 Error creating timeout for ${description}:`, timeoutInitError);
-          // Fall back to just the text promise without timeout
-          responseText = await textPromise;
-        }
-
-        if (timeoutPromise) {
-          responseText = await Promise.race([textPromise, timeoutPromise]);
-        }
-
-        console.log(`📷 ${description} response text length:`, responseText?.length || 0);
-        console.log(`📷 ${description} response preview:`, responseText?.substring(0, 200) || 'Empty');
-      } catch (textError) {
-        console.error(`📷 Error reading ${description} response text:`, textError);
-
-        // Provide more specific error information
-        let errorMessage = 'Text read error';
-        if (textError instanceof Error) {
-          errorMessage = textError.message;
-          if (textError.message.includes('timeout')) {
-            errorMessage = 'Response reading timed out after 10 seconds';
-          } else if (textError.message.includes('network')) {
-            errorMessage = 'Network error while reading response';
-          } else if (textError.message.includes('body')) {
-            errorMessage = 'Response body is not readable or was already consumed';
-          }
-        }
-
-        return {
-          success: false,
-          error: `Failed to read ${description} response: ${errorMessage}`
-        };
-      }
-
-      if (!responseText || responseText.trim() === '') {
-        return {
-          success: false,
-          error: `Empty response from ${description}`
-        };
-      }
-
-      // Try to parse JSON
-      try {
-        const parsed = JSON.parse(responseText);
-        console.log(`📷 Parsed ${description} result:`, parsed);
-        return {
-          success: true,
-          data: parsed
-        };
-      } catch (parseError) {
-        console.error(`📷 JSON parse error for ${description}:`, parseError);
-        return {
-          success: false,
-          error: `Invalid JSON in ${description} response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`,
-          data: { rawResponse: responseText.substring(0, 500) }
-        };
-      }
-    } catch (error) {
-      console.error(`📷 Unexpected error reading ${description} response:`, error);
-      return {
-        success: false,
-        error: `Unexpected error reading ${description} response: ${error instanceof Error ? error.message : 'Unknown error'}`
-      };
-    }
-  };
+  // Removed complex safeReadResponse function - using direct response.json() instead
 
   const testSimpleConnectivity = async () => {
     try {
