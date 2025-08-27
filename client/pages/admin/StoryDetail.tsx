@@ -153,6 +153,7 @@ export default function StoryDetail({
   // Progress tracking for async text conversion
   const [processingProgress, setProcessingProgress] = useState<number>(0);
   const [processingTotal, setProcessingTotal] = useState<number>(0);
+  const [conversionError, setConversionError] = useState<string>("");
 
   // Fetch complete story details when editing
   const fetchCompleteStory = async (storyId: string) => {
