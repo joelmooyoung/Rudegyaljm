@@ -577,38 +577,33 @@ export default function StoryDetail({
         }
       }
 
-      if (!response.ok) {
-        const errorMessage = result?.error || result?.message || `Upload failed: ${response.status} ${response.statusText}`;
-        console.error("[IMAGE UPLOAD] Server error:", errorMessage);
+      // Check if upload was successful
+      if (!result || !result.success) {
+        const errorMessage = result?.error || result?.message || "Upload failed - server error";
+        console.error("[IMAGE UPLOAD] Server reported failure:", errorMessage);
         throw new Error(errorMessage);
       }
 
-      if (result.success) {
-        if (!result.imageUrl) {
-          throw new Error("Server did not return an image URL");
-        }
+      if (!result.imageUrl) {
+        throw new Error("Server did not return an image URL");
+      }
 
-        console.log("[IMAGE UPLOAD] ✅ Upload successful");
+      console.log("[IMAGE UPLOAD] ✅ Upload successful");
 
-        const imageUrl = result.imageUrl;
-        setImagePreview(imageUrl);
-        handleInputChange("image", imageUrl);
+      const imageUrl = result.imageUrl;
+      setImagePreview(imageUrl);
+      handleInputChange("image", imageUrl);
 
-        // Show compression info if available
-        if (result.compressionRatio && result.originalSize && result.compressedSize) {
-          console.log(
-            `Image uploaded and compressed successfully:\n` +
-              `Original: ${(result.originalSize / 1024).toFixed(1)}KB\n` +
-              `Compressed: ${(result.compressedSize / 1024).toFixed(1)}KB\n` +
-              `Saved: ${result.compressionRatio}`,
-          );
-        } else {
-          console.log(`Image uploaded successfully`);
-        }
+      // Show compression info if available
+      if (result.compressionRatio && result.originalSize && result.compressedSize) {
+        console.log(
+          `Image uploaded and compressed successfully:\n` +
+            `Original: ${(result.originalSize / 1024).toFixed(1)}KB\n` +
+            `Compressed: ${(result.compressedSize / 1024).toFixed(1)}KB\n` +
+            `Saved: ${result.compressionRatio}`,
+        );
       } else {
-        const errorMessage = result.message || result.error || "Upload failed - unknown server error";
-        console.error("[IMAGE UPLOAD] Server reported failure:", errorMessage);
-        throw new Error(errorMessage);
+        console.log(`Image uploaded successfully`);
       }
     } catch (error) {
       console.error("[IMAGE UPLOAD] ❌ Upload failed:", error);
