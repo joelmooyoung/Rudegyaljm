@@ -975,34 +975,50 @@ Check console for full details.`);
 
   const testSimpleConnectivity = async () => {
     try {
-      console.log("🔍 Testing basic connectivity...");
+      console.log("🔍 Testing basic connectivity with minimal endpoint...");
 
-      // Test basic fetch to a simple endpoint
-      const response = await fetch("/api/test-migration", {
+      // Test basic fetch to the simplest possible endpoint
+      const response = await fetch("/api/test-minimal", {
         method: "GET",
         headers: {
           "Accept": "application/json",
         },
       });
 
-      console.log("🔍 Basic connectivity test response:", {
+      console.log("🔍 Minimal endpoint response details:", {
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
         bodyUsed: response.bodyUsed,
         type: response.type,
-        url: response.url
+        url: response.url,
+        headers: Object.fromEntries(response.headers.entries())
       });
 
-      // Simple alert based on status
+      // Try to read response safely
       if (response.ok) {
-        alert("✅ Basic connectivity test passed! Network and server are responding.");
+        try {
+          // Simple check without reading body if there are issues
+          alert(`✅ Basic connectivity test passed!\n\nStatus: ${response.status}\nServer is responding correctly.`);
+        } catch (readError) {
+          console.error("🔍 Error reading response (but status was OK):", readError);
+          alert(`✅ Basic connectivity test passed!\n\nStatus: ${response.status}\nNote: Response body could not be read, but server is responding.`);
+        }
       } else {
         alert(`❌ Basic connectivity test failed: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error("🔍 Basic connectivity test error:", error);
-      alert(`❌ Basic connectivity test failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+
+      let errorMessage = "Unknown error";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.message.includes("fetch")) {
+          errorMessage += " (Network connectivity issue)";
+        }
+      }
+
+      alert(`❌ Basic connectivity test failed: ${errorMessage}`);
     }
   };
 
@@ -1858,7 +1874,7 @@ Check console for full details.`);
                         <div key={index} className="text-sm p-2 bg-gray-50 rounded border">
                           <div className="font-medium">{change.title}</div>
                           <div className="text-xs text-gray-600 mt-1">
-                            Views: {change.before.views} → {change.after.views} |
+                            Views: {change.before.views} �� {change.after.views} |
                             Likes: {change.before.likes} → {change.after.likes} |
                             Ratings: {change.before.ratings} → {change.after.ratings}
                           </div>
