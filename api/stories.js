@@ -231,6 +231,8 @@ export default async function handler(req, res) {
           viewCount = 0,
           rating = 0,
           ratingCount = 0,
+          commentCount = 0,
+          likeCount = 0,
         } = req.body;
 
         if (!title || !content || !author || !category) {
