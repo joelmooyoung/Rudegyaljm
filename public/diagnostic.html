@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { border-color: #4CAF50; background: #f8fff8; }
+        .error { border-color: #f44336; background: #fff8f8; }
+        .loading { border-color: #2196F3; background: #f8f9ff; }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #1976D2; }
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Network & Application Diagnostic Tool</h1>
+        
+        <div class="test-section">
+            <h3>🌐 Basic Connectivity Tests</h3>
+            <button onclick="testBasicConnectivity()">Test Basic API</button>
+            <button onclick="testStoriesAPI()">Test Stories API</button>
+            <button onclick="testLandingStats()">Test Landing Stats</button>
+            <div id="connectivity-result" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 Frontend Application Tests</h3>
+            <button onclick="testReactApp()">Test React App Load</button>
+            <button onclick="testViteResources()">Test Vite Resources</button>
+            <button onclick="checkConsoleErrors()">Check Console Errors</button>
+            <div id="frontend-result" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Environment Information</h3>
+            <div id="env-info" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Real-time Error Monitor</h3>
+            <button onclick="startErrorMonitor()">Start Monitoring</button>
+            <button onclick="stopErrorMonitor()">Stop Monitoring</button>
+            <div id="error-monitor" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        let errorMonitorActive = false;
+        let errorCount = 0;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '🔍';
+            element.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        async function testBasicConnectivity() {
+            log('connectivity-result', 'Testing basic API connectivity...', 'info');
+            
+            try {
+                const response = await fetch('/api/test-connectivity', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('connectivity-result', `Basic API test: ${data.message}`, 'success');
+                } else {
+                    log('connectivity-result', `Basic API failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('connectivity-result', `Basic API error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStoriesAPI() {
+            log('connectivity-result', 'Testing Stories API...', 'info');
+            
+            try {
+                const response = await fetch('/api/stories?limit=1', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('connectivity-result', `Stories API test: Found ${data.stories?.length || data.length || 0} stories`, 'success');
+                } else {
+                    log('connectivity-result', `Stories API failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('connectivity-result', `Stories API error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLandingStats() {
+            log('connectivity-result', 'Testing Landing Stats API...', 'info');
+            
+            try {
+                const response = await fetch('/api/landing-stats', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('connectivity-result', `Landing Stats test: ${data.storiesCount} stories, query time: ${data.queryTime}`, 'success');
+                } else {
+                    log('connectivity-result', `Landing Stats failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('connectivity-result', `Landing Stats error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testReactApp() {
+            log('frontend-result', 'Testing React application...', 'info');
+            
+            try {
+                // Test if main app files are accessible
+                const tests = [
+                    { url: '/src/main.tsx', name: 'Main TypeScript' },
+                    { url: '/src/App.tsx', name: 'App Component' },
+                    { url: '/@vite/client', name: 'Vite Client' }
+                ];
+
+                for (const test of tests) {
+                    try {
+                        const response = await fetch(test.url);
+                        if (response.ok) {
+                            log('frontend-result', `${test.name}: ✅ Accessible`, 'success');
+                        } else {
+                            log('frontend-result', `${test.name}: ❌ ${response.status}`, 'error');
+                        }
+                    } catch (error) {
+                        log('frontend-result', `${test.name}: ❌ ${error.message}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log('frontend-result', `React app test error: ${error.message}`, 'error');
+            }
+        }
+
+        function testViteResources() {
+            log('frontend-result', 'Checking Vite development resources...', 'info');
+            
+            // Check if we're in development mode
+            const isDev = window.location.port === '8080' || window.location.hostname.includes('localhost');
+            log('frontend-result', `Development mode: ${isDev}`, 'info');
+            
+            // Check for Vite specific elements
+            const viteScript = document.querySelector('script[src*="@vite"]');
+            if (viteScript) {
+                log('frontend-result', 'Vite client script found', 'success');
+            } else {
+                log('frontend-result', 'Vite client script not found', 'error');
+            }
+            
+            // Check if HMR is working (development specific)
+            if (window.__vite_plugin_react_preamble_installed__) {
+                log('frontend-result', 'React HMR plugin detected', 'success');
+            } else {
+                log('frontend-result', 'React HMR plugin not detected', 'info');
+            }
+        }
+
+        function checkConsoleErrors() {
+            log('frontend-result', 'Checking browser console for errors...', 'info');
+            
+            // Override console methods to capture errors
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            let errorCaptured = false;
+            
+            console.error = function(...args) {
+                log('frontend-result', `Console Error: ${args.join(' ')}`, 'error');
+                errorCaptured = true;
+                originalError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                log('frontend-result', `Console Warning: ${args.join(' ')}`, 'info');
+                originalWarn.apply(console, args);
+            };
+            
+            // Trigger a small delay then report
+            setTimeout(() => {
+                if (!errorCaptured) {
+                    log('frontend-result', 'No console errors detected in the last few seconds', 'success');
+                }
+                
+                // Restore original methods
+                console.error = originalError;
+                console.warn = originalWarn;
+            }, 3000);
+        }
+
+        function startErrorMonitor() {
+            if (errorMonitorActive) return;
+            
+            errorMonitorActive = true;
+            errorCount = 0;
+            log('error-monitor', 'Started real-time error monitoring...', 'info');
+            
+            // Global error handler
+            window.addEventListener('error', (e) => {
+                errorCount++;
+                log('error-monitor', `JS Error #${errorCount}: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+            });
+            
+            // Unhandled promise rejection handler
+            window.addEventListener('unhandledrejection', (e) => {
+                errorCount++;
+                log('error-monitor', `Promise Rejection #${errorCount}: ${e.reason}`, 'error');
+            });
+            
+            // Network error detection
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                try {
+                    const response = await originalFetch.apply(this, args);
+                    if (!response.ok) {
+                        log('error-monitor', `Fetch Error: ${args[0]} returned ${response.status} ${response.statusText}`, 'error');
+                    }
+                    return response;
+                } catch (error) {
+                    errorCount++;
+                    log('error-monitor', `Network Error #${errorCount}: ${error.message} for ${args[0]}`, 'error');
+                    throw error;
+                }
+            };
+        }
+
+        function stopErrorMonitor() {
+            if (!errorMonitorActive) return;
+            
+            errorMonitorActive = false;
+            log('error-monitor', `Stopped error monitoring. Total errors captured: ${errorCount}`, 'info');
+        }
+
+        // Display environment information
+        function displayEnvironmentInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'URL': window.location.href,
+                'Protocol': window.location.protocol,
+                'Hostname': window.location.hostname,
+                'Port': window.location.port || 'default',
+                'Path': window.location.pathname,
+                'Search': window.location.search || 'none',
+                'Hash': window.location.hash || 'none',
+                'Referrer': document.referrer || 'direct',
+                'Cookie Enabled': navigator.cookieEnabled,
+                'Online Status': navigator.onLine,
+                'Language': navigator.language,
+                'Platform': navigator.platform,
+                'Viewport': `${window.innerWidth}x${window.innerHeight}`,
+                'Screen': `${screen.width}x${screen.height}`,
+                'Color Depth': `${screen.colorDepth} bit`,
+                'Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+            
+            let infoText = '';
+            for (const [key, value] of Object.entries(info)) {
+                infoText += `${key}: ${value}\n`;
+            }
+            
+            document.getElementById('env-info').textContent = infoText;
+        }
+
+        // Run environment info on load
+        displayEnvironmentInfo();
+        
+        // Auto-start basic connectivity test
+        setTimeout(() => {
+            testBasicConnectivity();
+        }, 1000);
+    </script>
+</body>
+</html>
