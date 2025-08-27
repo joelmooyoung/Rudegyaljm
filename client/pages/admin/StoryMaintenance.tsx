@@ -746,7 +746,7 @@ export default function StoryMaintenance({
     };
 
     setConnectionDebug(debugInfo);
-    console.log("🔍 Connection Debug Info:", debugInfo);
+    console.log("���� Connection Debug Info:", debugInfo);
 
     alert(`🔍 Connection Debug Info:
 
@@ -1183,28 +1183,39 @@ Check console for full details.`);
           throw new Error(`Network error accessing upload test: ${fetchError instanceof Error ? fetchError.message : 'Fetch failed'}`);
         }
 
-        const uploadResult = await safeReadResponse(uploadTestResponse, "upload test");
+        console.log("📷 Upload test response status:", uploadTestResponse.status, uploadTestResponse.statusText);
 
-        if (!uploadResult.success) {
-          throw new Error(uploadResult.error || "Failed to read upload test response");
+        // Handle POST response directly to avoid body consumption issues
+        let uploadResult;
+        if (uploadTestResponse.ok) {
+          try {
+            uploadResult = await uploadTestResponse.json();
+            console.log("📷 Upload test result:", uploadResult);
+          } catch (jsonError) {
+            console.error("📷 Upload test JSON parse error:", jsonError);
+            throw new Error(`Upload test returned invalid JSON: ${jsonError instanceof Error ? jsonError.message : 'Parse error'}`);
+          }
+        } else {
+          // Try to read error response
+          try {
+            const errorText = await uploadTestResponse.text();
+            throw new Error(`Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText} - ${errorText.substring(0, 200)}`);
+          } catch (textError) {
+            throw new Error(`Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}`);
+          }
         }
 
-        if (!uploadTestResponse.ok) {
-          const errorMessage = uploadResult.data?.error || uploadResult.data?.message || `Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}`;
-          throw new Error(errorMessage);
-        }
-
-        if (uploadResult.data?.success) {
+        if (uploadResult?.success) {
           alert(
             `✅ Image Upload Test Results:\n\n` +
             `Endpoint Status: Working\n` +
-            `Upload API Status: ${uploadResult.data.uploadApiStatus || 'Unknown'}\n` +
-            `Upload Success: ${uploadResult.data.uploadApiResponse?.success || 'Unknown'}\n` +
-            `Error (if any): ${uploadResult.data.uploadApiResponse?.error || 'None'}\n\n` +
+            `Upload API Status: ${uploadResult.uploadApiStatus || 'Unknown'}\n` +
+            `Upload Success: ${uploadResult.uploadApiResponse?.success || 'Unknown'}\n` +
+            `Error (if any): ${uploadResult.uploadApiResponse?.error || 'None'}\n\n` +
             `The image upload functionality appears to be working correctly.`
           );
         } else {
-          alert(`❌ Image upload test failed: ${uploadResult.data?.message || 'Unknown upload test error'}`);
+          alert(`❌ Image upload test failed: ${uploadResult?.message || 'Unknown upload test error'}`);
         }
       } else {
         alert(`❌ Image upload test endpoint failed: ${testResult.data?.message || 'Unknown test endpoint error'}`);
