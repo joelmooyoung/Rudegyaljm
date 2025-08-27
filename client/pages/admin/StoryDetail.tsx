@@ -366,15 +366,30 @@ export default function StoryDetail({
     setIsProcessingPreview(true);
     setProcessingProgress(0);
     setProcessingTotal(0);
+    setConversionError("");
 
     try {
+      // Validate input
+      if (!plainTextInput.trim()) {
+        setConversionError("Please enter some text to convert.");
+        return;
+      }
+
+      // Check for extremely large text
+      if (plainTextInput.length > 100000) {
+        setConversionError("Text is too large (>100,000 characters). Please break it into smaller sections.");
+        return;
+      }
+
       // Check text size and decide on processing method
       const textLength = plainTextInput.length;
       const paragraphCount = plainTextInput.split("\n\n").length;
 
+      console.log(`Converting text: ${textLength} chars, ${paragraphCount} paragraphs`);
+
       // For large texts, use async processing with progress tracking
       if (textLength > 3000 || paragraphCount > 100) {
-        console.log(`Processing large text: ${textLength} chars, ${paragraphCount} paragraphs`);
+        console.log("Using async processing for large text");
 
         const htmlContent = await convertPlainTextToHTMLAsync(
           plainTextInput,
@@ -385,18 +400,35 @@ export default function StoryDetail({
           }
         );
 
+        if (!htmlContent || htmlContent.trim() === "") {
+          throw new Error("Conversion resulted in empty content");
+        }
+
         handleInputChange("content", htmlContent);
       } else {
         // For smaller texts, use synchronous processing
+        console.log("Using sync processing for small text");
         const htmlContent = convertPlainTextToHTML(plainTextInput);
+
+        if (!htmlContent || htmlContent.trim() === "") {
+          throw new Error("Conversion resulted in empty content");
+        }
+
         handleInputChange("content", htmlContent);
       }
 
+      // Success - clear form and close dialog
       setPlainTextInput("");
+      setConversionError("");
       setIsPlainTextDialogOpen(false);
+
+      console.log("Text conversion completed successfully");
     } catch (err) {
       console.error("Text conversion error:", err);
-      alert("Failed to convert text. Try breaking it into smaller sections or reducing text size.");
+      const errorMessage = err instanceof Error ? err.message : "Unknown conversion error";
+      setConversionError(errorMessage);
+
+      // Don't close dialog on error - let user fix the issue
     } finally {
       setIsProcessingPreview(false);
       setProcessingProgress(0);
