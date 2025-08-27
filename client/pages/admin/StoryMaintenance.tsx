@@ -1189,6 +1189,13 @@ Check console for full details.`);
               >
                 🔧 Test Fields
               </Button>
+              <Button
+                variant="outline"
+                onClick={testImageUpload}
+                className="bg-pink-50 hover:bg-pink-100 border-pink-200 text-pink-700"
+              >
+                📷 Test Image
+              </Button>
               <Button onClick={() => onEditStory(null, "add")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Story
