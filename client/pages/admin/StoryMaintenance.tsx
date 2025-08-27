@@ -176,7 +176,7 @@ export default function StoryMaintenance({
           setTotalStories(paginationData.total);
           setTotalPages(paginationData.totalPages);
           console.log(
-            `📄 Pagination: Page ${paginationData.page} of ${paginationData.totalPages} (${paginationData.total} total stories)`,
+            `�� Pagination: Page ${paginationData.page} of ${paginationData.totalPages} (${paginationData.total} total stories)`,
           );
         }
 
@@ -918,7 +918,24 @@ Check console for full details.`);
       if (!response || typeof response.text !== 'function') {
         return {
           success: false,
-          error: `Invalid response object for ${description}`
+          error: `Invalid response object for ${description} - response may be corrupted`
+        };
+      }
+
+      // Additional validation for response object integrity
+      try {
+        // Test if we can access basic properties without errors
+        const testAccess = response.status && response.headers;
+        if (!testAccess) {
+          return {
+            success: false,
+            error: `Response object properties inaccessible for ${description}`
+          };
+        }
+      } catch (accessError) {
+        return {
+          success: false,
+          error: `Response object access error for ${description}: ${accessError instanceof Error ? accessError.message : 'Access failed'}`
         };
       }
 
@@ -1874,7 +1891,7 @@ Check console for full details.`);
                         <div key={index} className="text-sm p-2 bg-gray-50 rounded border">
                           <div className="font-medium">{change.title}</div>
                           <div className="text-xs text-gray-600 mt-1">
-                            Views: {change.before.views} �� {change.after.views} |
+                            Views: {change.before.views} → {change.after.views} |
                             Likes: {change.before.likes} → {change.after.likes} |
                             Ratings: {change.before.ratings} → {change.after.ratings}
                           </div>
