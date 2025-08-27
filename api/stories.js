@@ -326,7 +326,7 @@ export default async function handler(req, res) {
           });
         }
 
-        // Update fields
+        // Update fields - Map frontend field names to correct MongoDB schema field names
         const updateFields = {};
         if (req.body.title) updateFields.title = req.body.title;
         if (req.body.content) updateFields.content = req.body.content;
@@ -335,17 +335,39 @@ export default async function handler(req, res) {
         if (req.body.tags)
           updateFields.tags = Array.isArray(req.body.tags) ? req.body.tags : [];
         if (req.body.image !== undefined) updateFields.image = req.body.image;
+        if (req.body.audioUrl !== undefined) updateFields.audioUrl = req.body.audioUrl;
         if (req.body.excerpt) updateFields.excerpt = req.body.excerpt;
         if (req.body.accessLevel)
           updateFields.accessLevel = req.body.accessLevel;
         if (req.body.hasOwnProperty("published"))
           updateFields.published = req.body.published;
+
+        // Stats field mapping: Frontend -> MongoDB Schema
         if (req.body.hasOwnProperty("viewCount"))
-          updateFields.viewCount = req.body.viewCount;
+          updateFields.views = req.body.viewCount;        // Frontend: viewCount -> Schema: views
         if (req.body.hasOwnProperty("rating"))
-          updateFields.rating = req.body.rating;
+          updateFields.averageRating = req.body.rating;   // Frontend: rating -> Schema: averageRating
         if (req.body.hasOwnProperty("ratingCount"))
-          updateFields.ratingCount = req.body.ratingCount;
+          updateFields.ratingCount = req.body.ratingCount; // Same name
+        if (req.body.hasOwnProperty("commentCount"))
+          updateFields.commentCount = req.body.commentCount; // Same name
+        if (req.body.hasOwnProperty("likeCount"))
+          updateFields.likeCount = req.body.likeCount;     // Same name
+
+        console.log(`[STORIES API] Update fields for stats:`, {
+          viewCount: req.body.viewCount,
+          rating: req.body.rating,
+          ratingCount: req.body.ratingCount,
+          commentCount: req.body.commentCount,
+          likeCount: req.body.likeCount,
+          mappedFields: {
+            views: updateFields.views,
+            averageRating: updateFields.averageRating,
+            ratingCount: updateFields.ratingCount,
+            commentCount: updateFields.commentCount,
+            likeCount: updateFields.likeCount
+          }
+        });
 
         const updatedStory = await Story.findOneAndUpdate(
           { storyId: updateId },
