@@ -244,6 +244,15 @@ export default async function handler(req, res) {
         }
 
         const storyId = Date.now().toString();
+
+        console.log(`[STORIES API] Creating story with stats:`, {
+          viewCount,
+          rating,
+          ratingCount,
+          commentCount,
+          likeCount
+        });
+
         const newStory = new Story({
           storyId,
           title,
@@ -257,10 +266,12 @@ export default async function handler(req, res) {
           accessLevel,
           published,
           featured: false,
-          viewCount: viewCount,
-          likeCount: 0,
-          rating: rating,
-          ratingCount: ratingCount,
+          // Map frontend field names to correct MongoDB schema field names
+          views: viewCount,          // Frontend: viewCount -> Schema: views
+          averageRating: rating,     // Frontend: rating -> Schema: averageRating
+          ratingCount: ratingCount,  // Same name in both
+          commentCount: commentCount, // Same name in both
+          likeCount: likeCount,      // Same name in both
         });
 
         await newStory.save();
