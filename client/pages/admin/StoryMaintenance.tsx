@@ -869,7 +869,7 @@ Check console for full details.`);
         alert(`❌ Migration API test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText.substring(0, 200)}`);
       }
     } catch (error) {
-      console.error("❌ Error testing migration API:", error);
+      console.error("��� Error testing migration API:", error);
       console.error("❌ Error type:", typeof error);
       console.error("❌ Error constructor:", error.constructor.name);
       console.error("❌ Error stack:", error.stack);
@@ -970,6 +970,39 @@ Check console for full details.`);
         success: false,
         error: `Unexpected error reading ${description} response: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
+    }
+  };
+
+  const testSimpleConnectivity = async () => {
+    try {
+      console.log("🔍 Testing basic connectivity...");
+
+      // Test basic fetch to a simple endpoint
+      const response = await fetch("/api/test-migration", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+        },
+      });
+
+      console.log("🔍 Basic connectivity test response:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        bodyUsed: response.bodyUsed,
+        type: response.type,
+        url: response.url
+      });
+
+      // Simple alert based on status
+      if (response.ok) {
+        alert("✅ Basic connectivity test passed! Network and server are responding.");
+      } else {
+        alert(`❌ Basic connectivity test failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("🔍 Basic connectivity test error:", error);
+      alert(`❌ Basic connectivity test failed: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
