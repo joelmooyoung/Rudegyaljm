@@ -898,12 +898,23 @@ Check console for full details.`);
   // Robust response reader that handles various edge cases
   const safeReadResponse = async (response: Response, description: string): Promise<{ success: boolean; data?: any; error?: string }> => {
     try {
+      // Safe logging with error protection
+      let headersObj = {};
+      try {
+        if (response.headers && typeof response.headers.entries === 'function') {
+          headersObj = Object.fromEntries(response.headers.entries());
+        }
+      } catch (headersError) {
+        console.warn(`📷 Could not read headers for ${description}:`, headersError);
+        headersObj = { error: 'Headers not readable' };
+      }
+
       console.log(`📷 Reading ${description} response:`, {
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
         bodyUsed: response.bodyUsed,
-        headers: Object.fromEntries(response.headers.entries())
+        headers: headersObj
       });
 
       // Check if body was already consumed
@@ -1846,7 +1857,7 @@ Check console for full details.`);
                   STATS MIGRATION RESULTS
                 </Badge>
                 <span className="text-sm text-purple-700">
-                  {migrationResult.success ? "✅ Completed Successfully" : "❌ Failed"}
+                  {migrationResult.success ? "✅ Completed Successfully" : "�� Failed"}
                 </span>
               </div>
             </CardHeader>
