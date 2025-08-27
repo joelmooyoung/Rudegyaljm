@@ -895,103 +895,155 @@ Check console for full details.`);
     }
   };
 
+  // Robust response reader that handles various edge cases
+  const safeReadResponse = async (response: Response, description: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+    try {
+      console.log(`📷 Reading ${description} response:`, {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        bodyUsed: response.bodyUsed,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
+      // Check if body was already consumed
+      if (response.bodyUsed) {
+        return {
+          success: false,
+          error: `Response body already consumed for ${description}`
+        };
+      }
+
+      // Check if response exists and has the right methods
+      if (!response || typeof response.text !== 'function') {
+        return {
+          success: false,
+          error: `Invalid response object for ${description}`
+        };
+      }
+
+      let responseText;
+      try {
+        // Use a timeout to prevent hanging
+        const textPromise = response.text();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Response reading timeout')), 10000)
+        );
+
+        responseText = await Promise.race([textPromise, timeoutPromise]);
+        console.log(`📷 ${description} response text length:`, responseText?.length || 0);
+        console.log(`📷 ${description} response preview:`, responseText?.substring(0, 200) || 'Empty');
+      } catch (textError) {
+        console.error(`📷 Error reading ${description} response text:`, textError);
+        return {
+          success: false,
+          error: `Failed to read ${description} response: ${textError instanceof Error ? textError.message : 'Text read error'}`
+        };
+      }
+
+      if (!responseText || responseText.trim() === '') {
+        return {
+          success: false,
+          error: `Empty response from ${description}`
+        };
+      }
+
+      // Try to parse JSON
+      try {
+        const parsed = JSON.parse(responseText);
+        console.log(`📷 Parsed ${description} result:`, parsed);
+        return {
+          success: true,
+          data: parsed
+        };
+      } catch (parseError) {
+        console.error(`📷 JSON parse error for ${description}:`, parseError);
+        return {
+          success: false,
+          error: `Invalid JSON in ${description} response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`,
+          data: { rawResponse: responseText.substring(0, 500) }
+        };
+      }
+    } catch (error) {
+      console.error(`📷 Unexpected error reading ${description} response:`, error);
+      return {
+        success: false,
+        error: `Unexpected error reading ${description} response: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  };
+
   const testImageUpload = async () => {
     try {
       console.log("📷 Testing image upload API...");
 
       // First test the endpoint availability
-      const testResponse = await fetch("/api/test-image-upload", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("📷 Test response status:", testResponse.status, testResponse.statusText);
-
-      // Handle first response properly to avoid body consumption issues
-      let testResult;
+      let testResponse;
       try {
-        const testResponseText = await testResponse.text();
-        console.log("📷 Test response text length:", testResponseText.length);
-        console.log("📷 Test response preview:", testResponseText.substring(0, 200));
-
-        if (!testResponseText.trim()) {
-          throw new Error("Empty response from test endpoint");
-        }
-
-        try {
-          testResult = JSON.parse(testResponseText);
-          console.log("📷 Parsed test result:", testResult);
-        } catch (parseError) {
-          console.error("📷 JSON parse error for test response:", parseError);
-          throw new Error(`Invalid JSON in test response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
-        }
-      } catch (textError) {
-        console.error("📷 Error reading test response text:", textError);
-        throw new Error(`Failed to read test response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
-      }
-
-      if (!testResponse.ok) {
-        const errorMessage = testResult?.error || testResult?.message || `Test endpoint failed: ${testResponse.status} ${testResponse.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      if (testResult.success) {
-        console.log("📷 Test endpoint is working, now testing upload functionality...");
-
-        // Now test the actual upload functionality
-        const uploadTestResponse = await fetch("/api/test-image-upload", {
-          method: "POST",
+        testResponse = await fetch("/api/test-image-upload", {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
+      } catch (fetchError) {
+        console.error("📷 Fetch error for test endpoint:", fetchError);
+        throw new Error(`Network error accessing test endpoint: ${fetchError instanceof Error ? fetchError.message : 'Fetch failed'}`);
+      }
 
-        console.log("📷 Upload test response status:", uploadTestResponse.status, uploadTestResponse.statusText);
+      const testResult = await safeReadResponse(testResponse, "test endpoint");
 
-        // Handle second response properly to avoid body consumption issues
-        let uploadResult;
+      if (!testResult.success) {
+        throw new Error(testResult.error || "Failed to read test endpoint response");
+      }
+
+      if (!testResponse.ok) {
+        const errorMessage = testResult.data?.error || testResult.data?.message || `Test endpoint failed: ${testResponse.status} ${testResponse.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      if (testResult.data?.success) {
+        console.log("📷 Test endpoint is working, now testing upload functionality...");
+
+        // Now test the actual upload functionality
+        let uploadTestResponse;
         try {
-          const uploadResponseText = await uploadTestResponse.text();
-          console.log("📷 Upload response text length:", uploadResponseText.length);
-          console.log("📷 Upload response preview:", uploadResponseText.substring(0, 200));
+          uploadTestResponse = await fetch("/api/test-image-upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        } catch (fetchError) {
+          console.error("📷 Fetch error for upload test:", fetchError);
+          throw new Error(`Network error accessing upload test: ${fetchError instanceof Error ? fetchError.message : 'Fetch failed'}`);
+        }
 
-          if (!uploadResponseText.trim()) {
-            throw new Error("Empty response from upload test");
-          }
+        const uploadResult = await safeReadResponse(uploadTestResponse, "upload test");
 
-          try {
-            uploadResult = JSON.parse(uploadResponseText);
-            console.log("📷 Parsed upload result:", uploadResult);
-          } catch (parseError) {
-            console.error("📷 JSON parse error for upload response:", parseError);
-            throw new Error(`Invalid JSON in upload response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
-          }
-        } catch (textError) {
-          console.error("📷 Error reading upload response text:", textError);
-          throw new Error(`Failed to read upload response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.error || "Failed to read upload test response");
         }
 
         if (!uploadTestResponse.ok) {
-          const errorMessage = uploadResult?.error || uploadResult?.message || `Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}`;
+          const errorMessage = uploadResult.data?.error || uploadResult.data?.message || `Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}`;
           throw new Error(errorMessage);
         }
 
-        if (uploadResult.success) {
+        if (uploadResult.data?.success) {
           alert(
             `✅ Image Upload Test Results:\n\n` +
             `Endpoint Status: Working\n` +
-            `Upload API Status: ${uploadResult.uploadApiStatus || 'Unknown'}\n` +
-            `Upload Success: ${uploadResult.uploadApiResponse?.success || 'Unknown'}\n` +
-            `Error (if any): ${uploadResult.uploadApiResponse?.error || 'None'}\n\n` +
+            `Upload API Status: ${uploadResult.data.uploadApiStatus || 'Unknown'}\n` +
+            `Upload Success: ${uploadResult.data.uploadApiResponse?.success || 'Unknown'}\n` +
+            `Error (if any): ${uploadResult.data.uploadApiResponse?.error || 'None'}\n\n` +
             `The image upload functionality appears to be working correctly.`
           );
         } else {
-          alert(`❌ Image upload test failed: ${uploadResult.message || 'Unknown upload test error'}`);
+          alert(`❌ Image upload test failed: ${uploadResult.data?.message || 'Unknown upload test error'}`);
         }
       } else {
-        alert(`❌ Image upload test endpoint failed: ${testResult.message || 'Unknown test endpoint error'}`);
+        alert(`❌ Image upload test endpoint failed: ${testResult.data?.message || 'Unknown test endpoint error'}`);
       }
     } catch (error) {
       console.error("❌ Error testing image upload:", error);
@@ -999,10 +1051,14 @@ Check console for full details.`);
 
       let userMessage = "Error testing image upload.";
       if (error instanceof Error) {
-        if (error.message.includes("fetch")) {
-          userMessage += " Network error - please check your connection.";
+        if (error.message.includes("Network error") || error.message.includes("fetch")) {
+          userMessage += " Network connection issue - please check your internet connection.";
+        } else if (error.message.includes("timeout")) {
+          userMessage += " Request timed out - the server may be slow or unavailable.";
         } else if (error.message.includes("JSON") || error.message.includes("parse")) {
-          userMessage += " Server response error - check console for details.";
+          userMessage += " Server response format error - check console for details.";
+        } else if (error.message.includes("body already consumed")) {
+          userMessage += " Browser response handling error - please refresh and try again.";
         } else {
           userMessage += ` ${error.message}`;
         }
