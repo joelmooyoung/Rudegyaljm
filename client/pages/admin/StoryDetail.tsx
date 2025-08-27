@@ -1178,7 +1178,12 @@ export default function StoryDetail({
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="outline"
-                          onClick={() => setIsPlainTextDialogOpen(false)}
+                          onClick={() => {
+                            setIsPlainTextDialogOpen(false);
+                            setConversionError("");
+                            setProcessingProgress(0);
+                            setProcessingTotal(0);
+                          }}
                           disabled={isProcessingPreview}
                         >
                           Cancel
