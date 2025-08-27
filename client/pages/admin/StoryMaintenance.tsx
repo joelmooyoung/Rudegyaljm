@@ -957,19 +957,54 @@ Check console for full details.`);
       let responseText;
       try {
         // Use a timeout to prevent hanging
-        const textPromise = response.text();
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Response reading timeout')), 10000)
-        );
+        let textPromise;
+        let timeoutPromise;
 
-        responseText = await Promise.race([textPromise, timeoutPromise]);
+        try {
+          textPromise = response.text();
+        } catch (textInitError) {
+          console.error(`📷 Error initializing text read for ${description}:`, textInitError);
+          return {
+            success: false,
+            error: `Failed to initialize text reading for ${description}: ${textInitError instanceof Error ? textInitError.message : 'Text init error'}`
+          };
+        }
+
+        try {
+          timeoutPromise = new Promise<string>((_, reject) =>
+            setTimeout(() => reject(new Error('Response reading timeout')), 10000)
+          );
+        } catch (timeoutInitError) {
+          console.error(`📷 Error creating timeout for ${description}:`, timeoutInitError);
+          // Fall back to just the text promise without timeout
+          responseText = await textPromise;
+        }
+
+        if (timeoutPromise) {
+          responseText = await Promise.race([textPromise, timeoutPromise]);
+        }
+
         console.log(`📷 ${description} response text length:`, responseText?.length || 0);
         console.log(`📷 ${description} response preview:`, responseText?.substring(0, 200) || 'Empty');
       } catch (textError) {
         console.error(`📷 Error reading ${description} response text:`, textError);
+
+        // Provide more specific error information
+        let errorMessage = 'Text read error';
+        if (textError instanceof Error) {
+          errorMessage = textError.message;
+          if (textError.message.includes('timeout')) {
+            errorMessage = 'Response reading timed out after 10 seconds';
+          } else if (textError.message.includes('network')) {
+            errorMessage = 'Network error while reading response';
+          } else if (textError.message.includes('body')) {
+            errorMessage = 'Response body is not readable or was already consumed';
+          }
+        }
+
         return {
           success: false,
-          error: `Failed to read ${description} response: ${textError instanceof Error ? textError.message : 'Text read error'}`
+          error: `Failed to read ${description} response: ${errorMessage}`
         };
       }
 
