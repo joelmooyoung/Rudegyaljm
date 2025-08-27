@@ -1163,24 +1163,42 @@ Check console for full details.`);
       }
     } catch (error) {
       console.error("❌ Error testing image upload:", error);
+      console.error("❌ Error type:", typeof error);
+      console.error("❌ Error constructor:", error?.constructor?.name);
       console.error("❌ Error stack:", error instanceof Error ? error.stack : "No stack trace");
 
       let userMessage = "Error testing image upload.";
+      let technicalDetails = "";
+
       if (error instanceof Error) {
-        if (error.message.includes("Network error") || error.message.includes("fetch")) {
+        technicalDetails = `Type: ${error.constructor.name}, Message: ${error.message}`;
+
+        if (error.message.includes("Network error") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
           userMessage += " Network connection issue - please check your internet connection.";
         } else if (error.message.includes("timeout")) {
           userMessage += " Request timed out - the server may be slow or unavailable.";
         } else if (error.message.includes("JSON") || error.message.includes("parse")) {
           userMessage += " Server response format error - check console for details.";
-        } else if (error.message.includes("body already consumed")) {
+        } else if (error.message.includes("body already consumed") || error.message.includes("body is not readable")) {
           userMessage += " Browser response handling error - please refresh and try again.";
-        } else {
+        } else if (error.message.includes("Invalid response object") || error.message.includes("corrupted")) {
+          userMessage += " Response object error - the server response may be corrupted.";
+        } else if (error.message.includes("Response object access error")) {
+          userMessage += " Browser compatibility issue - please try refreshing the page.";
+        } else if (error.message && error.message.trim() !== "") {
           userMessage += ` ${error.message}`;
+        } else {
+          userMessage += " Unknown error occurred (check console for details).";
         }
+      } else if (error && typeof error === 'object') {
+        technicalDetails = `Non-Error object: ${JSON.stringify(error).substring(0, 100)}`;
+        userMessage += " Unexpected error type - check console for details.";
+      } else {
+        technicalDetails = `Primitive error: ${String(error)}`;
+        userMessage += " Unexpected error format - check console for details.";
       }
 
-      alert(`❌ ${userMessage}`);
+      alert(`❌ ${userMessage}\n\nTechnical: ${technicalDetails}`);
     }
   };
 
