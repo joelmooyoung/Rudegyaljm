@@ -150,6 +150,10 @@ export default function StoryDetail({
   const [isLoadingStory, setIsLoadingStory] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Progress tracking for async text conversion
+  const [processingProgress, setProcessingProgress] = useState<number>(0);
+  const [processingTotal, setProcessingTotal] = useState<number>(0);
+
   // Fetch complete story details when editing
   const fetchCompleteStory = async (storyId: string) => {
     try {
@@ -244,89 +248,38 @@ export default function StoryDetail({
     handleInputChange("tags", tagsArray);
   };
 
-  // Enhanced plain text to HTML converter with headers and spacing
-  const convertPlainTextToHTML = (text: string): string => {
-    if (!text) return "";
-
-    return text
-      .split("\n\n") // Split into paragraphs
-      .map((paragraph) => {
-        if (!paragraph.trim()) return "";
-
-        const trimmed = paragraph.trim();
-
-        // Detect headers (lines that are shorter and look like titles)
-        // Main headers: ALL CAPS or Title Case with no periods
-        if (
-          trimmed.length < 60 &&
-          (trimmed === trimmed.toUpperCase() ||
-            /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
-          !trimmed.includes(".")
-        ) {
-          // Large header
-          return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
-        }
-
-        // Sub headers: Lines ending with colon or shorter declarative sentences
-        if (
-          (trimmed.endsWith(":") ||
-            (trimmed.length < 80 &&
-              !trimmed.includes(".") &&
-              !trimmed.includes(","))) &&
-          trimmed.length > 10
-        ) {
-          return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
-        }
-
-        // Regular paragraph formatting
-        let formatted = paragraph
-          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") // Bold
-          .replace(/\*(.+?)\*/g, "<em>$1</em>") // Italic
-          .replace(/`(.+?)`/g, "<code>$1</code>") // Code
-          .replace(/\n/g, "<br>"); // Line breaks
-
-        return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
-      })
-      .filter((p) => p !== "")
-      .join("\n");
+  // Utility to detect headers
+  const detectHeader = (text: string): boolean => {
+    const trimmed = text.trim();
+    return (
+      trimmed.length < 60 &&
+      (trimmed === trimmed.toUpperCase() || /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
+      !trimmed.includes(".")
+    );
   };
 
-  // Chunked text processing to prevent UI freezing
-  const processLargeTextInChunks = async (text: string): Promise<string> => {
+  // Asynchronous chunked processing
+  const convertPlainTextToHTMLAsync = async (
+    text: string,
+    chunkSize: number = 50,
+    onProgress?: (done: number, total: number) => void
+  ): Promise<string> => {
     const paragraphs = text.split("\n\n");
-    const chunkSize = 50; // Process 50 paragraphs at a time
-    let result = "";
+    let htmlChunks: string[] = [];
 
     for (let i = 0; i < paragraphs.length; i += chunkSize) {
       const chunk = paragraphs.slice(i, i + chunkSize);
-
-      // Process chunk with enhanced formatting
-      const processedChunk = chunk
-        .map((paragraph) => {
+      htmlChunks.push(
+        ...chunk.map((paragraph) => {
           if (!paragraph.trim()) return "";
 
           const trimmed = paragraph.trim();
 
-          // Detect headers in chunked processing too
-          if (
-            trimmed.length < 60 &&
-            (trimmed === trimmed.toUpperCase() ||
-              /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
-            !trimmed.includes(".")
-          ) {
-            return `<h1 style="margin: 2em 0 1em 0; font-size: 1.5em; font-weight: bold;">${trimmed}</h1>`;
-          }
-
-          if (
-            (trimmed.endsWith(":") ||
-              (trimmed.length < 80 &&
-                !trimmed.includes(".") &&
-                !trimmed.includes(","))) &&
-            trimmed.length > 10
-          ) {
+          if (detectHeader(trimmed)) {
             return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
           }
 
+          // Paragraph with formatting
           let formatted = paragraph
             .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
             .replace(/\*(.+?)\*/g, "<em>$1</em>")
@@ -335,17 +288,44 @@ export default function StoryDetail({
 
           return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
         })
-        .filter((p) => p !== "")
-        .join("\n");
+      );
 
-      result += processedChunk;
+      if (onProgress) onProgress(Math.min(i + chunk.length, paragraphs.length), paragraphs.length);
 
-      // Yield control back to the browser to prevent freezing
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+      // Yield to browser to keep UI responsive
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
 
-    return result;
+    return htmlChunks.filter((p) => p !== "").join("\n");
   };
+
+  // Simple synchronous converter for small texts
+  const convertPlainTextToHTML = (text: string): string => {
+    if (!text) return "";
+
+    return text
+      .split("\n\n")
+      .map((paragraph) => {
+        if (!paragraph.trim()) return "";
+
+        const trimmed = paragraph.trim();
+
+        if (detectHeader(trimmed)) {
+          return `<h2 style="margin: 1.5em 0 0.5em 0; font-size: 1.2em; font-weight: bold;">${trimmed}</h2>`;
+        }
+
+        let formatted = paragraph
+          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.+?)\*/g, "<em>$1</em>")
+          .replace(/`(.+?)`/g, "<code>$1</code>")
+          .replace(/\n/g, "<br>");
+
+        return `<p style="margin: 1em 0; line-height: 1.6;">${formatted}</p>`;
+      })
+      .filter((p) => p !== "")
+      .join("\n");
+  };
+
 
   // Debounced preview calculation to prevent freezing during typing
   const [debouncedPlainText, setDebouncedPlainText] = useState("");
@@ -383,48 +363,43 @@ export default function StoryDetail({
 
   const handlePlainTextConfirm = async () => {
     setIsProcessingPreview(true);
+    setProcessingProgress(0);
+    setProcessingTotal(0);
 
     try {
-      // For large texts, use chunked processing to prevent freezing
-      if (plainTextInput.length > 5000) {
-        setError(
-          "Processing large text in chunks... Please wait and do not close this dialog.",
+      // Check text size and decide on processing method
+      const textLength = plainTextInput.length;
+      const paragraphCount = plainTextInput.split("\n\n").length;
+
+      // For large texts, use async processing with progress tracking
+      if (textLength > 3000 || paragraphCount > 100) {
+        console.log(`Processing large text: ${textLength} chars, ${paragraphCount} paragraphs`);
+
+        const htmlContent = await convertPlainTextToHTMLAsync(
+          plainTextInput,
+          50, // chunk size
+          (done, total) => {
+            setProcessingProgress(done);
+            setProcessingTotal(total);
+          }
         );
 
-        // Use setTimeout to ensure UI updates before heavy processing
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        try {
-          const htmlContent = await processLargeTextInChunks(plainTextInput);
-          handleInputChange("content", htmlContent);
-          setPlainTextInput("");
-          setError("");
-          if (typeof setIsPlainTextDialogOpen === "function") {
-            setIsPlainTextDialogOpen(false);
-          }
-        } catch (err) {
-          setError(
-            "Failed to convert large text. Try breaking it into smaller sections or reduce text size.",
-          );
-          console.error("Text conversion error:", err);
-        }
-        return;
+        handleInputChange("content", htmlContent);
+      } else {
+        // For smaller texts, use synchronous processing
+        const htmlContent = convertPlainTextToHTML(plainTextInput);
+        handleInputChange("content", htmlContent);
       }
 
-      // For smaller texts, use regular processing with delay to prevent blocking
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      const htmlContent = convertPlainTextToHTML(plainTextInput);
-      handleInputChange("content", htmlContent);
       setPlainTextInput("");
-      setError("");
-      if (typeof setIsPlainTextDialogOpen === "function") {
-        setIsPlainTextDialogOpen(false);
-      }
-    } catch (error) {
-      setError("Error converting text. Please try again.");
-      console.error("Error in handlePlainTextConfirm:", error);
+      setIsPlainTextDialogOpen(false);
+    } catch (err) {
+      console.error("Text conversion error:", err);
+      alert("Failed to convert text. Try breaking it into smaller sections or reducing text size.");
     } finally {
       setIsProcessingPreview(false);
+      setProcessingProgress(0);
+      setProcessingTotal(0);
     }
   };
 
