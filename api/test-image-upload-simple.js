@@ -1,6 +1,8 @@
 // Simple image upload test endpoint
 export default function handler(req, res) {
-  console.log(`[TEST IMAGE UPLOAD] ${req.method} /api/test-image-upload-simple`);
+  console.log(
+    `[TEST IMAGE UPLOAD] ${req.method} /api/test-image-upload-simple`,
+  );
 
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,10 +28,10 @@ export default function handler(req, res) {
   if (req.method === "POST") {
     // Test actual upload functionality
     console.log("[TEST IMAGE UPLOAD] Testing upload functionality");
-    
+
     try {
       const { imageData, filename } = req.body || {};
-      
+
       if (!imageData || !filename) {
         return res.status(400).json({
           success: false,
@@ -37,7 +39,7 @@ export default function handler(req, res) {
           received: {
             hasImageData: !!imageData,
             hasFilename: !!filename,
-          }
+          },
         });
       }
 
@@ -46,12 +48,12 @@ export default function handler(req, res) {
         return res.status(400).json({
           success: false,
           error: "Invalid image data format in test request",
-          format: imageData.substring(0, 50) + "..."
+          format: imageData.substring(0, 50) + "...",
         });
       }
 
       console.log("[TEST IMAGE UPLOAD] ✅ Test upload validation passed");
-      
+
       return res.status(200).json({
         success: true,
         message: "Image upload test successful",

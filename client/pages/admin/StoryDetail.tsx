@@ -254,7 +254,8 @@ export default function StoryDetail({
     const trimmed = text.trim();
     return (
       trimmed.length < 60 &&
-      (trimmed === trimmed.toUpperCase() || /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
+      (trimmed === trimmed.toUpperCase() ||
+        /^[A-Z][a-zA-Z\s]*[^.]$/.test(trimmed)) &&
       !trimmed.includes(".")
     );
   };
@@ -263,7 +264,7 @@ export default function StoryDetail({
   const convertPlainTextToHTMLAsync = async (
     text: string,
     chunkSize: number = 50,
-    onProgress?: (done: number, total: number) => void
+    onProgress?: (done: number, total: number) => void,
   ): Promise<string> => {
     if (!text || !text.trim()) {
       throw new Error("No text provided for conversion");
@@ -290,11 +291,11 @@ export default function StoryDetail({
               // Escape HTML to prevent XSS
               const escaped = trimmed.replace(/[<>&"']/g, (char) => {
                 const escapeMap: { [key: string]: string } = {
-                  '<': '&lt;',
-                  '>': '&gt;',
-                  '&': '&amp;',
-                  '"': '&quot;',
-                  "'": '&#39;'
+                  "<": "&lt;",
+                  ">": "&gt;",
+                  "&": "&amp;",
+                  '"': "&quot;",
+                  "'": "&#39;",
                 };
                 return escapeMap[char];
               });
@@ -305,11 +306,11 @@ export default function StoryDetail({
             let formatted = paragraph
               .replace(/[<>&"']/g, (char) => {
                 const escapeMap: { [key: string]: string } = {
-                  '<': '&lt;',
-                  '>': '&gt;',
-                  '&': '&amp;',
-                  '"': '&quot;',
-                  "'": '&#39;'
+                  "<": "&lt;",
+                  ">": "&gt;",
+                  "&": "&amp;",
+                  '"': "&quot;",
+                  "'": "&#39;",
                 };
                 return escapeMap[char];
               })
@@ -322,7 +323,7 @@ export default function StoryDetail({
           } catch (err) {
             console.warn("Error processing paragraph:", err);
             // Return a safe fallback for problematic paragraphs
-            return `<p style="margin: 1em 0; line-height: 1.6;">${paragraph.replace(/[<>&"']/g, '')}</p>`;
+            return `<p style="margin: 1em 0; line-height: 1.6;">${paragraph.replace(/[<>&"']/g, "")}</p>`;
           }
         });
 
@@ -337,7 +338,9 @@ export default function StoryDetail({
       }
     } catch (error) {
       console.error("Error in async conversion:", error);
-      throw new Error(`Conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Conversion failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
 
     const result = htmlChunks.filter((p) => p !== "").join("\n");
@@ -375,7 +378,6 @@ export default function StoryDetail({
       .filter((p) => p !== "")
       .join("\n");
   };
-
 
   // Debounced preview calculation to prevent freezing during typing
   const [debouncedPlainText, setDebouncedPlainText] = useState("");
@@ -426,7 +428,9 @@ export default function StoryDetail({
 
       // Check for extremely large text
       if (plainTextInput.length > 100000) {
-        setConversionError("Text is too large (>100,000 characters). Please break it into smaller sections.");
+        setConversionError(
+          "Text is too large (>100,000 characters). Please break it into smaller sections.",
+        );
         return;
       }
 
@@ -434,7 +438,9 @@ export default function StoryDetail({
       const textLength = plainTextInput.length;
       const paragraphCount = plainTextInput.split("\n\n").length;
 
-      console.log(`Converting text: ${textLength} chars, ${paragraphCount} paragraphs`);
+      console.log(
+        `Converting text: ${textLength} chars, ${paragraphCount} paragraphs`,
+      );
 
       // For large texts, use async processing with progress tracking
       if (textLength > 3000 || paragraphCount > 100) {
@@ -446,7 +452,7 @@ export default function StoryDetail({
           (done, total) => {
             setProcessingProgress(done);
             setProcessingTotal(total);
-          }
+          },
         );
 
         if (!htmlContent || htmlContent.trim() === "") {
@@ -474,7 +480,8 @@ export default function StoryDetail({
       console.log("Text conversion completed successfully");
     } catch (err) {
       console.error("Text conversion error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Unknown conversion error";
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown conversion error";
       setConversionError(errorMessage);
 
       // Don't close dialog on error - let user fix the issue
@@ -496,7 +503,7 @@ export default function StoryDetail({
       name: file.name,
       size: file.size,
       type: file.type,
-      sizeKB: (file.size / 1024).toFixed(1)
+      sizeKB: (file.size / 1024).toFixed(1),
     });
 
     setIsUploadingImage(true);
@@ -504,8 +511,11 @@ export default function StoryDetail({
 
     try {
       // Validate file size before compression
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        throw new Error("Image file is too large (>10MB). Please choose a smaller image.");
+      if (file.size > 10 * 1024 * 1024) {
+        // 10MB limit
+        throw new Error(
+          "Image file is too large (>10MB). Please choose a smaller image.",
+        );
       }
 
       console.log("[IMAGE UPLOAD] Compressing image...");
@@ -517,11 +527,16 @@ export default function StoryDetail({
         console.log("[IMAGE UPLOAD] Image compressed successfully");
       } catch (compressionError) {
         console.error("[IMAGE UPLOAD] Compression failed:", compressionError);
-        throw new Error(`Image compression failed: ${compressionError instanceof Error ? compressionError.message : 'Unknown compression error'}`);
+        throw new Error(
+          `Image compression failed: ${compressionError instanceof Error ? compressionError.message : "Unknown compression error"}`,
+        );
       }
 
       // Validate compressed data
-      if (!compressedImageData || !compressedImageData.startsWith("data:image/")) {
+      if (
+        !compressedImageData ||
+        !compressedImageData.startsWith("data:image/")
+      ) {
         throw new Error("Invalid compressed image data generated");
       }
 
@@ -541,8 +556,15 @@ export default function StoryDetail({
         }),
       });
 
-      console.log("[IMAGE UPLOAD] API response status:", response.status, response.statusText);
-      console.log("[IMAGE UPLOAD] Response headers:", Object.fromEntries(response.headers.entries()));
+      console.log(
+        "[IMAGE UPLOAD] API response status:",
+        response.status,
+        response.statusText,
+      );
+      console.log(
+        "[IMAGE UPLOAD] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
 
       // Simplified response handling
       let result;
@@ -555,7 +577,9 @@ export default function StoryDetail({
           } catch (textError) {
             errorText = `Unable to read error response: ${textError.message}`;
           }
-          throw new Error(`Upload failed: ${response.status} ${response.statusText}. ${errorText}`);
+          throw new Error(
+            `Upload failed: ${response.status} ${response.statusText}. ${errorText}`,
+          );
         }
 
         // Parse successful response
@@ -564,7 +588,7 @@ export default function StoryDetail({
           success: result.success,
           hasImageUrl: !!result.imageUrl,
           error: result.error,
-          message: result.message
+          message: result.message,
         });
       } catch (error) {
         console.error("[IMAGE UPLOAD] Response processing error:", error);
@@ -573,13 +597,16 @@ export default function StoryDetail({
         if (error.message.includes("Upload failed:")) {
           throw error; // Already formatted error from non-200 response
         } else {
-          throw new Error(`Failed to process server response: ${error.message}`);
+          throw new Error(
+            `Failed to process server response: ${error.message}`,
+          );
         }
       }
 
       // Check if upload was successful
       if (!result || !result.success) {
-        const errorMessage = result?.error || result?.message || "Upload failed - server error";
+        const errorMessage =
+          result?.error || result?.message || "Upload failed - server error";
         console.error("[IMAGE UPLOAD] Server reported failure:", errorMessage);
         throw new Error(errorMessage);
       }
@@ -595,7 +622,11 @@ export default function StoryDetail({
       handleInputChange("image", imageUrl);
 
       // Show compression info if available
-      if (result.compressionRatio && result.originalSize && result.compressedSize) {
+      if (
+        result.compressionRatio &&
+        result.originalSize &&
+        result.compressedSize
+      ) {
         console.log(
           `Image uploaded and compressed successfully:\n` +
             `Original: ${(result.originalSize / 1024).toFixed(1)}KB\n` +
@@ -607,7 +638,10 @@ export default function StoryDetail({
       }
     } catch (error) {
       console.error("[IMAGE UPLOAD] ❌ Upload failed:", error);
-      console.error("[IMAGE UPLOAD] Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      console.error(
+        "[IMAGE UPLOAD] Error stack:",
+        error instanceof Error ? error.stack : "No stack trace",
+      );
 
       let userMessage = "Failed to upload image.";
 
@@ -615,13 +649,23 @@ export default function StoryDetail({
         const errorMsg = error.message.toLowerCase();
 
         if (errorMsg.includes("network") || errorMsg.includes("fetch")) {
-          userMessage = "Network error - please check your connection and try again.";
-        } else if (errorMsg.includes("too large") || errorMsg.includes("size")) {
-          userMessage = "Image file is too large. Please choose a smaller image.";
+          userMessage =
+            "Network error - please check your connection and try again.";
+        } else if (
+          errorMsg.includes("too large") ||
+          errorMsg.includes("size")
+        ) {
+          userMessage =
+            "Image file is too large. Please choose a smaller image.";
         } else if (errorMsg.includes("compression")) {
-          userMessage = "Image compression failed. Please try a different image.";
-        } else if (errorMsg.includes("invalid") || errorMsg.includes("format")) {
-          userMessage = "Invalid image format. Please use JPG, PNG, GIF, or WebP.";
+          userMessage =
+            "Image compression failed. Please try a different image.";
+        } else if (
+          errorMsg.includes("invalid") ||
+          errorMsg.includes("format")
+        ) {
+          userMessage =
+            "Invalid image format. Please use JPG, PNG, GIF, or WebP.";
         } else if (errorMsg.includes("404") || errorMsg.includes("not found")) {
           userMessage = "Upload service unavailable. Please try again later.";
         } else if (errorMsg.includes("timeout")) {
@@ -634,9 +678,11 @@ export default function StoryDetail({
       alert(userMessage);
 
       // Reset file input to allow retry with same file
-      const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+      const fileInput = document.getElementById(
+        "image-upload",
+      ) as HTMLInputElement;
       if (fileInput) {
-        fileInput.value = '';
+        fileInput.value = "";
       }
     } finally {
       setIsUploadingImage(false);
@@ -1045,9 +1091,13 @@ export default function StoryDetail({
                         type="button"
                         onClick={async () => {
                           try {
-                            const response = await fetch("/api/test-image-upload-simple");
+                            const response = await fetch(
+                              "/api/test-image-upload-simple",
+                            );
                             const result = await response.json();
-                            alert(`Test Result: ${result.success ? "✅ Working" : "❌ Failed"}\n\nMessage: ${result.message}`);
+                            alert(
+                              `Test Result: ${result.success ? "✅ Working" : "❌ Failed"}\n\nMessage: ${result.message}`,
+                            );
                           } catch (error) {
                             alert(`Test Failed: ${error.message}`);
                           }
@@ -1228,7 +1278,8 @@ export default function StoryDetail({
                             {plainTextInput.length.toLocaleString()} characters
                             {isProcessingPreview && processingTotal > 0 && (
                               <span className="text-blue-600 ml-2">
-                                🔄 Processing {processingProgress}/{processingTotal}...
+                                🔄 Processing {processingProgress}/
+                                {processingTotal}...
                               </span>
                             )}
                             {isProcessingPreview && processingTotal === 0 && (
@@ -1237,7 +1288,8 @@ export default function StoryDetail({
                               </span>
                             )}
                             {!isProcessingPreview &&
-                              (plainTextInput.length > 3000 || plainTextInput.split('\n\n').length > 100) && (
+                              (plainTextInput.length > 3000 ||
+                                plainTextInput.split("\n\n").length > 100) && (
                                 <span className="text-orange-600 ml-2">
                                   ⚡ Async processing will be used
                                 </span>
@@ -1252,7 +1304,8 @@ export default function StoryDetail({
                             {!isProcessingPreview &&
                               plainTextInput.length > 50000 && (
                                 <span className="text-red-600 ml-2">
-                                  🚨 Very large text - consider breaking into sections
+                                  🚨 Very large text - consider breaking into
+                                  sections
                                 </span>
                               )}
                           </span>
@@ -1280,7 +1333,8 @@ export default function StoryDetail({
                               Processing large text...
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {processingProgress} / {processingTotal} paragraphs
+                              {processingProgress} / {processingTotal}{" "}
+                              paragraphs
                             </p>
                             {/* Progress bar */}
                             <div className="w-full bg-muted rounded-full h-2 mt-2">
@@ -1355,16 +1409,15 @@ export default function StoryDetail({
                               <div className="animate-spin h-4 w-4 mr-2 border-2 border-current border-t-transparent rounded-full" />
                               {processingTotal > 0
                                 ? `Processing ${processingProgress}/${processingTotal}...`
-                                : "Processing..."
-                              }
+                                : "Processing..."}
                             </>
                           ) : (
                             <>
                               <Code className="h-4 w-4 mr-2" />
-                              {plainTextInput.length > 3000 || plainTextInput.split('\n\n').length > 100
+                              {plainTextInput.length > 3000 ||
+                              plainTextInput.split("\n\n").length > 100
                                 ? "Convert Large Text"
-                                : "Convert & Use"
-                              }
+                                : "Convert & Use"}
                             </>
                           )}
                         </Button>
