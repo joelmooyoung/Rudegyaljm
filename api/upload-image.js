@@ -38,6 +38,8 @@ function compressImageBase64(base64Data, maxWidth = 800, quality = 0.7) {
 }
 
 export default async function handler(req, res) {
+  console.log(`[UPLOAD IMAGE API] ${req.method} /api/upload-image.js`);
+
   // Enable CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -48,10 +50,24 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    console.log("[UPLOAD IMAGE API] Method not allowed:", req.method);
+    return res.status(405).json({
+      success: false,
+      error: "Method not allowed"
+    });
   }
 
   try {
+    console.log("[UPLOAD IMAGE API] Processing image upload request");
+
+    // Validate request body exists
+    if (!req.body) {
+      console.log("[UPLOAD IMAGE API] No request body provided");
+      return res.status(400).json({
+        success: false,
+        error: "No request body provided",
+      });
+    }
     const { imageData, filename, maxWidth = 800, quality = 0.7 } = req.body;
 
     if (!imageData || !filename) {
