@@ -29,7 +29,10 @@ export default async function handler(req, res) {
       
       console.log("[IMAGE UPLOAD TEST] Testing with sample image data");
 
-      const response = await fetch(`${req.headers.host ? 'https://' + req.headers.host : 'http://localhost:3000'}/api/upload-image.js`, {
+      const uploadUrl = `${req.headers.host ? 'https://' + req.headers.host : 'http://localhost:3000'}/api/upload-image.js`;
+      console.log("[IMAGE UPLOAD TEST] Testing upload to:", uploadUrl);
+
+      const response = await fetch(uploadUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,18 +45,42 @@ export default async function handler(req, res) {
         }),
       });
 
-      const responseText = await response.text();
-      console.log("[IMAGE UPLOAD TEST] Upload API response:", responseText);
+      console.log("[IMAGE UPLOAD TEST] Response status:", response.status, response.statusText);
+
+      let responseText;
+      try {
+        responseText = await response.text();
+        console.log("[IMAGE UPLOAD TEST] Response text length:", responseText.length);
+        console.log("[IMAGE UPLOAD TEST] Response preview:", responseText.substring(0, 200));
+      } catch (textError) {
+        console.error("[IMAGE UPLOAD TEST] Error reading response text:", textError);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to read upload API response",
+          error: textError.message
+        });
+      }
+
+      if (!responseText.trim()) {
+        return res.status(500).json({
+          success: false,
+          message: "Upload API returned empty response",
+          responseStatus: response.status
+        });
+      }
 
       let result;
       try {
         result = JSON.parse(responseText);
+        console.log("[IMAGE UPLOAD TEST] Parsed result:", result);
       } catch (parseError) {
+        console.error("[IMAGE UPLOAD TEST] JSON parse error:", parseError);
         return res.status(500).json({
           success: false,
           message: "Upload API returned invalid JSON",
-          responseText: responseText,
-          parseError: parseError.message
+          responseText: responseText.substring(0, 500),
+          parseError: parseError.message,
+          responseStatus: response.status
         });
       }
 
