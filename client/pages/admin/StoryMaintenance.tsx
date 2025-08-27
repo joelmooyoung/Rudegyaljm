@@ -1150,18 +1150,23 @@ Check console for full details.`);
         throw new Error(`Network error accessing test endpoint: ${fetchError instanceof Error ? fetchError.message : 'Fetch failed'}`);
       }
 
-      const testResult = await safeReadResponse(testResponse, "test endpoint");
+      console.log("📷 Test endpoint response status:", testResponse.status, testResponse.statusText);
 
-      if (!testResult.success) {
-        throw new Error(testResult.error || "Failed to read test endpoint response");
+      // Handle GET response directly to avoid body consumption issues
+      let testResult;
+      if (testResponse.ok) {
+        try {
+          testResult = await testResponse.json();
+          console.log("📷 Test endpoint result:", testResult);
+        } catch (jsonError) {
+          console.error("📷 Test endpoint JSON parse error:", jsonError);
+          throw new Error(`Test endpoint returned invalid JSON: ${jsonError instanceof Error ? jsonError.message : 'Parse error'}`);
+        }
+      } else {
+        throw new Error(`Test endpoint failed: ${testResponse.status} ${testResponse.statusText}`);
       }
 
-      if (!testResponse.ok) {
-        const errorMessage = testResult.data?.error || testResult.data?.message || `Test endpoint failed: ${testResponse.status} ${testResponse.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      if (testResult.data?.success) {
+      if (testResult?.success) {
         console.log("��� Test endpoint is working, now testing upload functionality...");
 
         // Now test the actual upload functionality
