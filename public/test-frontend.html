@@ -1,149 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Frontend Test</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f8ff; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .status { padding: 15px; margin: 10px 0; border-radius: 4px; }
-        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        .loading { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
-        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; margin: 10px 5px; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        pre { background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 14px; }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #f0f8ff;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .loading {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px 5px;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 14px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>🔧 Frontend Loading Test</h1>
-        
-        <div id="status" class="status loading">
-            🔄 Running tests...
-        </div>
-        
-        <div>
-            <button onclick="testReactApp()">Test React App</button>
-            <button onclick="testAPI()">Test API</button>
-            <button onclick="clearResults()">Clear Results</button>
-        </div>
-        
-        <div id="results"></div>
+      <h1>🔧 Frontend Loading Test</h1>
+
+      <div id="status" class="status loading">🔄 Running tests...</div>
+
+      <div>
+        <button onclick="testReactApp()">Test React App</button>
+        <button onclick="testAPI()">Test API</button>
+        <button onclick="clearResults()">Clear Results</button>
+      </div>
+
+      <div id="results"></div>
     </div>
 
     <script>
-        let testResults = [];
+      let testResults = [];
 
-        function log(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const entry = `[${timestamp}] ${message}`;
-            testResults.push({ entry, type });
-            updateResults();
+      function log(message, type = "info") {
+        const timestamp = new Date().toLocaleTimeString();
+        const entry = `[${timestamp}] ${message}`;
+        testResults.push({ entry, type });
+        updateResults();
+      }
+
+      function updateResults() {
+        const resultsDiv = document.getElementById("results");
+        if (testResults.length > 0) {
+          resultsDiv.innerHTML =
+            "<h3>Test Results:</h3><pre>" +
+            testResults.map((r) => r.entry).join("\n") +
+            "</pre>";
         }
+      }
 
-        function updateResults() {
-            const resultsDiv = document.getElementById('results');
-            if (testResults.length > 0) {
-                resultsDiv.innerHTML = '<h3>Test Results:</h3><pre>' + 
-                    testResults.map(r => r.entry).join('\n') + '</pre>';
-            }
+      function clearResults() {
+        testResults = [];
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("status").textContent = "✅ Ready for testing";
+        document.getElementById("status").className = "status success";
+      }
+
+      async function testAPI() {
+        log("🔍 Testing API connectivity...", "info");
+
+        try {
+          const response = await fetch("/api/test-connectivity");
+          if (response.ok) {
+            const data = await response.json();
+            log(`✅ API Test: ${data.message}`, "success");
+            document.getElementById("status").textContent = "✅ API is working";
+            document.getElementById("status").className = "status success";
+          } else {
+            log(
+              `❌ API Test failed: ${response.status} ${response.statusText}`,
+              "error",
+            );
+            document.getElementById("status").textContent = "❌ API failed";
+            document.getElementById("status").className = "status error";
+          }
+        } catch (error) {
+          log(`❌ API Error: ${error.message}`, "error");
+          document.getElementById("status").textContent = "❌ Network error";
+          document.getElementById("status").className = "status error";
         }
+      }
 
-        function clearResults() {
-            testResults = [];
-            document.getElementById('results').innerHTML = '';
-            document.getElementById('status').textContent = '✅ Ready for testing';
-            document.getElementById('status').className = 'status success';
+      async function testReactApp() {
+        log("🔍 Testing React application loading...", "info");
+
+        try {
+          // Test if we can access the main React app
+          const iframe = document.createElement("iframe");
+          iframe.style.display = "none";
+          iframe.src = "/";
+
+          document.body.appendChild(iframe);
+
+          iframe.onload = function () {
+            log("✅ React App: Main page loaded successfully", "success");
+            document.getElementById("status").textContent =
+              "✅ React app is loading";
+            document.getElementById("status").className = "status success";
+            document.body.removeChild(iframe);
+          };
+
+          iframe.onerror = function () {
+            log("❌ React App: Failed to load main page", "error");
+            document.getElementById("status").textContent =
+              "❌ React app failed to load";
+            document.getElementById("status").className = "status error";
+            document.body.removeChild(iframe);
+          };
+
+          // Test Vite assets
+          const viteResponse = await fetch("/@vite/client");
+          if (viteResponse.ok) {
+            log("✅ Vite: Client script accessible", "success");
+          } else {
+            log("❌ Vite: Client script failed", "error");
+          }
+
+          // Test main.tsx
+          const mainResponse = await fetch("/src/main.tsx");
+          if (mainResponse.ok) {
+            log("✅ Main: main.tsx accessible", "success");
+          } else {
+            log("❌ Main: main.tsx failed", "error");
+          }
+        } catch (error) {
+          log(`❌ React App Error: ${error.message}`, "error");
+          document.getElementById("status").textContent = "❌ React app error";
+          document.getElementById("status").className = "status error";
         }
+      }
 
-        async function testAPI() {
-            log('🔍 Testing API connectivity...', 'info');
-            
-            try {
-                const response = await fetch('/api/test-connectivity');
-                if (response.ok) {
-                    const data = await response.json();
-                    log(`✅ API Test: ${data.message}`, 'success');
-                    document.getElementById('status').textContent = '✅ API is working';
-                    document.getElementById('status').className = 'status success';
-                } else {
-                    log(`❌ API Test failed: ${response.status} ${response.statusText}`, 'error');
-                    document.getElementById('status').textContent = '❌ API failed';
-                    document.getElementById('status').className = 'status error';
-                }
-            } catch (error) {
-                log(`❌ API Error: ${error.message}`, 'error');
-                document.getElementById('status').textContent = '❌ Network error';
-                document.getElementById('status').className = 'status error';
-            }
-        }
-
-        async function testReactApp() {
-            log('🔍 Testing React application loading...', 'info');
-            
-            try {
-                // Test if we can access the main React app
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = '/';
-                
-                document.body.appendChild(iframe);
-                
-                iframe.onload = function() {
-                    log('✅ React App: Main page loaded successfully', 'success');
-                    document.getElementById('status').textContent = '✅ React app is loading';
-                    document.getElementById('status').className = 'status success';
-                    document.body.removeChild(iframe);
-                };
-                
-                iframe.onerror = function() {
-                    log('❌ React App: Failed to load main page', 'error');
-                    document.getElementById('status').textContent = '❌ React app failed to load';
-                    document.getElementById('status').className = 'status error';
-                    document.body.removeChild(iframe);
-                };
-
-                // Test Vite assets
-                const viteResponse = await fetch('/@vite/client');
-                if (viteResponse.ok) {
-                    log('✅ Vite: Client script accessible', 'success');
-                } else {
-                    log('❌ Vite: Client script failed', 'error');
-                }
-
-                // Test main.tsx
-                const mainResponse = await fetch('/src/main.tsx');
-                if (mainResponse.ok) {
-                    log('✅ Main: main.tsx accessible', 'success');
-                } else {
-                    log('❌ Main: main.tsx failed', 'error');
-                }
-
-            } catch (error) {
-                log(`❌ React App Error: ${error.message}`, 'error');
-                document.getElementById('status').textContent = '❌ React app error';
-                document.getElementById('status').className = 'status error';
-            }
-        }
-
-        // Auto-run basic tests
+      // Auto-run basic tests
+      setTimeout(() => {
+        testAPI();
         setTimeout(() => {
-            testAPI();
-            setTimeout(() => {
-                testReactApp();
-            }, 1000);
-        }, 500);
+          testReactApp();
+        }, 1000);
+      }, 500);
 
-        // Global error handler
-        window.addEventListener('error', (e) => {
-            log(`❌ JavaScript Error: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
-        });
+      // Global error handler
+      window.addEventListener("error", (e) => {
+        log(
+          `❌ JavaScript Error: ${e.message} at ${e.filename}:${e.lineno}`,
+          "error",
+        );
+      });
 
-        window.addEventListener('unhandledrejection', (e) => {
-            log(`❌ Promise Rejection: ${e.reason}`, 'error');
-        });
+      window.addEventListener("unhandledrejection", (e) => {
+        log(`❌ Promise Rejection: ${e.reason}`, "error");
+      });
     </script>
-</body>
+  </body>
 </html>

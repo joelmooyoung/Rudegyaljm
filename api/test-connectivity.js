@@ -4,7 +4,7 @@ export default function handler(req, res) {
     method: req.method,
     url: req.url,
     headers: req.headers,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   try {
@@ -14,7 +14,7 @@ export default function handler(req, res) {
       message: "Connectivity test successful",
       timestamp: new Date().toISOString(),
       method: req.method,
-      status: "OK"
+      status: "OK",
     };
 
     console.log("🔍 [TEST CONNECTIVITY] Sending response:", response);
@@ -25,7 +25,7 @@ export default function handler(req, res) {
     res.status(500).json({
       success: false,
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }
