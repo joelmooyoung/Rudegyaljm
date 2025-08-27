@@ -1104,7 +1104,13 @@ export default function StoryDetail({
                         <Textarea
                           placeholder="Paste your story text here..."
                           value={plainTextInput}
-                          onChange={(e) => setPlainTextInput(e.target.value)}
+                          onChange={(e) => {
+                            setPlainTextInput(e.target.value);
+                            // Clear any previous conversion errors when user types
+                            if (conversionError) {
+                              setConversionError("");
+                            }
+                          }}
                           className="min-h-80 max-h-96 overflow-y-auto resize-y"
                         />
                       </div>
