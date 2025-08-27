@@ -1131,12 +1131,18 @@ export default function StoryDetail({
                           {isProcessingPreview ? (
                             <>
                               <div className="animate-spin h-4 w-4 mr-2 border-2 border-current border-t-transparent rounded-full" />
-                              Processing...
+                              {processingTotal > 0
+                                ? `Processing ${processingProgress}/${processingTotal}...`
+                                : "Processing..."
+                              }
                             </>
                           ) : (
                             <>
                               <Code className="h-4 w-4 mr-2" />
-                              Convert & Use
+                              {plainTextInput.length > 3000 || plainTextInput.split('\n\n').length > 100
+                                ? "Convert Large Text"
+                                : "Convert & Use"
+                              }
                             </>
                           )}
                         </Button>
