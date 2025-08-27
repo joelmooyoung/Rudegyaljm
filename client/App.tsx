@@ -358,6 +358,15 @@ const App = () => {
         const apiUrl = isBuilderPreview
           ? "https://rudegyaljm-amber.vercel.app/api/stories"
           : "/api/stories";
+
+        console.log("[STORY SAVE] Creating story with stats:", {
+          viewCount: storyData.viewCount,
+          rating: storyData.rating,
+          ratingCount: storyData.ratingCount,
+          commentCount: storyData.commentCount,
+          likeCount: storyData.likeCount
+        });
+
         response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -373,9 +382,11 @@ const App = () => {
             excerpt: storyData.excerpt,
             accessLevel: storyData.accessLevel || "free",
             published: storyData.isPublished || false,
-            viewCount: storyData.viewCount || 0,
-            rating: storyData.rating || 0,
-            ratingCount: storyData.ratingCount || 0,
+            viewCount: storyData.viewCount !== undefined ? storyData.viewCount : 0,
+            rating: storyData.rating !== undefined ? storyData.rating : 0,
+            ratingCount: storyData.ratingCount !== undefined ? storyData.ratingCount : 0,
+            commentCount: storyData.commentCount !== undefined ? storyData.commentCount : 0,
+            likeCount: storyData.likeCount !== undefined ? storyData.likeCount : 0,
             audioUrl: storyData.audioUrl,
           }),
         });
