@@ -513,12 +513,31 @@ export default function StoryDetail({
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Upload failed");
+      // Handle response properly to avoid body consumption issues
+      let result;
+      try {
+        const responseText = await response.text();
+        console.log("[IMAGE UPLOAD] Response text:", responseText.substring(0, 200));
+
+        if (!responseText.trim()) {
+          throw new Error("Empty response from server");
+        }
+
+        try {
+          result = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("[IMAGE UPLOAD] JSON parse error:", parseError);
+          throw new Error(`Invalid response format: ${responseText.substring(0, 100)}`);
+        }
+      } catch (textError) {
+        console.error("[IMAGE UPLOAD] Response text error:", textError);
+        throw new Error(`Failed to read response: ${textError.message}`);
       }
 
-      const result = await response.json();
+      if (!response.ok) {
+        const errorMessage = result?.error || result?.message || `Upload failed: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
 
       if (result.success) {
         const imageUrl = result.imageUrl;
