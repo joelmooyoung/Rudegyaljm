@@ -70,15 +70,26 @@ export default async function handler(req, res) {
     }
     const { imageData, filename, maxWidth = 800, quality = 0.7 } = req.body;
 
+    console.log("[UPLOAD IMAGE API] Request data:", {
+      hasImageData: !!imageData,
+      hasFilename: !!filename,
+      maxWidth,
+      quality
+    });
+
     if (!imageData || !filename) {
+      console.log("[UPLOAD IMAGE API] Missing required data");
       return res.status(400).json({
+        success: false,
         error: "Missing image data or filename",
       });
     }
 
     // Validate the image data is base64
     if (!imageData.startsWith("data:image/")) {
+      console.log("[UPLOAD IMAGE API] Invalid image data format");
       return res.status(400).json({
+        success: false,
         error: "Invalid image data format",
       });
     }
@@ -86,7 +97,9 @@ export default async function handler(req, res) {
     // Extract base64 data
     const base64Data = imageData.split(",")[1];
     if (!base64Data) {
+      console.log("[UPLOAD IMAGE API] Invalid base64 data");
       return res.status(400).json({
+        success: false,
         error: "Invalid base64 image data",
       });
     }
