@@ -72,6 +72,7 @@ export default async function handler(req, res) {
                 image: 1,
                 tags: 1,
                 excerpt: 1,
+                audioUrl: 1, // Include audioUrl for audio indicators
                 // Only include what we need, heavy fields automatically excluded
               },
             },
