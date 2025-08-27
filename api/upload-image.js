@@ -158,7 +158,14 @@ export default async function handler(req, res) {
       100
     ).toFixed(1);
 
-    return res.status(200).json({
+    console.log("[UPLOAD IMAGE API] Processing completed:", {
+      originalSizeKB: (originalSize / 1024).toFixed(1),
+      finalSizeKB: (finalSize / 1024).toFixed(1),
+      compressionRatio: `${compressionRatio}%`,
+      filename: newFilename
+    });
+
+    const successResponse = {
       success: true,
       imageUrl: finalImageData,
       filename: newFilename,
@@ -167,12 +174,21 @@ export default async function handler(req, res) {
       compressionRatio: `${compressionRatio}%`,
       message: "Image processed and compressed successfully",
       isBase64: true,
-    });
+    };
+
+    console.log("[UPLOAD IMAGE API] ✅ Returning success response");
+    return res.status(200).json(successResponse);
   } catch (error) {
-    console.error("Image upload error:", error);
-    return res.status(500).json({
+    console.error("[UPLOAD IMAGE API] ❌ Error:", error);
+    console.error("[UPLOAD IMAGE API] Error stack:", error.stack);
+
+    const errorResponse = {
+      success: false,
       error: "Failed to process image",
       message: error.message,
-    });
+    };
+
+    console.log("[UPLOAD IMAGE API] Returning error response:", errorResponse);
+    return res.status(500).json(errorResponse);
   }
 }
