@@ -869,7 +869,7 @@ Check console for full details.`);
         alert(`❌ Migration API test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText.substring(0, 200)}`);
       }
     } catch (error) {
-      console.error("��� Error testing migration API:", error);
+      console.error("❌ Error testing migration API:", error);
       console.error("❌ Error type:", typeof error);
       console.error("❌ Error constructor:", error.constructor.name);
       console.error("❌ Error stack:", error.stack);
@@ -1394,6 +1394,13 @@ Check console for full details.`);
                 className="bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
               >
                 🔧 Test Fields
+              </Button>
+              <Button
+                variant="outline"
+                onClick={testSimpleConnectivity}
+                className="bg-cyan-50 hover:bg-cyan-100 border-cyan-200 text-cyan-700"
+              >
+                🔍 Test Basic
               </Button>
               <Button
                 variant="outline"
