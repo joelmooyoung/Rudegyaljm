@@ -205,7 +205,7 @@ export default function StoryMaintenance({
           try {
             const storyIds = validStories.map((story) => story.id).join(",");
             console.log(
-              `�� Fetching bulk stats for ${validStories.length} stories...`,
+              `📊 Fetching bulk stats for ${validStories.length} stories...`,
             );
 
             const statsResponse = await fetch(
@@ -406,7 +406,7 @@ export default function StoryMaintenance({
         }
       } else {
         alert(
-          `��� Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`,
+          `❌ Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`,
         );
       }
     } catch (error) {
@@ -1044,8 +1044,8 @@ Check console for full details.`);
     try {
       console.log("🔍 Testing basic connectivity with minimal endpoint...");
 
-      // Test basic fetch to the simplest possible endpoint
-      const response = await fetch("/api/test-minimal", {
+      // Test basic fetch to the ultra-simple endpoint
+      const response = await fetch("/api/test-simple-response", {
         method: "GET",
         headers: {
           "Accept": "application/json",
