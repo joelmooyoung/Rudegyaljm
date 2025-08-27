@@ -546,9 +546,24 @@ export default function StoryDetail({
       // Handle response properly to avoid body consumption issues
       let result;
       try {
-        const responseText = await response.text();
-        console.log("[IMAGE UPLOAD] Response text length:", responseText.length);
-        console.log("[IMAGE UPLOAD] Response text preview:", responseText.substring(0, 200));
+        // Validate response object integrity before reading
+        if (!response || typeof response.text !== 'function') {
+          throw new Error("Invalid or corrupted response object");
+        }
+
+        if (response.bodyUsed) {
+          throw new Error("Response body already consumed");
+        }
+
+        // Read response with timeout protection
+        const textPromise = response.text();
+        const timeoutPromise = new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error('Response reading timeout')), 10000)
+        );
+
+        const responseText = await Promise.race([textPromise, timeoutPromise]);
+        console.log("[IMAGE UPLOAD] Response text length:", responseText?.length || 0);
+        console.log("[IMAGE UPLOAD] Response text preview:", responseText?.substring(0, 200) || 'Empty');
 
         if (!responseText.trim()) {
           throw new Error("Empty response from server");
