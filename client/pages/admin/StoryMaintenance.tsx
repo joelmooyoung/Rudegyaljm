@@ -683,7 +683,7 @@ export default function StoryMaintenance({
         try {
           // Try to parse as JSON
           const result = JSON.parse(responseText);
-          console.log("📊 Database diagnostic result:", result);
+          console.log("���� Database diagnostic result:", result);
           setDiagnostic(result);
         } catch (parseError) {
           console.error("❌ JSON parsing failed:", parseError);
@@ -892,6 +892,27 @@ Check console for full details.`);
       }
 
       alert(`❌ Migration API test error: ${errorMessage}\n\nTechnical details: ${technicalDetails}\n\nCheck the browser console for full details.`);
+    }
+  };
+
+  // Comprehensive error analysis function
+  const analyzeError = (error: any, context: string): string => {
+    console.log(`🔍 Analyzing error in context: ${context}`);
+    console.log("🔍 Error details:", {
+      type: typeof error,
+      constructor: error?.constructor?.name,
+      isError: error instanceof Error,
+      hasMessage: 'message' in error,
+      hasStack: 'stack' in error,
+      keys: error && typeof error === 'object' ? Object.keys(error) : []
+    });
+
+    if (error instanceof Error) {
+      return `${error.constructor.name}: ${error.message}`;
+    } else if (error && typeof error === 'object') {
+      return `Object error: ${JSON.stringify(error, null, 2)}`;
+    } else {
+      return `Primitive error: ${String(error)}`;
     }
   };
 
