@@ -108,11 +108,17 @@ export default async function handler(req, res) {
     const buffer = Buffer.from(base64Data, "base64");
     const originalSize = buffer.length;
 
+    console.log("[UPLOAD IMAGE API] Image size:", {
+      originalSizeBytes: originalSize,
+      originalSizeKB: (originalSize / 1024).toFixed(1)
+    });
+
     // Validate file size (1.5MB limit for compressed images)
     if (buffer.length > 1.5 * 1024 * 1024) {
+      console.log("[UPLOAD IMAGE API] Image too large:", originalSize);
       return res.status(400).json({
-        error:
-          "Image too large. Please ensure your image is compressed to under 1.5MB.",
+        success: false,
+        error: "Image too large. Please ensure your image is compressed to under 1.5MB.",
       });
     }
 
@@ -120,10 +126,14 @@ export default async function handler(req, res) {
     const mimeMatch = imageData.match(/data:image\/([^;]+)/);
     const mimeType = mimeMatch ? mimeMatch[1] : "jpeg";
 
+    console.log("[UPLOAD IMAGE API] Detected MIME type:", mimeType);
+
     // Validate file type
     const allowedTypes = ["jpeg", "jpg", "png", "gif", "webp"];
     if (!allowedTypes.includes(mimeType.toLowerCase())) {
+      console.log("[UPLOAD IMAGE API] Invalid file type:", mimeType);
       return res.status(400).json({
+        success: false,
         error: "Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.",
       });
     }
