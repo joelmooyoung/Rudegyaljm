@@ -1,29 +1,31 @@
-export default async function handler(req, res) {
-  console.log(`[TEST CONNECTIVITY] ${req.method} /api/test-connectivity`);
-
-  // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+// Simple connectivity test endpoint
+export default function handler(req, res) {
+  console.log("🔍 [TEST CONNECTIVITY] Request received:", {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    timestamp: new Date().toISOString()
+  });
 
   try {
-    return res.status(200).json({
+    // Return simple JSON response
+    const response = {
       success: true,
-      message: "API connectivity working",
-      method: req.method,
+      message: "Connectivity test successful",
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || "unknown",
-    });
+      method: req.method,
+      status: "OK"
+    };
+
+    console.log("🔍 [TEST CONNECTIVITY] Sending response:", response);
+
+    res.status(200).json(response);
   } catch (error) {
-    console.error("[TEST CONNECTIVITY] Error:", error);
-    return res.status(500).json({
+    console.error("🔍 [TEST CONNECTIVITY] Error:", error);
+    res.status(500).json({
       success: false,
-      message: "API connectivity failed",
       error: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 }
