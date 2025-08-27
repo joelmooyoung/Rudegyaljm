@@ -205,7 +205,7 @@ export default function StoryMaintenance({
           try {
             const storyIds = validStories.map((story) => story.id).join(",");
             console.log(
-              `📊 Fetching bulk stats for ${validStories.length} stories...`,
+              `�� Fetching bulk stats for ${validStories.length} stories...`,
             );
 
             const statsResponse = await fetch(
@@ -406,7 +406,7 @@ export default function StoryMaintenance({
         }
       } else {
         alert(
-          `❌ Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`,
+          `��� Direct test failed: ${response.status} ${response.statusText}\n\nResponse: ${responseText}`,
         );
       }
     } catch (error) {
@@ -1086,6 +1086,28 @@ Check console for full details.`);
       }
 
       alert(`❌ Basic connectivity test failed: ${errorMessage}`);
+    }
+  };
+
+  const testSimpleImageUpload = async () => {
+    try {
+      console.log("📷 Running simple image upload test...");
+
+      // Just test if the endpoint responds at all
+      const response = await fetch("/api/test-image-upload", {
+        method: "GET"
+      });
+
+      console.log("📷 Simple test response status:", response.status);
+
+      if (response.ok) {
+        alert(`✅ Simple image upload test passed!\n\nStatus: ${response.status}\nThe upload API endpoint is responding.`);
+      } else {
+        alert(`❌ Simple image upload test failed!\n\nStatus: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("❌ Simple image upload test error:", error);
+      alert(`❌ Simple image upload test failed: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
