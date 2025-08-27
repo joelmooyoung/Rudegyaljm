@@ -907,9 +907,38 @@ Check console for full details.`);
         },
       });
 
-      if (testResponse.ok) {
-        const testResult = await testResponse.json();
-        console.log("📷 Image upload test endpoint result:", testResult);
+      console.log("📷 Test response status:", testResponse.status, testResponse.statusText);
+
+      // Handle first response properly to avoid body consumption issues
+      let testResult;
+      try {
+        const testResponseText = await testResponse.text();
+        console.log("📷 Test response text length:", testResponseText.length);
+        console.log("📷 Test response preview:", testResponseText.substring(0, 200));
+
+        if (!testResponseText.trim()) {
+          throw new Error("Empty response from test endpoint");
+        }
+
+        try {
+          testResult = JSON.parse(testResponseText);
+          console.log("📷 Parsed test result:", testResult);
+        } catch (parseError) {
+          console.error("📷 JSON parse error for test response:", parseError);
+          throw new Error(`Invalid JSON in test response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
+        }
+      } catch (textError) {
+        console.error("📷 Error reading test response text:", textError);
+        throw new Error(`Failed to read test response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
+      }
+
+      if (!testResponse.ok) {
+        const errorMessage = testResult?.error || testResult?.message || `Test endpoint failed: ${testResponse.status} ${testResponse.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      if (testResult.success) {
+        console.log("📷 Test endpoint is working, now testing upload functionality...");
 
         // Now test the actual upload functionality
         const uploadTestResponse = await fetch("/api/test-image-upload", {
@@ -919,33 +948,67 @@ Check console for full details.`);
           },
         });
 
-        if (uploadTestResponse.ok) {
-          const uploadResult = await uploadTestResponse.json();
-          console.log("📷 Image upload functionality test result:", uploadResult);
+        console.log("📷 Upload test response status:", uploadTestResponse.status, uploadTestResponse.statusText);
 
-          if (uploadResult.success) {
-            alert(
-              `✅ Image Upload Test Results:\n\n` +
-              `Endpoint Status: Working\n` +
-              `Upload API Status: ${uploadResult.uploadApiStatus}\n` +
-              `Upload Success: ${uploadResult.uploadApiResponse?.success || 'Unknown'}\n` +
-              `Error (if any): ${uploadResult.uploadApiResponse?.error || 'None'}\n\n` +
-              `The image upload functionality appears to be working correctly.`
-            );
-          } else {
-            alert(`❌ Image upload test failed: ${uploadResult.message}`);
+        // Handle second response properly to avoid body consumption issues
+        let uploadResult;
+        try {
+          const uploadResponseText = await uploadTestResponse.text();
+          console.log("📷 Upload response text length:", uploadResponseText.length);
+          console.log("📷 Upload response preview:", uploadResponseText.substring(0, 200));
+
+          if (!uploadResponseText.trim()) {
+            throw new Error("Empty response from upload test");
           }
+
+          try {
+            uploadResult = JSON.parse(uploadResponseText);
+            console.log("📷 Parsed upload result:", uploadResult);
+          } catch (parseError) {
+            console.error("📷 JSON parse error for upload response:", parseError);
+            throw new Error(`Invalid JSON in upload response: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
+          }
+        } catch (textError) {
+          console.error("📷 Error reading upload response text:", textError);
+          throw new Error(`Failed to read upload response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
+        }
+
+        if (!uploadTestResponse.ok) {
+          const errorMessage = uploadResult?.error || uploadResult?.message || `Upload test failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}`;
+          throw new Error(errorMessage);
+        }
+
+        if (uploadResult.success) {
+          alert(
+            `✅ Image Upload Test Results:\n\n` +
+            `Endpoint Status: Working\n` +
+            `Upload API Status: ${uploadResult.uploadApiStatus || 'Unknown'}\n` +
+            `Upload Success: ${uploadResult.uploadApiResponse?.success || 'Unknown'}\n` +
+            `Error (if any): ${uploadResult.uploadApiResponse?.error || 'None'}\n\n` +
+            `The image upload functionality appears to be working correctly.`
+          );
         } else {
-          const errorText = await uploadTestResponse.text();
-          alert(`❌ Image upload functionality test request failed: ${uploadTestResponse.status} ${uploadTestResponse.statusText}\n\nResponse: ${errorText}`);
+          alert(`❌ Image upload test failed: ${uploadResult.message || 'Unknown upload test error'}`);
         }
       } else {
-        const errorText = await testResponse.text();
-        alert(`❌ Image upload test endpoint failed: ${testResponse.status} ${testResponse.statusText}\n\nResponse: ${errorText}`);
+        alert(`❌ Image upload test endpoint failed: ${testResult.message || 'Unknown test endpoint error'}`);
       }
     } catch (error) {
       console.error("❌ Error testing image upload:", error);
-      alert(`❌ Error testing image upload: ${error instanceof Error ? error.message : "Unknown error"}`);
+      console.error("❌ Error stack:", error instanceof Error ? error.stack : "No stack trace");
+
+      let userMessage = "Error testing image upload.";
+      if (error instanceof Error) {
+        if (error.message.includes("fetch")) {
+          userMessage += " Network error - please check your connection.";
+        } else if (error.message.includes("JSON") || error.message.includes("parse")) {
+          userMessage += " Server response error - check console for details.";
+        } else {
+          userMessage += ` ${error.message}`;
+        }
+      }
+
+      alert(`❌ ${userMessage}`);
     }
   };
 
