@@ -492,12 +492,40 @@ export default function StoryDetail({
       return;
     }
 
+    console.log("[IMAGE UPLOAD] Starting upload for:", {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      sizeKB: (file.size / 1024).toFixed(1)
+    });
+
     setIsUploadingImage(true);
     setImageFile(file);
 
     try {
-      // Compress image before upload
-      const compressedImageData = await compressImage(file, 600, 0.6);
+      // Validate file size before compression
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        throw new Error("Image file is too large (>10MB). Please choose a smaller image.");
+      }
+
+      console.log("[IMAGE UPLOAD] Compressing image...");
+
+      // Compress image before upload with error handling
+      let compressedImageData;
+      try {
+        compressedImageData = await compressImage(file, 600, 0.6);
+        console.log("[IMAGE UPLOAD] Image compressed successfully");
+      } catch (compressionError) {
+        console.error("[IMAGE UPLOAD] Compression failed:", compressionError);
+        throw new Error(`Image compression failed: ${compressionError instanceof Error ? compressionError.message : 'Unknown compression error'}`);
+      }
+
+      // Validate compressed data
+      if (!compressedImageData || !compressedImageData.startsWith("data:image/")) {
+        throw new Error("Invalid compressed image data generated");
+      }
+
+      console.log("[IMAGE UPLOAD] Sending to API...");
 
       // Upload compressed image to API
       const response = await fetch("/api/upload-image.js", {
@@ -513,11 +541,14 @@ export default function StoryDetail({
         }),
       });
 
+      console.log("[IMAGE UPLOAD] API response status:", response.status, response.statusText);
+
       // Handle response properly to avoid body consumption issues
       let result;
       try {
         const responseText = await response.text();
-        console.log("[IMAGE UPLOAD] Response text:", responseText.substring(0, 200));
+        console.log("[IMAGE UPLOAD] Response text length:", responseText.length);
+        console.log("[IMAGE UPLOAD] Response text preview:", responseText.substring(0, 200));
 
         if (!responseText.trim()) {
           throw new Error("Empty response from server");
@@ -525,31 +556,41 @@ export default function StoryDetail({
 
         try {
           result = JSON.parse(responseText);
+          console.log("[IMAGE UPLOAD] Parsed response:", {
+            success: result.success,
+            hasImageUrl: !!result.imageUrl,
+            error: result.error,
+            message: result.message
+          });
         } catch (parseError) {
           console.error("[IMAGE UPLOAD] JSON parse error:", parseError);
-          throw new Error(`Invalid response format: ${responseText.substring(0, 100)}`);
+          console.error("[IMAGE UPLOAD] Raw response that failed to parse:", responseText);
+          throw new Error(`Server returned invalid JSON: ${parseError instanceof Error ? parseError.message : 'Parse error'}`);
         }
       } catch (textError) {
-        console.error("[IMAGE UPLOAD] Response text error:", textError);
-        throw new Error(`Failed to read response: ${textError.message}`);
+        console.error("[IMAGE UPLOAD] Response text reading error:", textError);
+        throw new Error(`Failed to read server response: ${textError instanceof Error ? textError.message : 'Text read error'}`);
       }
 
       if (!response.ok) {
         const errorMessage = result?.error || result?.message || `Upload failed: ${response.status} ${response.statusText}`;
+        console.error("[IMAGE UPLOAD] Server error:", errorMessage);
         throw new Error(errorMessage);
       }
 
       if (result.success) {
+        if (!result.imageUrl) {
+          throw new Error("Server did not return an image URL");
+        }
+
+        console.log("[IMAGE UPLOAD] ✅ Upload successful");
+
         const imageUrl = result.imageUrl;
         setImagePreview(imageUrl);
         handleInputChange("image", imageUrl);
 
         // Show compression info if available
-        if (
-          result.compressionRatio &&
-          result.originalSize &&
-          result.compressedSize
-        ) {
+        if (result.compressionRatio && result.originalSize && result.compressedSize) {
           console.log(
             `Image uploaded and compressed successfully:\n` +
               `Original: ${(result.originalSize / 1024).toFixed(1)}KB\n` +
@@ -560,13 +601,28 @@ export default function StoryDetail({
           console.log(`Image uploaded successfully`);
         }
       } else {
-        throw new Error(result.message || "Upload failed");
+        const errorMessage = result.message || result.error || "Upload failed - unknown server error";
+        console.error("[IMAGE UPLOAD] Server reported failure:", errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error("Failed to upload image:", error);
-      alert(
-        `Failed to upload image: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
+      console.error("[IMAGE UPLOAD] ❌ Upload failed:", error);
+      console.error("[IMAGE UPLOAD] Error stack:", error instanceof Error ? error.stack : "No stack trace");
+
+      let userMessage = "Failed to upload image.";
+      if (error instanceof Error) {
+        if (error.message.includes("fetch")) {
+          userMessage += " Network error - please check your connection.";
+        } else if (error.message.includes("JSON") || error.message.includes("parse")) {
+          userMessage += " Server response error - please try again.";
+        } else if (error.message.includes("too large")) {
+          userMessage += " File too large - please choose a smaller image.";
+        } else {
+          userMessage += ` ${error.message}`;
+        }
+      }
+
+      alert(userMessage);
     } finally {
       setIsUploadingImage(false);
     }
@@ -705,7 +761,7 @@ export default function StoryDetail({
         );
       }
     } catch (error) {
-      console.error("[ADMIN AUDIO] ❌ Upload error:", error);
+      console.error("[ADMIN AUDIO] ��� Upload error:", error);
       alert(
         `Failed to upload audio: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
