@@ -1505,10 +1505,17 @@ Check console for full details.`);
               </Button>
               <Button
                 variant="outline"
+                onClick={testSimpleImageUpload}
+                className="bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-700"
+              >
+                📷 Simple Test
+              </Button>
+              <Button
+                variant="outline"
                 onClick={testImageUpload}
                 className="bg-pink-50 hover:bg-pink-100 border-pink-200 text-pink-700"
               >
-                📷 Test Image
+                📷 Full Test
               </Button>
               <Button onClick={() => onEditStory(null, "add")}>
                 <Plus className="h-4 w-4 mr-2" />
