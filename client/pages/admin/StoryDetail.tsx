@@ -1574,6 +1574,33 @@ export default function StoryDetail({
                 </div>
               </div>
 
+              {/* Test Stats Button - for development/debugging */}
+              {mode === "add" && (
+                <div className="mt-6 pt-4 border-t border-dashed border-yellow-300 bg-yellow-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-medium text-yellow-800">🧪 Stats Testing</h4>
+                      <p className="text-xs text-yellow-700">Test if stats are saved correctly when creating new stories</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Fill in test stats
+                        handleInputChange("viewCount", 150);
+                        handleInputChange("rating", 4.2);
+                        handleInputChange("ratingCount", 25);
+                        handleInputChange("commentCount", 8);
+                        handleInputChange("likeCount", 42);
+                        alert("Test stats filled in! Now save the story and check if stats are preserved.");
+                      }}
+                      className="text-xs px-3 py-1 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 rounded border border-yellow-400"
+                    >
+                      Fill Test Stats
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Publishing Status */}
               <div className="mt-6 pt-6 border-t">
                 <div className="flex items-center space-x-2">
