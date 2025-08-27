@@ -1039,6 +1039,23 @@ export default function StoryDetail({
                           PNG, JPG, GIF, WebP - Images will be compressed
                         </span>
                       </label>
+
+                      {/* Debug test button */}
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch("/api/test-image-upload-simple");
+                            const result = await response.json();
+                            alert(`Test Result: ${result.success ? "✅ Working" : "❌ Failed"}\n\nMessage: ${result.message}`);
+                          } catch (error) {
+                            alert(`Test Failed: ${error.message}`);
+                          }
+                        }}
+                        className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                      >
+                        🔧 Test Upload API
+                      </button>
                     </div>
                   </div>
 
