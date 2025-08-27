@@ -683,7 +683,7 @@ export default function StoryMaintenance({
         try {
           // Try to parse as JSON
           const result = JSON.parse(responseText);
-          console.log("���� Database diagnostic result:", result);
+          console.log("📊 Database diagnostic result:", result);
           setDiagnostic(result);
         } catch (parseError) {
           console.error("❌ JSON parsing failed:", parseError);
@@ -1162,7 +1162,7 @@ Check console for full details.`);
       }
 
       if (testResult.data?.success) {
-        console.log("📷 Test endpoint is working, now testing upload functionality...");
+        console.log("��� Test endpoint is working, now testing upload functionality...");
 
         // Now test the actual upload functionality
         let uploadTestResponse;
@@ -1206,16 +1206,13 @@ Check console for full details.`);
       }
     } catch (error) {
       console.error("❌ Error testing image upload:", error);
-      console.error("❌ Error type:", typeof error);
-      console.error("❌ Error constructor:", error?.constructor?.name);
-      console.error("❌ Error stack:", error instanceof Error ? error.stack : "No stack trace");
+
+      const errorAnalysis = analyzeError(error, "testImageUpload");
+      console.error("❌ Error analysis:", errorAnalysis);
 
       let userMessage = "Error testing image upload.";
-      let technicalDetails = "";
 
       if (error instanceof Error) {
-        technicalDetails = `Type: ${error.constructor.name}, Message: ${error.message}`;
-
         if (error.message.includes("Network error") || error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
           userMessage += " Network connection issue - please check your internet connection.";
         } else if (error.message.includes("timeout")) {
@@ -1233,15 +1230,11 @@ Check console for full details.`);
         } else {
           userMessage += " Unknown error occurred (check console for details).";
         }
-      } else if (error && typeof error === 'object') {
-        technicalDetails = `Non-Error object: ${JSON.stringify(error).substring(0, 100)}`;
-        userMessage += " Unexpected error type - check console for details.";
       } else {
-        technicalDetails = `Primitive error: ${String(error)}`;
-        userMessage += " Unexpected error format - check console for details.";
+        userMessage += " Unexpected error type - check console for details.";
       }
 
-      alert(`❌ ${userMessage}\n\nTechnical: ${technicalDetails}`);
+      alert(`❌ ${userMessage}\n\nTechnical: ${errorAnalysis}`);
     }
   };
 
