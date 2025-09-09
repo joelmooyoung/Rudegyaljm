@@ -2008,6 +2008,22 @@ export function createServer() {
     }
   });
 
+  // Find user by email/username
+  app.post("/api/admin/find-user", async (req, res) => {
+    console.log(`[SERVER] Admin find user request`);
+    try {
+      const { default: handler } = await import("../api/admin/find-user.js");
+      return handler(req, res);
+    } catch (error) {
+      console.error(`[SERVER] Failed to import find-user handler:`, error);
+      return res.status(500).json({
+        success: false,
+        message: "Find user handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   app.post("/api/admin/remove-hardcoded-auth", async (req, res) => {
     console.log(`[SERVER] Remove hardcoded auth request`);
     try {
@@ -2306,7 +2322,7 @@ export function createServer() {
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.error("🚀 [FORCE CREATE ADMIN] ❌ Error:", error);
+      console.error("���� [FORCE CREATE ADMIN] ❌ Error:", error);
       return res.status(500).json({
         success: false,
         message: "Failed to force-create admin users",
