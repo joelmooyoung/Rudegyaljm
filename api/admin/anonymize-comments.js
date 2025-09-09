@@ -8,7 +8,9 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
   }
 
   try {
@@ -39,10 +41,15 @@ export default async function handler(req, res) {
       message: `Anonymized ${result.modifiedCount} comment(s)`,
       modified: result.modifiedCount,
       matched: result.matchedCount,
-      options: { beforeDate: beforeDate || null, alsoAnonymizeUserId: !!alsoAnonymizeUserId },
+      options: {
+        beforeDate: beforeDate || null,
+        alsoAnonymizeUserId: !!alsoAnonymizeUserId,
+      },
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message || "Internal error" });
+    return res
+      .status(500)
+      .json({ success: false, message: err.message || "Internal error" });
   }
 }
