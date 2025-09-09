@@ -24,33 +24,56 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, username, newPassword } = req.body;
+    const { email, username, newPassword, userId } = req.body || {};
 
-    if ((!email && !username) || !newPassword) {
+    if ((!email && !username && !userId) || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: "Email or username and newPassword are required",
+        message: "Provide userId or email or username, and newPassword",
       });
     }
 
+    const norm = (s) =>
+      typeof s === "string" ? s.trim().toLowerCase() : undefined;
+    const emailN = norm(email);
+    const usernameN = norm(username);
+    const userIdN = typeof userId === "string" ? userId.trim() : undefined;
+
     console.log(`[FORCE UPDATE PASSWORD] Updating password for:`, {
-      email,
-      username,
+      email: emailN,
+      username: usernameN,
+      userId: userIdN,
     });
 
     // Connect to database
     await connectToDatabase();
     console.log("[FORCE UPDATE PASSWORD] Database connected");
 
-    // Find user by email or username
+    // Find user by strongest identifier first
     let user = null;
-    if (email) {
-      user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    if (userIdN) {
+      user = await User.findOne({ userId: userIdN });
     }
-    if (!user && username) {
-      user = await User.findOne({
-        username: String(username).toLowerCase().trim(),
-      });
+    if (!user && emailN) {
+      user = await User.findOne({ email: emailN });
+    }
+    if (!user && usernameN) {
+      user = await User.findOne({ username: usernameN });
+    }
+
+    // Fallback: tolerate stray whitespace/casing stored in DB
+    if (!user && (emailN || usernameN)) {
+      const escape = (v) => v.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+      const ors = [];
+      if (emailN) {
+        ors.push({ email: new RegExp(`^${escape(emailN)}\\s*$`, "i") });
+      }
+      if (usernameN) {
+        ors.push({ username: new RegExp(`^${escape(usernameN)}\\s*$`, "i") });
+      }
+      if (ors.length) {
+        user = await User.findOne({ $or: ors });
+      }
     }
 
     if (!user) {
@@ -60,13 +83,23 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[FORCE UPDATE PASSWORD] Found user: ${user.email}`);
+    console.log(`[FORCE UPDATE PASSWORD] Found user:`, {
+      userId: user.userId,
+      email: user.email,
+      username: user.username,
+    });
 
     // Hash new password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    // Update user password and clear any reset tokens
+    // Normalize stored identifiers to prevent future mismatches
+    const safeEmail = typeof user.email === "string" ? user.email.trim().toLowerCase() : user.email;
+    const safeUsername = typeof user.username === "string" ? user.username.trim().toLowerCase() : user.username;
+
+    // Update user password, clear tokens, and normalize fields
+    user.email = safeEmail;
+    user.username = safeUsername;
     user.password = hashedPassword;
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
@@ -83,6 +116,7 @@ export default async function handler(req, res) {
       success: true,
       message: "Password updated successfully in database",
       user: {
+        id: user.userId,
         email: user.email,
         username: user.username,
         type: user.type,
