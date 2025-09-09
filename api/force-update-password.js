@@ -24,23 +24,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, newPassword } = req.body;
+    const { email, username, newPassword } = req.body;
 
-    if (!email || !newPassword) {
+    if ((!email && !username) || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: "Email and new password are required",
+        message: "Email or username and newPassword are required",
       });
     }
 
-    console.log(`[FORCE UPDATE PASSWORD] Updating password for: ${email}`);
+    console.log(`[FORCE UPDATE PASSWORD] Updating password for:`, { email, username });
 
     // Connect to database
     await connectToDatabase();
     console.log("[FORCE UPDATE PASSWORD] Database connected");
 
-    // Find user by email
-    const user = await User.findOne({ email: email.toLowerCase() });
+    // Find user by email or username
+    let user = null;
+    if (email) {
+      user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    }
+    if (!user && username) {
+      user = await User.findOne({ username: String(username).toLowerCase().trim() });
+    }
 
     if (!user) {
       return res.status(404).json({
