@@ -63,7 +63,10 @@ export default async function handler(req, res) {
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
+      $or: [
+        { email: email.toLowerCase() },
+        { username: username.toLowerCase() },
+      ],
     });
 
     if (existingUser) {
@@ -82,8 +85,8 @@ export default async function handler(req, res) {
     const userId = Date.now().toString();
     const newUser = new User({
       userId,
-      username,
-      email,
+      username: username.toLowerCase(),
+      email: email.toLowerCase(),
       password: hashedPassword,
       type: role, // Map role to type for database
       country: "Unknown",
