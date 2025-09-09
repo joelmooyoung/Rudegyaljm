@@ -127,8 +127,6 @@ const userStoryReadSchema = new mongoose.Schema(
 // Indexes for better performance and statistics queries
 
 // === USER SCHEMA INDEXES ===
-userSchema.index({ email: 1 });
-userSchema.index({ userId: 1 });
 // Statistics optimized indexes
 userSchema.index({ createdAt: -1 }); // For user registration analytics
 userSchema.index({ active: 1, createdAt: -1 }); // For active user registration counts
@@ -137,7 +135,6 @@ userSchema.index({ country: 1, active: 1 }); // For country-based user analytics
 userSchema.index({ active: 1 }); // For active user counts
 
 // === STORY SCHEMA INDEXES ===
-storySchema.index({ storyId: 1 });
 storySchema.index({ published: 1 });
 storySchema.index({ category: 1 });
 // Statistics optimized indexes
