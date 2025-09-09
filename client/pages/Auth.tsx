@@ -404,36 +404,7 @@ export default function Auth({
                     </div>
                   )}
 
-                  {/* Debug: Test error display functionality */}
-                  <div className="text-center space-y-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        console.log("🔧 Test button clicked!");
-                        setError("🔧 Debug: Error display is working!");
-                      }}
-                      className="text-xs mb-2"
-                    >
-                      Test Error Display
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        console.log("🔧 Login test button clicked!");
-                        console.log("🔧 Current login data:", loginData);
-                        alert(
-                          "JavaScript is working! Check console for login data.",
-                        );
-                      }}
-                      className="text-xs mb-2"
-                    >
-                      Test JavaScript
-                    </Button>
-                  </div>
+                  {/* Debug controls removed for production */}
 
                   <Button
                     type="submit"
