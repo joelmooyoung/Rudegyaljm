@@ -15,7 +15,8 @@ export default async function handler(req, res) {
 
     await connectToDatabase();
 
-    const norm = (s) => (typeof s === "string" ? s.trim().toLowerCase() : undefined);
+    const norm = (s) =>
+      typeof s === "string" ? s.trim().toLowerCase() : undefined;
     const emailL = norm(email);
     const usernameL = norm(username);
     const qL = norm(q);
@@ -33,7 +34,8 @@ export default async function handler(req, res) {
     // Fallback to fuzzy search if not found
     let matches = [];
     if (!user && (emailL || usernameL || qL)) {
-      const regex = (val) => new RegExp(val.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "i");
+      const regex = (val) =>
+        new RegExp(val.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "i");
       const ors = [];
       if (emailL) {
         ors.push({ email: regex(emailL) });
@@ -45,14 +47,18 @@ export default async function handler(req, res) {
         ors.push({ email: regex(qL) }, { username: regex(qL) });
       }
       if (ors.length > 0) {
-        matches = await User.find({ $or: ors }).limit(10).select(
-          "userId email username type active createdAt lastLogin loginCount",
-        );
+        matches = await User.find({ $or: ors })
+          .limit(10)
+          .select(
+            "userId email username type active createdAt lastLogin loginCount",
+          );
       }
     }
 
     if (!user && matches.length === 0) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     if (user) {
@@ -88,6 +94,8 @@ export default async function handler(req, res) {
       })),
     });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message || "Internal error" });
+    return res
+      .status(500)
+      .json({ success: false, message: err.message || "Internal error" });
   }
 }

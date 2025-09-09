@@ -94,8 +94,14 @@ export default async function handler(req, res) {
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
     // Normalize stored identifiers to prevent future mismatches
-    const safeEmail = typeof user.email === "string" ? user.email.trim().toLowerCase() : user.email;
-    const safeUsername = typeof user.username === "string" ? user.username.trim().toLowerCase() : user.username;
+    const safeEmail =
+      typeof user.email === "string"
+        ? user.email.trim().toLowerCase()
+        : user.email;
+    const safeUsername =
+      typeof user.username === "string"
+        ? user.username.trim().toLowerCase()
+        : user.username;
 
     // Update user password, clear tokens, and normalize fields
     user.email = safeEmail;
