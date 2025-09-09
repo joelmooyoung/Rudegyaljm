@@ -2010,6 +2010,27 @@ export function createServer() {
     }
   });
 
+  // Anonymize existing comments (admin)
+  app.post("/api/admin/anonymize-comments", async (req, res) => {
+    console.log(`[SERVER] Admin anonymize comments request`);
+    try {
+      const { default: handler } = await import(
+        "../api/admin/anonymize-comments.js"
+      );
+      return handler(req, res);
+    } catch (error) {
+      console.error(
+        `[SERVER] Failed to import anonymize-comments handler:`,
+        error,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Anonymize comments handler not available",
+        error: error.message,
+      });
+    }
+  });
+
   // Find user by email/username
   app.post("/api/admin/find-user", async (req, res) => {
     console.log(`[SERVER] Admin find user request`);
