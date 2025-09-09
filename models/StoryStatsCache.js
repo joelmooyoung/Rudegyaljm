@@ -50,7 +50,6 @@ const StoryStatsCacheSchema = new mongoose.Schema({
 });
 
 // Index for efficient queries
-StoryStatsCacheSchema.index({ storyId: 1 });
 StoryStatsCacheSchema.index({ lastCalculated: -1 });
 
 export default mongoose.models.StoryStatsCache || 
