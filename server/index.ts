@@ -1411,10 +1411,7 @@ export function createServer() {
       const { default: handler } = await import("../api/test-migration.js");
       return handler(req, res);
     } catch (error) {
-      console.error(
-        `[SERVER] Failed to import test-migration handler:`,
-        error,
-      );
+      console.error(`[SERVER] Failed to import test-migration handler:`, error);
       return res.status(500).json({
         success: false,
         message: "Migration test handler not available",
@@ -1427,7 +1424,9 @@ export function createServer() {
   app.post("/api/migrate-story-stats", async (req, res) => {
     console.log(`[SERVER] Story stats migration request`);
     try {
-      const { default: handler } = await import("../api/migrate-story-stats.js");
+      const { default: handler } = await import(
+        "../api/migrate-story-stats.js"
+      );
       return handler(req, res);
     } catch (error) {
       console.error(
@@ -1447,7 +1446,7 @@ export function createServer() {
     console.log(`[SERVER] Catch-all API request: ${req.method} ${req.path}`);
 
     // Extract the path after /api/
-    const apiPath = req.path.replace(/^\/api\//, '');
+    const apiPath = req.path.replace(/^\/api\//, "");
 
     try {
       // Try to import the corresponding API file
@@ -1455,7 +1454,10 @@ export function createServer() {
       console.log(`[SERVER] Successfully imported handler for ${apiPath}`);
       return handler(req, res);
     } catch (error) {
-      console.error(`[SERVER] No handler found for ${req.path}:`, error.message);
+      console.error(
+        `[SERVER] No handler found for ${req.path}:`,
+        error.message,
+      );
       return res.status(404).json({
         success: false,
         message: `API endpoint not found: ${req.path}`,
@@ -1465,8 +1467,8 @@ export function createServer() {
           "/api/comments",
           "/api/test-basic",
           "/api/test-migration",
-          "/api/migrate-story-stats"
-        ]
+          "/api/migrate-story-stats",
+        ],
       });
     }
   });

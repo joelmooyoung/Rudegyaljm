@@ -33,7 +33,10 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[FORCE UPDATE PASSWORD] Updating password for:`, { email, username });
+    console.log(`[FORCE UPDATE PASSWORD] Updating password for:`, {
+      email,
+      username,
+    });
 
     // Connect to database
     await connectToDatabase();
@@ -45,7 +48,9 @@ export default async function handler(req, res) {
       user = await User.findOne({ email: String(email).toLowerCase().trim() });
     }
     if (!user && username) {
-      user = await User.findOne({ username: String(username).toLowerCase().trim() });
+      user = await User.findOne({
+        username: String(username).toLowerCase().trim(),
+      });
     }
 
     if (!user) {
