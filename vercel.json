@@ -1,5 +1,9 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/spa",
-  "framework": null
+  "framework": null,
+  "functions": {
+    "api/**/*.js": { "runtime": "nodejs22.x" },
+    "pages/api/**/*.js": { "runtime": "nodejs22.x" }
+  }
 }
